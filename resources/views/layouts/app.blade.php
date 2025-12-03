@@ -3,96 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title') - Aplikasi Buku Induk</title>
+    <title>@yield('title')</title>
 
-    <!-- Bootstrap 5 CSS -->
+    <!-- BOOTSTRAP -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome untuk Ikon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Custom CSS (opsional, jika Anda ingin menambahkan style sendiri) -->
+
     <style>
-        .sidebar .list-group-item.active {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
+        .sidebar {
+            min-height: 100vh;
+            background-color: #EBF0FF;
+        }
+
+        .sidebar .nav-link {
+            border-radius: 8px;
+            margin-bottom: 5px;
+            padding: 10px 15px;
+            color: #333;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: #d7e0ff;
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #2F53FF !important;
+            color: #fff !important;
+        }
+
+        .content-wrapper {
+            background: #f8f9fa;
+            padding: 30px;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container-fluid">
-        <div class="row">
-            <!-- SIDEBAR -->
-            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
-                <div class="position-sticky pt-3">
-                    <div class="text-center mb-4">
-                        <h4>{{ Auth::user()->name }}</h4>
-                        <small class="text-muted">Role: {{ ucfirst(Auth::user()->role) }}</small>
-                    </div>
+<div class="container-fluid">
+    <div class="row">
 
-                    <div class="list-group list-group-flush">
-                        
-                        {{-- ========================
-                             ROLE: SISWA
-                        ========================= --}}
-                        @if(Auth::user()->role == 'siswa')
-                            <a href="{{ route('siswa.dashboard') }}" class="list-group-item list-group-item-action">
-                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
-                            </a>
-                            <a href="{{ route('siswa.dataDiri') }}" class="list-group-item list-group-item-action">
-                                <i class="fas fa-user me-2"></i> Data Diri
-                            </a>
-                            <a href="{{ route('siswa.raport') }}" class="list-group-item list-group-item-action">
-                                <i class="fas fa-file-alt me-2"></i> Lihat Raport
-                            </a>
-                            <a href="{{ route('siswa.catatan') }}" class="list-group-item list-group-item-action">
-                                <i class="fas fa-sticky-note me-2"></i> Catatan Wali Kelas
-                            </a>
-                        @endif
+        <!-- =============== SIDEBAR =============== -->
+        <nav class="col-md-3 col-lg-2 sidebar d-flex flex-column p-3">
 
-                        {{-- ========================
-                             ROLE: WALI KELAS
-                        ========================= --}}
-                        @if(Auth::user()->role == 'walikelas')
-                            <a href="{{ route('walikelas.dashboard') }}" class="list-group-item list-group-item-action">
-                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
-                            </a>
-                           <a href="{{ route('walikelas.siswa.index') }}" class="list-group-item list-group-item-action">
-    <i class="fas fa-users me-2"></i> Data Siswa
-</a>
+            <!-- PROFILE -->
+            <div class="text-center mb-4">
+                <img src="https://ui-avatars.com/api/?name={{ Auth::user()->name }}"
+                     class="rounded-circle mb-2" width="70" height="70">
 
-                            <a href="#" class="list-group-item list-group-item-action">
-                                <i class="fas fa-clipboard-check me-2"></i> Penilaian
-                            </a>
-                            <a href="#" class="list-group-item list-group-item-action">
-                                <i class="fas fa-comment-dots me-2"></i> Catatan Siswa
-                            </a>
-                        @endif
+                <h5 class="mb-0">{{ Auth::user()->name }}</h5>
+                <small class="text-muted">{{ ucfirst(Auth::user()->role) }}</small>
+            </div>
 
-                        {{-- ... Tambahkan role lainnya di sini dengan pola yang sama ... --}}
-                        
-                    </div>
+            <!-- MENU -->
+            <ul class="nav flex-column mb-auto">
 
-                    <hr>
+                @if(Auth::user()->role === 'kaprog')
 
-                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-danger btn-sm w-100">
-                            <i class="fas fa-sign-out-alt me-1"></i> Logout
-                        </button>
-                    </form>
-                </div>
-            </nav>
+                    <li class="nav-item">
+                        <a href="{{ route('kaprog.dashboard') }}"
+                           class="nav-link {{ request()->routeIs('kaprog.dashboard') ? 'active' : '' }}">
+                            <i class="fa-solid fa-gauge me-2"></i> Dashboard
+                        </a>
+                    </li>
 
-            <!-- MAIN CONTENT -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                @yield('content')
-            </main>
-        </div>
+                    <li class="nav-item">
+                        <a href="{{ route('kaprog.raport.siswa') }}"
+                           class="nav-link {{ request()->routeIs('kaprog.raport.siswa') ? 'active' : '' }}">
+                            <i class="fa-solid fa-file-lines me-2"></i> View raport
+                        </a>
+                    </li>
+
+                @endif
+
+            </ul>
+
+            <!-- LOGOUT -->
+            <form action="{{ route('logout') }}" method="POST" class="mt-auto">
+                @csrf
+                <button type="submit" class="btn btn-danger w-100">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                </button>
+            </form>
+
+        </nav>
+
+        <!-- =============== MAIN CONTENT =============== -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 content-wrapper">
+            @yield('content')
+        </main>
+
     </div>
+</div>
 
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

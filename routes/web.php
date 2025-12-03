@@ -105,9 +105,16 @@ Route::middleware('web')->group(function () {
         | ROUTE KAPROG
         |--------------------------------------------------------------------------
         */
-        Route::prefix('kaprog')->name('kaprog.')->group(function () {
-            Route::get('/dashboard', fn() => view('kaprog.dashboard'))->name('dashboard');
-        });
+       Route::prefix('kaprog')->name('kaprog.')->group(function () {
+
+    // Dashboard
+    Route::get('/dashboard', fn() => view('kaprog.dashboard'))->name('dashboard');
+
+    // Raport siswa
+    Route::get('/raport-siswa', fn() => view('kaprog.raport'))->name('raport.siswa');
+
+});
+
 
         /*
         |--------------------------------------------------------------------------
