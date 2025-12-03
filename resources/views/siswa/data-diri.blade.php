@@ -95,7 +95,7 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label fw-semibold">Sekolah Asal</label>
+                                <label class="form-label fw-semibold">Asal sekolah</label>
                                 <p class="form-control-plaintext">{{ $siswa->sekolah_asal }}</p>
                             </div>
 
