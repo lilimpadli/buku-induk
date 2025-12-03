@@ -3,84 +3,114 @@
 @section('title', 'Input Nilai Raport')
 
 @section('content')
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-            <h3>Input nilai raport: {{ $siswa->nama_lengkap }}</h3>
-            <p>Kelas: {{ $siswa->kelas }} | Tahun Ajaran: {{ date('Y') }}/{{ date('Y')+1 }}</p>
-        </div>
-        <div>
-            <img src="https://ui-avatars.com/api/?name={{ urlencode($siswa->nama_lengkap) }}&size=40&background=0D8ABC&color=fff" 
-                 class="rounded-circle" alt="Avatar">
-        </div>
-    </div>
+<div class="container mt-4 mb-4">
 
-    <div class="card shadow">
-        <div class="card-body">
-            <form method="POST" action="{{ route('walikelas.input_nilai_raport.store', $siswa->id) }}">
-                @csrf
+    <!-- HEADER SISWA -->
+    <div class="card shadow mb-4">
+        <div class="card-body p-4">
+            <table class="table table-borderless mb-0">
+                <tr>
+                    <th width="35%">Nama Peserta Didik</th>
+                    <td>: {{ $siswa->nama_lengkap }}</td>
+                </tr>
+                <tr>
+                    <th>Nomor Induk / NISN</th>
+                    <td>: {{ $siswa->nis }} / {{ $siswa->nisn }}</td>
+                </tr>
+                <tr>
+                    <th>Sekolah</th>
+                    <td>: SMK NEGERI 1 KAWALI</td>
+                </tr>
+                <tr>
+                    <th>Alamat</th>
+                    <td>: JL. TALAGASARI NO. 35</td>
+                </tr>
+                <tr>
+                    <th>Kelas</th>
+                    <td>: {{ $siswa->kelas }}</td>
+                </tr>
 
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Semester</label>
-                        <select name="semester" class="form-select" required>
+                <!-- FORM SEMESTER & TAHUN AJARAN -->
+                <tr>
+                    <th>Semester</th>
+                    <td>
+                        <select name="semester" form="formNilai" class="form-control" required>
                             <option value="">-- Pilih Semester --</option>
                             <option value="Ganjil">Ganjil</option>
                             <option value="Genap">Genap</option>
                         </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Tahun Ajaran</label>
-                        <input type="text" name="tahun_ajaran" class="form-control" 
-                               value="{{ date('Y') }}/{{ date('Y')+1 }}" required>
-                    </div>
-                </div>
+                    </td>
+                </tr>
 
-                <h5 class="mb-3 fw-semibold">Formulir Input Nilai Raport</h5>
+                <tr>
+                    <th>Tahun Ajaran</th>
+                    <td>
+                        <input type="text" name="tahun_ajaran" form="formNilai"
+                               class="form-control" placeholder="2024/2025" required>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- FORM INPUT NILAI -->
+    <form id="formNilai" action="{{ route('walikelas.input_nilai_raport.store', $siswa->id) }}" method="POST">
+        @csrf
+
+        <div class="card shadow">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold mb-3">A. NILAI AKADEMIK</h5>
+
+                <p class="fw-semibold mb-1">A. Kelompok Mata Pelajaran Umum</p>
 
                 <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Mata Pelajaran</th>
-                                <th>KKM</th>
-                                <th>Nilai Akhir</th>
-                                <th>Predikat</th>
-                                <th>Deskripsi</th>
+                    <table class="table table-bordered table-sm align-middle">
+
+                        <thead class="table-light text-center align-middle">
+                            <tr style="font-weight: bold;">
+                                <th style="width: 40px;">No</th>
+                                <th style="width: 220px;">Mata Pelajaran</th>
+                                <th style="width: 80px;">Nilai Akhir</th>
+                                <th>Capaian Kompetensi</th>
                             </tr>
                         </thead>
+
                         <tbody>
-                            @foreach ($mataPelajaran as $mapel)
+                            @foreach ($mataPelajaran as $index => $mapel)
                                 <tr>
+                                    <td class="text-center fw-bold">{{ $index + 1 }}</td>
+
                                     <td>
-                                        <input type="hidden" name="nilai[{{ $loop->index }}][mata_pelajaran_id]" value="{{ $mapel->id }}">
+                                        <input type="hidden" name="nilai[{{ $index }}][mata_pelajaran]" value="{{ $mapel->nama }}">
                                         {{ $mapel->nama }}
                                     </td>
-                                    <td>{{ $mapel->kkm }}</td>
+
                                     <td>
-                                        <input type="number" name="nilai[{{ $loop->index }}][nilai_akhir]" 
-                                               class="form-control" min="0" max="100" required>
+                                        <input type="number" name="nilai[{{ $index }}][nilai_pengetahuan]"
+                                               class="form-control text-center"
+                                               min="0" max="100" required>
                                     </td>
+
                                     <td>
-                                        <input type="text" name="nilai[{{ $loop->index }}][predikat]" 
-                                               class="form-control" required>
-                                    </td>
-                                    <td>
-                                        <textarea name="nilai[{{ $loop->index }}][deskripsi]" 
-                                                  class="form-control" rows="1" required></textarea>
+                                        <textarea name="nilai[{{ $index }}][deskripsi_pengetahuan]"
+                                                  class="form-control" rows="2" required></textarea>
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
+
                     </table>
                 </div>
 
-                <div class="d-flex justify-content-end mt-4">
-                    <a href="{{ route('walikelas.input_nilai_raport.index') }}" class="btn btn-secondary me-2">Batal</a>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
+                <div class="text-end mt-3">
+                    <button class="btn btn-primary">Simpan Nilai Raport</button>
                 </div>
-            </form>
+
+            </div>
         </div>
-    </div>
+
+    </form>
+
 </div>
 @endsection

@@ -20,50 +20,46 @@ class InputNilaiRaportController extends Controller
     {
         $siswa = Siswa::findOrFail($siswa_id);
         $mataPelajaran = MataPelajaran::all();
-        
+
         return view('walikelas.input_nilai_raport.create', compact('siswa', 'mataPelajaran'));
     }
 
-    public function store(Request $request, $siswa_id)
-    {
-        $request->validate([
-            'semester' => 'required|string',
-            'tahun_ajaran' => 'required|string',
-            'nilai' => 'required|array',
-            'nilai.*.mata_pelajaran_id' => 'required|exists:mata_pelajarans,id',
-            'nilai.*.nilai_akhir' => 'required|integer|min:0|max:100',
-            'nilai.*.predikat' => 'required|string',
-            'nilai.*.deskripsi' => 'required|string',
-        ]);
+   public function store(Request $request, $siswa_id)
+{
+    $request->validate([
+        'semester' => 'required|string',
+        'tahun_ajaran' => 'required|string',
 
-        $siswa = Siswa::findOrFail($siswa_id);
+        'nilai' => 'required|array',
 
-        // Hapus nilai raport lama untuk siswa, semester, dan tahun ajaran yang sama
-        NilaiRaport::where('siswa_id', $siswa_id)
-            ->where('semester', $request->semester)
-            ->where('tahun_ajaran', $request->tahun_ajaran)
-            ->delete();
+        'nilai.*.mata_pelajaran' => 'required|string',
+        'nilai.*.nilai_pengetahuan' => 'required|integer|min:0|max:100',
+        'nilai.*.deskripsi_pengetahuan' => 'required|string',
+    ]);
 
-        // Simpan nilai raport baru
-        foreach ($request->nilai as $nilai) {
-            $mapel = MataPelajaran::find($nilai['mata_pelajaran_id']);
-            
-            NilaiRaport::create([
-                'siswa_id' => $siswa_id,
-                'semester' => $request->semester,
-                'tahun_ajaran' => $request->tahun_ajaran,
-                'mata_pelajaran' => $mapel->nama,
-                'kkm' => $mapel->kkm,
-                'nilai_pengetahuan' => $nilai['nilai_akhir'],
-                'predikat_pengetahuan' => $nilai['predikat'],
-                'deskripsi_pengetahuan' => $nilai['deskripsi'],
-                'nilai_keterampilan' => 0, // Default 0 jika tidak ada input
-                'predikat_keterampilan' => '',
-                'deskripsi_keterampilan' => '',
-            ]);
-        }
+    // Hapus data lama yang sama (semester & tahun ajaran)
+    NilaiRaport::where('siswa_id', $siswa_id)
+        ->where('semester', $request->semester)
+        ->where('tahun_ajaran', $request->tahun_ajaran)
+        ->delete();
 
-        return redirect()->route('walikelas.input_nilai_raport.index')
-            ->with('success', 'Nilai raport berhasil disimpan');
+    // Simpan data baru
+    foreach ($request->nilai as $row) {
+
+       NilaiRaport::create([
+    'siswa_id' => $siswa_id,
+    'semester' => $request->semester,
+    'tahun_ajaran' => $request->tahun_ajaran,
+
+    'mata_pelajaran' => $row['mata_pelajaran'],
+    'nilai_pengetahuan' => $row['nilai_pengetahuan'],
+    'deskripsi_pengetahuan' => $row['deskripsi_pengetahuan'],
+]);
+
     }
+
+    return redirect()->route('walikelas.input_nilai_raport.index')
+        ->with('success', 'Nilai raport berhasil disimpan');
+}
+
 }
