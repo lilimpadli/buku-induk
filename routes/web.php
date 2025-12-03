@@ -2,89 +2,118 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\WaliKelasSiswaController;
 
 /*
 |--------------------------------------------------------------------------
-| HALAMAN AWAL
+| HALAMAN UTAMA
 |--------------------------------------------------------------------------
 */
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::middleware('web')->group(function () {
 
-/*
-|--------------------------------------------------------------------------
-| AUTH ROUTES
-|--------------------------------------------------------------------------
-*/
+    Route::get('/', function () {
+        return view('welcome');
+    })->name('home');
 
-// Form Login
-Route::get('/login', [LoginController::class, 'showLoginForm'])
-    ->middleware('guest')
-    ->name('login');
+    /*
+    |--------------------------------------------------------------------------
+    | AUTENTIKASI
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('guest')->group(function () {
+        Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+        Route::post('/login', [LoginController::class, 'login'])->name('login.process');
+    });
 
-// Proses Login
-Route::post('/login', [LoginController::class, 'login'])
-    ->middleware('guest')
-    ->name('login.process');
+    Route::post('/logout', [LoginController::class, 'logout'])
+        ->middleware('auth')
+        ->name('logout');
 
-// Logout
-Route::post('/logout', [LoginController::class, 'logout'])
-    ->middleware('auth')
-    ->name('logout');
+    /*
+    |--------------------------------------------------------------------------
+    | ROUTE UNTUK PENGGUNA LOGIN
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('auth')->group(function () {
 
-/*
-|--------------------------------------------------------------------------
-| DASHBOARD UTAMA (AUTO REDIRECT BERDASARKAN ROLE)
-|--------------------------------------------------------------------------
-*/
-Route::middleware('auth')->group(function () {
+        Route::get('/dashboard', function () {
+            $role = auth()->user()->role;
 
-    Route::get('/dashboard', function () {
-        $role = auth()->user()->role;
+            return match ($role) {
+                'siswa'       => redirect()->route('siswa.dashboard'),
+                'walikelas'   => redirect()->route('walikelas.dashboard'),
+                'kaprog'      => redirect()->route('kaprog.dashboard'),
+                'tu'          => redirect()->route('tu.dashboard'),
+                'kurikulum'   => redirect()->route('kurikulum.dashboard'),
+                'calon_siswa' => redirect()->route('calon.dashboard'),
+                default       => abort(403, 'Role tidak dikenali'),
+            };
+        })->name('dashboard');
 
-        return match ($role) {
-            'siswa'      => redirect()->route('dashboard.siswa'),
-            'walikelas'  => redirect()->route('dashboard.walikelas'),
-            'kaprog'     => redirect()->route('dashboard.kaprog'),
-            'tu'         => redirect()->route('dashboard.tu'),
-            'kurikulum'  => redirect()->route('dashboard.kurikulum'),
-            'calon'      => redirect()->route('dashboard.calon'),
-            default      => abort(403, 'Role tidak dikenali'),
-        };
-    })->name('dashboard');
 
-});
+        /*
+        |--------------------------------------------------------------------------
+        | ROUTE SISWA
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('siswa')->name('siswa.')->group(function () {
 
-/*
-|--------------------------------------------------------------------------
-| DASHBOARD PER ROLE
-|--------------------------------------------------------------------------
-*/
-Route::middleware('auth')->group(function () {
+            Route::get('/dashboard', fn() => view('siswa.dashboard'))->name('dashboard');
 
-    Route::get('/dashboard/siswa', function () {
-        return view('siswa.dashboard');
-    })->name('dashboard.siswa');
+            Route::get('/data-diri', [SiswaController::class, 'dataDiri'])->name('dataDiri');
+            Route::get('/data-diri/create', [SiswaController::class, 'create'])->name('dataDiri.create');
+            Route::post('/data-diri', [SiswaController::class, 'store'])->name('dataDiri.store');
+            Route::get('/data-diri/edit', [SiswaController::class, 'edit'])->name('dataDiri.edit');
+            Route::put('/data-diri', [SiswaController::class, 'update'])->name('dataDiri.update');
 
-    Route::get('/dashboard/walikelas', function () {
-        return view('walikelas.dashboard');
-    })->name('dashboard.walikelas');
+            Route::get('/raport', [SiswaController::class, 'raport'])->name('raport');
+            Route::get('/catatan', [SiswaController::class, 'catatan'])->name('catatan');
 
-    Route::get('/dashboard/kaprog', function () {
-        return view('kaprog.dashboard');
-    })->name('dashboard.kaprog');
+            Route::get('/export/pdf', [SiswaController::class, 'exportPDF'])->name('export.pdf');
+        });
 
-    Route::get('/dashboard/tu', function () {
-        return view('tu.dashboard');
-    })->name('dashboard.tu');
 
-    Route::get('/dashboard/kurikulum', function () {
-        return view('kurikulum.dashboard');
-    })->name('dashboard.kurikulum');
+        /*
+        |--------------------------------------------------------------------------
+        | ROUTE WALI KELAS
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('walikelas')->name('walikelas.')->group(function () {
+            Route::get('/dashboard', fn() => view('walikelas.dashboard'))->name('dashboard');
 
-    Route::get('/dashboard/calon-siswa', function () {
-        return view('calonSiswa.dashboard'); // diperbaiki dari yang sebelumnya salah
-    })->name('dashboard.calon');
+            Route::get('/siswa', [WaliKelasSiswaController::class, 'index'])
+        ->name('siswa.index');
 
+    Route::get('/siswa/{id}', [WaliKelasSiswaController::class, 'show'])
+        ->name('siswa.show');
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | ROUTE KAPROG
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('kaprog')->name('kaprog.')->group(function () {
+            Route::get('/dashboard', fn() => view('kaprog.dashboard'))->name('dashboard');
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | ROUTE TU
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('tu')->name('tu.')->group(function () {
+            Route::get('/dashboard', fn() => view('tu.dashboard'))->name('dashboard');
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | ROUTE KURIKULUM
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('kurikulum')->name('kurikulum.')->group(function () {
+            Route::get('/dashboard', fn() => view('kurikulum.dashboard'))->name('dashboard');
+        });
+    });
 });

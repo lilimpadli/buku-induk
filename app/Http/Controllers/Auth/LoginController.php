@@ -41,15 +41,16 @@ class LoginController extends Controller
             $user = Auth::user();
 
             // Redirect sesuai role
-            return match ($user->role) {
-                'siswa'        => redirect()->route('dashboard.siswa'),
-                'walikelas'    => redirect()->route('dashboard.walikelas'),
-                'kaprog'       => redirect()->route('dashboard.kaprog'),
-                'tu'           => redirect()->route('dashboard.tu'),
-                'kurikulum'    => redirect()->route('dashboard.kurikulum'),
-                'calon_siswa'  => redirect()->route('dashboard.calon'),
-                default        => redirect()->route('dashboard'),
-            };
+           return match ($user->role) {
+    'siswa'        => redirect()->route('siswa.dashboard'),
+    'walikelas'    => redirect()->route('walikelas.dashboard'),
+    'kaprog'       => redirect()->route('kaprog.dashboard'),
+    'tu'           => redirect()->route('tu.dashboard'),
+    'kurikulum'    => redirect()->route('kurikulum.dashboard'),
+    'calon_siswa'  => redirect()->route('calon.dashboard'),
+    default        => redirect()->route('dashboard'),
+};
+
         }
 
         // Jika gagal login
