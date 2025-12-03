@@ -3,14 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\NilaiRaport;
 
 class Siswa extends Model
 {
     protected $table = 'data_siswa';
 
-    // Tambahkan 'user_id' ke dalam fillable
     protected $fillable = [
-        'user_id', // <-- TAMBAHKAN INI
+        'user_id',
         'nama_lengkap',
         'nis',
         'nisn',
@@ -25,12 +25,13 @@ class Siswa extends Model
         'pekerjaan_ibu',
     ];
 
-    /**
-     * Relasi ke model User (One-to-One).
-     * Data siswa ini dimiliki oleh satu user.
-     */
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    
+    public function nilaiRaports()
+    {
+        return $this->hasMany(NilaiRaport::class, 'siswa_id');
     }
 }

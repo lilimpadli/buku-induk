@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\WaliKelasSiswaController;
+use App\Http\Controllers\WaliKelas\InputNilaiRaportController;
+use App\Http\Controllers\WaliKelas\NilaiRaportController; // Tambahkan ini
 
 /*
 |--------------------------------------------------------------------------
@@ -83,10 +85,19 @@ Route::middleware('web')->group(function () {
             Route::get('/dashboard', fn() => view('walikelas.dashboard'))->name('dashboard');
 
             Route::get('/siswa', [WaliKelasSiswaController::class, 'index'])
-        ->name('siswa.index');
+                ->name('siswa.index');
 
-    Route::get('/siswa/{id}', [WaliKelasSiswaController::class, 'show'])
-        ->name('siswa.show');
+            Route::get('/siswa/{id}', [WaliKelasSiswaController::class, 'show'])
+                ->name('siswa.show');
+                
+            // Route untuk Input Nilai Raport
+            Route::get('/input-nilai-raport', [InputNilaiRaportController::class, 'index'])->name('input_nilai_raport.index');
+            Route::get('/input-nilai-raport/create/{siswa_id}', [InputNilaiRaportController::class, 'create'])->name('input_nilai_raport.create');
+            Route::post('/input-nilai-raport/store/{siswa_id}', [InputNilaiRaportController::class, 'store'])->name('input_nilai_raport.store');
+            
+            // Route untuk melihat Nilai Raport
+            Route::get('/nilai-raport', [NilaiRaportController::class, 'index'])->name('nilai_raport.index');
+            Route::get('/nilai-raport/{siswa_id}', [NilaiRaportController::class, 'show'])->name('nilai_raport.show');
         });
 
         /*
