@@ -3,20 +3,42 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\NilaiRaport;
 
 class DataSiswa extends Model
 {
     protected $table = 'data_siswa';
 
     protected $fillable = [
-        'user_id', 'nama_lengkap', 'nis', 'nisn', 'jenis_kelamin', 'tempat_lahir',
-        'tanggal_lahir', 'agama', 'status_keluarga', 'anak_ke', 'alamat', 'no_hp',
-        'sekolah_asal', 'kelas', 'tanggal_diterima',
-        'nama_ayah', 'pekerjaan_ayah', 'telepon_ayah',
-        'nama_ibu', 'pekerjaan_ibu', 'telepon_ibu',
-        'nama_wali', 'alamat_wali', 'telepon_wali', 'pekerjaan_wali',
-        'foto'
+        'user_id',
+        'nama_lengkap',
+        'nis',
+        'nisn',
+        'tempat_lahir',
+        'tanggal_lahir',
+        'jenis_kelamin',
+        'agama',
+        'status_keluarga',
+        'anak_ke',
+        'alamat',
+        'no_hp',
+        'sekolah_asal',
+        'kelas',
+        'tanggal_diterima',
+        'nama_ayah',
+        'pekerjaan_ayah',
+        'telepon_ayah',
+        'nama_ibu',
+        'pekerjaan_ibu',
+        'telepon_ibu',
+        'nama_wali',
+        'alamat_wali',
+        'telepon_wali',
+        'pekerjaan_wali',
+        'foto',
+        'catatan_wali_kelas',
     ];
+
 
 
     public function nilai()
@@ -38,5 +60,17 @@ public function raporInfo()
 {
     return $this->hasOne(RaporInfo::class, 'siswa_id');
 }
+
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    
+    public function nilaiRaports()
+    {
+        return $this->hasMany(NilaiRaport::class, 'siswa_id');
+    }
 
 }

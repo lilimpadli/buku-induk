@@ -44,6 +44,8 @@ Route::prefix('rapor')->group(function () {
 use App\Http\Controllers\WaliKelas\InputNilaiRaportController;
 use App\Http\Controllers\WaliKelas\NilaiRaportController;
 
+use App\Http\Controllers\TUController; // Tambahkan ini
+
 
 /*
 |--------------------------------------------------------------------------
@@ -247,11 +249,20 @@ Route::middleware('web')->group(function () {
         | ROUTE TU
         |--------------------------------------------------------------------------
         */
-        Route::prefix('tu')->name('tu.')->group(function () {
+       Route::prefix('tu')->name('tu.')->group(function () {
+    Route::get('/dashboard', [TUController::class, 'dashboard'])->name('dashboard');
+    Route::get('/siswa', [TUController::class, 'siswa'])->name('siswa');
+    Route::get('/siswa/create', [TUController::class, 'siswaCreate'])->name('siswa.create');
+    Route::post('/siswa', [TUController::class, 'siswaStore'])->name('siswa.store');
+    Route::get('/siswa/{id}', [TUController::class, 'siswaDetail'])->name('siswa.detail');
+    Route::get('/siswa/{id}/edit', [TUController::class, 'siswaEdit'])->name('siswa.edit');
+    Route::put('/siswa/{id}', [TUController::class, 'siswaUpdate'])->name('siswa.update');
+    Route::delete('/siswa/{id}', [TUController::class, 'siswaDestroy'])->name('siswa.destroy');
+    Route::get('/wali-kelas', [TUController::class, 'waliKelas'])->name('wali-kelas');
+    Route::get('/wali-kelas/{id}', [TUController::class, 'waliKelasDetail'])->name('wali-kelas.detail');
+    Route::get('/laporan-nilai', [TUController::class, 'laporanNilai'])->name('laporan.nilai');
+});
 
-            Route::get('/dashboard', fn() => view('tu.dashboard'))
-                ->name('dashboard');
-        });
 
 
 
