@@ -1,54 +1,98 @@
 @extends('layouts.app')
 
+@section('title', 'Dashboard Wali Kelas')
+
 @section('content')
-<div class="container">
+<div class="container mt-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Dashboard Wali Kelas</h1>
+    <h3 class="mb-1">Dashboard Wali Kelas</h3>
+    <p class="text-muted">Selamat datang, {{ auth()->user()->name }}!</p>
 
-        <!-- Tombol Logout -->
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
-            <button type="submit" class="btn btn-outline-danger btn-sm">
-                Logout
-            </button>
-        </form>
-    </div>
-
-    <p>Selamat datang di dashboard wali kelas.</p>
-
+    {{-- MENU RAPOR --}}
     <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card shadow">
-                <div class="card-body text-center">
-                    <i class="fas fa-users fa-3x text-primary mb-3"></i>
-                    <h5>Daftar Siswa</h5>
-                    <p class="text-muted">Kelola data siswa</p>
-                    <a href="{{ route('walikelas.siswa.index') }}" class="btn btn-primary">Lihat</a>
+
+        {{-- Lihat Daftar Siswa --}}
+        <div class="col-md-3 mb-3">
+            <a href="{{ route('walikelas.siswa.index') }}" class="text-decoration-none">
+                <div class="card shadow-sm hover-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-2x mb-2"></i>
+                        <h6>Daftar Siswa</h6>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
-        <div class="col-md-4">
-            <div class="card shadow">
-                <div class="card-body text-center">
-                    <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
-                    <h5>Nilai Raport</h5>
-                    <p class="text-muted">Lihat nilai raport siswa</p>
-                    <a href="{{ route('walikelas.nilai_raport.index') }}" class="btn btn-success">Lihat Nilai</a>
+
+        {{-- Input Nilai --}}
+        <div class="col-md-3 mb-3">
+            <a href="{{ route('walikelas.siswa.index') }}?menu=nilai" class="text-decoration-none">
+                <div class="card shadow-sm hover-card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-edit fa-2x mb-2"></i>
+                        <h6>Input Nilai Rapor</h6>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
-        <div class="col-md-4">
-            <div class="card shadow">
-                <div class="card-body text-center">
-                    <i class="fas fa-edit fa-3x text-warning mb-3"></i>
-                    <h5>Input Nilai Raport</h5>
-                    <p class="text-muted">Input nilai raport siswa</p>
-                    <a href="{{ route('walikelas.input_nilai_raport.index') }}" class="btn btn-warning">Input Nilai</a>
+
+        {{-- Ekstrakurikuler --}}
+        <div class="col-md-3 mb-3">
+            <a href="{{ route('walikelas.siswa.index') }}?menu=ekstra" class="text-decoration-none">
+                <div class="card shadow-sm hover-card bg-success text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-star fa-2x mb-2"></i>
+                        <h6>Input Ekstrakurikuler</h6>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
+
+        {{-- Kehadiran --}}
+        <div class="col-md-3 mb-3">
+            <a href="{{ route('walikelas.siswa.index') }}?menu=kehadiran" class="text-decoration-none">
+                <div class="card shadow-sm hover-card bg-warning">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar-check fa-2x mb-2"></i>
+                        <h6>Input Kehadiran</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        {{-- Info Rapor --}}
+        <div class="col-md-3 mb-3">
+            <a href="{{ route('walikelas.siswa.index') }}?menu=info" class="text-decoration-none">
+                <div class="card shadow-sm hover-card bg-info text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-info-circle fa-2x mb-2"></i>
+                        <h6>Info Rapor</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        {{-- Cetak Rapor --}}
+        <div class="col-md-3 mb-3">
+            <a href="{{ route('walikelas.siswa.index') }}?menu=cetak" class="text-decoration-none">
+                <div class="card shadow-sm hover-card bg-dark text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-file-pdf fa-2x mb-2"></i>
+                        <h6>Cetak Rapor</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+
     </div>
 
 </div>
+
+{{-- Hover Effect --}}
+<style>
+    .hover-card:hover {
+        transform: translateY(-5px);
+        transition: .2s;
+    }
+</style>
+
 @endsection

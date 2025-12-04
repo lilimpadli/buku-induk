@@ -12,7 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
 ->withMiddleware(function (Middleware $middleware) {
 
-    // REGISTRASI MIDDLEWARE WEB (WAJIB UNTUK LOGIN & CSRF)
+    // REGISTRASI MIDDLEWARE WEB
     $middleware->group('web', [
         \Illuminate\Cookie\Middleware\EncryptCookies::class,
         \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
@@ -20,6 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
+    ]);
+
+    // 🔥 REGISTER MIDDLEWARE ROLE DI SINI
+    $middleware->alias([
+        'role' => \App\Http\Middleware\RoleMiddleware::class,
     ]);
 })
 

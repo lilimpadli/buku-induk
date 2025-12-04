@@ -4,31 +4,20 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMataPelajaransTable extends Migration
-{
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
+return new class extends Migration {
     public function up()
     {
         Schema::create('mata_pelajarans', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // bigint unsigned
             $table->string('nama');
-            $table->integer('kkm')->default(75);
-            $table->string('kelompok')->nullable(); // Wajib, Peminatan, etc.
+            $table->enum('kelompok', ['A', 'B'])->default('A'); // Kelompok A/B
+            $table->integer('urutan')->nullable(); // nomor di rapor
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('mata_pelajarans');
     }
-}
+};

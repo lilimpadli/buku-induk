@@ -17,4 +17,26 @@ class DataSiswa extends Model
         'nama_wali', 'alamat_wali', 'telepon_wali', 'pekerjaan_wali',
         'foto'
     ];
+
+
+    public function nilai()
+{
+    return $this->hasMany(NilaiRaport::class, 'siswa_id');
+}
+
+public function ekstra()
+{
+    return $this->hasMany(EkstrakurikulerSiswa::class, 'siswa_id');
+}
+
+public function kehadiran()
+{
+    return $this->hasOne(Kehadiran::class, 'siswa_id');
+}
+
+public function raporInfo()
+{
+    return $this->hasOne(RaporInfo::class, 'siswa_id');
+}
+
 }

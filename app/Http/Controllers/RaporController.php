@@ -1,0 +1,144 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\DataSiswa;
+use App\Models\MataPelajaran;
+use App\Models\NilaiRaport;
+use App\Models\EkstrakurikulerSiswa;
+use App\Models\Kehadiran;
+use App\Models\RaporInfo;
+use Illuminate\Http\Request;
+
+class RaporController extends Controller
+{
+    // =============================
+    // 1. FORM INPUT NILAI
+    // =============================
+    public function formNilai($siswa_id)
+    {
+        $siswa = DataSiswa::findOrFail($siswa_id);
+        $mapel = MataPelajaran::orderBy('kelompok')->orderBy('urutan')->get();
+
+        return view('rapor.input-nilai', compact('siswa', 'mapel'));
+    }
+
+    // SIMPAN NILAI RAPOR
+    public function simpanNilai(Request $req, $siswa_id)
+    {
+        foreach ($req->nilai as $mapel_id => $nilai) {
+            NilaiRaport::updateOrCreate(
+                [
+                    'siswa_id' => $siswa_id,
+                    'mata_pelajaran_id' => $mapel_id,
+                    'semester' => $req->semester,
+                    'tahun_ajaran' => $req->tahun_ajaran,
+                ],
+                [
+                    'nilai_akhir' => $nilai,
+                    'deskripsi' => $req->deskripsi[$mapel_id] ?? null,
+                ]
+            );
+        }
+
+        return back()->with('success', 'Nilai rapor disimpan.');
+    }
+
+    // =============================
+    // 2. INPUT EKSTRAKURIKULER
+    // =============================
+    public function simpanEkstra(Request $req, $siswa_id)
+    {
+        EkstrakurikulerSiswa::updateOrCreate(
+            [
+                'siswa_id' => $siswa_id,
+                'nama_ekstra' => $req->nama_ekstra,
+            ],
+            [
+                'predikat' => $req->predikat,
+                'keterangan' => $req->keterangan,
+            ]
+        );
+
+        return back()->with('success', 'Ekstrakurikuler disimpan.');
+    }
+
+    // =============================
+    // 3. INPUT KEHADIRAN
+    // =============================
+    public function simpanKehadiran(Request $req, $siswa_id)
+    {
+        Kehadiran::updateOrCreate(
+            [
+                'siswa_id' => $siswa_id,
+                'semester' => $req->semester,
+                'tahun_ajaran' => $req->tahun_ajaran,
+            ],
+            [
+                'sakit' => $req->sakit,
+                'izin' => $req->izin,
+                'tanpa_keterangan' => $req->tanpa_keterangan,
+            ]
+        );
+
+        return back()->with('success', 'Data kehadiran disimpan.');
+    }
+
+    // =============================
+    // 4. INPUT INFO RAPOR (WALI, KEPSEK)
+    // =============================
+    public function simpanInfoRapor(Request $req, $siswa_id)
+    {
+        RaporInfo::updateOrCreate(
+            [
+                'siswa_id' => $siswa_id,
+                'semester' => $req->semester,
+                'tahun_ajaran' => $req->tahun_ajaran,
+            ],
+            [
+                'wali_kelas' => $req->wali_kelas,
+                'nip_wali' => $req->nip_wali,
+                'kepala_sekolah' => $req->kepala_sekolah,
+                'nip_kepsek' => $req->nip_kepsek,
+                'tanggal_rapor' => $req->tanggal_rapor,
+            ]
+        );
+
+        return back()->with('success', 'Info rapor disimpan.');
+    }
+
+    // =============================
+    // 5. TAMPILKAN RAPOR UNTUK PDF
+    // =============================
+    public function cetakRapor($siswa_id, $semester, $tahun)
+    {
+        $siswa = DataSiswa::findOrFail($siswa_id);
+
+        $nilai = NilaiRaport::with('mapel')
+            ->where('siswa_id', $siswa_id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->orderBy(MataPelajaran::select('urutan')->whereColumn('mata_pelajarans.id', 'nilai_raports.mata_pelajaran_id'))
+            ->get();
+
+        $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa_id)->get();
+        $kehadiran = Kehadiran::where('siswa_id', $siswa_id)->where('semester', $semester)->first();
+        $info = RaporInfo::where('siswa_id', $siswa_id)->where('semester', $semester)->first();
+
+        return view('rapor.cetak', compact('siswa', 'nilai', 'ekstra', 'kehadiran', 'info', 'semester', 'tahun'));
+    }
+
+    public function dashboard()
+{
+    $siswa = DataSiswa::orderBy('nama_lengkap')->get();
+
+    return view('walikelas.dashboard', [
+        'siswa' => $siswa,
+        'totalSiswa' => $siswa->count(),
+        'nilaiTerisi' => \App\Models\NilaiRaport::count(),
+        'belumTerisi' => max($siswa->count() - \App\Models\NilaiRaport::select('siswa_id')->distinct()->count(), 0),
+        'ekstraTerisi' => \App\Models\EkstrakurikulerSiswa::count(),
+    ]);
+}
+
+}
