@@ -11,10 +11,42 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
+
         .sidebar .list-group-item.active {
             background-color: #0d6efd;
             border-color: #0d6efd;
             color: white !important;
+
+        body {
+            background: #f6f7fb;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background-color: #EBF0FF;
+        }
+
+        .sidebar .nav-link {
+            border-radius: 8px;
+            margin-bottom: 5px;
+            padding: 10px 15px;
+            color: #333;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: #d7e0ff;
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #2F53FF !important;
+            color: #fff !important;
+            font-weight: 600;
+        }
+
+        .content-wrapper {
+            background: #f8f9fa;
+            padding: 35px 40px;
+
         }
     </style>
 </head>
@@ -113,8 +145,12 @@
                         </a>
 
                         <a href="{{ route('kaprog.raport.siswa') }}"
+
                            class="list-group-item list-group-item-action {{ request()->routeIs('kaprog.raport.*') ? 'active' : '' }}">
                             <i class="fas fa-file-lines me-2"></i> View Raport
+
+                          
+
                         </a>
 
                     @endif
