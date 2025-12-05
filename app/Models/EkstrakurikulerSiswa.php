@@ -3,11 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class EkstrakurikulerSiswa extends Model
 {
-    use HasFactory;
+    protected $table = 'ekstrakurikuler_siswa'; // ← FIX PENTING
 
     protected $fillable = [
         'siswa_id',
@@ -15,9 +14,4 @@ class EkstrakurikulerSiswa extends Model
         'predikat',
         'keterangan',
     ];
-
-    public function siswa()
-    {
-        return $this->belongsTo(DataSiswa::class, 'siswa_id');
-    }
 }

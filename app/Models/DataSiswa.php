@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\NilaiRaport;
 
 class DataSiswa extends Model
 {
@@ -37,40 +36,47 @@ class DataSiswa extends Model
         'pekerjaan_wali',
         'foto',
         'catatan_wali_kelas',
+
+        // TAMBAHAN BARU
+        'rombel_id',
     ];
 
-
-
+    /* ================================
+     |  RELASI RAPOR
+     ================================= */
     public function nilai()
-{
-    return $this->hasMany(NilaiRaport::class, 'siswa_id');
-}
-
-public function ekstra()
-{
-    return $this->hasMany(EkstrakurikulerSiswa::class, 'siswa_id');
-}
-
-public function kehadiran()
-{
-    return $this->hasOne(Kehadiran::class, 'siswa_id');
-}
-
-public function raporInfo()
-{
-    return $this->hasOne(RaporInfo::class, 'siswa_id');
-}
-
-
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-    
-    public function nilaiRaports()
     {
         return $this->hasMany(NilaiRaport::class, 'siswa_id');
     }
 
+    public function ekstra()
+    {
+        return $this->hasMany(EkstrakurikulerSiswa::class, 'siswa_id');
+    }
+
+    public function kehadiran()
+    {
+        return $this->hasOne(Kehadiran::class, 'siswa_id');
+    }
+
+    public function raporInfo()
+    {
+        return $this->hasOne(RaporInfo::class, 'siswa_id');
+    }
+
+    /* ================================
+     |  RELASI USER
+     ================================= */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /* ================================
+     |  RELASI ROMBEL (BARU)
+     ================================= */
+    public function rombel()
+    {
+        return $this->belongsTo(Rombel::class);
+    }
 }
