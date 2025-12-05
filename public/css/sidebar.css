@@ -1,0 +1,51 @@
+/* Sidebar Layout */
+.sidebar-kurikulum {
+    width: 240px;
+    min-height: 100vh;
+    background: #F7F8FA;
+    border-right: 1px solid #e5e5e5;
+    padding: 20px 0;
+    position: fixed;
+}
+
+/* Logo Area */
+.sidebar-header {
+    padding: 0 20px;
+    font-size: 18px;
+}
+
+/* Menu List */
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    color: #333;
+    font-weight: 500;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: 0.2s;
+}
+
+.menu-item:hover {
+    background: #E3E9FF;
+}
+
+.menu-item.active {
+    background: #3D5AFE;
+    color: white !important;
+}
+
+/* Bottom Profile */
+.sidebar-bottom {
+    padding: 10px 20px;
+    margin-bottom: 15px;
+}
+
+.sidebar-bottom .btn {
+    border-radius: 10px;
+}

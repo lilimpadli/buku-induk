@@ -1,0 +1,60 @@
+/* HEADER */
+.page-title {
+    font-weight: 700;
+    font-size: 28px;
+}
+
+.search-box input {
+    width: 230px;
+    border-radius: 10px;
+}
+
+.btn-add {
+    background-color: #3D5AFE;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+/* STATISTIK KARTU */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 2px;
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: 700;
+}
+
+/* TABEL AKTIVITAS */
+.activity-card {
+    border-radius: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.table thead th {
+    font-size: 14px;
+    background-color: #f8f9fa;
+}
+
+.table td {
+    padding: 14px 16px;
+}
+.table tbody tr:hover {
+    background-color: #f1f3f5;
+}
