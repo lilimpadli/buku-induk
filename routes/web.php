@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+//
+use App\Models\Jurusan; // Tambahkan ini
+use App\Models\Kelas;
 
 // AUTH
 use App\Http\Controllers\Auth\LoginController;
@@ -11,6 +14,12 @@ use App\Http\Controllers\SiswaController;
 // WALI KELAS
 use App\Http\Controllers\WaliKelasSiswaController;
 use App\Http\Controllers\RaporController;
+
+// tu
+use App\Http\Controllers\TU\TambahKelasController;
+use App\Http\Controllers\TU\KelasController;
+use App\Http\Controllers\TU\WaliKelasController;
+
 
 Route::prefix('rapor')->group(function () {
 
@@ -242,15 +251,16 @@ Route::middleware('web')->group(function () {
                 ->name('raport.siswa');
         });
 
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | ROUTE TU
-        |--------------------------------------------------------------------------
-        */
-       Route::prefix('tu')->name('tu.')->group(function () {
+     /*
+|--------------------------------------------------------------------------
+| ROUTE TU
+|--------------------------------------------------------------------------
+*/
+Route::prefix('tu')->name('tu.')->group(function () {
+    // Dashboard
     Route::get('/dashboard', [TUController::class, 'dashboard'])->name('dashboard');
+    
+    // Route untuk siswa
     Route::get('/siswa', [TUController::class, 'siswa'])->name('siswa');
     Route::get('/siswa/create', [TUController::class, 'siswaCreate'])->name('siswa.create');
     Route::post('/siswa', [TUController::class, 'siswaStore'])->name('siswa.store');
@@ -258,11 +268,26 @@ Route::middleware('web')->group(function () {
     Route::get('/siswa/{id}/edit', [TUController::class, 'siswaEdit'])->name('siswa.edit');
     Route::put('/siswa/{id}', [TUController::class, 'siswaUpdate'])->name('siswa.update');
     Route::delete('/siswa/{id}', [TUController::class, 'siswaDestroy'])->name('siswa.destroy');
-    Route::get('/wali-kelas', [TUController::class, 'waliKelas'])->name('wali-kelas');
+    
+    // Route untuk kelas
+    Route::get('/kelas', [TUController::class, 'kelas'])->name('kelas');
+    Route::get('/kelas/create', [TUController::class, 'kelasCreate'])->name('kelas.create');
+    Route::post('/kelas', [TUController::class, 'kelasStore'])->name('kelas.store');
+    Route::get('/kelas/{id}', [TUController::class, 'kelasDetail'])->name('kelas.detail');
+    Route::get('/kelas/{id}/edit', [TUController::class, 'kelasEdit'])->name('kelas.edit');
+    Route::put('/kelas/{id}', [TUController::class, 'kelasUpdate'])->name('kelas.update');
+    Route::delete('/kelas/{id}', [TUController::class, 'kelasDestroy'])->name('kelas.destroy');
+    
+     Route::get('/wali-kelas', [TUController::class, 'waliKelas'])->name('wali-kelas');
+    Route::get('/wali-kelas/create', [TUController::class, 'waliKelasCreate'])->name('wali-kelas.create');
+    Route::post('/wali-kelas', [TUController::class, 'waliKelasStore'])->name('wali-kelas.store');
     Route::get('/wali-kelas/{id}', [TUController::class, 'waliKelasDetail'])->name('wali-kelas.detail');
+    Route::get('/wali-kelas/{id}/edit', [TUController::class, 'waliKelasEdit'])->name('wali-kelas.edit');
+    Route::put('/wali-kelas/{id}', [TUController::class, 'waliKelasUpdate'])->name('wali-kelas.update');
+    Route::delete('/wali-kelas/{id}', [TUController::class, 'waliKelasDestroy'])->name('wali-kelas.destroy');
+    // Route untuk laporan
     Route::get('/laporan-nilai', [TUController::class, 'laporanNilai'])->name('laporan.nilai');
 });
-
 
 
 

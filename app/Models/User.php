@@ -38,4 +38,10 @@ class User extends Authenticatable
     {
         return 'nomor_induk';
     }
+
+    public function rombels()
+{
+    return $this->hasMany(Rombel::class, 'wali_kelas_id');
+}
+
 }

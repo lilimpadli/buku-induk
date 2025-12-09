@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\DataSiswa;
 use App\Models\User;
 use App\Models\NilaiRaport;
+use App\Models\Kelas;
+use App\Models\Jurusan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -18,13 +20,19 @@ class TUController extends Controller
         // Statistik dasar
         $totalSiswa = DataSiswa::count();
         $totalWaliKelas = User::where('role', 'walikelas')->count();
-        $totalKelas = DataSiswa::distinct('kelas')->count('kelas');
+        $totalKelas = Kelas::count();
         
         // Data siswa terbaru
         $siswaBaru = DataSiswa::with('user')->latest()->take(5)->get();
         
-        // Data wali kelas
+        // Data wali kelas (untuk ditampilkan semua di bagian bawah)
         $waliKelas = User::where('role', 'walikelas')->get();
+        
+        // Data wali kelas dengan limit (untuk ringkasan)
+        $waliKelasLimit = User::where('role', 'walikelas')->take(5)->get();
+        
+        // Data kelas dengan limit (untuk ringkasan)
+        $kelasLimit = Kelas::with('jurusan')->take(5)->get();
         
         // Statistik nilai raport
         $totalNilai = NilaiRaport::count();
@@ -36,6 +44,8 @@ class TUController extends Controller
             'totalKelas',
             'siswaBaru',
             'waliKelas',
+            'waliKelasLimit',
+            'kelasLimit',
             'totalNilai',
             'nilaiTerbaru'
         ));
@@ -197,12 +207,185 @@ class TUController extends Controller
     }
     
     /**
+     * Halaman daftar kelas
+     */
+    public function kelas()
+    {
+        $kelas = Kelas::with('jurusan')->get();
+        return view('tu.kelas', compact('kelas'));
+    }
+
+    /**
+     * Halaman tambah kelas
+     */
+    public function kelasCreate()
+    {
+        $jurusans = Jurusan::all();
+        return view('tu.kelas-create', compact('jurusans'));
+    }
+
+    /**
+     * Simpan data kelas baru
+     */
+    public function kelasStore(Request $request)
+    {
+        $request->validate([
+            'tingkat' => 'required|in:X,XI,XII',
+            'jurusan_id' => 'required|exists:jurusans,id'
+        ]);
+
+        Kelas::create($request->all());
+        
+        return redirect()->route('tu.kelas')
+            ->with('success', 'Data kelas berhasil ditambahkan.');
+    }
+
+    /**
+     * Halaman detail kelas
+     */public function kelasDetail($id)
+{
+    $kelas = Kelas::with([
+        'jurusan',
+        'rombels.siswa'
+    ])->findOrFail($id);
+
+    return view('tu.kelas-detail', compact('kelas'));
+}
+
+
+    /**
+     * Halaman edit kelas
+     */
+    public function kelasEdit($id)
+    {
+        $kelas = Kelas::findOrFail($id);
+        $jurusans = Jurusan::all();
+        return view('tu.kelas-edit', compact('kelas', 'jurusans'));
+    }
+
+    /**
+     * Update data kelas
+     */
+    public function kelasUpdate(Request $request, $id)
+    {
+        $kelas = Kelas::findOrFail($id);
+        
+        $request->validate([
+            'tingkat' => 'required|in:X,XI,XII',
+            'jurusan_id' => 'required|exists:jurusans,id'
+        ]);
+
+        $kelas->update($request->all());
+
+        return redirect()->route('tu.kelas.detail', $id)
+            ->with('success', 'Data kelas berhasil diperbarui.');
+    }
+
+    /**
+     * Hapus data kelas
+     */
+    public function kelasDestroy($id)
+    {
+        $kelas = Kelas::findOrFail($id);
+        $kelas->delete();
+
+        return redirect()->route('tu.kelas')
+            ->with('success', 'Data kelas berhasil dihapus.');
+    }
+    
+    /**
      * Halaman daftar wali kelas
      */
-    public function waliKelas()
+ public function waliKelas()
+{
+    $waliKelas = User::where('role', 'walikelas')
+                     ->with('rombels')
+                     ->paginate(10);
+
+    return view('tu.wali-kelas.index', compact('waliKelas'));
+}
+
+
+
+    /**
+     * Halaman tambah wali kelas
+     */
+    public function waliKelasCreate()
     {
-        $waliKelas = User::where('role', 'walikelas')->paginate(10);
-        return view('tu.wali-kelas', compact('waliKelas'));
+        return view('tu.wali-kelas-create');
+    }
+
+    /**
+     * Simpan data wali kelas baru
+     */
+    public function waliKelasStore(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'nomor_induk' => 'required|string|unique:users,nomor_induk',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'nomor_induk' => $request->nomor_induk,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'walikelas',
+        ]);
+        
+        return redirect()->route('tu.wali-kelas')
+            ->with('success', 'Data wali kelas berhasil ditambahkan.');
+    }
+
+    /**
+     * Halaman edit wali kelas
+     */
+    public function waliKelasEdit($id)
+    {
+        $waliKelas = User::findOrFail($id);
+        return view('tu.wali-kelas-edit', compact('waliKelas'));
+    }
+
+    /**
+     * Update data wali kelas
+     */
+    public function waliKelasUpdate(Request $request, $id)
+    {
+        $waliKelas = User::findOrFail($id);
+        
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'nomor_induk' => 'required|string|unique:users,nomor_induk,' . $id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+        ]);
+
+        $data = $request->all();
+        
+        if ($request->filled('password')) {
+            $request->validate([
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $waliKelas->update($data);
+
+        return redirect()->route('tu.wali-kelas.detail', $id)
+            ->with('success', 'Data wali kelas berhasil diperbarui.');
+    }
+
+    /**
+     * Hapus data wali kelas
+     */
+    public function waliKelasDestroy($id)
+    {
+        $waliKelas = User::findOrFail($id);
+        $waliKelas->delete();
+
+        return redirect()->route('tu.wali-kelas')
+            ->with('success', 'Data wali kelas berhasil dihapus.');
     }
     
     /**

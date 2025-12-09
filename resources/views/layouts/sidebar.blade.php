@@ -21,3 +21,27 @@
         </a>
     </li>
 @endif
+
+<!-- Menu TU -->
+@if(auth()->user()->hasRole('tu'))
+    <li class="nav-item">
+        <a class="nav-link {{ request()->is('tu') ? 'active' : '' }}" href="{{ route('tu.dashboard') }}">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {{ request()->is('tu/siswa*') ? 'active' : '' }}" href="{{ route('tu.siswa') }}">
+            <i class="fas fa-users"></i> Data Siswa
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {{ request()->is('tu/wali-kelas*') ? 'active' : '' }}" href="{{ route('tu.wali-kelas') }}">
+            <i class="fas fa-chalkboard-teacher"></i> Wali Kelas
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {{ request()->is('tu/laporan-nilai*') ? 'active' : '' }}" href="{{ route('tu.laporan.nilai') }}">
+            <i class="fas fa-chart-line"></i> Laporan Nilai
+        </a>
+    </li>
+@endif

@@ -122,15 +122,47 @@
 
 
 
-                    {{-- ======================== ROLE: TU ======================== --}}
-                    @if(Auth::user()->role == 'tu')
+                   {{-- ======================== ROLE: TU ======================== --}}
+@if(Auth::user()->role == 'tu')
 
-                        <a href="{{ route('tu.dashboard') }}"
-                           class="list-group-item list-group-item-action {{ request()->routeIs('tu.dashboard') ? 'active' : '' }}">
-                            <i class="fas fa-gauge me-2"></i> Dashboard
-                        </a>
+    <a href="{{ route('tu.dashboard') }}"
+       class="list-group-item list-group-item-action {{ request()->routeIs('tu.dashboard') ? 'active' : '' }}">
+        <i class="fas fa-gauge me-2"></i> Dashboard
+    </a>
 
-                    @endif
+    <li class="nav-item">
+        <a class="nav-link {{ request()->is('tu') ? 'active' : '' }}" href="{{ route('tu.dashboard') }}">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link {{ request()->is('tu/siswa*') ? 'active' : '' }}" href="{{ route('tu.siswa') }}">
+            <i class="fas fa-users"></i> Data Siswa
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link {{ request()->is('tu/wali-kelas*') ? 'active' : '' }}" href="{{ route('tu.wali-kelas') }}">
+            <i class="fas fa-chalkboard-teacher"></i> Wali Kelas
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link {{ request()->is('tu/laporan-nilai*') ? 'active' : '' }}" href="{{ route('tu.laporan.nilai') }}">
+            <i class="fas fa-chart-line"></i> Laporan Nilai
+        </a>
+    </li>
+
+    {{-- ================= Tambah Wali Kelas (Menu Baru) ================= --}}
+    <li class="nav-item">
+        <a class="nav-link {{ request()->is('tu/kelas') ? 'active' : '' }}" href="{{ route('tu.kelas') }}">
+            <i class="fas fa-plus-circle"></i> Manejemen Kelas
+        </a>
+    </li>
+
+@endif
+
 
 
 
