@@ -17,6 +17,7 @@ use App\Http\Controllers\RaporController;
 // KURIKULUM
 use App\Http\Controllers\Kurikulum\KurikulumDashboardController;
 use App\Http\Controllers\Kurikulum\KurikulumSiswaController;
+use App\Models\Kelas;
 
 // TU
 use App\Http\Controllers\TUController;
@@ -299,14 +300,50 @@ Route::middleware('web')->group(function () {
         | ROUTE KURIKULUM
         |--------------------------------------------------------------------------
         */
-        Route::prefix('kurikulum')->name('kurikulum.')->group(function () {
+       Route::prefix('kurikulum')->name('kurikulum.')->group(function () {
 
-            Route::get('/dashboard', [KurikulumDashboardController::class, 'index'])
-                ->name('dashboard');
+    Route::get('/dashboard', [KurikulumDashboardController::class, 'index'])
+        ->name('dashboard');
 
-            Route::get('/siswa', [KurikulumSiswaController::class, 'index'])
-                ->name('siswa.index');
-        });
+    Route::get('/siswa', [KurikulumSiswaController::class, 'index'])
+        ->name('siswa.index');
+        
+        Route::get('/kurikulum/manajemen-kelas', [KelasController::class, 'index'])
+    ->name('kurikulum.kelas.index');
+
+    Route::view('/kurikulum/siswa/show', 'kurikulum.show')->name('kurikulum.siswa.show');
+
+
+
+        
+    // Halaman utama manajemen kelas
+    Route::get('/manajemen-kelas', function () {
+        return view('kurikulum.manajemen-kelas.index');
+    })->name('kelas.index');
+
+    // ============================
+    //  MANAGEMEN KELAS — EDIT
+    // ============================
+
+    Route::get('/manajemen-kelas/{id}/edit', function ($id) {
+        return view('kurikulum.manajemen-kelas.edit', [
+            'kelas' => (object)[
+                'id' => $id,
+                'kelas' => '',
+                'jurusan' => '',
+                'rombel' => '',
+                'wali_kelas' => ''
+            ]
+        ]);
+    })->name('kelas.edit');
+
+    Route::put('/manajemen-kelas/{id}', function ($id) {
+        // sementara dummy (belum ada database)
+        return redirect()->route('kurikulum.kelas.index')
+            ->with('success', 'Data kelas berhasil diperbarui.');
+    })->name('kelas.update');
+
+});
 
     }); // END AUTH
 });

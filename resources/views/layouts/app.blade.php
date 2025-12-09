@@ -171,10 +171,10 @@
                             <i class="fa fa-users me-2"></i> Manajemen Siswa
                         </a>
 
-                        <a href=""
+                        <a href="{{ route('kurikulum.kelas.index') }}"
                            class="list-group-item list-group-item-action {{ request()->routeIs('kurikulum.kelas*') ? 'active' : '' }}">
-                            <i class="fa fa-building me-2"></i> Manajemen Kelas
-                        </a>
+                             <i class="fa fa-building me-2"></i> Manajemen Kelas
+                    </a>
 
                         <a href=""
                            class="list-group-item list-group-item-action {{ request()->routeIs('kurikulum.akun') ? 'active' : '' }}">
