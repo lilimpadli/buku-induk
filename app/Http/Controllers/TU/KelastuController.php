@@ -7,7 +7,7 @@ use App\Models\Jurusan;
 use App\Models\Kelas;
 use Illuminate\Http\Request;
 
-class KelasController extends Controller
+class KelastuController extends Controller
 {
     public function index()
     {

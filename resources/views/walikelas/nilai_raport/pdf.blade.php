@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<<<<<<< HEAD
     <meta charset="utf-8">
     <title>Raport {{ $siswa->nama_lengkap }}</title>
     <style>
@@ -121,3 +122,21 @@
     </div>
 </body>
 </html>
+=======
+    <title>Rapor</title>
+    <style>
+        body { font-family: DejaVu Sans, sans-serif; }
+        .page-break { page-break-before: always; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { border: 1px solid black; padding: 6px; }
+    </style>
+</head>
+<body>
+
+{{-- Bagian utama rapor --}}
+@include('walikelas.nilai_raport.review_main')
+
+</body>
+</html>
+>>>>>>> 5add1ecc7cd2a588cf070b03ab4d282d07b38d48
