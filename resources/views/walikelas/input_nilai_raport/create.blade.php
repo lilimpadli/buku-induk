@@ -95,20 +95,36 @@
                 <tr>
                     <th width="5%">No</th>
                     <th>Nama Ekstrakurikuler</th>
+                    <th width="10%">Predikat</th>
                     <th>Keterangan</th>
                 </tr>
             </thead>
             <tbody>
-                @for($i = 0; $i < 3; $i++)
+                @for($i=0;$i<3;$i++)
                 <tr>
                     <td class="text-center">{{ $i+1 }}</td>
+
+                    {{-- nama ekstra --}}
                     <td>
-                        <input type="text" name="ekstra[{{ $i }}][nama_ekstra]"
-                               class="form-control" placeholder="Contoh: Pramuka">
+                        <input type="text" class="form-control"
+                               name="ekstra[{{ $i }}][nama_ekstra]"
+                               placeholder="Contoh: Pramuka">
                     </td>
+
+                    {{-- predikat --}}
                     <td>
-                        <textarea name="ekstra[{{ $i }}][keterangan]"
-                                  class="form-control" rows="2"></textarea>
+                        <select name="ekstra[{{ $i }}][predikat]" class="form-control">
+                            <option value="">-</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                        </select>
+                    </td>
+
+                    {{-- keterangan --}}
+                    <td>
+                        <textarea class="form-control" rows="2"
+                                  name="ekstra[{{ $i }}][keterangan]"></textarea>
                     </td>
                 </tr>
                 @endfor
@@ -146,10 +162,14 @@
                 </select>
             </div>
 
-            <div class="col-md-3">
-                <label>Ke Kelas</label>
-                <input type="text" class="form-control"
-                       name="kenaikan[ke_kelas]" placeholder="XI MM 1">
+            <div class="col-md-4">
+                <label>Rombel Tujuan</label>
+                <select name="kenaikan[rombel_tujuan_id]" class="form-control">
+                    <option value="">-- Pilih Rombel --</option>
+                    @foreach($rombels as $r)
+                        <option value="{{ $r->id }}">{{ $r->nama }}</option>
+                    @endforeach
+                </select>
             </div>
         </div>
 

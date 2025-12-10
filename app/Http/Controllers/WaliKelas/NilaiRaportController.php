@@ -9,8 +9,9 @@ use App\Models\EkstrakurikulerSiswa;
 use App\Models\Kehadiran;
 use App\Models\RaporInfo;
 use App\Models\KenaikanKelas;
+use App\Models\MataPelajaran;
+use App\Models\Rombel;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class NilaiRaportController extends Controller
 {
@@ -20,21 +21,32 @@ class NilaiRaportController extends Controller
         return view('walikelas.nilai_raport.index', compact('siswas'));
     }
 
-    // =============================
-    // SHOW RAPOR BERDASARKAN SEMESTER & TAHUN
-    // =============================
-    public function show(Request $req, $siswa_id)
+    public function list($id)
     {
-        $semester = $req->semester;
-        $tahun    = $req->tahun;
+        $siswa = DataSiswa::findOrFail($id);
 
-        if (!$semester || !$tahun) {
-            abort(404, "Semester atau tahun ajaran tidak ditemukan.");
+        $raports = NilaiRaport::select('semester', 'tahun_ajaran')
+            ->where('siswa_id', $id)
+            ->groupBy('semester', 'tahun_ajaran')
+            ->orderBy('tahun_ajaran', 'desc')
+            ->orderBy('semester', 'asc')
+            ->get();
+
+        return view('walikelas.nilai_raport.list', compact('siswa', 'raports'));
+    }
+
+    public function show(Request $request)
+    {
+        $siswa_id = $request->siswa_id;
+        $semester = $request->semester;
+        $tahun = $request->tahun;
+
+        if (!$siswa_id || !$semester || !$tahun) {
+            abort(404, "Parameter tidak lengkap.");
         }
 
         $siswa = DataSiswa::findOrFail($siswa_id);
 
-        // NILAI
         $nilaiRaports = NilaiRaport::with('mapel')
             ->where('siswa_id', $siswa_id)
             ->where('semester', $semester)
@@ -42,26 +54,23 @@ class NilaiRaportController extends Controller
             ->orderBy('mata_pelajaran_id')
             ->get();
 
-        // EKSTRA
         $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->get();
 
-        // KEHADIRAN
         $kehadiran = Kehadiran::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->first();
 
-        // INFO RAPOR
         $info = RaporInfo::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->first();
 
-        // KENAIKAN KELAS
-        $kenaikan = KenaikanKelas::where('siswa_id', $siswa_id)
+        $kenaikan = KenaikanKelas::with('rombelTujuan')
+            ->where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->first();
@@ -78,56 +87,178 @@ class NilaiRaportController extends Controller
         ));
     }
 
-    // REVIEW (TANPA FILTER — OPSIONAL)
-    public function review($id)
+    public function edit(Request $request)
     {
-        $siswa = DataSiswa::findOrFail($id);
+        $siswa_id = $request->siswa_id;
+        $semester = $request->semester;
+        $tahun = $request->tahun;
 
-        $nilaiRaports = NilaiRaport::where('siswa_id', $id)->get();
-        $ekstra = EkstrakurikulerSiswa::where('siswa_id', $id)->get();
-        $kehadiran = Kehadiran::where('siswa_id', $id)->first();
-        $kenaikan = KenaikanKelas::where('siswa_id', $id)->first();
+        if (!$siswa_id || !$semester || !$tahun) {
+            abort(404, "Parameter tidak lengkap.");
+        }
 
-        return view('walikelas.nilai_raport.review', compact(
-            'siswa', 'nilaiRaports', 'ekstra', 'kehadiran', 'kenaikan'
-        ));
-    }
+        $siswa = DataSiswa::findOrFail($siswa_id);
 
-    // EXPORT PDF (SUDAH PAKE FILTER)
-    public function exportPdf(Request $req, $id)
-    {
-        $semester = $req->semester;
-        $tahun    = $req->tahun;
+        // Ambil semua mapel
+        $mapel = MataPelajaran::orderBy('urutan')->get();
+        $kelompokA = $mapel->where('kelompok', 'A');
+        $kelompokB = $mapel->where('kelompok', 'B');
 
-        $siswa = DataSiswa::findOrFail($id);
+        // Ambil nilai & mapping berdasarkan mapel ID
+        $nilai = NilaiRaport::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->get()
+            ->keyBy('mata_pelajaran_id');
 
-        $nilaiRaports = NilaiRaport::where('siswa_id', $id)
+        // Ambil data lain
+        $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa->id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->get();
 
-        $pdf = Pdf::loadView('walikelas.nilai_raport.pdf', [
-            'siswa' => $siswa,
-            'semester' => $semester,
-            'tahun' => $tahun,
-            'nilaiRaports' => $nilaiRaports
-        ]);
+        $kehadiran = Kehadiran::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
 
-        return $pdf->stream("Raport_{$siswa->nama_lengkap}.pdf");
+        $info = RaporInfo::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        $kenaikan = KenaikanKelas::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        // Ambil semua rombel untuk dropdown kenaikan kelas
+        $rombels = Rombel::orderBy('nama')->get();
+
+        return view('walikelas.nilai_raport.edit', compact(
+            'siswa',
+            'semester',
+            'tahun',
+            'nilai',
+            'kelompokA',
+            'kelompokB',
+            'ekstra',
+            'kehadiran',
+            'info',
+            'kenaikan',
+            'rombels'
+        ));
     }
 
-    // LIST HISTORY
-    public function list($id)
+    public function update(Request $request)
     {
-        $siswa = DataSiswa::findOrFail($id);
+        $siswa_id = $request->siswa_id;
+        $semester = $request->semester;
+        $tahun = $request->tahun;
 
-        $raports = NilaiRaport::select('semester', 'tahun_ajaran')
-            ->where('siswa_id', $id)
-            ->groupBy('semester', 'tahun_ajaran')
-            ->orderBy('tahun_ajaran', 'desc')
-            ->orderBy('semester', 'asc')
-            ->get();
+        if (!$siswa_id || !$semester || !$tahun) {
+            abort(404, "Parameter tidak lengkap.");
+        }
 
-        return view('walikelas.nilai_raport.list', compact('siswa', 'raports'));
+        $siswa = DataSiswa::findOrFail($siswa_id);
+
+        /* ================================
+       UPDATE NILAI MAPEL
+    ==================================*/
+        if ($request->nilai) {
+            foreach ($request->nilai as $mapel_id => $value) {
+                NilaiRaport::updateOrCreate(
+                    [
+                        'siswa_id' => $siswa->id,
+                        'mata_pelajaran_id' => $mapel_id,
+                        'semester' => $semester,
+                        'tahun_ajaran' => $tahun,
+                    ],
+                    [
+                        'nilai_akhir' => $value['nilai_akhir'] ?? null,
+                        'deskripsi'   => $value['deskripsi'] ?? null,
+                    ]
+                );
+            }
+        }
+
+        /* ================================
+       UPDATE EKSTRAKURIKULER
+    ==================================*/
+        if ($request->ekstra) {
+            foreach ($request->ekstra as $data) {
+                // Skip jika nama ekstra kosong
+                if (!$data['nama_ekstra']) continue;
+
+                EkstrakurikulerSiswa::updateOrCreate(
+                    [
+                        'siswa_id' => $siswa->id,
+                        'nama_ekstra' => $data['nama_ekstra'],
+                        'semester' => $semester,
+                        'tahun_ajaran' => $tahun,
+                    ],
+                    [
+                        'predikat' => $data['predikat'] ?? null,
+                        'keterangan' => $data['keterangan'] ?? null,
+                    ]
+                );
+            }
+        }
+
+        /* ================================
+       UPDATE KEHADIRAN
+    ==================================*/
+        Kehadiran::updateOrCreate(
+            [
+                'siswa_id' => $siswa->id,
+                'semester' => $semester,
+                'tahun_ajaran' => $tahun,
+            ],
+            [
+                'sakit' => $request->hadir['sakit'] ?? 0,
+                'izin'  => $request->hadir['izin'] ?? 0,
+                'tanpa_keterangan' => $request->hadir['alpa'] ?? 0,
+            ]
+        );
+
+        /* ================================
+       UPDATE INFO RAPOR
+    ==================================*/
+        RaporInfo::updateOrCreate(
+            [
+                'siswa_id' => $siswa->id,
+                'semester' => $semester,
+                'tahun_ajaran' => $tahun,
+            ],
+            [
+                'wali_kelas' => $request->info['wali_kelas'] ?? '',
+                'nip_wali' => $request->info['nip_wali'] ?? '',
+                'kepala_sekolah' => $request->info['kepsek'] ?? '',
+                'nip_kepsek' => $request->info['nip_kepsek'] ?? '',
+                'tanggal_rapor' => $request->info['tanggal_rapor'] ?? date('Y-m-d'),
+            ]
+        );
+
+        /* ================================
+        UPDATE KENAIKAN KELAS
+    ==================================*/
+        KenaikanKelas::updateOrCreate(
+            [
+                'siswa_id' => $siswa->id,
+                'semester' => $semester,
+                'tahun_ajaran' => $tahun,
+            ],
+            [
+                'status' => $request->kenaikan['status'] ?? '-',
+                'rombel_tujuan_id' => $request->kenaikan['rombel_tujuan_id'] ?? null,
+                'catatan' => $request->kenaikan['catatan'] ?? '',
+            ]
+        );
+
+        return redirect()->route('walikelas.nilai_raport.show', [
+            'siswa_id' => $siswa->id,
+            'semester' => $semester,
+            'tahun' => $tahun
+        ])->with('success', 'Rapor berhasil diperbarui!');
     }
 }

@@ -22,16 +22,20 @@ class InputNilaiRaportController extends Controller
     }
 
     public function create($siswa_id)
-    {
-        $siswa = DataSiswa::findOrFail($siswa_id);
+{
+    $siswa = DataSiswa::findOrFail($siswa_id);
 
-        $kelompokA = MataPelajaran::where('kelompok', 'A')->orderBy('urutan')->get();
-        $kelompokB = MataPelajaran::where('kelompok', 'B')->orderBy('urutan')->get();
+    $kelompokA = MataPelajaran::where('kelompok', 'A')->orderBy('urutan')->get();
+    $kelompokB = MataPelajaran::where('kelompok', 'B')->orderBy('urutan')->get();
 
-        return view('walikelas.input_nilai_raport.create', compact(
-            'siswa', 'kelompokA', 'kelompokB'
-        ));
-    }
+    // <-- ambil rombels agar dropdown 'rombel tujuan' tersedia di view
+    $rombels = Rombel::orderBy('nama')->get();
+
+    return view('walikelas.input_nilai_raport.create', compact(
+        'siswa', 'kelompokA', 'kelompokB', 'rombels'
+    ));
+}
+
 
     public function store(Request $req, $siswa_id)
     {
@@ -44,7 +48,9 @@ class InputNilaiRaportController extends Controller
         $semester = $req->semester;
         $tahun    = $req->tahun_ajaran;
 
+        // --------------------------
         // SIMPAN NILAI MAPEL
+        // --------------------------
         foreach ($req->nilai as $mapel_id => $row) {
             NilaiRaport::updateOrCreate(
                 [
@@ -60,27 +66,33 @@ class InputNilaiRaportController extends Controller
             );
         }
 
-        // SIMPAN EKSTRA
+        // --------------------------
+        // SIMPAN EKSTRA — FIXED
+        // --------------------------
         if ($req->has('ekstra')) {
-            foreach ($req->ekstra as $item) {
+            foreach ($req->ekstra as $i => $item) {
+
                 if (empty($item['nama_ekstra'])) continue;
 
                 EkstrakurikulerSiswa::updateOrCreate(
+                    [
+                        'id'           => $item['id'] ?? null, // aman saat edit
+                    ],
                     [
                         'siswa_id'     => $siswa_id,
                         'semester'     => $semester,
                         'tahun_ajaran' => $tahun,
                         'nama_ekstra'  => $item['nama_ekstra'],
-                    ],
-                    [
-                        'predikat'   => $item['predikat'] ?? null,
-                        'keterangan' => $item['keterangan'] ?? null,
+                        'predikat'     => $item['predikat'] ?? null,
+                        'keterangan'   => $item['keterangan'] ?? null,
                     ]
                 );
             }
         }
 
+        // --------------------------
         // KEHADIRAN
+        // --------------------------
         Kehadiran::updateOrCreate(
             [
                 'siswa_id'     => $siswa_id,
@@ -94,7 +106,9 @@ class InputNilaiRaportController extends Controller
             ]
         );
 
+        // --------------------------
         // INFO RAPOR
+        // --------------------------
         RaporInfo::updateOrCreate(
             [
                 'siswa_id'     => $siswa_id,
@@ -110,7 +124,9 @@ class InputNilaiRaportController extends Controller
             ]
         );
 
-        // KENAIKAN
+        // --------------------------
+        // KENAIKAN KELAS
+        // --------------------------
         if ($req->has('kenaikan')) {
             KenaikanKelas::updateOrCreate(
                 [
@@ -135,7 +151,7 @@ class InputNilaiRaportController extends Controller
     {
         $siswa = DataSiswa::findOrFail($id);
 
-        $raports = NilaiRaport::select('semester', 'tahun_ajaran')
+        $raports = NilaiRaport::select('semester','tahun_ajaran')
             ->where('siswa_id', $id)
             ->groupBy('semester','tahun_ajaran')
             ->orderBy('tahun_ajaran','desc')
@@ -180,13 +196,12 @@ class InputNilaiRaportController extends Controller
 
         $kelompokA = MataPelajaran::where('kelompok','A')->orderBy('urutan')->get();
         $kelompokB = MataPelajaran::where('kelompok','B')->orderBy('urutan')->get();
-
-        // 🔥 WAJIB DITAMBAHKAN → FIX ERROR
-        $rombels = Rombel::orderBy('nama')->get();
+        $rombels   = Rombel::orderBy('nama')->get();
 
         return view('walikelas.input_nilai_raport.edit', compact(
             'siswa', 'nilai', 'ekstra', 'kehadiran', 'info',
-            'kenaikan', 'kelompokA', 'kelompokB', 'semester', 'tahun', 'rombels'
+            'kenaikan', 'kelompokA', 'kelompokB',
+            'semester', 'tahun', 'rombels'
         ));
     }
 }

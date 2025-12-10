@@ -24,11 +24,7 @@
 
                     <div class="text-end">
 
-                        {{-- Tombol Lihat Raport Terbaru --}}
-                        <a href="{{ route('walikelas.nilai_raport.show', $siswa->id) }}"
-                           class="btn btn-primary btn-sm mb-1">
-                            Lihat Raport Terbaru
-                        </a>
+                        
 
                         {{-- Tombol List Raport --}}
                         <a href="{{ route('walikelas.nilai_raport.list', $siswa->id) }}"
