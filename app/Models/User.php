@@ -6,18 +6,26 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+
+/**
+ * @property int $id
+ * @property string $nomor_induk
+ * @property string $nama_lengkap
+ * @property string $nisn
+ */
+
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name',
-        'nomor_induk',   // kolom login
-        'photo',
-        'email',
-        'role',
-        'password',
-    ];
+    'nomor_induk',
+    'nama_lengkap',
+    'nisn',
+    'email',
+    'password',
+];
+
 
     protected $hidden = [
         'password',

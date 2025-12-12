@@ -3,10 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\DataSiswa;
+use App\Models\NilaiRaport;
+use App\Models\EkstrakurikulerSiswa;
+use App\Models\Kehadiran;
+use App\Models\RaporInfo;
+use App\Models\KenaikanKelas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
-
 
 class SiswaController extends Controller
 {
@@ -16,7 +21,6 @@ class SiswaController extends Controller
     private function getSiswaLogin()
     {
         $user = Auth::user();
-
         return DataSiswa::where('nis', $user->nomor_induk)->first();
     }
 
@@ -30,16 +34,42 @@ class SiswaController extends Controller
     }
 
     /**
-     * Halaman create data diri
+     * Dashboard siswa — ringkasan data penting agar tidak kosong
      */
+    public function dashboard()
+    {
+        $siswa = $this->getSiswaLogin();
+
+        // Ambil daftar tahun_ajaran unik untuk raport
+        $raportYears = [];
+        if ($siswa) {
+            $raportYears = \App\Models\NilaiRaport::select('tahun_ajaran')
+                ->where('siswa_id', $siswa->id)
+                ->groupBy('tahun_ajaran')
+                ->orderBy('tahun_ajaran', 'desc')
+                ->pluck('tahun_ajaran')
+                ->toArray();
+        }
+
+        // cek kelengkapan profil (field penting)
+        $required = ['nama_lengkap','nisn','tempat_lahir','tanggal_lahir','agama','alamat','no_hp'];
+        $missing = [];
+        if ($siswa) {
+            foreach ($required as $f) {
+                if (empty($siswa->{$f})) {
+                    $missing[] = $f;
+                }
+            }
+        }
+
+        return view('siswa.dashboard', compact('siswa','raportYears','missing'));
+    }
+
     public function create()
     {
         return view('siswa.data-diri-create');
     }
 
-    /**
-     * Store data siswa
-     */
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -51,31 +81,15 @@ class SiswaController extends Controller
             'tempat_lahir'     => 'required|string|max:255',
             'tanggal_lahir'    => 'required|date',
             'agama'            => 'required|string|max:50',
-            'status_keluarga'  => 'nullable|string|max:100',
-            'anak_ke'          => 'nullable|integer',
             'alamat'           => 'required|string',
             'no_hp'            => 'required|string|max:20',
-            'sekolah_asal'     => 'nullable|string|max:255',
-            'kelas'            => 'required|string|max:50',
-            'tanggal_diterima' => 'nullable|date',
 
-            // Orang tua
             'nama_ayah'        => 'required|string|max:255',
             'pekerjaan_ayah'   => 'required|string|max:255',
-            'telepon_ayah'     => 'nullable|string|max:20',
-
             'nama_ibu'         => 'required|string|max:255',
             'pekerjaan_ibu'    => 'required|string|max:255',
-            'telepon_ibu'      => 'nullable|string|max:20',
-
-            // Wali
-            'nama_wali'        => 'nullable|string|max:255',
-            'alamat_wali'      => 'nullable|string',
-            'telepon_wali'     => 'nullable|string|max:20',
-            'pekerjaan_wali'   => 'nullable|string|max:255',
         ]);
 
-        // Auto set NIS dari user login
         $data = $request->all();
         $data['nis'] = $user->nomor_induk;
         $data['user_id'] = $user->id;
@@ -86,25 +100,7 @@ class SiswaController extends Controller
             ->with('success', 'Data diri berhasil disimpan.');
     }
 
-    /**
-     * Halaman edit data diri
-     */
     public function edit()
-    {
-        $siswa = $this->getSiswaLogin();
-
-        if (!$siswa) {
-            return redirect()->route('siswa.dataDiri.create')
-                ->with('error', 'Data siswa tidak ditemukan, silakan isi terlebih dahulu.');
-        }
-
-        return view('siswa.data-diri-edit', compact('siswa'));
-    }
-
-    /**
-     * Update data diri siswa
-     */
-    public function update(Request $request)
     {
         $siswa = $this->getSiswaLogin();
 
@@ -113,6 +109,13 @@ class SiswaController extends Controller
                 ->with('error', 'Data siswa tidak ditemukan.');
         }
 
+        return view('siswa.data-diri-edit', compact('siswa'));
+    }
+
+    public function update(Request $request)
+    {
+        $siswa = $this->getSiswaLogin();
+
         $request->validate([
             'nama_lengkap'     => 'required|string|max:255',
             'nisn'             => 'required|string|max:20|unique:data_siswa,nisn,' . $siswa->id,
@@ -120,26 +123,13 @@ class SiswaController extends Controller
             'tempat_lahir'     => 'required|string|max:255',
             'tanggal_lahir'    => 'required|date',
             'agama'            => 'required|string|max:50',
-            'status_keluarga'  => 'nullable|string|max:100',
-            'anak_ke'          => 'nullable|integer',
             'alamat'           => 'required|string',
             'no_hp'            => 'required|string|max:20',
-            'sekolah_asal'     => 'nullable|string|max:255',
-            'kelas'            => 'required|string|max:50',
-            'tanggal_diterima' => 'nullable|date',
 
             'nama_ayah'        => 'required|string|max:255',
             'pekerjaan_ayah'   => 'required|string|max:255',
-            'telepon_ayah'     => 'nullable|string|max:20',
-
             'nama_ibu'         => 'required|string|max:255',
             'pekerjaan_ibu'    => 'required|string|max:255',
-            'telepon_ibu'      => 'nullable|string|max:20',
-
-            'nama_wali'        => 'nullable|string|max:255',
-            'alamat_wali'      => 'nullable|string',
-            'telepon_wali'     => 'nullable|string|max:20',
-            'pekerjaan_wali'   => 'nullable|string|max:255',
         ]);
 
         $siswa->update($request->all());
@@ -149,36 +139,188 @@ class SiswaController extends Controller
     }
 
     /**
-     * Raport siswa
+     * Upload / update foto profil siswa
      */
-    public function raport()
+    public function uploadPhoto(Request $request)
     {
         $siswa = $this->getSiswaLogin();
-        return view('siswa.raport', compact('siswa'));
+
+        if (!$siswa) {
+            return redirect()->back()->with('error', 'Data siswa tidak ditemukan.');
+        }
+
+        $request->validate([
+            'foto' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        // Simpan pada disk `public` di folder `siswa_photos`
+        $path = $request->file('foto')->store('siswa_photos', 'public');
+
+        // Hapus foto lama jika ada
+        if ($siswa->foto && Storage::disk('public')->exists($siswa->foto)) {
+            Storage::disk('public')->delete($siswa->foto);
+        }
+
+        $siswa->foto = $path;
+        $siswa->save();
+
+        return redirect()->back()->with('success', 'Foto profil berhasil diperbarui.');
     }
 
     /**
-     * Catatan wali kelas
+     * ============================
+     *       RAPORT SISWA
+     * ============================
      */
+
+    // 🔹 Halaman list raport: daftar (semester & tahun)
+   // 🔹 Halaman list raport: daftar (tahun ajaran)
+public function raport()
+{
+    $siswa = $this->getSiswaLogin();
+
+    // Ubah query untuk hanya mengambil tahun ajaran unik
+    $raports = NilaiRaport::select('tahun_ajaran')
+        ->where('siswa_id', $siswa->id)
+        ->groupBy('tahun_ajaran')
+        ->orderBy('tahun_ajaran', 'desc')
+        ->get();
+
+    return view('siswa.raport.raport', compact('siswa', 'raports'));
+}
+
+    // 🔹 Halaman detail raport lengkap
+   // 🔹 Halaman detail raport lengkap
+public function raportShow($semester, $tahun)
+{
+    $siswa = $this->getSiswaLogin();
+    // jika $tahun dikirimkan dari URL sebagai '2025-2026', konversi kembali ke '2025/2026'
+    $tahun = str_replace('-', '/', $tahun);
+
+    // Validasi semester
+    if (!in_array($semester, ['Ganjil', 'Genap'])) {
+        return redirect()->route('siswa.raport')
+            ->with('error', 'Semester tidak valid');
+    }
+
+    $nilaiRaports = NilaiRaport::with('mapel')
+        ->where('siswa_id', $siswa->id)
+        ->where('semester', $semester)
+        ->where('tahun_ajaran', $tahun)
+        ->orderBy('mata_pelajaran_id')
+        ->get();
+
+    // Cek apakah ada data raport
+    if ($nilaiRaports->isEmpty()) {
+        return redirect()->route('siswa.raport')
+            ->with('error', 'Data raport untuk semester ' . $semester . ' tahun ajaran ' . $tahun . ' tidak ditemukan');
+    }
+
+    $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa->id)
+        ->where('semester', $semester)
+        ->where('tahun_ajaran', $tahun)
+        ->get();
+
+    $kehadiran = Kehadiran::where('siswa_id', $siswa->id)
+        ->where('semester', $semester)
+        ->where('tahun_ajaran', $tahun)
+        ->first();
+
+    $info = RaporInfo::where('siswa_id', $siswa->id)
+        ->where('semester', $semester)
+        ->where('tahun_ajaran', $tahun)
+        ->first();
+
+    $kenaikan = KenaikanKelas::where('siswa_id', $siswa->id)
+        ->where('semester', $semester)
+        ->where('tahun_ajaran', $tahun)
+        ->first();
+
+    return view('siswa.raport.show', compact(
+        'siswa',
+        'semester',
+        'tahun',
+        'nilaiRaports',
+        'ekstra',
+        'kehadiran',
+        'info',
+        'kenaikan'
+    ));
+}
+
+    // 🔹 Export raport ke PDF
+// 🔹 Export raport ke PDF
+public function raportPDF($semester, $tahun)
+{
+    $siswa = $this->getSiswaLogin();
+    // jika $tahun dikirimkan dari URL sebagai '2025-2026', konversi kembali ke '2025/2026'
+    $tahun = str_replace('-', '/', $tahun);
+
+    // Validasi semester
+    if (!in_array($semester, ['Ganjil', 'Genap'])) {
+        return redirect()->route('siswa.raport')
+            ->with('error', 'Semester tidak valid');
+    }
+
+    $nilaiRaports = NilaiRaport::with('mapel')
+        ->where('siswa_id', $siswa->id)
+        ->where('semester', $semester)
+        ->where('tahun_ajaran', $tahun)
+        ->orderBy('mata_pelajaran_id')
+        ->get();
+
+    // Cek apakah ada data raport
+    if ($nilaiRaports->isEmpty()) {
+        return redirect()->route('siswa.raport')
+            ->with('error', 'Data raport untuk semester ' . $semester . ' tahun ajaran ' . $tahun . ' tidak ditemukan');
+    }
+
+    $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa->id)
+        ->where('semester', $semester)
+        ->where('tahun_ajaran', $tahun)
+        ->get();
+
+    $kehadiran = Kehadiran::where('siswa_id', $siswa->id)
+        ->where('semester', $semester)
+        ->where('tahun_ajaran', $tahun)
+        ->first();
+
+    $info = RaporInfo::where('siswa_id', $siswa->id)
+        ->where('semester', $semester)
+        ->where('tahun_ajaran', $tahun)
+        ->first();
+
+    $kenaikan = KenaikanKelas::where('siswa_id', $siswa->id)
+        ->where('semester', $semester)
+        ->where('tahun_ajaran', $tahun)
+        ->first();
+
+    $pdf = Pdf::loadView('siswa.raport.pdf', compact(
+        'siswa',
+        'semester',
+        'tahun',
+        'nilaiRaports',
+        'ekstra',
+        'kehadiran',
+        'info',
+        'kenaikan'
+    ))->setPaper('A4', 'portrait');
+
+    return $pdf->stream('Raport - ' . $siswa->nama_lengkap . ' - ' . $semester . ' - ' . $tahun . '.pdf');
+}
     public function catatan()
     {
         $siswa = $this->getSiswaLogin();
         return view('siswa.catatan', compact('siswa'));
     }
-public function exportPDF()
-{
-    $siswa = $this->getSiswaLogin();
 
-    if (!$siswa) {
-        return redirect()->route('siswa.dataDiri')
-            ->with('error', 'Data siswa belum diisi.');
+    public function exportPDF()
+    {
+        $siswa = $this->getSiswaLogin();
+
+        $pdf = Pdf::loadView('siswa.pdf', compact('siswa'))
+            ->setPaper('A4', 'portrait');
+
+        return $pdf->stream('Data Diri - ' . $siswa->nama_lengkap . '.pdf');
     }
-
-    $pdf = Pdf::loadView('siswa.pdf', compact('siswa'))
-                ->setPaper('A4', 'portrait');
-
-    return $pdf->stream('Data Diri - '.$siswa->nama_lengkap.'.pdf');
 }
-    
-}
-

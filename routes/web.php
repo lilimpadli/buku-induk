@@ -16,6 +16,7 @@ use App\Http\Controllers\WaliKelas\NilaiRaportController;
 use App\Http\Controllers\RaporController;
 
 
+
 // tu
 use App\Http\Controllers\TU\TambahKelasController;
 use App\Http\Controllers\TU\KelastuController;
@@ -99,7 +100,7 @@ Route::middleware('web')->group(function () {
         // Redirect dashboard berdasarkan role
         Route::get('/dashboard', function () {
 
-           return match (Auth::user()->role) {
+            return match (Auth::user()->role) {
                 'siswa'       => redirect()->route('siswa.dashboard'),
                 'walikelas'   => redirect()->route('walikelas.dashboard'),
                 'kaprog'      => redirect()->route('kaprog.dashboard'),
@@ -117,40 +118,32 @@ Route::middleware('web')->group(function () {
         | ROUTE SISWA
         |--------------------------------------------------------------------------
         */
-        Route::prefix('siswa')->name('siswa.')->group(function () {
+       Route::prefix('siswa')->name('siswa.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [App\Http\Controllers\SiswaController::class, 'dashboard'])->name('dashboard');
 
-            Route::get('/dashboard', fn() => view('siswa.dashboard'))->name('dashboard');
+    // Data Diri
+    Route::get('/data-diri', [SiswaController::class, 'dataDiri'])->name('dataDiri');
+    Route::get('/data-diri/create', [SiswaController::class, 'create'])->name('dataDiri.create');
+    Route::post('/data-diri', [SiswaController::class, 'store'])->name('dataDiri.store');
+    Route::get('/data-diri/edit', [SiswaController::class, 'edit'])->name('dataDiri.edit');
+    Route::put('/data-diri', [SiswaController::class, 'update'])->name('dataDiri.update');
+    Route::get('/data-diri/export-pdf', [SiswaController::class, 'exportPDF'])->name('dataDiri.exportPDF');
 
-            Route::get('/data-diri', [SiswaController::class, 'dataDiri'])->name('dataDiri');
-            Route::get('/data-diri/create', [SiswaController::class, 'create'])->name('dataDiri.create');
-            Route::post('/data-diri', [SiswaController::class, 'store'])->name('dataDiri.store');
-            Route::get('/data-diri/edit', [SiswaController::class, 'edit'])->name('dataDiri.edit');
-            Route::put('/data-diri', [SiswaController::class, 'update'])->name('dataDiri.update');
+    // Raport - PERBAIKAN DI SINI
+    Route::get('/raport', [SiswaController::class, 'raport'])->name('raport');
+    Route::get('/raport/{semester}/{tahun}', [SiswaController::class, 'raportShow'])->name('raport.show');
+    Route::get('/raport/{semester}/{tahun}/pdf', [SiswaController::class, 'raportPDF'])->name('raport.pdf');
 
-            Route::get('/raport', [SiswaController::class, 'raport'])->name('raport');
-            Route::get('/catatan', [SiswaController::class, 'catatan'])->name('catatan');
+    // Catatan
+    Route::get('/catatan', [SiswaController::class, 'catatan'])->name('catatan');
 
-            Route::post('/data-diri', [SiswaController::class, 'store'])
-                ->name('dataDiri.store');
+    // Upload foto profil siswa
+    Route::post('/profile/photo', [SiswaController::class, 'uploadPhoto'])->name('profile.photo');
 
-            Route::get('/data-diri/edit', [SiswaController::class, 'edit'])
-                ->name('dataDiri.edit');
-
-            Route::put('/data-diri', [SiswaController::class, 'update'])
-                ->name('dataDiri.update');
-
-            Route::get('/raport', [SiswaController::class, 'raport'])
-                ->name('raport');
-
-            Route::get('/catatan', [SiswaController::class, 'catatan'])
-                ->name('catatan');
-
-            // Cetak raport siswa sendiri
-            Route::get(
-                '/nilai_raport/{siswa_id}/{semester}/{tahun}/cetak',
-                [NilaiRaportController::class, 'exportPdf']
-            )->name('raport.cetak_pdf');
-        });
+    // Cetak raport siswa sendiri
+    Route::get('/nilai_raport/{siswa_id}/{semester}/{tahun}/cetak', [NilaiRaportController::class, 'exportPdf'])->name('raport.cetak_pdf');
+});
 
 
 
@@ -167,16 +160,20 @@ Route::middleware('web')->group(function () {
                 /*
         | Dashboard Wali Kelas
         */
-                Route::get('/dashboard', fn() => view('walikelas.dashboard'))
+                Route::get('/dashboard', [App\Http\Controllers\WaliKelasSiswaController::class, 'dashboard'])
                     ->name('dashboard');
 
-                    
-        
+
+
                 Route::get('/siswa', [WaliKelasSiswaController::class, 'index'])
                     ->name('siswa.index');
 
                 Route::get('/siswa/{id}', [WaliKelasSiswaController::class, 'show'])
                     ->name('siswa.show');
+
+                // Export data siswa (PDF)
+                Route::get('/siswa/{id}/export-pdf', [WaliKelasSiswaController::class, 'exportPdf'])
+                    ->name('siswa.exportPDF');
 
                 // Nilai Raport
                 Route::get('/nilai-raport', [NilaiRaportController::class, 'index'])
@@ -230,49 +227,63 @@ Route::middleware('web')->group(function () {
         |--------------------------------------------------------------------------
         */
         Route::prefix('kaprog')->name('kaprog.')->group(function () {
-            Route::get('/dashboard', fn() => view('kaprog.dashboard'))->name('dashboard');
-            Route::get('/raport-siswa', fn() => view('kaprog.raport'))->name('raport.siswa');
-        });
 
-     /*
+     // Dashboard
+    Route::get('/dashboard', [KurikulumDashboardController::class, 'index'])
+        ->name('dashboard');
+
+    // View Raport
+    Route::get('/raport-siswa', fn() => view('kaprog.raport.raport'))
+        ->name('raport.siswa');
+
+    // Detail siswa (AJAX)
+    Route::get('/siswa/{id}/detail', [KurikulumDashboardController::class, 'detail'])
+        ->name('siswa.detail');
+
+});
+
+
+        /*
 |--------------------------------------------------------------------------
 | ROUTE TU
 |--------------------------------------------------------------------------
 */
-Route::prefix('tu')->name('tu.')->group(function () {
-    // Dashboard
-    Route::get('/dashboard', [TUController::class, 'dashboard'])->name('dashboard');
-    
-    // Route untuk siswa
-    Route::get('/siswa', [TUController::class, 'siswa'])->name('siswa');
-    Route::get('/siswa/create', [TUController::class, 'siswaCreate'])->name('siswa.create');
-    Route::post('/siswa', [TUController::class, 'siswaStore'])->name('siswa.store');
-    Route::get('/siswa/{id}', [TUController::class, 'siswaDetail'])->name('siswa.detail');
-    Route::get('/siswa/{id}/edit', [TUController::class, 'siswaEdit'])->name('siswa.edit');
-    Route::put('/siswa/{id}', [TUController::class, 'siswaUpdate'])->name('siswa.update');
-    Route::delete('/siswa/{id}', [TUController::class, 'siswaDestroy'])->name('siswa.destroy');
-    
-    // Route untuk kelas
-    Route::get('/kelas', [TUController::class, 'kelas'])->name('kelas');
-    Route::get('/kelas/create', [TUController::class, 'kelasCreate'])->name('kelas.create');
-    Route::post('/kelas', [TUController::class, 'kelasStore'])->name('kelas.store');
-    Route::get('/kelas/{id}', [TUController::class, 'kelasDetail'])->name('kelas.detail');
-    Route::get('/kelas/{id}/edit', [TUController::class, 'kelasEdit'])->name('kelas.edit');
-    Route::put('/kelas/{id}', [TUController::class, 'kelasUpdate'])->name('kelas.update');
-    Route::delete('/kelas/{id}', [TUController::class, 'kelasDestroy'])->name('kelas.destroy');
-    
-     Route::get('/wali-kelas', [TUController::class, 'waliKelas'])->name('wali-kelas');
-    Route::get('/wali-kelas/create', [TUController::class, 'waliKelasCreate'])->name('wali-kelas.create');
-    Route::post('/wali-kelas', [TUController::class, 'waliKelasStore'])->name('wali-kelas.store');
-    Route::get('/wali-kelas/{id}', [TUController::class, 'waliKelasDetail'])->name('wali-kelas.detail');
-    Route::get('/wali-kelas/{id}/edit', [TUController::class, 'waliKelasEdit'])->name('wali-kelas.edit');
-    Route::put('/wali-kelas/{id}', [TUController::class, 'waliKelasUpdate'])->name('wali-kelas.update');
-    Route::delete('/wali-kelas/{id}', [TUController::class, 'waliKelasDestroy'])->name('wali-kelas.destroy');
-    // Route untuk laporan
-    Route::get('/laporan-nilai', [TUController::class, 'laporanNilai'])->name('laporan.nilai');
-});
+        Route::prefix('tu')->name('tu.')->group(function () {
+            // Dashboard
+            Route::get('/dashboard', [TUController::class, 'dashboard'])->name('dashboard');
 
-          
+            // Route untuk siswa
+            Route::get('/siswa', [TUController::class, 'siswa'])->name('siswa');
+            Route::get('/siswa/create', [TUController::class, 'siswaCreate'])->name('siswa.create');
+            Route::post('/siswa', [TUController::class, 'siswaStore'])->name('siswa.store');
+            Route::get('/siswa/{id}', [TUController::class, 'siswaDetail'])->name('siswa.detail');
+            Route::get('/siswa/{id}/edit', [TUController::class, 'siswaEdit'])->name('siswa.edit');
+            Route::put('/siswa/{id}', [TUController::class, 'siswaUpdate'])->name('siswa.update');
+            Route::delete('/siswa/{id}', [TUController::class, 'siswaDestroy'])->name('siswa.destroy');
+
+            // Route untuk kelas
+            Route::get('/kelas', [TUController::class, 'kelas'])->name('kelas');
+            Route::get('/kelas/create', [TUController::class, 'kelasCreate'])->name('kelas.create');
+            Route::post('/kelas', [TUController::class, 'kelasStore'])->name('kelas.store');
+            Route::get('/kelas/{id}', [TUController::class, 'kelasDetail'])->name('kelas.detail');
+            Route::get('/kelas/{id}/edit', [TUController::class, 'kelasEdit'])->name('kelas.edit');
+            Route::put('/kelas/{id}', [TUController::class, 'kelasUpdate'])->name('kelas.update');
+            Route::delete('/kelas/{id}', [TUController::class, 'kelasDestroy'])->name('kelas.destroy');
+
+            Route::get('/wali-kelas', [TUController::class, 'waliKelas'])->name('wali-kelas');
+            Route::get('/wali-kelas/create', [TUController::class, 'waliKelasCreate'])->name('wali-kelas.create');
+            Route::post('/wali-kelas', [TUController::class, 'waliKelasStore'])->name('wali-kelas.store');
+            Route::get('/wali-kelas/{id}', [TUController::class, 'waliKelasDetail'])->name('wali-kelas.detail');
+            Route::get('/wali-kelas/{id}/edit', [TUController::class, 'waliKelasEdit'])->name('wali-kelas.edit');
+            Route::put('/wali-kelas/{id}', [TUController::class, 'waliKelasUpdate'])->name('wali-kelas.update');
+            Route::delete('/wali-kelas/{id}', [TUController::class, 'waliKelasDestroy'])->name('wali-kelas.destroy');
+            // Route untuk laporan
+            Route::get('/laporan-nilai', [TUController::class, 'laporanNilai'])->name('laporan.nilai');
+        });
+
+
+
+
 
 
         /*
@@ -280,52 +291,48 @@ Route::prefix('tu')->name('tu.')->group(function () {
         | ROUTE KURIKULUM
         |--------------------------------------------------------------------------
         */
-       Route::prefix('kurikulum')->name('kurikulum.')->group(function () {
+        Route::prefix('kurikulum')->name('kurikulum.')->group(function () {
 
-    Route::get('/dashboard', [KurikulumDashboardController::class, 'index'])
-        ->name('dashboard');
+            Route::get('/dashboard', [KurikulumDashboardController::class, 'index'])
+                ->name('dashboard');
 
-    Route::get('/siswa', [KurikulumSiswaController::class, 'index'])
-        ->name('siswa.index');
-        
-        Route::get('/kurikulum/manajemen-kelas', [KelasController::class, 'index'])
-    ->name('kurikulum.kelas.index');
+            Route::get('/siswa', [KurikulumSiswaController::class, 'index'])
+                ->name('siswa.index');
 
-    Route::view('/kurikulum/siswa/show', 'kurikulum.show')->name('kurikulum.siswa.show');
+            Route::get('/kurikulum/manajemen-kelas', [KelasController::class, 'index'])
+                ->name('kurikulum.kelas.index');
 
-
-
-        
-    // Halaman utama manajemen kelas
-    Route::get('/manajemen-kelas', function () {
-        return view('kurikulum.manajemen-kelas.index');
-    })->name('kelas.index');
-
-    // ============================
-    //  MANAGEMEN KELAS — EDIT
-    // ============================
-
-    Route::get('/manajemen-kelas/{id}/edit', function ($id) {
-        return view('kurikulum.manajemen-kelas.edit', [
-            'kelas' => (object)[
-                'id' => $id,
-                'kelas' => '',
-                'jurusan' => '',
-                'rombel' => '',
-                'wali_kelas' => ''
-            ]
-        ]);
-    })->name('kelas.edit');
-
-    Route::put('/manajemen-kelas/{id}', function ($id) {
-        // sementara dummy (belum ada database)
-        return redirect()->route('kurikulum.kelas.index')
-            ->with('success', 'Data kelas berhasil diperbarui.');
-    })->name('kelas.update');
-
-});
-
-    }); // END AUTH
+            Route::view('/kurikulum/siswa/show', 'kurikulum.show')->name('kurikulum.siswa.show');
 
 
+
+
+            // Halaman utama manajemen kelas
+            Route::get('/manajemen-kelas', function () {
+                return view('kurikulum.manajemen-kelas.index');
+            })->name('kelas.index');
+
+            // ============================
+            //  MANAGEMEN KELAS — EDIT
+            // ============================
+
+            Route::get('/manajemen-kelas/{id}/edit', function ($id) {
+                return view('kurikulum.manajemen-kelas.edit', [
+                    'kelas' => (object)[
+                        'id' => $id,
+                        'kelas' => '',
+                        'jurusan' => '',
+                        'rombel' => '',
+                        'wali_kelas' => ''
+                    ]
+                ]);
+            })->name('kelas.edit');
+
+            Route::put('/manajemen-kelas/{id}', function ($id) {
+                // sementara dummy (belum ada database)
+                return redirect()->route('kurikulum.kelas.index')
+                    ->with('success', 'Data kelas berhasil diperbarui.');
+            })->name('kelas.update');
+        });
+    }); 
 });

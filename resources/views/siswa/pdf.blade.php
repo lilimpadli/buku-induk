@@ -45,7 +45,10 @@
 <br><br>
 
 @if($siswa->foto)
-    <img src="{{ public_path('uploads/foto/'.$siswa->foto) }}" class="photo">
+    @php $fotoPath = public_path('storage/' . $siswa->foto); @endphp
+    @if(file_exists($fotoPath))
+        <img src="{{ $fotoPath }}" class="photo">
+    @endif
 @endif
 
 </body>

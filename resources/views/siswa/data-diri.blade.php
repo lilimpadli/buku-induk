@@ -16,9 +16,9 @@
                         <i class="fas fa-edit me-1"></i> Edit Data
                     </a>
 
-                   <a href="{{ route('siswa.export.pdf') }}" class="btn btn-danger">
-    <i class="bi bi-file-earmark-pdf"></i> Export PDF
-</a>
+                    <a href="{{ route('siswa.dataDiri.exportPDF') }}" class="btn btn-danger" target="_blank">
+                        <i class="bi bi-file-earmark-pdf"></i> Export PDF
+                    </a>
 
                 @else
                     <a href="{{ route('siswa.dataDiri.create') }}" class="btn btn-primary">
@@ -149,6 +149,12 @@
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">Telepon Ibu</label>
                                 <p class="form-control-plaintext">{{ $siswa->telepon_ibu }}</p>
+                            </div>
+
+                            <!-- Alamat Orang Tua -->
+                            <div class="col-12 mt-3">
+                                <label class="form-label fw-semibold">Alamat Orang Tua</label>
+                                <p class="form-control-plaintext">{{ $siswa->alamat_orangtua ?? '-' }}</p>
                             </div>
 
                             <!-- DATA WALI -->

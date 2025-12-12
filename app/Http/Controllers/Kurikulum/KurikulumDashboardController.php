@@ -3,39 +3,28 @@
 namespace App\Http\Controllers\Kurikulum;
 
 use App\Http\Controllers\Controller;
-use App\Models\Siswa;
+use App\Models\DataSiswa;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class KurikulumDashboardController extends Controller
 {
-   public function index()
+    public function index()
+    {
+        $totalSiswa = DataSiswa::count();
+        $totalGuru  = User::where('role', '!=', 'siswa')->count();
+        $totalKelas = DB::table('kelas')->count();
+
+        $siswas = DataSiswa::orderBy('nama_lengkap')->get();
+
+        return view('kaprog.dashboard', compact('totalSiswa', 'totalGuru', 'totalKelas', 'siswas'));
+    }
+
+    public function detail($id)
 {
-    $totalSiswa = Siswa::count();
-    $totalGuru = 12; // contoh
-    $totalKelas = 18; // contoh
+    $siswa = DataSiswa::findOrFail($id);
 
-    $aktivitas = [
-        [
-            'nama' => 'Ade Santoso',
-            'kelas' => 'X RPL 1',
-            'aktivitas' => 'Mengubah data profil',
-            'waktu' => '2025-12-05',
-        ],
-        [
-            'nama' => 'Putri Lestari',
-            'kelas' => 'XI TKJ 2',
-            'aktivitas' => 'Menambahkan data anggota keluarga',
-            'waktu' => '2025-12-04',
-        ],
-    ];
-
-    return view('kurikulum.dashboard', compact(
-        'totalSiswa',
-        'totalGuru',
-        'totalKelas',
-        'aktivitas'
-    ));
+    return response()->json($siswa);
 }
 
-
-    
 }

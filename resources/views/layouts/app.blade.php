@@ -72,29 +72,28 @@
                     <div class="list-group list-group-flush">
 
                         {{-- ======================== ROLE: SISWA ======================== --}}
-                        @if(Auth::user()->role == 'siswa')
+                       {{-- ======================== ROLE: SISWA ======================== --}}
+@if(Auth::user()->role == 'siswa')
+    <a href="{{ route('siswa.dashboard') }}"
+        class="list-group-item list-group-item-action {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
+        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+    </a>
 
-                            <a href="{{ route('siswa.dashboard') }}"
-                                class="list-group-item list-group-item-action {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
-                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
-                            </a>
+    <a href="{{ route('siswa.dataDiri') }}"
+        class="list-group-item list-group-item-action {{ request()->routeIs('siswa.dataDiri*') ? 'active' : '' }}">
+        <i class="fas fa-user me-2"></i> Data Diri
+    </a>
 
-                            <a href="{{ route('siswa.dataDiri') }}"
-                                class="list-group-item list-group-item-action {{ request()->routeIs('siswa.dataDiri*') ? 'active' : '' }}">
-                                <i class="fas fa-user me-2"></i> Data Diri
-                            </a>
+    <a href="{{ route('siswa.raport') }}" 
+        class="list-group-item list-group-item-action {{ request()->routeIs('siswa.raport') ? 'active' : '' }}">
+        <i class="fas fa-file-alt me-2"></i> Lihat Raport
+    </a>
 
-                            <a href="{{ route('siswa.raport') }}"
-                                class="list-group-item list-group-item-action {{ request()->routeIs('siswa.raport') ? 'active' : '' }}">
-                                <i class="fas fa-file-alt me-2"></i> Lihat Raport
-                            </a>
-
-                            <a href="{{ route('siswa.catatan') }}"
-                                class="list-group-item list-group-item-action {{ request()->routeIs('siswa.catatan') ? 'active' : '' }}">
-                                <i class="fas fa-sticky-note me-2"></i> Catatan Wali Kelas
-                            </a>
-
-                        @endif
+    <a href="{{ route('siswa.catatan') }}"
+        class="list-group-item list-group-item-action {{ request()->routeIs('siswa.catatan') ? 'active' : '' }}">
+        <i class="fas fa-sticky-note me-2"></i> Catatan Wali Kelas
+    </a>
+@endif
 
 
                         {{-- ======================== ROLE: WALI KELAS ======================== --}}
@@ -203,15 +202,19 @@
                                 <i class="fa fa-users me-2"></i> Manajemen Siswa
                             </a>
 
-                            <a href="{{ route('kurikulum.kelas.index') }}"
-                                class="list-group-item list-group-item-action {{ request()->routeIs('kurikulum.kelas*') ? 'active' : '' }}">
-                                <i class="fa fa-building me-2"></i> Manajemen Kelas
-                            </a>
+    {{-- Input Nilai Raport --}}
+    <a href="{{ route('walikelas.input_nilai_raport.index') }}"
+       class="list-group-item list-group-item-action 
+       {{ request()->routeIs('walikelas.rapor.nilai.*') ? 'active' : '' }}">
+        <i class="fas fa-clipboard-check me-2"></i> Input Nilai Raport
+    </a>
 
-                            <a href=""
-                                class="list-group-item list-group-item-action {{ request()->routeIs('kurikulum.akun') ? 'active' : '' }}">
-                                <i class="fa fa-user-cog me-2"></i> Manajemen Akun
-                            </a>
+    {{-- Lihat / Cetak Raport --}}
+    <a href="{{ route('walikelas.nilai_raport.index') }}"
+       class="list-group-item list-group-item-action 
+       {{ request()->routeIs('walikelas.rapor.cetak') ? 'active' : '' }}">
+        <i class="fas fa-file-lines me-2"></i> Lihat Nilai Raport
+    </a>
 
                             <a href=""
                                 class="list-group-item list-group-item-action {{ request()->routeIs('kurikulum.raport*') ? 'active' : '' }}">

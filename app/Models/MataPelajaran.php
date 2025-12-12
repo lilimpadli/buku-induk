@@ -19,4 +19,9 @@ class MataPelajaran extends Model
     {
         return $this->hasMany(NilaiRaport::class, 'mata_pelajaran_id');
     }
+
+    public function jurusan()
+{
+    return $this->belongsTo(Jurusan::class, 'jurusan_id');
+}
 }

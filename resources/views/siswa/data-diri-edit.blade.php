@@ -3,214 +3,232 @@
 @section('title', 'Edit Data Diri Siswa')
 
 @section('content')
-<div class="container mt-4 mb-4">
+<div class="container mt-3">
     <div class="row">
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <h3 class="mb-4">Edit Data Diri</h3>
 
-        <div class="col-md-10 mx-auto">
-
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="fw-semibold">Edit Data Diri</h3>
-            </div>
-
-            <div class="card shadow-sm">
+            <div class="card shadow">
                 <div class="card-body">
+                    <!-- Progress Bar -->
+                    <div class="mb-4">
+                        <div class="progress" style="height: 5px;">
+                            <div class="progress-bar" id="progressBar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2 small text-muted">
+                            <span class="step-label active" id="step1Label"><i class="fas fa-user me-1"></i>Langkah 1: Data Siswa</span>
+                            <span class="step-label" id="step2Label"><i class="fas fa-users me-1"></i>Langkah 2: Data Orang Tua</span>
+                        </div>
+                    </div>
 
-                    <form method="POST" action="{{ route('siswa.dataDiri.update') }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('siswa.dataDiri.update') }}" enctype="multipart/form-data" id="multiStepForm">
                         @csrf
                         @method('PUT')
+                        <input type="hidden" name="step" id="stepInput" value="1">
 
-                        <div class="row g-3">
+                        <!-- ========== STEP 1: DATA SISWA ========== -->
+                        <div id="step1" class="step-form">
+                            <h5 class="mb-3 fw-semibold">Identitas Siswa</h5>
+                            <div class="row g-3">
+                                <!-- Nama Lengkap, NIS, NISN -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Nama Lengkap <span class="text-danger">*</span></label>
+                                    <input type="text" name="nama_lengkap" class="form-control step1-field" value="{{ $siswa->nama_lengkap ?? old('nama_lengkap') }}" required>
+                                    @error('nama_lengkap')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
 
-                            <!-- Identitas Siswa -->
-                            <div class="col-12">
-                                <h5 class="border-bottom pb-2 fw-semibold">Identitas Siswa</h5>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">NIS</label>
+                                    <input type="text" value="{{ $siswa->nis }}" class="form-control" disabled>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">NISN <span class="text-danger">*</span></label>
+                                    <input type="text" name="nisn" class="form-control step1-field" value="{{ $siswa->nisn ?? old('nisn') }}" required>
+                                    @error('nisn')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <!-- TTL dan Jenis Kelamin -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Tempat Lahir <span class="text-danger">*</span></label>
+                                    <input type="text" name="tempat_lahir" class="form-control step1-field" value="{{ $siswa->tempat_lahir ?? old('tempat_lahir') }}" required>
+                                    @error('tempat_lahir')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Tanggal Lahir <span class="text-danger">*</span></label>
+                                    <input type="date" name="tanggal_lahir" class="form-control step1-field" value="{{ $siswa->tanggal_lahir ?? old('tanggal_lahir') }}" required>
+                                    @error('tanggal_lahir')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Jenis Kelamin <span class="text-danger">*</span></label>
+                                    <select name="jenis_kelamin" class="form-select step1-field" required>
+                                        <option value="">-- Pilih --</option>
+                                        <option value="Laki-laki" {{ ($siswa->jenis_kelamin ?? old('jenis_kelamin')) == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                        <option value="Perempuan" {{ ($siswa->jenis_kelamin ?? old('jenis_kelamin')) == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                    </select>
+                                    @error('jenis_kelamin')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <!-- Agama, Status Keluarga, Anak Ke -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Agama <span class="text-danger">*</span></label>
+                                    <input type="text" name="agama" class="form-control step1-field" value="{{ $siswa->agama ?? old('agama') }}" required>
+                                    @error('agama')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Status Keluarga <span class="text-danger">*</span></label>
+                                    <input type="text" name="status_keluarga" class="form-control step1-field" value="{{ $siswa->status_keluarga ?? old('status_keluarga') }}" required>
+                                    @error('status_keluarga')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Anak ke <span class="text-danger">*</span></label>
+                                    <input type="number" name="anak_ke" class="form-control step1-field" value="{{ $siswa->anak_ke ?? old('anak_ke') }}" required>
+                                    @error('anak_ke')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <!-- Alamat, No HP -->
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold">Alamat <span class="text-danger">*</span></label>
+                                    <textarea name="alamat" class="form-control step1-field" rows="3" required>{{ $siswa->alamat ?? old('alamat') }}</textarea>
+                                    @error('alamat')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">No HP <span class="text-danger">*</span></label>
+                                    <input type="text" name="no_hp" class="form-control step1-field" value="{{ $siswa->no_hp ?? old('no_hp') }}" required>
+                                    @error('no_hp')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <!-- Sekolah Asal, Kelas, Tanggal Diterima -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Sekolah Asal <span class="text-danger">*</span></label>
+                                    <input type="text" name="sekolah_asal" class="form-control step1-field" value="{{ $siswa->sekolah_asal ?? old('sekolah_asal') }}" required>
+                                    @error('sekolah_asal')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Kelas <span class="text-danger">*</span></label>
+                                    <input type="text" name="kelas" class="form-control step1-field" value="{{ $siswa->kelas ?? old('kelas') }}" required>
+                                    @error('kelas')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Tanggal Diterima <span class="text-danger">*</span></label>
+                                    <input type="date" name="tanggal_diterima" class="form-control step1-field" value="{{ $siswa->tanggal_diterima ?? old('tanggal_diterima') }}" required>
+                                    @error('tanggal_diterima')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <!-- Foto -->
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold">Foto Siswa</label>
+                                    @if ($siswa->foto)
+                                        <div class="mb-2">
+                                            <img src="{{ asset('storage/' . $siswa->foto) }}" width="100" class="rounded">
+                                        </div>
+                                    @endif
+                                    <input type="file" name="foto" class="form-control" accept="image/*">
+                                    <small class="text-muted">Format: JPG, PNG | Max: 2MB</small>
+                                </div>
                             </div>
+                        </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Nama Lengkap</label>
-                                <input type="text" name="nama_lengkap" class="form-control"
-                                    value="{{ old('nama_lengkap', $siswa->nama_lengkap) }}" required>
+                        <!-- ========== STEP 2: DATA ORANG TUA / WALI ========== -->
+                        <div id="step2" class="step-form" style="display: none;">
+                            <h5 class="mb-3 fw-semibold">Data Orang Tua & Wali</h5>
+                            <div class="row g-3">
+                                <!-- Data Ayah -->
+                                <div class="col-12">
+                                    <h6 class="border-bottom pb-2 fw-semibold text-primary">📋 Data Ayah</h6>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Nama Ayah <span class="text-danger">*</span></label>
+                                    <input type="text" name="nama_ayah" class="form-control" value="{{ $siswa->nama_ayah ?? old('nama_ayah') }}" required>
+                                    @error('nama_ayah')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Pekerjaan Ayah <span class="text-danger">*</span></label>
+                                    <input type="text" name="pekerjaan_ayah" class="form-control" value="{{ $siswa->pekerjaan_ayah ?? old('pekerjaan_ayah') }}" required>
+                                    @error('pekerjaan_ayah')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Telepon Ayah</label>
+                                    <input type="text" name="telepon_ayah" class="form-control" value="{{ $siswa->telepon_ayah ?? old('telepon_ayah') }}">
+                                </div>
+
+                                <!-- Data Ibu -->
+                                <div class="col-12 mt-3">
+                                    <h6 class="border-bottom pb-2 fw-semibold text-primary">👩 Data Ibu</h6>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Nama Ibu <span class="text-danger">*</span></label>
+                                    <input type="text" name="nama_ibu" class="form-control" value="{{ $siswa->nama_ibu ?? old('nama_ibu') }}" required>
+                                    @error('nama_ibu')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Pekerjaan Ibu <span class="text-danger">*</span></label>
+                                    <input type="text" name="pekerjaan_ibu" class="form-control" value="{{ $siswa->pekerjaan_ibu ?? old('pekerjaan_ibu') }}" required>
+                                    @error('pekerjaan_ibu')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Telepon Ibu</label>
+                                    <input type="text" name="telepon_ibu" class="form-control" value="{{ $siswa->telepon_ibu ?? old('telepon_ibu') }}">
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold">Alamat Orang Tua</label>
+                                    <textarea name="alamat_orangtua" class="form-control" rows="2">{{ $siswa->alamat_orangtua ?? old('alamat_orangtua') }}</textarea>
+                                </div>
+
+                                <!-- Data Wali -->
+                                <div class="col-12 mt-3">
+                                    <h6 class="border-bottom pb-2 fw-semibold text-primary">🧑‍💼 Data Wali (Opsional)</h6>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Nama Wali</label>
+                                    <input type="text" name="nama_wali" class="form-control" value="{{ $siswa->nama_wali ?? old('nama_wali') }}">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Alamat Wali</label>
+                                    <input type="text" name="alamat_wali" class="form-control" value="{{ $siswa->alamat_wali ?? old('alamat_wali') }}">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Telepon Wali</label>
+                                    <input type="text" name="telepon_wali" class="form-control" value="{{ $siswa->telepon_wali ?? old('telepon_wali') }}">
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold">Pekerjaan Wali</label>
+                                    <input type="text" name="pekerjaan_wali" class="form-control" value="{{ $siswa->pekerjaan_wali ?? old('pekerjaan_wali') }}">
+                                </div>
                             </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">NIS</label>
-                                <input type="text" class="form-control" value="{{ $siswa->nis }}" disabled>
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">NISN</label>
-                                <input type="text" name="nisn" class="form-control"
-                                    value="{{ old('nisn', $siswa->nisn) }}" required>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Tempat Lahir</label>
-                                <input type="text" name="tempat_lahir" class="form-control"
-                                    value="{{ old('tempat_lahir', $siswa->tempat_lahir) }}" required>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Tanggal Lahir</label>
-                                <input type="date" name="tanggal_lahir" class="form-control"
-                                    value="{{ old('tanggal_lahir', $siswa->tanggal_lahir) }}" required>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Jenis Kelamin</label>
-                                <select name="jenis_kelamin" class="form-select" required>
-                                    <option value="Laki-laki"   {{ $siswa->jenis_kelamin == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
-                                    <option value="Perempuan"   {{ $siswa->jenis_kelamin == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
-                                </select>
-                            </div>
-
-                            <!-- Agama, Status Keluarga, Anak Ke -->
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Agama</label>
-                                <input type="text" name="agama" class="form-control"
-                                    value="{{ old('agama', $siswa->agama) }}" required>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Status Keluarga</label>
-                                <input type="text" name="status_keluarga" class="form-control"
-                                    value="{{ old('status_keluarga', $siswa->status_keluarga) }}">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Anak Ke</label>
-                                <input type="number" name="anak_ke" class="form-control"
-                                    value="{{ old('anak_ke', $siswa->anak_ke) }}">
-                            </div>
-
-                            <!-- Kontak -->
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">No HP</label>
-                                <input type="text" name="no_hp" class="form-control"
-                                    value="{{ old('no_hp', $siswa->no_hp) }}" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Sekolah Asal</label>
-                                <input type="text" name="sekolah_asal" class="form-control"
-                                    value="{{ old('sekolah_asal', $siswa->sekolah_asal) }}">
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Kelas</label>
-                                <input type="text" name="kelas" class="form-control"
-                                    value="{{ old('kelas', $siswa->kelas) }}" placeholder="Contoh: XI MM 1">
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Tanggal Diterima</label>
-                                <input type="date" name="tanggal_diterima" class="form-control"
-                                    value="{{ old('tanggal_diterima', $siswa->tanggal_diterima) }}">
-                            </div>
-
-                            <!-- Alamat -->
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">Alamat Lengkap</label>
-                                <textarea name="alamat" class="form-control" rows="3" required>{{ old('alamat', $siswa->alamat) }}</textarea>
-                            </div>
-
-                            <!-- Data Ayah -->
-                            <div class="col-12 mt-4">
-                                <h5 class="border-bottom pb-2 fw-semibold">Data Ayah</h5>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Nama Ayah</label>
-                                <input type="text" name="nama_ayah" class="form-control"
-                                    value="{{ old('nama_ayah', $siswa->nama_ayah) }}">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Pekerjaan Ayah</label>
-                                <input type="text" name="pekerjaan_ayah" class="form-control"
-                                    value="{{ old('pekerjaan_ayah', $siswa->pekerjaan_ayah) }}">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Telepon Ayah</label>
-                                <input type="text" name="telepon_ayah" class="form-control"
-                                    value="{{ old('telepon_ayah', $siswa->telepon_ayah) }}">
-                            </div>
-
-                            <!-- Data Ibu -->
-                            <div class="col-12 mt-4">
-                                <h5 class="border-bottom pb-2 fw-semibold">Data Ibu</h5>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Nama Ibu</label>
-                                <input type="text" name="nama_ibu" class="form-control"
-                                    value="{{ old('nama_ibu', $siswa->nama_ibu) }}">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Pekerjaan Ibu</label>
-                                <input type="text" name="pekerjaan_ibu" class="form-control"
-                                    value="{{ old('pekerjaan_ibu', $siswa->pekerjaan_ibu) }}">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Telepon Ibu</label>
-                                <input type="text" name="telepon_ibu" class="form-control"
-                                    value="{{ old('telepon_ibu', $siswa->telepon_ibu) }}">
-                            </div>
-
-                            <!-- Data Wali -->
-                            <div class="col-12 mt-4">
-                                <h5 class="border-bottom pb-2 fw-semibold">Data Wali</h5>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Nama Wali</label>
-                                <input type="text" name="nama_wali" class="form-control"
-                                    value="{{ old('nama_wali', $siswa->nama_wali) }}">
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Telepon Wali</label>
-                                <input type="text" name="telepon_wali" class="form-control"
-                                    value="{{ old('telepon_wali', $siswa->telepon_wali) }}">
-                            </div>
-
-                            <div class="col-md-12">
-                                <label class="form-label fw-semibold">Alamat Wali</label>
-                                <textarea name="alamat_wali" class="form-control" rows="2">{{ old('alamat_wali', $siswa->alamat_wali) }}</textarea>
-                            </div>
-
-                            <div class="col-md-12">
-                                <label class="form-label fw-semibold">Pekerjaan Wali</label>
-                                <input type="text" name="pekerjaan_wali" class="form-control"
-                                    value="{{ old('pekerjaan_wali', $siswa->pekerjaan_wali) }}">
-                            </div>
-
-                            <!-- Foto -->
-                            <div class="col-12 mt-4">
-                                <h5 class="border-bottom pb-2 fw-semibold">Foto Siswa</h5>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Upload Foto Baru</label>
-                                <input type="file" name="foto" class="form-control">
-                            </div>
-
-                            <div class="col-md-6">
-                                @if($siswa->foto)
-                                    <p class="fw-semibold">Foto Saat Ini:</p>
-                                    <img src="{{ asset('storage/foto_siswa/' . $siswa->foto) }}"
-                                        class="img-thumbnail" width="150">
-                                @endif
-                            </div>
-
                         </div>
 
                         <!-- Tombol -->
-                        <div class="mt-4 d-flex justify-content-end">
-                            <a href="{{ route('siswa.dataDiri') }}" class="btn btn-secondary me-2">Batal</a>
-                            <button type="submit" class="btn btn-primary">
+                        <div class="mt-5 d-flex justify-content-end gap-2">
+                            <a href="{{ route('siswa.dataDiri') }}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Batal
+                            </a>
+                            <button type="button" class="btn btn-outline-secondary" id="prevBtn" style="display: none;">
+                                <i class="fas fa-arrow-left me-1"></i> Kembali
+                            </button>
+                            <button type="button" class="btn btn-primary" id="nextBtn">
+                                <i class="fas fa-arrow-right me-1"></i> Lanjut
+                            </button>
+                            <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
                                 <i class="fas fa-save me-1"></i> Simpan Perubahan
                             </button>
                         </div>
@@ -219,8 +237,90 @@
 
                 </div>
             </div>
-
         </div>
+
     </div>
 </div>
+
+<style>
+    .step-label {
+        font-weight: 500;
+        color: #999;
+        transition: color 0.3s;
+    }
+    .step-label.active {
+        color: #0056b3;
+        font-weight: 600;
+    }
+</style>
+
+<script>
+    let currentStep = 1;
+    const totalSteps = 2;
+
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const stepInput = document.getElementById('stepInput');
+    const form = document.getElementById('multiStepForm');
+
+    function showStep(step) {
+        // Hide all steps
+        document.getElementById('step1').style.display = step === 1 ? 'block' : 'none';
+        document.getElementById('step2').style.display = step === 2 ? 'block' : 'none';
+
+        // Update progress bar
+        const progress = (step / totalSteps) * 100;
+        document.querySelector('.progress-bar').style.width = progress + '%';
+
+        // Update step labels
+        document.getElementById('step1Label').classList.toggle('active', step === 1);
+        document.getElementById('step2Label').classList.toggle('active', step === 2);
+
+        // Update buttons
+        prevBtn.style.display = step === 1 ? 'none' : 'block';
+        nextBtn.style.display = step === 2 ? 'none' : 'block';
+        submitBtn.style.display = step === 2 ? 'block' : 'none';
+
+        stepInput.value = step;
+        currentStep = step;
+    }
+
+    nextBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Validasi step 1 fields
+        const step1Fields = document.querySelectorAll('.step1-field');
+        let isValid = true;
+
+        step1Fields.forEach(field => {
+            // Check if field is empty
+            if (!field.value || (field.tagName === 'SELECT' && field.value === '')) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+
+        if (isValid && currentStep < totalSteps) {
+            showStep(currentStep + 1);
+            // Scroll to top
+            document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (!isValid) {
+            alert('Mohon isi semua field yang diperlukan pada Langkah 1');
+        }
+    });
+
+    prevBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (currentStep > 1) {
+            showStep(currentStep - 1);
+            document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+
+    // Initialize on page load
+    showStep(1);
+</script>
 @endsection

@@ -30,14 +30,13 @@ class DataSiswa extends Model
         'nama_ibu',
         'pekerjaan_ibu',
         'telepon_ibu',
+        'alamat_orangtua',
         'nama_wali',
         'alamat_wali',
         'telepon_wali',
         'pekerjaan_wali',
         'foto',
         'catatan_wali_kelas',
-
-        // TAMBAHAN BARU
         'rombel_id',
     ];
 
@@ -45,6 +44,12 @@ class DataSiswa extends Model
      |  RELASI RAPOR
      ================================= */
     public function nilai()
+    {
+        return $this->hasMany(NilaiRaport::class, 'siswa_id');
+    }
+
+    // Tambahan untuk fix error: alias dari nilai()
+    public function nilaiRaports()
     {
         return $this->hasMany(NilaiRaport::class, 'siswa_id');
     }
@@ -73,10 +78,11 @@ class DataSiswa extends Model
     }
 
     /* ================================
-     |  RELASI ROMBEL (BARU)
+     |  RELASI ROMBEL
      ================================= */
     public function rombel()
     {
         return $this->belongsTo(Rombel::class);
     }
 }
+
