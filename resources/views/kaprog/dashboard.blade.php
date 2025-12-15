@@ -4,33 +4,41 @@
 
 @section('content')
 
-<h5 class="fw-bold mb-2">Dashboard Program Keahlian</h5>
-<p class="mb-1">Selamat Datang, <strong>{{ Auth::user()->name }}</strong></p>
-<p class="text-muted small mb-4">Berikut adalah ringkasan data penting untuk program keahlian Anda</p>
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h5 class="fw-bold mb-2">Dashboard Program Keahlian</h5>
+        <p class="mb-1">Selamat Datang, <strong>{{ Auth::user()->name }}</strong></p>
+        <p class="text-muted small mb-0">{{ $jurusan ? 'Program Keahlian: ' . $jurusan->nama : 'Program Keahlian: -' }}</p>
+    </div>
+    <div class="text-end">
+        <small class="text-muted">Ringkasan per jurusan</small>
+    </div>
+</div>
 
 <!-- STATS CARDS -->
 <div class="row g-3 mb-4">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card border-0 shadow-sm">
             <div class="card-body text-center py-4">
-                <p class="text-muted small mb-2">Total Siswa Aktif</p>
-                <h2 class="fw-bold mb-0" style="font-size: 2.5rem;">{{ $totalSiswa }}</h2>
+                <p class="text-muted small mb-2">Total Siswa</p>
+                <h2 class="fw-bold mb-0" style="font-size: 2.2rem;">{{ $totalSiswa }}</h2>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center py-4">
-                <p class="text-muted small mb-2">Jumlah Kelas</p>
-                <h2 class="fw-bold mb-0" style="font-size: 2.5rem;">{{ $totalKelas }}</h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
+   
+    <div class="col-md-3">
         <div class="card border-0 shadow-sm">
             <div class="card-body text-center py-4">
                 <p class="text-muted small mb-2">Jumlah Guru</p>
-                <h2 class="fw-bold mb-0" style="font-size: 2.5rem;">{{ $totalGuru }}</h2>
+                <h2 class="fw-bold mb-0" style="font-size: 2.2rem;">{{ $totalGuru }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-4">
+                <p class="text-muted small mb-2">Jumlah Rombel</p>
+                <h2 class="fw-bold mb-0" style="font-size: 2.2rem;">{{ $totalRombel ?? 0 }}</h2>
             </div>
         </div>
     </div>
@@ -38,28 +46,34 @@
 
 
 <!-- SEARCH & FILTERS -->
-<div class="row mb-4 align-items-center">
-    <div class="col-md-6 mb-3 mb-md-0">
-        <div class="input-group">
-            <input type="text" class="form-control" placeholder="Cari Data Siswa" id="searchInput">
-            <button class="btn btn-primary">
-                <i class="fa-solid fa-search"></i>
-            </button>
+<form method="GET" action="{{ route('kaprog.dashboard') }}">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6 mb-3 mb-md-0">
+            <div class="input-group">
+                <input type="text" name="q" value="{{ request('q') }}" class="form-control" placeholder="Cari Data Siswa (nama / NIS)">
+                <button class="btn btn-primary" type="submit">
+                    <i class="fa-solid fa-search"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-md-6 text-end">
+            <input type="hidden" name="kelas" id="kelasInput" value="{{ request('kelas', 'all') }}">
+            <button type="button" class="btn btn-sm {{ request('kelas') == 'all' || !request('kelas') ? 'btn-primary' : 'btn-outline-secondary' }} filter-btn" data-kelas="all">Semua</button>
+            <button type="button" class="btn btn-sm {{ request('kelas') == '10' ? 'btn-primary' : 'btn-outline-secondary' }} filter-btn" data-kelas="10">Kelas 10</button>
+            <button type="button" class="btn btn-sm {{ request('kelas') == '11' ? 'btn-primary' : 'btn-outline-secondary' }} filter-btn" data-kelas="11">Kelas 11</button>
+            <button type="button" class="btn btn-sm {{ request('kelas') == '12' ? 'btn-primary' : 'btn-outline-secondary' }} filter-btn" data-kelas="12">Kelas 12</button>
         </div>
     </div>
-    <div class="col-md-6 text-end">
-        <button class="btn btn-primary btn-sm filter-btn" data-kelas="all">Semua</button>
-        <button class="btn btn-outline-secondary btn-sm filter-btn" data-kelas="10">Kelas 10</button>
-        <button class="btn btn-outline-secondary btn-sm filter-btn" data-kelas="11">Kelas 11</button>
-        <button class="btn btn-outline-secondary btn-sm filter-btn" data-kelas="12">Kelas 12</button>
-    </div>
-</div>
+</form>
 
 
 <!-- TABLE -->
 <div class="card border-0 shadow-sm">
     <div class="card-body">
-        <h6 class="fw-bold mb-3">Daftar Siswa</h6>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0">Daftar Siswa</h6>
+                    <small class="text-muted">Menampilkan siswa untuk jurusan: {{ $jurusan->nama ?? '-' }}</small>
+                </div>
 
         <div class="table-responsive">
             <table class="table table-hover align-middle">
@@ -73,7 +87,7 @@
                 </thead>
 
                 <tbody id="siswaTable">
-                    @foreach ($siswas as $s)
+                    @forelse ($siswas as $s)
                     @php
                         if (str_starts_with($s->kelas, 'XII')) $kelasNum = 12;
                         elseif (str_starts_with($s->kelas, 'XI')) $kelasNum = 11;
@@ -93,7 +107,11 @@
 
                         </td>
                     </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">Tidak ada siswa untuk jurusan ini.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
 
             </table>
@@ -130,7 +148,6 @@
 
 // ROUTE AJAX BENAR
 const detailRoute = "{{ route('kaprog.siswa.detail', ['id' => '__ID__']) }}";
-
 document.querySelectorAll('.lihat-btn').forEach(btn => {
 
     btn.addEventListener('click', function () {
@@ -172,6 +189,16 @@ document.querySelectorAll('.lihat-btn').forEach(btn => {
                     </div>
                 `;
             });
+    });
+});
+
+// Filter buttons behavior: set hidden input and submit form
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+        const val = this.dataset.kelas;
+        document.getElementById('kelasInput').value = val === 'all' ? '' : val;
+        // submit the parent form
+        this.closest('form').submit();
     });
 });
 </script>

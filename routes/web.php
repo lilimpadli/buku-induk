@@ -29,6 +29,11 @@ use App\Http\Controllers\Kurikulum\KurikulumDashboardController;
 use App\Http\Controllers\Kurikulum\KurikulumSiswaController;
 use App\Http\Controllers\Kurikulum\KelasController;
 
+// KELAS KAPROG
+use App\Http\Controllers\KelaskaprogController;
+ use App\Http\Controllers\KaprogController;
+use App\Http\Controllers\KaprogGuruController;
+
 
 
 // TU
@@ -145,6 +150,13 @@ Route::middleware('web')->group(function () {
     Route::get('/nilai_raport/{siswa_id}/{semester}/{tahun}/cetak', [NilaiRaportController::class, 'exportPdf'])->name('raport.cetak_pdf');
 });
 
+    // ROUTE GURU - profil guru dapat dilihat dan diedit oleh guru yang login
+    Route::prefix('guru')->name('guru.')->middleware('auth')->group(function () {
+        Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])->name('profile');
+        Route::get('/profile/edit', [App\Http\Controllers\GuruController::class, 'edit'])->name('profile.edit');
+        Route::put('/profile', [App\Http\Controllers\GuruController::class, 'update'])->name('profile.update');
+    });
+
 
 
         /*
@@ -163,7 +175,8 @@ Route::middleware('web')->group(function () {
                 Route::get('/dashboard', [App\Http\Controllers\WaliKelasSiswaController::class, 'dashboard'])
                     ->name('dashboard');
 
-
+Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])
+            ->name('data_diri.profile');
 
                 Route::get('/siswa', [WaliKelasSiswaController::class, 'index'])
                     ->name('siswa.index');
@@ -228,8 +241,9 @@ Route::middleware('web')->group(function () {
         */
         Route::prefix('kaprog')->name('kaprog.')->group(function () {
 
-     // Dashboard
-    Route::get('/dashboard', [KurikulumDashboardController::class, 'index'])
+    // Dashboard (Kaprog)
+   
+    Route::get('/dashboard', [KaprogController::class, 'dashboard'])
         ->name('dashboard');
 
     // View Raport
@@ -239,6 +253,18 @@ Route::middleware('web')->group(function () {
     // Detail siswa (AJAX)
     Route::get('/siswa/{id}/detail', [KurikulumDashboardController::class, 'detail'])
         ->name('siswa.detail');
+
+    // Daftar kelas / rombel untuk kaprog
+    Route::get('/kelas', [KelaskaprogController::class, 'index'])->name('kelas.index');
+    Route::get('/kelas/{id}', [KelaskaprogController::class, 'show'])->name('kelas.show');
+
+    // Daftar guru untuk kaprog (hanya jurusan kaprog)
+    Route::get('/guru', [KaprogGuruController::class, 'index'])->name('guru.index');
+    Route::get('/guru/{id}', [KaprogGuruController::class, 'show'])->name('guru.show');
+
+    // Data diri kaprog
+    Route::get('/data-diri', [KaprogController::class, 'dataDiri'])->name('datapribadi.index');
+    Route::put('/data-diri', [KaprogController::class, 'updateDataDiri'])->name('datapribadi.update');
 
 });
 

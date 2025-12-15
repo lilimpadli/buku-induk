@@ -15,4 +15,10 @@ class Jurusan extends Model
         'kode',
         'nama',
     ];
+
+    // Relasi: satu jurusan punya banyak kelas
+    public function kelas()
+    {
+        return $this->hasMany(\App\Models\Kelas::class, 'jurusan_id');
+    }
 }

@@ -43,7 +43,7 @@ class SiswaController extends Controller
         // Ambil daftar tahun_ajaran unik untuk raport
         $raportYears = [];
         if ($siswa) {
-            $raportYears = \App\Models\NilaiRaport::select('tahun_ajaran')
+            $raportYears = NilaiRaport::select('tahun_ajaran')
                 ->where('siswa_id', $siswa->id)
                 ->groupBy('tahun_ajaran')
                 ->orderBy('tahun_ajaran', 'desc')

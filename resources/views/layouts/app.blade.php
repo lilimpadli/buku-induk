@@ -61,10 +61,13 @@
 
                     <!-- PROFILE -->
                     <div class="text-center mb-4">
-                        <img src="https://ui-avatars.com/api/?name={{ Auth::user()->name }}" class="rounded-circle mb-2"
-                            width="70" height="70">
+                        @if(isset(Auth::user()->photo) && Auth::user()->photo)
+                            <img src="{{ asset('storage/' . Auth::user()->photo) }}" class="rounded-circle mb-2" width="70" height="70" style="object-fit:cover;">
+                        @else
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->nama_lengkap ?? Auth::user()->name ?? '') }}" class="rounded-circle mb-2" width="70" height="70">
+                        @endif
 
-                        <h5 class="mb-0">{{ Auth::user()->name }}</h5>
+                        <h5 class="mb-0">{{ Auth::user()->nama_lengkap ?? Auth::user()->name ?? '-' }}</h5>
                         <small class="text-muted">{{ ucfirst(Auth::user()->role) }}</small>
                     </div>
 
@@ -72,56 +75,59 @@
                     <div class="list-group list-group-flush">
 
                         {{-- ======================== ROLE: SISWA ======================== --}}
-                       {{-- ======================== ROLE: SISWA ======================== --}}
-@if(Auth::user()->role == 'siswa')
-    <a href="{{ route('siswa.dashboard') }}"
-        class="list-group-item list-group-item-action {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
-        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
-    </a>
-
-    <a href="{{ route('siswa.dataDiri') }}"
-        class="list-group-item list-group-item-action {{ request()->routeIs('siswa.dataDiri*') ? 'active' : '' }}">
-        <i class="fas fa-user me-2"></i> Data Diri
-    </a>
-
-    <a href="{{ route('siswa.raport') }}" 
-        class="list-group-item list-group-item-action {{ request()->routeIs('siswa.raport') ? 'active' : '' }}">
-        <i class="fas fa-file-alt me-2"></i> Lihat Raport
-    </a>
-
-    <a href="{{ route('siswa.catatan') }}"
-        class="list-group-item list-group-item-action {{ request()->routeIs('siswa.catatan') ? 'active' : '' }}">
-        <i class="fas fa-sticky-note me-2"></i> Catatan Wali Kelas
-    </a>
-@endif
-
-
-                        {{-- ======================== ROLE: WALI KELAS ======================== --}}
-                        @if(Auth::user()->role == 'walikelas')
-
-                            <a href="{{ route('walikelas.dashboard') }}"
-                                class="list-group-item list-group-item-action {{ request()->routeIs('walikelas.dashboard') ? 'active' : '' }}">
+                        {{-- ======================== ROLE: SISWA ======================== --}}
+                        @if(Auth::user()->role == 'siswa')
+                            <a href="{{ route('siswa.dashboard') }}"
+                                class="list-group-item list-group-item-action {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
                                 <i class="fas fa-tachometer-alt me-2"></i> Dashboard
                             </a>
 
-                            <a href="{{ route('walikelas.siswa.index') }}"
-                                class="list-group-item list-group-item-action {{ request()->routeIs('walikelas.siswa.*') ? 'active' : '' }}">
-                                <i class="fas fa-users me-2"></i> Data Siswa
+                            <a href="{{ route('siswa.dataDiri') }}"
+                                class="list-group-item list-group-item-action {{ request()->routeIs('siswa.dataDiri*') ? 'active' : '' }}">
+                                <i class="fas fa-user me-2"></i> Data Diri
                             </a>
 
-                            {{-- Input Nilai Raport --}}
-                            <a href="{{ route('walikelas.input_nilai_raport.index') }}"
-                                class="list-group-item list-group-item-action {{ request()->routeIs('walikelas.rapor.nilai.*') ? 'active' : '' }}">
-                                <i class="fas fa-clipboard-check me-2"></i> Input Nilai Raport
+                            <a href="{{ route('siswa.raport') }}"
+                                class="list-group-item list-group-item-action {{ request()->routeIs('siswa.raport') ? 'active' : '' }}">
+                                <i class="fas fa-file-alt me-2"></i> Lihat Raport
                             </a>
 
-                            {{-- Lihat / Cetak Raport --}}
-                            <a href="{{ route('walikelas.nilai_raport.index') }}"
-                                class="list-group-item list-group-item-action {{ request()->routeIs('walikelas.rapor.cetak') ? 'active' : '' }}">
-                                <i class="fas fa-file-lines me-2"></i> Lihat Nilai Raport
-                            </a>
-
+                            
                         @endif
+
+
+                        {{-- ======================== ROLE: WALI KELAS ======================== --}}
+                        {{-- ======================== ROLE: WALI KELAS ======================== --}}
+@if(Auth::user()->role == 'walikelas')
+    <a href="{{ route('walikelas.dashboard') }}"
+        class="list-group-item list-group-item-action {{ request()->routeIs('walikelas.dashboard') ? 'active' : '' }}">
+        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+    </a>
+
+    {{-- PERBAIKI LINK INI --}}
+    <a href="{{ route('walikelas.data_diri.profile') }}"
+        class="list-group-item list-group-item-action {{ request()->routeIs('walikelas.data_diri.profile') ? 'active' : '' }}">
+        <i class="fas fa-user me-2"></i> Data Diri
+    </a>
+
+    <a href="{{ route('walikelas.siswa.index') }}"
+        class="list-group-item list-group-item-action {{ request()->routeIs('walikelas.siswa.*') ? 'active' : '' }}">
+        <i class="fas fa-users me-2"></i> Data Siswa
+    </a>
+
+    {{-- Input Nilai Raport --}}
+    <a href="{{ route('walikelas.input_nilai_raport.index') }}"
+        class="list-group-item list-group-item-action {{ request()->routeIs('walikelas.input_nilai_raport.index') ? 'active' : '' }}">
+        <i class="fas fa-clipboard-check me-2"></i> Input Nilai Raport
+    </a>
+
+    {{-- Lihat / Cetak Raport --}}
+    <a href="{{ route('walikelas.nilai_raport.index') }}"
+        class="list-group-item list-group-item-action {{ request()->routeIs('walikelas.nilai_raport.index') ? 'active' : '' }}">
+        <i class="fas fa-file-lines me-2"></i> Lihat Nilai Raport
+    </a>
+
+@endif
 
 
                         {{-- ======================== ROLE: KAPROG ======================== --}}
@@ -132,10 +138,22 @@
                                 <i class="fas fa-gauge me-2"></i> Dashboard
                             </a>
 
-                            <a href="{{ route('kaprog.raport.siswa') }}"
+                            <a href="{{ route('kaprog.datapribadi.index') }}"
                                 class="list-group-item list-group-item-action {{ request()->routeIs('kaprog.raport.*') ? 'active' : '' }}">
-                                <i class="fas fa-file-lines me-2"></i> View Raport
+                                <i class="fas fa-file-lines me-2"></i> data Diri
                             </a>
+
+                             <a href="{{ route('kaprog.kelas.index') }}"
+                                class="list-group-item list-group-item-action {{ request()->routeIs('kaprog.raport.*') ? 'active' : '' }}">
+                                <i class="fas fa-file-lines me-2"></i> data kelas
+                            </a>
+
+                            <a href="{{ route('kaprog.guru.index') }}"
+                                class="list-group-item list-group-item-action {{ request()->routeIs('kaprog.raport.*') ? 'active' : '' }}">
+                                <i class="fas fa-file-lines me-2"></i> GURU
+                            </a>
+
+                           
 
                         @endif
 
@@ -192,34 +210,32 @@
                         {{-- ======================== ROLE: KURIKULUM ======================== --}}
                         @if(Auth::user()->role == 'kurikulum')
 
-                            <a href="{{ route('kurikulum.dashboard') }}"
-                                class="list-group-item list-group-item-action {{ request()->routeIs('kurikulum.dashboard') ? 'active' : '' }}">
-                                <i class="fas fa-gauge me-2"></i> Dashboard
-                            </a>
+                                                <a href="{{ route('kurikulum.dashboard') }}"
+                                                    class="list-group-item list-group-item-action {{ request()->routeIs('kurikulum.dashboard') ? 'active' : '' }}">
+                                                    <i class="fas fa-gauge me-2"></i> Dashboard
+                                                </a>
 
-                            <a href="{{ route('kurikulum.siswa.index') }}"
-                                class="list-group-item list-group-item-action {{ request()->routeIs('kurikulum.siswa*') ? 'active' : '' }}">
-                                <i class="fa fa-users me-2"></i> Manajemen Siswa
-                            </a>
+                                                <a href="{{ route('kurikulum.siswa.index') }}"
+                                                    class="list-group-item list-group-item-action {{ request()->routeIs('kurikulum.siswa*') ? 'active' : '' }}">
+                                                    <i class="fa fa-users me-2"></i> Manajemen Siswa
+                                                </a>
 
-    {{-- Input Nilai Raport --}}
-    <a href="{{ route('walikelas.input_nilai_raport.index') }}"
-       class="list-group-item list-group-item-action 
-       {{ request()->routeIs('walikelas.rapor.nilai.*') ? 'active' : '' }}">
-        <i class="fas fa-clipboard-check me-2"></i> Input Nilai Raport
-    </a>
+                                                {{-- Input Nilai Raport --}}
+                                                <a href="{{ route('walikelas.input_nilai_raport.index') }}" class="list-group-item list-group-item-action 
+                               {{ request()->routeIs('walikelas.rapor.nilai.*') ? 'active' : '' }}">
+                                                    <i class="fas fa-clipboard-check me-2"></i> Input Nilai Raport
+                                                </a>
 
-    {{-- Lihat / Cetak Raport --}}
-    <a href="{{ route('walikelas.nilai_raport.index') }}"
-       class="list-group-item list-group-item-action 
-       {{ request()->routeIs('walikelas.rapor.cetak') ? 'active' : '' }}">
-        <i class="fas fa-file-lines me-2"></i> Lihat Nilai Raport
-    </a>
+                                                {{-- Lihat / Cetak Raport --}}
+                                                <a href="{{ route('walikelas.nilai_raport.index') }}" class="list-group-item list-group-item-action 
+                               {{ request()->routeIs('walikelas.rapor.cetak') ? 'active' : '' }}">
+                                                    <i class="fas fa-file-lines me-2"></i> Lihat Nilai Raport
+                                                </a>
 
-                            <a href=""
-                                class="list-group-item list-group-item-action {{ request()->routeIs('kurikulum.raport*') ? 'active' : '' }}">
-                                <i class="fa fa-file-alt me-2"></i> View Raport
-                            </a>
+                                                <a href=""
+                                                    class="list-group-item list-group-item-action {{ request()->routeIs('kurikulum.raport*') ? 'active' : '' }}">
+                                                    <i class="fa fa-file-alt me-2"></i> View Raport
+                                                </a>
 
                         @endif
 
@@ -247,6 +263,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    @stack('scripts')
 
 </body>
 

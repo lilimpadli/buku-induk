@@ -10,8 +10,10 @@ use Illuminate\Notifications\Notifiable;
 /**
  * @property int $id
  * @property string $nomor_induk
- * @property string $nama_lengkap
+ * @property string $name
  * @property string $nisn
+ * @property string $role
+ * @property string|null $photo
  */
 
 class User extends Authenticatable
@@ -19,12 +21,13 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-    'nomor_induk',
-    'nama_lengkap',
-    'nisn',
-    'email',
-    'password',
-];
+        'name',
+        'nomor_induk',
+        'nisn',
+        'photo',
+        'email',
+        'password',
+    ];
 
 
     protected $hidden = [
