@@ -7,56 +7,87 @@ use App\Models\User;
 use App\Models\NilaiRaport;
 use App\Models\Kelas;
 use App\Models\Jurusan;
+use App\Models\Ayah;
+use App\Models\Ibu;
+use App\Models\Wali;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class TUController extends Controller
 {
     /**
      * Dashboard TU
      */
-    public function dashboard()
-    {
-        // Statistik dasar
-        $totalSiswa = DataSiswa::count();
-        $totalWaliKelas = User::where('role', 'walikelas')->count();
-        $totalKelas = Kelas::count();
-        
-        // Data siswa terbaru
-        $siswaBaru = DataSiswa::with('user')->latest()->take(5)->get();
-        
-        // Data wali kelas (untuk ditampilkan semua di bagian bawah)
-        $waliKelas = User::where('role', 'walikelas')->get();
-        
-        // Data wali kelas dengan limit (untuk ringkasan)
-        $waliKelasLimit = User::where('role', 'walikelas')->take(5)->get();
-        
-        // Data kelas dengan limit (untuk ringkasan)
-        $kelasLimit = Kelas::with('jurusan')->take(5)->get();
-        
-        // Statistik nilai raport
-        $totalNilai = NilaiRaport::count();
-        $nilaiTerbaru = NilaiRaport::with('siswa')->latest()->take(5)->get();
-        
-        return view('tu.dashboard', compact(
-            'totalSiswa', 
-            'totalWaliKelas', 
-            'totalKelas',
-            'siswaBaru',
-            'waliKelas',
-            'waliKelasLimit',
-            'kelasLimit',
-            'totalNilai',
-            'nilaiTerbaru'
-        ));
-    }
+   public function dashboard()
+{
+    // Statistik dasar
+    $totalSiswa = DataSiswa::count();
+    $totalGuru = User::where('role', 'guru')->count(); // Ubah dari totalWaliKelas
+    $totalKelas = Kelas::count();
+    
+    // Inisialisasi variabel jurusan untuk menghindari error
+    $jurusan = null;
+    
+    // Data aktivitas terbaru
+    $aktivitas = [
+        [
+            'nama' => 'Ahmad Rizki',
+            'kelas' => 'XII RPL 1',
+            'aktivitas' => 'Penambahan data nilai',
+            'waktu' => '2 jam yang lalu'
+        ],
+        [
+            'nama' => 'Siti Nurhaliza',
+            'kelas' => 'XI TKJ 2',
+            'aktivitas' => 'Update profil siswa',
+            'waktu' => '5 jam yang lalu'
+        ],
+        [
+            'nama' => 'Budi Santoso',
+            'kelas' => 'X MM 1',
+            'aktivitas' => 'Pengajuan pindah kelas',
+            'waktu' => '1 hari yang lalu'
+        ]
+    ];
+    
+    // Data siswa terbaru
+    $siswaBaru = DataSiswa::with(['user', 'ayah', 'ibu', 'wali'])->latest()->take(5)->get();
+    
+    // Data wali kelas (untuk ditampilkan semua di bagian bawah)
+    $waliKelas = User::where('role', 'walikelas')->get();
+    
+    // Data wali kelas dengan limit (untuk ringkasan)
+    $waliKelasLimit = User::where('role', 'walikelas')->take(5)->get();
+    
+    // Data kelas dengan limit (untuk ringkasan)
+    $kelasLimit = Kelas::with('jurusan')->take(5)->get();
+    
+    // Statistik nilai raport
+    $totalNilai = NilaiRaport::count();
+    $nilaiTerbaru = NilaiRaport::with('siswa')->latest()->take(5)->get();
+    
+    return view('tu.dashboard', compact(
+        'totalSiswa', 
+        'totalGuru', // Ubah dari totalWaliKelas
+        'totalKelas',
+        'jurusan', // Tambahkan ini
+        'aktivitas', // Tambahkan ini
+        'siswaBaru',
+        'waliKelas',
+        'waliKelasLimit',
+        'kelasLimit',
+        'totalNilai',
+        'nilaiTerbaru'
+    ));
+}
     
     /**
      * Halaman daftar siswa
      */
     public function siswa()
     {
-        $siswas = DataSiswa::with('user')->latest()->paginate(10);
+        $siswas = DataSiswa::with(['user', 'ayah', 'ibu', 'wali'])->latest()->paginate(10);
         return view('tu.siswa', compact('siswas'));
     }
     
@@ -88,40 +119,96 @@ class TUController extends Controller
             'sekolah_asal'     => 'nullable|string|max:255',
             'kelas'            => 'required|string|max:50',
             'tanggal_diterima' => 'nullable|date',
+            'email'            => 'required|email|unique:users,email',
+            'password'         => 'required|string|min:8|confirmed',
 
             // Orang tua
             'nama_ayah'        => 'required|string|max:255',
             'pekerjaan_ayah'   => 'required|string|max:255',
             'telepon_ayah'     => 'nullable|string|max:20',
+            'alamat_ayah'      => 'required|string',
 
             'nama_ibu'         => 'required|string|max:255',
             'pekerjaan_ibu'    => 'required|string|max:255',
             'telepon_ibu'      => 'nullable|string|max:20',
+            'alamat_ibu'       => 'required|string',
 
             // Wali
             'nama_wali'        => 'nullable|string|max:255',
             'alamat_wali'      => 'nullable|string',
             'telepon_wali'     => 'nullable|string|max:20',
             'pekerjaan_wali'   => 'nullable|string|max:255',
-            
         ]);
 
-        // Buat user account untuk siswa
-        $user = User::create([
-            'name' => $request->nama_lengkap,
-            'nomor_induk' => $request->nis,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'siswa',
-        ]);
+        DB::beginTransaction();
+        try {
+            // Buat user account untuk siswa
+            $user = User::create([
+                'name' => $request->nama_lengkap,
+                'nomor_induk' => $request->nis,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'siswa',
+            ]);
 
-        // Simpan data siswa
-        $siswa = new DataSiswa($request->all());
-        $siswa->user_id = $user->id;
-        $siswa->save();
+            // Simpan data ayah
+            $ayah = Ayah::create([
+                'nama' => $request->nama_ayah,
+                'pekerjaan' => $request->pekerjaan_ayah,
+                'telepon' => $request->telepon_ayah,
+                'alamat' => $request->alamat_ayah,
+            ]);
 
-        return redirect()->route('tu.siswa')
-            ->with('success', 'Data siswa berhasil ditambahkan.');
+            // Simpan data ibu
+            $ibu = Ibu::create([
+                'nama' => $request->nama_ibu,
+                'pekerjaan' => $request->pekerjaan_ibu,
+                'telepon' => $request->telepon_ibu,
+                'alamat' => $request->alamat_ibu,
+            ]);
+
+            // Simpan data wali jika ada
+            $wali = null;
+            if ($request->filled('nama_wali')) {
+                $wali = Wali::create([
+                    'nama' => $request->nama_wali,
+                    'pekerjaan' => $request->pekerjaan_wali,
+                    'telepon' => $request->telepon_wali,
+                    'alamat' => $request->alamat_wali,
+                ]);
+            }
+
+            // Simpan data siswa
+            $siswa = new DataSiswa();
+            $siswa->user_id = $user->id;
+            $siswa->nama_lengkap = $request->nama_lengkap;
+            $siswa->nis = $request->nis;
+            $siswa->nisn = $request->nisn;
+            $siswa->jenis_kelamin = $request->jenis_kelamin;
+            $siswa->tempat_lahir = $request->tempat_lahir;
+            $siswa->tanggal_lahir = $request->tanggal_lahir;
+            $siswa->agama = $request->agama;
+            $siswa->status_keluarga = $request->status_keluarga;
+            $siswa->anak_ke = $request->anak_ke;
+            $siswa->alamat = $request->alamat;
+            $siswa->no_hp = $request->no_hp;
+            $siswa->sekolah_asal = $request->sekolah_asal;
+            $siswa->kelas = $request->kelas;
+            $siswa->tanggal_diterima = $request->tanggal_diterima;
+            $siswa->ayah_id = $ayah->id;
+            $siswa->ibu_id = $ibu->id;
+            $siswa->wali_id = $wali ? $wali->id : null;
+            $siswa->save();
+
+            DB::commit();
+            return redirect()->route('tu.siswa')
+                ->with('success', 'Data siswa berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
     
     /**
@@ -129,7 +216,7 @@ class TUController extends Controller
      */
     public function siswaDetail($id)
     {
-        $siswa = DataSiswa::with('user', 'nilaiRaports')->findOrFail($id);
+        $siswa = DataSiswa::with(['user', 'nilaiRaports', 'ayah', 'ibu', 'wali'])->findOrFail($id);
         return view('tu.siswa-detail', compact('siswa'));
     }
     
@@ -138,7 +225,7 @@ class TUController extends Controller
      */
     public function siswaEdit($id)
     {
-        $siswa = DataSiswa::findOrFail($id);
+        $siswa = DataSiswa::with(['ayah', 'ibu', 'wali'])->findOrFail($id);
         return view('tu.siswa-edit', compact('siswa'));
     }
     
@@ -169,10 +256,12 @@ class TUController extends Controller
             'nama_ayah'        => 'required|string|max:255',
             'pekerjaan_ayah'   => 'required|string|max:255',
             'telepon_ayah'     => 'nullable|string|max:20',
+            'alamat_ayah'      => 'required|string',
 
             'nama_ibu'         => 'required|string|max:255',
             'pekerjaan_ibu'    => 'required|string|max:255',
             'telepon_ibu'      => 'nullable|string|max:20',
+            'alamat_ibu'       => 'required|string',
 
             // Wali
             'nama_wali'        => 'nullable|string|max:255',
@@ -181,10 +270,105 @@ class TUController extends Controller
             'pekerjaan_wali'   => 'nullable|string|max:255',
         ]);
 
-        $siswa->update($request->all());
-
-        return redirect()->route('tu.siswa.detail', $id)
-            ->with('success', 'Data siswa berhasil diperbarui.');
+        DB::beginTransaction();
+        try {
+            // Update data siswa
+            $siswa->nama_lengkap = $request->nama_lengkap;
+            $siswa->nis = $request->nis;
+            $siswa->nisn = $request->nisn;
+            $siswa->jenis_kelamin = $request->jenis_kelamin;
+            $siswa->tempat_lahir = $request->tempat_lahir;
+            $siswa->tanggal_lahir = $request->tanggal_lahir;
+            $siswa->agama = $request->agama;
+            $siswa->status_keluarga = $request->status_keluarga;
+            $siswa->anak_ke = $request->anak_ke;
+            $siswa->alamat = $request->alamat;
+            $siswa->no_hp = $request->no_hp;
+            $siswa->sekolah_asal = $request->sekolah_asal;
+            $siswa->kelas = $request->kelas;
+            $siswa->tanggal_diterima = $request->tanggal_diterima;
+            
+            // Update user data
+            if ($siswa->user) {
+                $siswa->user->name = $request->nama_lengkap;
+                $siswa->user->nomor_induk = $request->nis;
+                $siswa->user->save();
+            }
+            
+            // Update data ayah
+            if ($siswa->ayah_id) {
+                $ayah = Ayah::find($siswa->ayah_id);
+                $ayah->update([
+                    'nama' => $request->nama_ayah,
+                    'pekerjaan' => $request->pekerjaan_ayah,
+                    'telepon' => $request->telepon_ayah,
+                    'alamat' => $request->alamat_ayah,
+                ]);
+            } else {
+                $ayah = Ayah::create([
+                    'nama' => $request->nama_ayah,
+                    'pekerjaan' => $request->pekerjaan_ayah,
+                    'telepon' => $request->telepon_ayah,
+                    'alamat' => $request->alamat_ayah,
+                ]);
+                $siswa->ayah_id = $ayah->id;
+            }
+            
+            // Update data ibu
+            if ($siswa->ibu_id) {
+                $ibu = Ibu::find($siswa->ibu_id);
+                $ibu->update([
+                    'nama' => $request->nama_ibu,
+                    'pekerjaan' => $request->pekerjaan_ibu,
+                    'telepon' => $request->telepon_ibu,
+                    'alamat' => $request->alamat_ibu,
+                ]);
+            } else {
+                $ibu = Ibu::create([
+                    'nama' => $request->nama_ibu,
+                    'pekerjaan' => $request->pekerjaan_ibu,
+                    'telepon' => $request->telepon_ibu,
+                    'alamat' => $request->alamat_ibu,
+                ]);
+                $siswa->ibu_id = $ibu->id;
+            }
+            
+            // Update data wali jika ada
+            if ($request->filled('nama_wali')) {
+                if ($siswa->wali_id) {
+                    $wali = Wali::find($siswa->wali_id);
+                    $wali->update([
+                        'nama' => $request->nama_wali,
+                        'pekerjaan' => $request->pekerjaan_wali,
+                        'telepon' => $request->telepon_wali,
+                        'alamat' => $request->alamat_wali,
+                    ]);
+                } else {
+                    $wali = Wali::create([
+                        'nama' => $request->nama_wali,
+                        'pekerjaan' => $request->pekerjaan_wali,
+                        'telepon' => $request->telepon_wali,
+                        'alamat' => $request->alamat_wali,
+                    ]);
+                    $siswa->wali_id = $wali->id;
+                }
+            } elseif ($siswa->wali_id) {
+                // Hapus data wali jika ada sebelumnya tapi sekarang dikosongkan
+                Wali::destroy($siswa->wali_id);
+                $siswa->wali_id = null;
+            }
+            
+            $siswa->save();
+            DB::commit();
+            
+            return redirect()->route('tu.siswa.detail', $id)
+                ->with('success', 'Data siswa berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
     
     /**
@@ -194,16 +378,46 @@ class TUController extends Controller
     {
         $siswa = DataSiswa::findOrFail($id);
         
-        // Hapus user terkait
-        if ($siswa->user) {
-            $siswa->user->delete();
+        DB::beginTransaction();
+        try {
+            // Hapus data orang tua jika tidak terkait dengan siswa lain
+            if ($siswa->ayah_id) {
+                $ayahCount = DataSiswa::where('ayah_id', $siswa->ayah_id)->count();
+                if ($ayahCount <= 1) {
+                    Ayah::destroy($siswa->ayah_id);
+                }
+            }
+            
+            if ($siswa->ibu_id) {
+                $ibuCount = DataSiswa::where('ibu_id', $siswa->ibu_id)->count();
+                if ($ibuCount <= 1) {
+                    Ibu::destroy($siswa->ibu_id);
+                }
+            }
+            
+            if ($siswa->wali_id) {
+                $waliCount = DataSiswa::where('wali_id', $siswa->wali_id)->count();
+                if ($waliCount <= 1) {
+                    Wali::destroy($siswa->wali_id);
+                }
+            }
+            
+            // Hapus user terkait
+            if ($siswa->user) {
+                $siswa->user->delete();
+            }
+            
+            // Hapus data siswa
+            $siswa->delete();
+            
+            DB::commit();
+            return redirect()->route('tu.siswa')
+                ->with('success', 'Data siswa berhasil dihapus.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-        
-        // Hapus data siswa
-        $siswa->delete();
-
-        return redirect()->route('tu.siswa')
-            ->with('success', 'Data siswa berhasil dihapus.');
     }
     
     /**
@@ -242,16 +456,18 @@ class TUController extends Controller
 
     /**
      * Halaman detail kelas
-     */public function kelasDetail($id)
-{
-    $kelas = Kelas::with([
-        'jurusan',
-        'rombels.siswa'
-    ])->findOrFail($id);
+     */
+    public function kelasDetail($id)
+    {
+        $kelas = Kelas::with([
+            'jurusan',
+            'rombels.siswa' => function($query) {
+                $query->with(['ayah', 'ibu', 'wali']);
+            }
+        ])->findOrFail($id);
 
-    return view('tu.kelas-detail', compact('kelas'));
-}
-
+        return view('tu.kelas-detail', compact('kelas'));
+    }
 
     /**
      * Halaman edit kelas
@@ -296,16 +512,14 @@ class TUController extends Controller
     /**
      * Halaman daftar wali kelas
      */
- public function waliKelas()
-{
-    $waliKelas = User::where('role', 'walikelas')
+    public function waliKelas()
+    {
+        $waliKelas = User::where('role', 'walikelas')
                      ->with('rombels')
                      ->paginate(10);
 
-    return view('tu.wali-kelas.index', compact('waliKelas'));
-}
-
-
+        return view('tu.wali-kelas.index', compact('waliKelas'));
+    }
 
     /**
      * Halaman tambah wali kelas
@@ -404,7 +618,9 @@ class TUController extends Controller
      */
     public function laporanNilai()
     {
-        $nilaiRaports = NilaiRaport::with('siswa')
+        $nilaiRaports = NilaiRaport::with(['siswa' => function($query) {
+            $query->with(['ayah', 'ibu', 'wali']);
+        }])
             ->orderBy('tahun_ajaran', 'desc')
             ->orderBy('semester', 'desc')
             ->paginate(20);

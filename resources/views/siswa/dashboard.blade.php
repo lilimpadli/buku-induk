@@ -71,23 +71,23 @@
                                 <tbody>
                                     <tr>
                                         <th width="35%">Nama Ayah</th>
-                                        <td>{{ $siswa->nama_ayah ?? '-' }}</td>
+                                        <td>{{ $siswa->ayah->nama ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <th>Telepon Ayah</th>
-                                        <td>{{ $siswa->telepon_ayah ?? '-' }}</td>
+                                        <td>{{ $siswa->ayah->telepon ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <th>Nama Ibu</th>
-                                        <td>{{ $siswa->nama_ibu ?? '-' }}</td>
+                                        <td>{{ $siswa->ibu->nama ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <th>Telepon Ibu</th>
-                                        <td>{{ $siswa->telepon_ibu ?? '-' }}</td>
+                                        <td>{{ $siswa->ibu->telepon ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <th>Alamat Orang Tua</th>
-                                        <td>{{ $siswa->alamat_orangtua ?? '-' }}</td>
+                                        <td>{{ $siswa->ayah->alamat ?? ($siswa->ibu->alamat ?? '-') }}</td>
                                     </tr>
                                 </tbody>
                             </table>

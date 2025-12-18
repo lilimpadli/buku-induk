@@ -94,6 +94,21 @@
                         <input type="date" name="tanggal_diterima" class="form-control">
                     </div>
 
+                    <!-- Akun Siswa -->
+                    <div class="col-12 mt-4">
+                        <h5 class="border-bottom pb-2 fw-semibold">Akun Siswa</h5>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Email</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Password</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+
                     <!-- Data Ayah -->
                     <div class="col-12 mt-4">
                         <h5 class="border-bottom pb-2 fw-semibold">Data Ayah</h5>
@@ -112,6 +127,11 @@
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Telepon Ayah</label>
                         <input type="text" name="telepon_ayah" class="form-control">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Alamat Ayah</label>
+                        <textarea name="alamat_ayah" class="form-control" rows="2" required></textarea>
                     </div>
 
                     <!-- Data Ibu -->
@@ -134,6 +154,11 @@
                         <input type="text" name="telepon_ibu" class="form-control">
                     </div>
 
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Alamat Ibu</label>
+                        <textarea name="alamat_ibu" class="form-control" rows="2" required></textarea>
+                    </div>
+
                     <!-- Data Wali -->
                     <div class="col-12 mt-4">
                         <h5 class="border-bottom pb-2 fw-semibold">Data Wali (Opsional)</h5>
@@ -145,19 +170,21 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-semibold">Telepon Wali</label>
-                        <input type="text" name="telepon_wali" class="form-control">
+                        <label class="form-label fw-semibold">Pekerjaan Wali</label>
+                        <input type="text" name="pekerjaan_wali" class="form-control">
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-semibold">Pekerjaan Wali</label>
-                        <input type="text" name="pekerjaan_wali" class="form-control">
+                        <label class="form-label fw-semibold">Telepon Wali</label>
+                        <input type="text" name="telepon_wali" class="form-control">
                     </div>
 
                     <div class="col-12">
                         <label class="form-label fw-semibold">Alamat Wali</label>
                         <textarea name="alamat_wali" class="form-control" rows="2"></textarea>
                     </div>
+                </div>
+
                 <!-- Tombol -->
                 <div class="mt-4 d-flex justify-content-end">
                     <a href="{{ route('tu.siswa') }}" class="btn btn-secondary me-2">Batal</a>

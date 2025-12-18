@@ -101,17 +101,22 @@
 
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Nama Ayah</label>
-                        <input type="text" name="nama_ayah" class="form-control" value="{{ $siswa->nama_ayah }}" required>
+                        <input type="text" name="nama_ayah" class="form-control" value="{{ $siswa->ayah->nama ?? '' }}" required>
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Pekerjaan Ayah</label>
-                        <input type="text" name="pekerjaan_ayah" class="form-control" value="{{ $siswa->pekerjaan_ayah }}" required>
+                        <input type="text" name="pekerjaan_ayah" class="form-control" value="{{ $siswa->ayah->pekerjaan ?? '' }}" required>
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Telepon Ayah</label>
-                        <input type="text" name="telepon_ayah" class="form-control" value="{{ $siswa->telepon_ayah }}">
+                        <input type="text" name="telepon_ayah" class="form-control" value="{{ $siswa->ayah->telepon ?? '' }}">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Alamat Ayah</label>
+                        <textarea name="alamat_ayah" class="form-control" rows="2" required>{{ $siswa->ayah->alamat ?? '' }}</textarea>
                     </div>
 
                     <!-- Data Ibu -->
@@ -121,17 +126,22 @@
 
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Nama Ibu</label>
-                        <input type="text" name="nama_ibu" class="form-control" value="{{ $siswa->nama_ibu }}" required>
+                        <input type="text" name="nama_ibu" class="form-control" value="{{ $siswa->ibu->nama ?? '' }}" required>
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Pekerjaan Ibu</label>
-                        <input type="text" name="pekerjaan_ibu" class="form-control" value="{{ $siswa->pekerjaan_ibu }}" required>
+                        <input type="text" name="pekerjaan_ibu" class="form-control" value="{{ $siswa->ibu->pekerjaan ?? '' }}" required>
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Telepon Ibu</label>
-                        <input type="text" name="telepon_ibu" class="form-control" value="{{ $siswa->telepon_ibu }}">
+                        <input type="text" name="telepon_ibu" class="form-control" value="{{ $siswa->ibu->telepon ?? '' }}">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Alamat Ibu</label>
+                        <textarea name="alamat_ibu" class="form-control" rows="2" required>{{ $siswa->ibu->alamat ?? '' }}</textarea>
                     </div>
 
                     <!-- Data Wali -->
@@ -141,22 +151,22 @@
 
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Nama Wali</label>
-                        <input type="text" name="nama_wali" class="form-control" value="{{ $siswa->nama_wali }}">
-                    </div>
-
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Telepon Wali</label>
-                        <input type="text" name="telepon_wali" class="form-control" value="{{ $siswa->telepon_wali }}">
+                        <input type="text" name="nama_wali" class="form-control" value="{{ $siswa->wali->nama ?? '' }}">
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Pekerjaan Wali</label>
-                        <input type="text" name="pekerjaan_wali" class="form-control" value="{{ $siswa->pekerjaan_wali }}">
+                        <input type="text" name="pekerjaan_wali" class="form-control" value="{{ $siswa->wali->pekerjaan ?? '' }}">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Telepon Wali</label>
+                        <input type="text" name="telepon_wali" class="form-control" value="{{ $siswa->wali->telepon ?? '' }}">
                     </div>
 
                     <div class="col-12">
                         <label class="form-label fw-semibold">Alamat Wali</label>
-                        <textarea name="alamat_wali" class="form-control" rows="2">{{ $siswa->alamat_wali }}</textarea>
+                        <textarea name="alamat_wali" class="form-control" rows="2">{{ $siswa->wali->alamat ?? '' }}</textarea>
                     </div>
                 </div>
 

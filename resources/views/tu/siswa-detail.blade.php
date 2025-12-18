@@ -83,15 +83,19 @@
                     <table class="table table-borderless">
                         <tr>
                             <td width="30%">Nama</td>
-                            <td>: {{ $siswa->nama_ayah }}</td>
+                            <td>: {{ $siswa->ayah->nama ?? '-' }}</td>
                         </tr>
                         <tr>
                             <td>Pekerjaan</td>
-                            <td>: {{ $siswa->pekerjaan_ayah }}</td>
+                            <td>: {{ $siswa->ayah->pekerjaan ?? '-' }}</td>
                         </tr>
                         <tr>
                             <td>Telepon</td>
-                            <td>: {{ $siswa->telepon_ayah }}</td>
+                            <td>: {{ $siswa->ayah->telepon ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Alamat</td>
+                            <td>: {{ $siswa->ayah->alamat ?? '-' }}</td>
                         </tr>
                     </table>
                 </div>
@@ -100,19 +104,58 @@
                     <table class="table table-borderless">
                         <tr>
                             <td width="30%">Nama</td>
-                            <td>: {{ $siswa->nama_ibu }}</td>
+                            <td>: {{ $siswa->ibu->nama ?? '-' }}</td>
                         </tr>
                         <tr>
                             <td>Pekerjaan</td>
-                            <td>: {{ $siswa->pekerjaan_ibu }}</td>
+                            <td>: {{ $siswa->ibu->pekerjaan ?? '-' }}</td>
                         </tr>
                         <tr>
                             <td>Telepon</td>
-                            <td>: {{ $siswa->telepon_ibu }}</td>
+                            <td>: {{ $siswa->ibu->telepon ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Alamat</td>
+                            <td>: {{ $siswa->ibu->alamat ?? '-' }}</td>
                         </tr>
                     </table>
                 </div>
             </div>
+            
+            <!-- Data Wali -->
+            @if($siswa->wali)
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h6>Data Wali</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td width="30%">Nama</td>
+                                    <td>: {{ $siswa->wali->nama ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Pekerjaan</td>
+                                    <td>: {{ $siswa->wali->pekerjaan ?? '-' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td width="30%">Telepon</td>
+                                    <td>: {{ $siswa->wali->telepon ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Alamat</td>
+                                    <td>: {{ $siswa->wali->alamat ?? '-' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 

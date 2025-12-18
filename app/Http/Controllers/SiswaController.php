@@ -8,6 +8,9 @@ use App\Models\EkstrakurikulerSiswa;
 use App\Models\Kehadiran;
 use App\Models\RaporInfo;
 use App\Models\KenaikanKelas;
+use App\Models\Ayah;
+use App\Models\Ibu;
+use App\Models\Wali;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -30,6 +33,8 @@ class SiswaController extends Controller
     public function dataDiri()
     {
         $siswa = $this->getSiswaLogin();
+        // Load relasi orang tua
+        $siswa->load(['ayah', 'ibu', 'wali']);
         return view('siswa.data-diri', compact('siswa'));
     }
 
@@ -75,6 +80,7 @@ class SiswaController extends Controller
         $user = Auth::user();
 
         $request->validate([
+            // Data siswa
             'nama_lengkap'     => 'required|string|max:255',
             'nisn'             => 'required|string|max:20|unique:data_siswa',
             'jenis_kelamin'    => 'required|in:Laki-laki,Perempuan',
@@ -84,17 +90,68 @@ class SiswaController extends Controller
             'alamat'           => 'required|string',
             'no_hp'            => 'required|string|max:20',
 
+            // Data Ayah
             'nama_ayah'        => 'required|string|max:255',
             'pekerjaan_ayah'   => 'required|string|max:255',
+            'telepon_ayah'     => 'nullable|string|max:20',
+            'alamat_ayah'      => 'required|string',
+
+            // Data Ibu
             'nama_ibu'         => 'required|string|max:255',
             'pekerjaan_ibu'    => 'required|string|max:255',
+            'telepon_ibu'      => 'nullable|string|max:20',
+            'alamat_ibu'       => 'required|string',
+
+            // Data Wali (opsional)
+            'nama_wali'        => 'nullable|string|max:255',
+            'pekerjaan_wali'   => 'nullable|string|max:255',
+            'telepon_wali'     => 'nullable|string|max:20',
+            'alamat_wali'      => 'nullable|string',
         ]);
 
-        $data = $request->all();
-        $data['nis'] = $user->nomor_induk;
-        $data['user_id'] = $user->id;
+        // Simpan data ayah
+        $ayah = Ayah::create([
+            'nama' => $request->nama_ayah,
+            'pekerjaan' => $request->pekerjaan_ayah,
+            'telepon' => $request->telepon_ayah,
+            'alamat' => $request->alamat_ayah,
+        ]);
 
-        DataSiswa::create($data);
+        // Simpan data ibu
+        $ibu = Ibu::create([
+            'nama' => $request->nama_ibu,
+            'pekerjaan' => $request->pekerjaan_ibu,
+            'telepon' => $request->telepon_ibu,
+            'alamat' => $request->alamat_ibu,
+        ]);
+
+        // Simpan data wali jika ada
+        $wali = null;
+        if ($request->filled('nama_wali')) {
+            $wali = Wali::create([
+                'nama' => $request->nama_wali,
+                'pekerjaan' => $request->pekerjaan_wali,
+                'telepon' => $request->telepon_wali,
+                'alamat' => $request->alamat_wali,
+            ]);
+        }
+
+        // Simpan data siswa
+        $siswa = DataSiswa::create([
+            'user_id' => $user->id,
+            'nis' => $user->nomor_induk,
+            'nama_lengkap' => $request->nama_lengkap,
+            'nisn' => $request->nisn,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'tempat_lahir' => $request->tempat_lahir,
+            'tanggal_lahir' => $request->tanggal_lahir,
+            'agama' => $request->agama,
+            'alamat' => $request->alamat,
+            'no_hp' => $request->no_hp,
+            'ayah_id' => $ayah->id,
+            'ibu_id' => $ibu->id,
+            'wali_id' => $wali ? $wali->id : null,
+        ]);
 
         return redirect()->route('siswa.dataDiri')
             ->with('success', 'Data diri berhasil disimpan.');
@@ -103,6 +160,8 @@ class SiswaController extends Controller
     public function edit()
     {
         $siswa = $this->getSiswaLogin();
+        // Load relasi orang tua
+        $siswa->load(['ayah', 'ibu', 'wali']);
 
         if (!$siswa) {
             return redirect()->route('siswa.dataDiri.create')
@@ -117,6 +176,7 @@ class SiswaController extends Controller
         $siswa = $this->getSiswaLogin();
 
         $request->validate([
+            // Data siswa
             'nama_lengkap'     => 'required|string|max:255',
             'nisn'             => 'required|string|max:20|unique:data_siswa,nisn,' . $siswa->id,
             'jenis_kelamin'    => 'required|in:Laki-laki,Perempuan',
@@ -126,13 +186,103 @@ class SiswaController extends Controller
             'alamat'           => 'required|string',
             'no_hp'            => 'required|string|max:20',
 
+            // Data Ayah
             'nama_ayah'        => 'required|string|max:255',
             'pekerjaan_ayah'   => 'required|string|max:255',
+            'telepon_ayah'     => 'nullable|string|max:20',
+            'alamat_ayah'      => 'required|string',
+
+            // Data Ibu
             'nama_ibu'         => 'required|string|max:255',
             'pekerjaan_ibu'    => 'required|string|max:255',
+            'telepon_ibu'      => 'nullable|string|max:20',
+            'alamat_ibu'       => 'required|string',
+
+            // Data Wali (opsional)
+            'nama_wali'        => 'nullable|string|max:255',
+            'pekerjaan_wali'   => 'nullable|string|max:255',
+            'telepon_wali'     => 'nullable|string|max:20',
+            'alamat_wali'      => 'nullable|string',
         ]);
 
-        $siswa->update($request->all());
+        // Update data siswa
+        $siswa->update([
+            'nama_lengkap' => $request->nama_lengkap,
+            'nisn' => $request->nisn,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'tempat_lahir' => $request->tempat_lahir,
+            'tanggal_lahir' => $request->tanggal_lahir,
+            'agama' => $request->agama,
+            'alamat' => $request->alamat,
+            'no_hp' => $request->no_hp,
+        ]);
+
+        // Update data ayah
+        if ($siswa->ayah_id) {
+            $ayah = Ayah::find($siswa->ayah_id);
+            $ayah->update([
+                'nama' => $request->nama_ayah,
+                'pekerjaan' => $request->pekerjaan_ayah,
+                'telepon' => $request->telepon_ayah,
+                'alamat' => $request->alamat_ayah,
+            ]);
+        } else {
+            $ayah = Ayah::create([
+                'nama' => $request->nama_ayah,
+                'pekerjaan' => $request->pekerjaan_ayah,
+                'telepon' => $request->telepon_ayah,
+                'alamat' => $request->alamat_ayah,
+            ]);
+            $siswa->ayah_id = $ayah->id;
+            $siswa->save();
+        }
+
+        // Update data ibu
+        if ($siswa->ibu_id) {
+            $ibu = Ibu::find($siswa->ibu_id);
+            $ibu->update([
+                'nama' => $request->nama_ibu,
+                'pekerjaan' => $request->pekerjaan_ibu,
+                'telepon' => $request->telepon_ibu,
+                'alamat' => $request->alamat_ibu,
+            ]);
+        } else {
+            $ibu = Ibu::create([
+                'nama' => $request->nama_ibu,
+                'pekerjaan' => $request->pekerjaan_ibu,
+                'telepon' => $request->telepon_ibu,
+                'alamat' => $request->alamat_ibu,
+            ]);
+            $siswa->ibu_id = $ibu->id;
+            $siswa->save();
+        }
+
+        // Update data wali jika ada
+        if ($request->filled('nama_wali')) {
+            if ($siswa->wali_id) {
+                $wali = Wali::find($siswa->wali_id);
+                $wali->update([
+                    'nama' => $request->nama_wali,
+                    'pekerjaan' => $request->pekerjaan_wali,
+                    'telepon' => $request->telepon_wali,
+                    'alamat' => $request->alamat_wali,
+                ]);
+            } else {
+                $wali = Wali::create([
+                    'nama' => $request->nama_wali,
+                    'pekerjaan' => $request->pekerjaan_wali,
+                    'telepon' => $request->telepon_wali,
+                    'alamat' => $request->alamat_wali,
+                ]);
+                $siswa->wali_id = $wali->id;
+                $siswa->save();
+            }
+        } elseif ($siswa->wali_id) {
+            // Hapus data wali jika ada sebelumnya tapi sekarang dikosongkan
+            Wali::destroy($siswa->wali_id);
+            $siswa->wali_id = null;
+            $siswa->save();
+        }
 
         return redirect()->route('siswa.dataDiri')
             ->with('success', 'Data diri berhasil diperbarui.');
@@ -173,141 +323,139 @@ class SiswaController extends Controller
      * ============================
      */
 
-    // 🔹 Halaman list raport: daftar (semester & tahun)
-   // 🔹 Halaman list raport: daftar (tahun ajaran)
-public function raport()
-{
-    $siswa = $this->getSiswaLogin();
+    // 🔹 Halaman list raport: daftar (tahun ajaran)
+    public function raport()
+    {
+        $siswa = $this->getSiswaLogin();
 
-    // Ubah query untuk hanya mengambil tahun ajaran unik
-    $raports = NilaiRaport::select('tahun_ajaran')
-        ->where('siswa_id', $siswa->id)
-        ->groupBy('tahun_ajaran')
-        ->orderBy('tahun_ajaran', 'desc')
-        ->get();
+        // Ubah query untuk hanya mengambil tahun ajaran unik
+        $raports = NilaiRaport::select('tahun_ajaran')
+            ->where('siswa_id', $siswa->id)
+            ->groupBy('tahun_ajaran')
+            ->orderBy('tahun_ajaran', 'desc')
+            ->get();
 
-    return view('siswa.raport.raport', compact('siswa', 'raports'));
-}
+        return view('siswa.raport.raport', compact('siswa', 'raports'));
+    }
 
     // 🔹 Halaman detail raport lengkap
-   // 🔹 Halaman detail raport lengkap
-public function raportShow($semester, $tahun)
-{
-    $siswa = $this->getSiswaLogin();
-    // jika $tahun dikirimkan dari URL sebagai '2025-2026', konversi kembali ke '2025/2026'
-    $tahun = str_replace('-', '/', $tahun);
+    public function raportShow($semester, $tahun)
+    {
+        $siswa = $this->getSiswaLogin();
+        // jika $tahun dikirimkan dari URL sebagai '2025-2026', konversi kembali ke '2025/2026'
+        $tahun = str_replace('-', '/', $tahun);
 
-    // Validasi semester
-    if (!in_array($semester, ['Ganjil', 'Genap'])) {
-        return redirect()->route('siswa.raport')
-            ->with('error', 'Semester tidak valid');
+        // Validasi semester
+        if (!in_array($semester, ['Ganjil', 'Genap'])) {
+            return redirect()->route('siswa.raport')
+                ->with('error', 'Semester tidak valid');
+        }
+
+        $nilaiRaports = NilaiRaport::with('mapel')
+            ->where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->orderBy('mata_pelajaran_id')
+            ->get();
+
+        // Cek apakah ada data raport
+        if ($nilaiRaports->isEmpty()) {
+            return redirect()->route('siswa.raport')
+                ->with('error', 'Data raport untuk semester ' . $semester . ' tahun ajaran ' . $tahun . ' tidak ditemukan');
+        }
+
+        $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->get();
+
+        $kehadiran = Kehadiran::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        $info = RaporInfo::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        $kenaikan = KenaikanKelas::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        return view('siswa.raport.show', compact(
+            'siswa',
+            'semester',
+            'tahun',
+            'nilaiRaports',
+            'ekstra',
+            'kehadiran',
+            'info',
+            'kenaikan'
+        ));
     }
-
-    $nilaiRaports = NilaiRaport::with('mapel')
-        ->where('siswa_id', $siswa->id)
-        ->where('semester', $semester)
-        ->where('tahun_ajaran', $tahun)
-        ->orderBy('mata_pelajaran_id')
-        ->get();
-
-    // Cek apakah ada data raport
-    if ($nilaiRaports->isEmpty()) {
-        return redirect()->route('siswa.raport')
-            ->with('error', 'Data raport untuk semester ' . $semester . ' tahun ajaran ' . $tahun . ' tidak ditemukan');
-    }
-
-    $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa->id)
-        ->where('semester', $semester)
-        ->where('tahun_ajaran', $tahun)
-        ->get();
-
-    $kehadiran = Kehadiran::where('siswa_id', $siswa->id)
-        ->where('semester', $semester)
-        ->where('tahun_ajaran', $tahun)
-        ->first();
-
-    $info = RaporInfo::where('siswa_id', $siswa->id)
-        ->where('semester', $semester)
-        ->where('tahun_ajaran', $tahun)
-        ->first();
-
-    $kenaikan = KenaikanKelas::where('siswa_id', $siswa->id)
-        ->where('semester', $semester)
-        ->where('tahun_ajaran', $tahun)
-        ->first();
-
-    return view('siswa.raport.show', compact(
-        'siswa',
-        'semester',
-        'tahun',
-        'nilaiRaports',
-        'ekstra',
-        'kehadiran',
-        'info',
-        'kenaikan'
-    ));
-}
 
     // 🔹 Export raport ke PDF
-// 🔹 Export raport ke PDF
-public function raportPDF($semester, $tahun)
-{
-    $siswa = $this->getSiswaLogin();
-    // jika $tahun dikirimkan dari URL sebagai '2025-2026', konversi kembali ke '2025/2026'
-    $tahun = str_replace('-', '/', $tahun);
+    public function raportPDF($semester, $tahun)
+    {
+        $siswa = $this->getSiswaLogin();
+        // jika $tahun dikirimkan dari URL sebagai '2025-2026', konversi kembali ke '2025/2026'
+        $tahun = str_replace('-', '/', $tahun);
 
-    // Validasi semester
-    if (!in_array($semester, ['Ganjil', 'Genap'])) {
-        return redirect()->route('siswa.raport')
-            ->with('error', 'Semester tidak valid');
+        // Validasi semester
+        if (!in_array($semester, ['Ganjil', 'Genap'])) {
+            return redirect()->route('siswa.raport')
+                ->with('error', 'Semester tidak valid');
+        }
+
+        $nilaiRaports = NilaiRaport::with('mapel')
+            ->where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->orderBy('mata_pelajaran_id')
+            ->get();
+
+        // Cek apakah ada data raport
+        if ($nilaiRaports->isEmpty()) {
+            return redirect()->route('siswa.raport')
+                ->with('error', 'Data raport untuk semester ' . $semester . ' tahun ajaran ' . $tahun . ' tidak ditemukan');
+        }
+
+        $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->get();
+
+        $kehadiran = Kehadiran::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        $info = RaporInfo::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        $kenaikan = KenaikanKelas::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        $pdf = Pdf::loadView('siswa.raport.pdf', compact(
+            'siswa',
+            'semester',
+            'tahun',
+            'nilaiRaports',
+            'ekstra',
+            'kehadiran',
+            'info',
+            'kenaikan'
+        ))->setPaper('A4', 'portrait');
+
+        return $pdf->stream('Raport - ' . $siswa->nama_lengkap . ' - ' . $semester . ' - ' . $tahun . '.pdf');
     }
 
-    $nilaiRaports = NilaiRaport::with('mapel')
-        ->where('siswa_id', $siswa->id)
-        ->where('semester', $semester)
-        ->where('tahun_ajaran', $tahun)
-        ->orderBy('mata_pelajaran_id')
-        ->get();
-
-    // Cek apakah ada data raport
-    if ($nilaiRaports->isEmpty()) {
-        return redirect()->route('siswa.raport')
-            ->with('error', 'Data raport untuk semester ' . $semester . ' tahun ajaran ' . $tahun . ' tidak ditemukan');
-    }
-
-    $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa->id)
-        ->where('semester', $semester)
-        ->where('tahun_ajaran', $tahun)
-        ->get();
-
-    $kehadiran = Kehadiran::where('siswa_id', $siswa->id)
-        ->where('semester', $semester)
-        ->where('tahun_ajaran', $tahun)
-        ->first();
-
-    $info = RaporInfo::where('siswa_id', $siswa->id)
-        ->where('semester', $semester)
-        ->where('tahun_ajaran', $tahun)
-        ->first();
-
-    $kenaikan = KenaikanKelas::where('siswa_id', $siswa->id)
-        ->where('semester', $semester)
-        ->where('tahun_ajaran', $tahun)
-        ->first();
-
-    $pdf = Pdf::loadView('siswa.raport.pdf', compact(
-        'siswa',
-        'semester',
-        'tahun',
-        'nilaiRaports',
-        'ekstra',
-        'kehadiran',
-        'info',
-        'kenaikan'
-    ))->setPaper('A4', 'portrait');
-
-    return $pdf->stream('Raport - ' . $siswa->nama_lengkap . ' - ' . $semester . ' - ' . $tahun . '.pdf');
-}
     public function catatan()
     {
         $siswa = $this->getSiswaLogin();
@@ -317,6 +465,8 @@ public function raportPDF($semester, $tahun)
     public function exportPDF()
     {
         $siswa = $this->getSiswaLogin();
+        // Load relasi orang tua
+        $siswa->load(['ayah', 'ibu', 'wali']);
 
         $pdf = Pdf::loadView('siswa.pdf', compact('siswa'))
             ->setPaper('A4', 'portrait');

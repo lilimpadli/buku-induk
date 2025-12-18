@@ -16,8 +16,10 @@ class KurikulumDashboardController extends Controller
         $totalKelas = DB::table('kelas')->count();
 
         $siswas = DataSiswa::orderBy('nama_lengkap')->get();
+        $jurusan = null;
+        $aktivitas = []; // Placeholder for activities
 
-        return view('kaprog.dashboard', compact('totalSiswa', 'totalGuru', 'totalKelas', 'siswas'));
+        return view('kurikulum.dashboard', compact('totalSiswa', 'totalGuru', 'totalKelas', 'siswas', 'jurusan', 'aktivitas'));
     }
 
     public function detail($id)

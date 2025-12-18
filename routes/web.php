@@ -34,10 +34,17 @@ use App\Http\Controllers\KelaskaprogController;
  use App\Http\Controllers\KaprogController;
 use App\Http\Controllers\KaprogGuruController;
 
+// PPDB
+use App\Http\Controllers\PpdbController;
+
 
 
 // TU
 use App\Http\Controllers\TUController;
+
+
+
+
 
 
 /*
@@ -77,6 +84,12 @@ Route::prefix('rapor')->group(function () {
 Route::middleware('web')->group(function () {
 
     Route::get('/', fn() => view('welcome'))->name('home');
+
+    // PPDB public routes (sesi -> jalur -> form)
+    Route::get('/ppdb', [PpdbController::class, 'index'])->name('ppdb.index');
+    Route::get('/ppdb/create', [PpdbController::class, 'create'])->name('ppdb.create');
+    Route::post('/ppdb', [PpdbController::class, 'store'])->name('ppdb.store');
+    Route::get('/ppdb/datasiswa/{id}', [PpdbController::class, 'fetchDataSiswa'])->name('ppdb.datasiswa');
 
 
     /*
@@ -266,6 +279,8 @@ Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])
     Route::get('/data-diri', [KaprogController::class, 'dataDiri'])->name('datapribadi.index');
     Route::put('/data-diri', [KaprogController::class, 'updateDataDiri'])->name('datapribadi.update');
 
+    
+
 });
 
 
@@ -305,6 +320,11 @@ Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])
             Route::delete('/wali-kelas/{id}', [TUController::class, 'waliKelasDestroy'])->name('wali-kelas.destroy');
             // Route untuk laporan
             Route::get('/laporan-nilai', [TUController::class, 'laporanNilai'])->name('laporan.nilai');
+
+            // PPDB (TU) - tampilkan pendaftar dan assign ke rombel
+            Route::get('/ppdb', [App\Http\Controllers\TU\PpdbController::class, 'index'])->name('ppdb.index');
+            Route::get('/ppdb/{id}/assign', [App\Http\Controllers\TU\PpdbController::class, 'show'])->name('ppdb.show');
+            Route::post('/ppdb/{id}/assign', [App\Http\Controllers\TU\PpdbController::class, 'assign'])->name('ppdb.assign');
         });
 
 

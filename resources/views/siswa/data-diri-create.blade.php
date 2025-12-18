@@ -159,6 +159,12 @@
                                     <input type="text" name="telepon_ayah" class="form-control" value="{{ old('telepon_ayah') }}">
                                 </div>
 
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold">Alamat Ayah <span class="text-danger">*</span></label>
+                                    <textarea name="alamat_ayah" class="form-control" rows="2" required>{{ old('alamat_ayah') }}</textarea>
+                                    @error('alamat_ayah')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
                                 <!-- Data Ibu -->
                                 <div class="col-12 mt-3">
                                     <h6 class="border-bottom pb-2 fw-semibold text-primary">👩 Data Ibu</h6>
@@ -182,8 +188,9 @@
                                 </div>
 
                                 <div class="col-md-12">
-                                    <label class="form-label fw-semibold">Alamat Orang Tua</label>
-                                    <textarea name="alamat_orangtua" class="form-control" rows="2">{{ old('alamat_orangtua') }}</textarea>
+                                    <label class="form-label fw-semibold">Alamat Ibu <span class="text-danger">*</span></label>
+                                    <textarea name="alamat_ibu" class="form-control" rows="2" required>{{ old('alamat_ibu') }}</textarea>
+                                    @error('alamat_ibu')<div class="text-danger small">{{ $message }}</div>@enderror
                                 </div>
 
                                 <!-- Data Wali -->
@@ -197,8 +204,8 @@
                                 </div>
 
                                 <div class="col-md-4">
-                                    <label class="form-label fw-semibold">Alamat Wali</label>
-                                    <input type="text" name="alamat_wali" class="form-control" value="{{ old('alamat_wali') }}">
+                                    <label class="form-label fw-semibold">Pekerjaan Wali</label>
+                                    <input type="text" name="pekerjaan_wali" class="form-control" value="{{ old('pekerjaan_wali') }}">
                                 </div>
 
                                 <div class="col-md-4">
@@ -207,8 +214,8 @@
                                 </div>
 
                                 <div class="col-md-12">
-                                    <label class="form-label fw-semibold">Pekerjaan Wali</label>
-                                    <input type="text" name="pekerjaan_wali" class="form-control" value="{{ old('pekerjaan_wali') }}">
+                                    <label class="form-label fw-semibold">Alamat Wali</label>
+                                    <textarea name="alamat_wali" class="form-control" rows="2">{{ old('alamat_wali') }}</textarea>
                                 </div>
                             </div>
                         </div>

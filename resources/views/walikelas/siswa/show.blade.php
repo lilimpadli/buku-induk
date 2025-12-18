@@ -39,9 +39,9 @@
                 <div class="card-body">
                     <h6>Kontak</h6>
                     <p class="mb-1"><strong>No HP:</strong> {{ $s->no_hp ?? '-' }}</p>
-                    <p class="mb-1"><strong>Telepon Ayah:</strong> {{ $s->telepon_ayah ?? '-' }}</p>
-                    <p class="mb-1"><strong>Telepon Ibu:</strong> {{ $s->telepon_ibu ?? '-' }}</p>
-                    <p class="mb-0"><strong>Telepon Wali:</strong> {{ $s->telepon_wali ?? '-' }}</p>
+                    <p class="mb-1"><strong>Telepon Ayah:</strong> {{ $s->ayah->telepon ?? '-' }}</p>
+                    <p class="mb-1"><strong>Telepon Ibu:</strong> {{ $s->ibu->telepon ?? '-' }}</p>
+                    <p class="mb-0"><strong>Telepon Wali:</strong> {{ $s->wali->telepon ?? '-' }}</p>
                 </div>
             </div>
         </div>
@@ -77,21 +77,22 @@
                 <div class="row mt-2">
                     <div class="col-md-6">
                         <table class="table table-borderless table-sm">
-                            <tr><th>Nama Ayah</th><td>{{ $s->nama_ayah ?? '-' }}</td></tr>
-                            <tr><th>Pekerjaan Ayah</th><td>{{ $s->pekerjaan_ayah ?? '-' }}</td></tr>
-                            <tr><th>Telepon Ayah</th><td>{{ $s->telepon_ayah ?? '-' }}</td></tr>
-                            <tr><th>Nama Ibu</th><td>{{ $s->nama_ibu ?? '-' }}</td></tr>
-                            <tr><th>Pekerjaan Ibu</th><td>{{ $s->pekerjaan_ibu ?? '-' }}</td></tr>
-                            <tr><th>Telepon Ibu</th><td>{{ $s->telepon_ibu ?? '-' }}</td></tr>
+                            <tr><th>Nama Ayah</th><td>{{ $s->ayah->nama ?? '-' }}</td></tr>
+                            <tr><th>Pekerjaan Ayah</th><td>{{ $s->ayah->pekerjaan ?? '-' }}</td></tr>
+                            <tr><th>Telepon Ayah</th><td>{{ $s->ayah->telepon ?? '-' }}</td></tr>
+                            <tr><th>Alamat Ayah</th><td>{{ $s->ayah->alamat ?? '-' }}</td></tr>
+                            <tr><th>Nama Ibu</th><td>{{ $s->ibu->nama ?? '-' }}</td></tr>
+                            <tr><th>Pekerjaan Ibu</th><td>{{ $s->ibu->pekerjaan ?? '-' }}</td></tr>
+                            <tr><th>Telepon Ibu</th><td>{{ $s->ibu->telepon ?? '-' }}</td></tr>
+                            <tr><th>Alamat Ibu</th><td>{{ $s->ibu->alamat ?? '-' }}</td></tr>
                         </table>
                     </div>
                     <div class="col-md-6">
                         <table class="table table-borderless table-sm">
-                            <tr><th>Alamat Orang Tua</th><td>{{ $s->alamat_orangtua ?? '-' }}</td></tr>
-                            <tr><th>Nama Wali</th><td>{{ $s->nama_wali ?? '-' }}</td></tr>
-                            <tr><th>Pekerjaan Wali</th><td>{{ $s->pekerjaan_wali ?? '-' }}</td></tr>
-                            <tr><th>Alamat Wali</th><td>{{ $s->alamat_wali ?? '-' }}</td></tr>
-                            <tr><th>Telepon Wali</th><td>{{ $s->telepon_wali ?? '-' }}</td></tr>
+                            <tr><th>Nama Wali</th><td>{{ $s->wali->nama ?? '-' }}</td></tr>
+                            <tr><th>Pekerjaan Wali</th><td>{{ $s->wali->pekerjaan ?? '-' }}</td></tr>
+                            <tr><th>Alamat Wali</th><td>{{ $s->wali->alamat ?? '-' }}</td></tr>
+                            <tr><th>Telepon Wali</th><td>{{ $s->wali->telepon ?? '-' }}</td></tr>
                         </table>
                     </div>
                 </div>

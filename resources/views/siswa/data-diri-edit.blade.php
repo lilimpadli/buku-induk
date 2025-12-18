@@ -148,19 +148,25 @@
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold">Nama Ayah <span class="text-danger">*</span></label>
-                                    <input type="text" name="nama_ayah" class="form-control" value="{{ $siswa->nama_ayah ?? old('nama_ayah') }}" required>
+                                    <input type="text" name="nama_ayah" class="form-control" value="{{ $siswa->ayah->nama ?? old('nama_ayah') }}" required>
                                     @error('nama_ayah')<div class="text-danger small">{{ $message }}</div>@enderror
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold">Pekerjaan Ayah <span class="text-danger">*</span></label>
-                                    <input type="text" name="pekerjaan_ayah" class="form-control" value="{{ $siswa->pekerjaan_ayah ?? old('pekerjaan_ayah') }}" required>
+                                    <input type="text" name="pekerjaan_ayah" class="form-control" value="{{ $siswa->ayah->pekerjaan ?? old('pekerjaan_ayah') }}" required>
                                     @error('pekerjaan_ayah')<div class="text-danger small">{{ $message }}</div>@enderror
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold">Telepon Ayah</label>
-                                    <input type="text" name="telepon_ayah" class="form-control" value="{{ $siswa->telepon_ayah ?? old('telepon_ayah') }}">
+                                    <input type="text" name="telepon_ayah" class="form-control" value="{{ $siswa->ayah->telepon ?? old('telepon_ayah') }}">
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold">Alamat Ayah <span class="text-danger">*</span></label>
+                                    <textarea name="alamat_ayah" class="form-control" rows="2" required>{{ $siswa->ayah->alamat ?? old('alamat_ayah') }}</textarea>
+                                    @error('alamat_ayah')<div class="text-danger small">{{ $message }}</div>@enderror
                                 </div>
 
                                 <!-- Data Ibu -->
@@ -170,24 +176,25 @@
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold">Nama Ibu <span class="text-danger">*</span></label>
-                                    <input type="text" name="nama_ibu" class="form-control" value="{{ $siswa->nama_ibu ?? old('nama_ibu') }}" required>
+                                    <input type="text" name="nama_ibu" class="form-control" value="{{ $siswa->ibu->nama ?? old('nama_ibu') }}" required>
                                     @error('nama_ibu')<div class="text-danger small">{{ $message }}</div>@enderror
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold">Pekerjaan Ibu <span class="text-danger">*</span></label>
-                                    <input type="text" name="pekerjaan_ibu" class="form-control" value="{{ $siswa->pekerjaan_ibu ?? old('pekerjaan_ibu') }}" required>
+                                    <input type="text" name="pekerjaan_ibu" class="form-control" value="{{ $siswa->ibu->pekerjaan ?? old('pekerjaan_ibu') }}" required>
                                     @error('pekerjaan_ibu')<div class="text-danger small">{{ $message }}</div>@enderror
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold">Telepon Ibu</label>
-                                    <input type="text" name="telepon_ibu" class="form-control" value="{{ $siswa->telepon_ibu ?? old('telepon_ibu') }}">
+                                    <input type="text" name="telepon_ibu" class="form-control" value="{{ $siswa->ibu->telepon ?? old('telepon_ibu') }}">
                                 </div>
 
                                 <div class="col-md-12">
-                                    <label class="form-label fw-semibold">Alamat Orang Tua</label>
-                                    <textarea name="alamat_orangtua" class="form-control" rows="2">{{ $siswa->alamat_orangtua ?? old('alamat_orangtua') }}</textarea>
+                                    <label class="form-label fw-semibold">Alamat Ibu <span class="text-danger">*</span></label>
+                                    <textarea name="alamat_ibu" class="form-control" rows="2" required>{{ $siswa->ibu->alamat ?? old('alamat_ibu') }}</textarea>
+                                    @error('alamat_ibu')<div class="text-danger small">{{ $message }}</div>@enderror
                                 </div>
 
                                 <!-- Data Wali -->
@@ -197,22 +204,22 @@
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold">Nama Wali</label>
-                                    <input type="text" name="nama_wali" class="form-control" value="{{ $siswa->nama_wali ?? old('nama_wali') }}">
+                                    <input type="text" name="nama_wali" class="form-control" value="{{ $siswa->wali->nama ?? old('nama_wali') }}">
                                 </div>
 
                                 <div class="col-md-4">
-                                    <label class="form-label fw-semibold">Alamat Wali</label>
-                                    <input type="text" name="alamat_wali" class="form-control" value="{{ $siswa->alamat_wali ?? old('alamat_wali') }}">
+                                    <label class="form-label fw-semibold">Pekerjaan Wali</label>
+                                    <input type="text" name="pekerjaan_wali" class="form-control" value="{{ $siswa->wali->pekerjaan ?? old('pekerjaan_wali') }}">
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold">Telepon Wali</label>
-                                    <input type="text" name="telepon_wali" class="form-control" value="{{ $siswa->telepon_wali ?? old('telepon_wali') }}">
+                                    <input type="text" name="telepon_wali" class="form-control" value="{{ $siswa->wali->telepon ?? old('telepon_wali') }}">
                                 </div>
 
                                 <div class="col-md-12">
-                                    <label class="form-label fw-semibold">Pekerjaan Wali</label>
-                                    <input type="text" name="pekerjaan_wali" class="form-control" value="{{ $siswa->pekerjaan_wali ?? old('pekerjaan_wali') }}">
+                                    <label class="form-label fw-semibold">Alamat Wali</label>
+                                    <textarea name="alamat_wali" class="form-control" rows="2">{{ $siswa->wali->alamat ?? old('alamat_wali') }}</textarea>
                                 </div>
                             </div>
                         </div>

@@ -166,7 +166,7 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link active" href="{{ url('/') }}">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url('/tentang') }}">Tentang</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url('/ppdb') }}">PPDB</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('ppdb.index') }}">PPDB</a></li>
                 </ul>
             </div>
         </div>
@@ -190,7 +190,8 @@
 
                     <div class="mt-4">
                         <a href="{{ route('login') }}" class="btn btn-custom btn-login">Login</a>
-                        <a href="{{ url('/ppdb') }}" class="btn btn-custom btn-login">PPDB</a>
+                       <a href="{{ route('ppdb.index') }}" class="btn btn-custom btn-login">PPDB</a>
+
                     </div>
 
                 </div>

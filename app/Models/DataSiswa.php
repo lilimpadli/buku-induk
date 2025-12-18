@@ -24,17 +24,9 @@ class DataSiswa extends Model
         'sekolah_asal',
         'kelas',
         'tanggal_diterima',
-        'nama_ayah',
-        'pekerjaan_ayah',
-        'telepon_ayah',
-        'nama_ibu',
-        'pekerjaan_ibu',
-        'telepon_ibu',
-        'alamat_orangtua',
-        'nama_wali',
-        'alamat_wali',
-        'telepon_wali',
-        'pekerjaan_wali',
+        'ayah_id',
+        'ibu_id',
+        'wali_id',
         'foto',
         'catatan_wali_kelas',
         'rombel_id',
@@ -78,6 +70,24 @@ class DataSiswa extends Model
     }
 
     /* ================================
+     |  RELASI ORANG TUA
+     ================================= */
+    public function ayah()
+    {
+        return $this->belongsTo(Ayah::class, 'ayah_id');
+    }
+
+    public function ibu()
+    {
+        return $this->belongsTo(Ibu::class, 'ibu_id');
+    }
+
+    public function wali()
+    {
+        return $this->belongsTo(Wali::class, 'wali_id');
+    }
+
+    /* ================================
      |  RELASI ROMBEL
      ================================= */
     public function rombel()
@@ -85,4 +95,3 @@ class DataSiswa extends Model
         return $this->belongsTo(Rombel::class);
     }
 }
-

@@ -6,28 +6,30 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
-    {
-        Schema::table('rombels', function (Blueprint $table) {
+   public function up()
+{
+    Schema::table('rombels', function (Blueprint $table) {
+        // pastikan kolom nullable
+        $table->unsignedBigInteger('guru_id')->nullable()->change();
+    });
 
-            // rename kolom jika masih pakai wali_kelas_id
-            if (Schema::hasColumn('rombels', 'wali_kelas_id')) {
-                $table->renameColumn('wali_kelas_id', 'guru_id');
-            }
-        });
+    // bersihkan data lama yang tidak valid
+    DB::table('rombels')
+        ->whereNotNull('guru_id')
+        ->whereNotIn('guru_id', function ($q) {
+            $q->select('id')->from('gurus');
+        })
+        ->update(['guru_id' => null]);
 
-        Schema::table('rombels', function (Blueprint $table) {
+    Schema::table('rombels', function (Blueprint $table) {
+        $table->foreign('guru_id')
+              ->references('id')
+              ->on('gurus')
+              ->onDelete('set null');
+    });
+}
 
-            // pastikan kolom nullable
-            $table->unsignedBigInteger('guru_id')->nullable()->change();
-
-            // tambah foreign key ke gurus
-            $table->foreign('guru_id')
-                  ->references('id')
-                  ->on('gurus')
-                  ->nullOnDelete();
-        });
-    }
+    
 
     public function down(): void
     {

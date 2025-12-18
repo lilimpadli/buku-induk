@@ -12,14 +12,15 @@
                 <h3 class="fw-semibold">Data Diri Siswa</h3>
 
                 @if ($siswa)
-                    <a href="{{ route('siswa.dataDiri.edit') }}" class="btn btn-primary">
-                        <i class="fas fa-edit me-1"></i> Edit Data
-                    </a>
+                    <div>
+                        <a href="{{ route('siswa.dataDiri.edit') }}" class="btn btn-primary me-2">
+                            <i class="fas fa-edit me-1"></i> Edit Data
+                        </a>
 
-                    <a href="{{ route('siswa.dataDiri.exportPDF') }}" class="btn btn-danger" target="_blank">
-                        <i class="bi bi-file-earmark-pdf"></i> Export PDF
-                    </a>
-
+                        <a href="{{ route('siswa.dataDiri.exportPDF') }}" class="btn btn-danger" target="_blank">
+                            <i class="bi bi-file-earmark-pdf"></i> Export PDF
+                        </a>
+                    </div>
                 @else
                     <a href="{{ route('siswa.dataDiri.create') }}" class="btn btn-primary">
                         <i class="fas fa-plus me-1"></i> Tambah Data
@@ -118,17 +119,22 @@
 
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">Nama Ayah</label>
-                                <p class="form-control-plaintext">{{ $siswa->nama_ayah }}</p>
+                                <p class="form-control-plaintext">{{ $siswa->ayah->nama ?? '-' }}</p>
                             </div>
 
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">Pekerjaan Ayah</label>
-                                <p class="form-control-plaintext">{{ $siswa->pekerjaan_ayah }}</p>
+                                <p class="form-control-plaintext">{{ $siswa->ayah->pekerjaan ?? '-' }}</p>
                             </div>
 
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">Telepon Ayah</label>
-                                <p class="form-control-plaintext">{{ $siswa->telepon_ayah }}</p>
+                                <p class="form-control-plaintext">{{ $siswa->ayah->telepon ?? '-' }}</p>
+                            </div>
+
+                            <div class="col-12 mt-2">
+                                <label class="form-label fw-semibold">Alamat Ayah</label>
+                                <p class="form-control-plaintext">{{ $siswa->ayah->alamat ?? '-' }}</p>
                             </div>
 
                             <!-- DATA IBU -->
@@ -138,23 +144,22 @@
 
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">Nama Ibu</label>
-                                <p class="form-control-plaintext">{{ $siswa->nama_ibu }}</p>
+                                <p class="form-control-plaintext">{{ $siswa->ibu->nama ?? '-' }}</p>
                             </div>
 
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">Pekerjaan Ibu</label>
-                                <p class="form-control-plaintext">{{ $siswa->pekerjaan_ibu }}</p>
+                                <p class="form-control-plaintext">{{ $siswa->ibu->pekerjaan ?? '-' }}</p>
                             </div>
 
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">Telepon Ibu</label>
-                                <p class="form-control-plaintext">{{ $siswa->telepon_ibu }}</p>
+                                <p class="form-control-plaintext">{{ $siswa->ibu->telepon ?? '-' }}</p>
                             </div>
 
-                            <!-- Alamat Orang Tua -->
-                            <div class="col-12 mt-3">
-                                <label class="form-label fw-semibold">Alamat Orang Tua</label>
-                                <p class="form-control-plaintext">{{ $siswa->alamat_orangtua ?? '-' }}</p>
+                            <div class="col-12 mt-2">
+                                <label class="form-label fw-semibold">Alamat Ibu</label>
+                                <p class="form-control-plaintext">{{ $siswa->ibu->alamat ?? '-' }}</p>
                             </div>
 
                             <!-- DATA WALI -->
@@ -164,22 +169,22 @@
 
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">Nama Wali</label>
-                                <p class="form-control-plaintext">{{ $siswa->nama_wali }}</p>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Alamat Wali</label>
-                                <p class="form-control-plaintext">{{ $siswa->alamat_wali }}</p>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Telepon Wali</label>
-                                <p class="form-control-plaintext">{{ $siswa->telepon_wali }}</p>
+                                <p class="form-control-plaintext">{{ $siswa->wali->nama ?? '-' }}</p>
                             </div>
 
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">Pekerjaan Wali</label>
-                                <p class="form-control-plaintext">{{ $siswa->pekerjaan_wali }}</p>
+                                <p class="form-control-plaintext">{{ $siswa->wali->pekerjaan ?? '-' }}</p>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Telepon Wali</label>
+                                <p class="form-control-plaintext">{{ $siswa->wali->telepon ?? '-' }}</p>
+                            </div>
+
+                            <div class="col-12 mt-2">
+                                <label class="form-label fw-semibold">Alamat Wali</label>
+                                <p class="form-control-plaintext">{{ $siswa->wali->alamat ?? '-' }}</p>
                             </div>
 
                             <!-- FOTO -->
