@@ -219,8 +219,13 @@
                                         <i class="fas fa-school"></i> <span class="label ms-2">Manajemen Kelas</span>
                                     </a>
 
-                                     <a href="{{ route('kurikulum.siswa.index') }}" class="nav-link {{ request()->routeIs('kurikulum.siswa*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Siswa">
+                                    <a href="{{ route('kurikulum.siswa.index') }}" class="nav-link {{ request()->routeIs('kurikulum.siswa*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Siswa">
                                         <i class="fas fa-users"></i> <span class="label ms-2">Manajemen Siswa</span>
+                                    </a>
+
+                                     <a href="{{ route('kurikulum.jurusan.index') }}" class="nav-link {{ request()->routeIs('kurikulum.jurusan*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Jurusan">
+                                        <i class="fas fa-users"></i> <span class="label ms-2">Manajemen Jurusan</span>
+                                    </a>
 
                                     <a href="{{ route('kurikulum.rapor.index') }}" class="nav-link {{ request()->routeIs('kurikulum.rapor*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Lihat Nilai Raport">
                                         <i class="fas fa-file-lines"></i> <span class="label ms-2">Lihat Nilai Raport</span>

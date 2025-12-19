@@ -41,20 +41,35 @@ class KelasController extends Controller
 
     public function create()
     {
-        $kelas = Kelas::with('jurusan')->get();
+        $tingkats = [10, 11, 12];
+        $jurusans = \App\Models\Jurusan::all();
         $gurus = \App\Models\Guru::all();
-        return view('kurikulum.manajemen-kelas.create', compact('kelas', 'gurus'));
+        return view('kurikulum.manajemen-kelas.create', compact('tingkats', 'jurusans', 'gurus'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'kelas_id' => 'required|exists:kelas,id',
+            'tingkat' => 'required|in:10,11,12',
+            'jurusan_id' => 'required|exists:jurusans,id',
             'nama' => 'required|string|max:255',
             'guru_id' => 'required|exists:gurus,id',
         ]);
 
-        Rombel::create($request->only(['kelas_id', 'nama', 'guru_id']));
+        // Cari kelas berdasarkan tingkat dan jurusan
+        $kelas = Kelas::where('tingkat', $request->tingkat)
+                      ->where('jurusan_id', $request->jurusan_id)
+                      ->first();
+
+        if (!$kelas) {
+            return back()->withErrors(['kelas' => 'Kelas dengan tingkat dan jurusan tersebut tidak ditemukan.'])->withInput();
+        }
+
+        Rombel::create([
+            'kelas_id' => $kelas->id,
+            'nama' => $request->nama,
+            'guru_id' => $request->guru_id,
+        ]);
 
         return redirect()->route('kurikulum.kelas.index')
             ->with('success', 'Data rombel berhasil ditambahkan.');
@@ -72,21 +87,36 @@ class KelasController extends Controller
     public function edit($id)
     {
         $rombel = Rombel::findOrFail($id);
-        $kelas = Kelas::with('jurusan')->get();
+        $tingkats = [10, 11, 12];
+        $jurusans = \App\Models\Jurusan::all();
         $gurus = \App\Models\Guru::all();
-        return view('kurikulum.manajemen-kelas.edit', compact('rombel', 'kelas', 'gurus'));
+        return view('kurikulum.manajemen-kelas.edit', compact('rombel', 'tingkats', 'jurusans', 'gurus'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'kelas_id' => 'required|exists:kelas,id',
+            'tingkat' => 'required|in:10,11,12',
+            'jurusan_id' => 'required|exists:jurusans,id',
             'nama' => 'required|string|max:255',
             'guru_id' => 'required|exists:gurus,id',
         ]);
 
+        // Cari kelas berdasarkan tingkat dan jurusan
+        $kelas = Kelas::where('tingkat', $request->tingkat)
+                      ->where('jurusan_id', $request->jurusan_id)
+                      ->first();
+
+        if (!$kelas) {
+            return back()->withErrors(['kelas' => 'Kelas dengan tingkat dan jurusan tersebut tidak ditemukan.'])->withInput();
+        }
+
         $rombel = Rombel::findOrFail($id);
-        $rombel->update($request->only(['kelas_id', 'nama', 'guru_id']));
+        $rombel->update([
+            'kelas_id' => $kelas->id,
+            'nama' => $request->nama,
+            'guru_id' => $request->guru_id,
+        ]);
 
         return redirect()->route('kurikulum.kelas.index')
             ->with('success', 'Data rombel berhasil diperbarui.');

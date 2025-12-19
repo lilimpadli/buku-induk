@@ -19,28 +19,41 @@
                 @method('PUT')
 
                 <div class="row mb-3">
-                    <!-- Kelas -->
+                    <!-- Tingkat -->
                     <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Kelas</label>
-                        <select name="kelas_id" class="form-select" required>
-                            <option value="">Pilih Kelas</option>
-                            @foreach($kelas as $k)
-                                <option value="{{ $k->id }}" {{ $k->id == $rombel->kelas_id ? 'selected' : '' }}>
-                                    {{ $k->tingkat }} {{ $k->jurusan->nama ?? '' }}
+                        <label class="form-label fw-semibold">Tingkat</label>
+                        <select name="tingkat" class="form-select" required>
+                            <option value="">Pilih Tingkat</option>
+                            @foreach($tingkats as $t)
+                                <option value="{{ $t }}" {{ $t == $rombel->kelas->tingkat ? 'selected' : '' }}>
+                                    Kelas {{ $t }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
 
+                    <!-- Konsentrasi Keahlian -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Konsentrasi Keahlian</label>
+                        <select name="jurusan_id" class="form-select" required>
+                            <option value="">Pilih Konsentrasi Keahlian</option>
+                            @foreach($jurusans as $j)
+                                <option value="{{ $j->id }}" {{ $j->id == $rombel->kelas->jurusan_id ? 'selected' : '' }}>
+                                    {{ $j->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
                     <!-- Nama Rombel -->
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-semibold">Nama Rombel</label>
                         <input type="text" name="nama" class="form-control" placeholder="Contoh: RPL 1, TKJ 2"
                             value="{{ old('nama', $rombel->nama) }}" required>
                     </div>
-                </div>
 
-                <div class="row mb-4">
                     <!-- Wali Kelas -->
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-semibold">Wali Kelas</label>
