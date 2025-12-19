@@ -1,22 +1,21 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Kelas')
+@section('title', 'Tambah Rombel')
 
 @section('content')
 <div class="container-fluid">
 
     <!-- JUDUL -->
-    <h3 class="fw-bold mb-1">Edit Rombel</h3>
+    <h3 class="fw-bold mb-1">Tambah Rombel</h3>
     <p class="text-muted mb-3">
-        Edit data rombel.
+        Tambah data rombel baru.
     </p>
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
 
-            <form action="{{ route('kurikulum.kelas.update', $rombel->id) }}" method="POST">
+            <form action="{{ route('kurikulum.kelas.store') }}" method="POST">
                 @csrf
-                @method('PUT')
 
                 <div class="row mb-3">
                     <!-- Kelas -->
@@ -25,9 +24,7 @@
                         <select name="kelas_id" class="form-select" required>
                             <option value="">Pilih Kelas</option>
                             @foreach($kelas as $k)
-                                <option value="{{ $k->id }}" {{ $k->id == $rombel->kelas_id ? 'selected' : '' }}>
-                                    {{ $k->tingkat }} {{ $k->jurusan->nama ?? '' }}
-                                </option>
+                                <option value="{{ $k->id }}">{{ $k->tingkat }} {{ $k->jurusan->nama ?? '' }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -36,7 +33,7 @@
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-semibold">Nama Rombel</label>
                         <input type="text" name="nama" class="form-control" placeholder="Contoh: RPL 1, TKJ 2"
-                            value="{{ old('nama', $rombel->nama) }}" required>
+                            value="{{ old('nama') }}" required>
                     </div>
                 </div>
 
@@ -47,9 +44,7 @@
                         <select name="guru_id" class="form-select" required>
                             <option value="">Pilih Wali Kelas</option>
                             @foreach($gurus as $guru)
-                                <option value="{{ $guru->id }}" {{ $guru->id == $rombel->guru_id ? 'selected' : '' }}>
-                                    {{ $guru->nama }}
-                                </option>
+                                <option value="{{ $guru->id }}">{{ $guru->nama }}</option>
                             @endforeach
                         </select>
                     </div>

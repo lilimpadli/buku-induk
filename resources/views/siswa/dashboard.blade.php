@@ -1,16 +1,108 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-4">
+
+<style>
+    /* ===================== STYLE DASHBOARD SISWA ===================== */
+
+    .dashboard-title {
+        font-size: 26px;
+        font-weight: 700;
+    }
+
+    .subtitle {
+        margin-top: -5px;
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    /* Kartu nilai */
+    .nilai-card {
+        border-radius: 15px;
+        transition: 0.2s;
+        background: white;
+    }
+    .nilai-card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 4px 14px rgba(0,0,0,0.09);
+    }
+
+    .nilai-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .nilai-angka {
+        font-size: 32px;
+        font-weight: 700;
+        color: #2F53FF;
+        line-height: 1.0;
+    }
+
+    .predikat {
+        font-size: 12px;
+    }
+
+    /* Card catatan */
+    .catatan-box {
+        height: 240px;
+        overflow-y: auto;
+    }
+
+    .catatan-item {
+        padding: 6px 0;
+        border-bottom: 1px dashed #ddd;
+        font-size: 13px;
+    }
+
+    .catatan-item:last-child {
+        border-bottom: none;
+    }
+
+</style>
+
+<div class="container-fluid">
+
+    <h3 class="dashboard-title">Selamat Datang, {{ $siswa->nama_lengkap ?? Auth::user()->name }}!</h3>
+    <p class="subtitle">Ringkasan Nilai dan catatan terbaru dari wali kelas Anda</p>
+
+    <!-- ========================= NILAI RINGKASAN ========================= -->
+    <h5 class="fw-bold mt-4 mb-3">Ringkasan Nilai Terbaru</h5>
+
     <div class="row g-3">
-        <div class="col-12 d-flex justify-content-between align-items-center mb-3">
-            <h3 class="mb-0">Dashboard Siswa</h3>
-            <div>
-                <a href="{{ route('siswa.dataDiri') }}" class="btn btn-outline-primary me-2">Data Diri</a>
-                <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-danger">Logout</button>
-                </form>
+
+        @if(isset($ringkasanNilai) && count($ringkasanNilai) > 0)
+            @foreach($ringkasanNilai as $mapel => $nilai)
+                <div class="col-md-3">
+                    <div class="card nilai-card shadow-sm p-3">
+                        <span class="nilai-title">{{ $mapel }}</span>
+
+                        <div class="nilai-angka mt-1">{{ $nilai['angka'] }}</div>
+                        <small>/ 100</small>
+
+                        <p class="text-success predikat mt-1">{{ $nilai['predikat'] }}</p>
+                    </div>
+                </div>
+            @endforeach
+        @else
+            <p class="text-muted">Belum ada nilai terbaru.</p>
+        @endif
+
+        <!-- ========================= CATATAN WALI KELAS ========================= -->
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 h-100">
+                <h6 class="fw-bold">Catatan Wali Kelas</h6>
+
+                <div class="catatan-box mt-2">
+
+                  
+
+                </div>
+
+                <a href="" class="btn btn-primary btn-sm w-100 mt-2">
+                    Lihat Semua Catatan
+                </a>
             </div>
         </div>
 
@@ -113,5 +205,6 @@
             </div>
         </div>
     </div>
+
 </div>
 @endsection

@@ -28,4 +28,9 @@ class Rombel extends Model
     {
         return $this->hasMany(DataSiswa::class, 'rombel_id');
     }
+
+    public function siswas()
+{
+    return $this->hasMany(\App\Models\Siswa::class, 'rombel_id');
+}
 }

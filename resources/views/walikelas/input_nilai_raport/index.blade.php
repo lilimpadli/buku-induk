@@ -11,7 +11,7 @@
         <div class="list-group list-group-flush">
             @foreach ($siswas as $siswa)
                 <a href="{{ route('walikelas.input_nilai_raport.create', $siswa->id) }}" 
-                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                   class="list-gro`up-item list-group-item-action d-flex justify-content-between align-items-center">
                     <div>
                         <strong>{{ $siswa->nama_lengkap }}</strong>
                         <br>

@@ -15,7 +15,6 @@
     </div>
 </div>
 
-<!-- STATS CARDS -->
 <div class="row g-3 mb-4">
     <div class="col-md-3">
         <div class="card border-0 shadow-sm">

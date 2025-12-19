@@ -36,7 +36,7 @@
                             <td>{{ $item->nisn }}</td>
                             <td>{{ $item->nis }}</td>
                             <td>{{ $item->nama_lengkap }}</td>
-                            <td>{{ $item->kelas }}</td>
+                            <td>{{ $item->rombel->nama ?? '-' }}</td>
                             <td>{{ $item->tanggal_diterima }}</td>
                             <td class="text-center">
                                 <a href="{{ route('kurikulum.data-siswa.show', $item->id) }}" class="text-dark me-2" title="Lihat">

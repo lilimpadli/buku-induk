@@ -12,6 +12,9 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
     <style>
         /* Layout */
         :root{
@@ -31,6 +34,7 @@
             padding: 1.25rem 0.75rem;
             border-right: 1px solid rgba(47,83,255,0.06);
             width: 260px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
 
         .sidebar-header {
@@ -211,20 +215,15 @@
                                         <i class="fas fa-gauge"></i> <span class="label ms-2">Dashboard</span>
                                     </a>
 
-                                    <a href="{{ route('kurikulum.siswa.index') }}" class="nav-link {{ request()->routeIs('kurikulum.siswa*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Siswa">
-                                        <i class="fa fa-users"></i> <span class="label ms-2">Manajemen Siswa</span>
+                                    <a href="{{ route('kurikulum.kelas.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kelas*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Kelas">
+                                        <i class="fas fa-school"></i> <span class="label ms-2">Manajemen Kelas</span>
                                     </a>
 
-                                    <a href="{{ route('walikelas.input_nilai_raport.index') }}" class="nav-link {{ request()->routeIs('walikelas.rapor.nilai.*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Input Nilai Raport">
-                                        <i class="fas fa-clipboard-check"></i> <span class="label ms-2">Input Nilai Raport</span>
-                                    </a>
+                                     <a href="{{ route('kurikulum.siswa.index') }}" class="nav-link {{ request()->routeIs('kurikulum.siswa*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Siswa">
+                                        <i class="fas fa-users"></i> <span class="label ms-2">Manajemen Siswa</span>
 
-                                    <a href="{{ route('walikelas.nilai_raport.index') }}" class="nav-link {{ request()->routeIs('walikelas.rapor.cetak') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Lihat Nilai Raport">
+                                    <a href="{{ route('kurikulum.rapor.index') }}" class="nav-link {{ request()->routeIs('kurikulum.rapor*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Lihat Nilai Raport">
                                         <i class="fas fa-file-lines"></i> <span class="label ms-2">Lihat Nilai Raport</span>
-                                    </a>
-
-                                    <a href="" class="nav-link {{ request()->routeIs('kurikulum.raport*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="View Raport">
-                                        <i class="fa fa-file-alt"></i> <span class="label ms-2">View Raport</span>
                                     </a>
                                 @endif
 

@@ -32,9 +32,17 @@ class SiswaController extends Controller
      */
     public function dataDiri()
     {
-        $siswa = $this->getSiswaLogin();
+       $siswa = $this->getSiswaLogin();
+
+        // Jika tidak ada data siswa, arahkan ke form pembuatan data diri
+        if (! $siswa) {
+            return redirect()->route('siswa.dataDiri.create')
+                ->with('info', 'Silakan lengkapi data diri siswa terlebih dahulu.');
+        }
+
         // Load relasi orang tua
         $siswa->load(['ayah', 'ibu', 'wali']);
+
         return view('siswa.data-diri', compact('siswa'));
     }
 

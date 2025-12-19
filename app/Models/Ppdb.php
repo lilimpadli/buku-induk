@@ -10,6 +10,7 @@ class Ppdb extends Model
 
     protected $fillable = [
         'nama_lengkap',
+        'nis',
         'nisn',
         'jenis_kelamin',
         'tempat_lahir',

@@ -9,6 +9,7 @@ use App\Models\EkstrakurikulerSiswa;
 use App\Models\Kehadiran;
 use App\Models\RaporInfo;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class RaporController extends Controller
 {
@@ -174,7 +175,8 @@ class RaporController extends Controller
         $kehadiran = Kehadiran::where('siswa_id', $siswa_id)->where('semester', $semester)->first();
         $info = RaporInfo::where('siswa_id', $siswa_id)->where('semester', $semester)->first();
 
-        return view('rapor.cetak', compact('siswa', 'nilai', 'ekstra', 'kehadiran', 'info', 'semester', 'tahun'));
+        $pdf = Pdf::loadView('rapor.cetak', compact('siswa', 'nilai', 'ekstra', 'kehadiran', 'info', 'semester', 'tahun'));
+        return $pdf->stream('Raport - ' . $siswa->nama_lengkap . ' - ' . $semester . ' - ' . $tahun . '.pdf');
     }
 
 

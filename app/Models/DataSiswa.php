@@ -22,7 +22,6 @@ class DataSiswa extends Model
         'alamat',
         'no_hp',
         'sekolah_asal',
-        'kelas',
         'tanggal_diterima',
         'ayah_id',
         'ibu_id',
