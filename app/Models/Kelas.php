@@ -32,5 +32,9 @@ class Kelas extends Model
     {
         return $this->hasMany(Rombel::class, 'kelas_id');
     }
+    public function waliKelas()
+{
+    return $this->hasMany(WaliKelas::class, 'kelas_id');
+}
 
 }

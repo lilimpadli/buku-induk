@@ -345,6 +345,20 @@ Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])
             Route::get('/siswa', [KurikulumSiswaController::class, 'index'])
                 ->name('siswa.index');
 
+            // Data Siswa (gunakan TUController actions supaya kurikulum bisa membuka form/detail)
+            Route::get('/siswa/create', [App\Http\Controllers\TUController::class, 'siswaCreate'])
+                ->name('data-siswa.create');
+            Route::post('/siswa', [App\Http\Controllers\TUController::class, 'siswaStore'])
+                ->name('data-siswa.store');
+            Route::get('/siswa/{id}', [App\Http\Controllers\TUController::class, 'siswaDetail'])
+                ->name('data-siswa.show');
+            Route::get('/siswa/{id}/edit', [App\Http\Controllers\TUController::class, 'siswaEdit'])
+                ->name('data-siswa.edit');
+            Route::put('/siswa/{id}', [App\Http\Controllers\TUController::class, 'siswaUpdate'])
+                ->name('data-siswa.update');
+            Route::delete('/siswa/{id}', [App\Http\Controllers\TUController::class, 'siswaDestroy'])
+                ->name('data-siswa.destroy');
+
             Route::get('/kurikulum/manajemen-kelas', [KelasController::class, 'index'])
                 ->name('kurikulum.kelas.index');
 

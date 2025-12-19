@@ -1,0 +1,16 @@
+[33m410e02c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: pull: Fast-forward
+[33mb4cd5a3[m HEAD@{1}: reset: moving to HEAD
+[33mb4cd5a3[m HEAD@{2}: commit (merge): tu
+[33me3fea61[m HEAD@{3}: commit (merge): isi pesan sndiri
+[33m20f0c8c[m HEAD@{4}: rebase (abort): returning to refs/heads/main
+[33m762c609[m HEAD@{5}: commit: tu
+[33m0d3dfb8[m HEAD@{6}: commit: TU
+[33m0344554[m HEAD@{7}: pull origin main --rebase (start): checkout 0344554925c65c6173635774b228c9f87f1e75a1
+[33m20f0c8c[m HEAD@{8}: commit: TU
+[33m6498e81[m HEAD@{9}: reset: moving to HEAD
+[33m6498e81[m HEAD@{10}: commit: TU
+[33mb5c77a1[m HEAD@{11}: pull: Fast-forward
+[33m8782283[m HEAD@{12}: reset: moving to HEAD
+[33m8782283[m HEAD@{13}: commit: walas
+[33m6b8e493[m HEAD@{14}: commit: asal sekolah
+[33m1019038[m HEAD@{15}: clone: from https://github.com/lilimpadli/buku-induk.git

@@ -23,34 +23,45 @@
                             <th>Nama</th>
                             <th>Nomor Induk</th>
                             <th>Email</th>
-                            <th>Kelas</th> {{-- Kolom baru --}}
+                            <th>Kelas</th>
+                            <th>Jurusan</th>
+                            <th>Rombel</th>
+                            <th>Tahun Ajaran</th>
+                            <th>Semester</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($waliKelas as $wk)
                             <tr>
-                                <td>{{ $wk->name }}</td>
-                                <td>{{ $wk->nomor_induk }}</td>
-                                <td>{{ $wk->email }}</td>
-
-                                {{-- Kelas yang diwalikelasi --}}
+                                <td>{{ optional($wk->user)->name }}</td>
+                                <td>{{ optional($wk->user)->nomor_induk }}</td>
+                                <td>{{ optional($wk->user)->email }}</td>
+                                <td>{{ optional($wk->kelas)->tingkat }}</td>
+                                <td>{{ optional($wk->jurusan)->nama }}</td>
+                                <td>{{ optional($wk->rombel)->nama }}</td>
+                                <td>{{ $wk->tahun_ajaran }}</td>
+                                <td>{{ $wk->semester }}</td>
                                 <td>
-                                    @if ($wk->rombels->count() > 0)
-                                        @foreach ($wk->rombels as $rombel)
-                                            <span class="badge bg-success">
-                                                {{ $rombel->nama }}
-                                            </span><br>
-                                        @endforeach
-                                    @else
-                                        <span class="text-muted">Belum memegang kelas</span>
-                                    @endif
+                                    <span class="badge bg-{{ $wk->status == 'Aktif' ? 'success' : 'danger' }}">
+                                        {{ $wk->status }}
+                                    </span>
                                 </td>
-
                                 <td>
                                     <a href="{{ route('tu.wali-kelas.detail', $wk->id) }}" class="btn btn-sm btn-info">
                                         <i class="fas fa-eye"></i> Detail
                                     </a>
+                                    <a href="{{ route('tu.wali-kelas.edit', $wk->id) }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <form action="{{ route('tu.wali-kelas.destroy', $wk->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+                                            <i class="fas fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach

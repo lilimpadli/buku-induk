@@ -10,6 +10,8 @@ use App\Models\Jurusan;
 use App\Models\Ayah;
 use App\Models\Ibu;
 use App\Models\Wali;
+use App\Models\WaliKelas;
+use App\Models\Rombel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +27,8 @@ class TUController extends Controller
     $totalSiswa = DataSiswa::count();
     $totalGuru = User::where('role', 'guru')->count(); // Ubah dari totalWaliKelas
     $totalKelas = Kelas::count();
+    // Jumlah wali kelas (dibutuhkan oleh view tu.dashboard)
+    $totalWaliKelas = User::where('role', 'walikelas')->count();
     
     // Inisialisasi variabel jurusan untuk menghindari error
     $jurusan = null;
@@ -71,6 +75,7 @@ class TUController extends Controller
         'totalSiswa', 
         'totalGuru', // Ubah dari totalWaliKelas
         'totalKelas',
+        'totalWaliKelas',
         'jurusan', // Tambahkan ini
         'aktivitas', // Tambahkan ini
         'siswaBaru',
@@ -425,7 +430,7 @@ class TUController extends Controller
      */
     public function kelas()
     {
-        $kelas = Kelas::with('jurusan')->get();
+        $kelas = Kelas::with(['jurusan', 'rombels', 'waliKelas.user'])->get();
         return view('tu.kelas', compact('kelas'));
     }
 
@@ -514,9 +519,9 @@ class TUController extends Controller
      */
     public function waliKelas()
     {
-        $waliKelas = User::where('role', 'walikelas')
-                     ->with('rombels')
-                     ->paginate(10);
+        $waliKelas = WaliKelas::with(['user', 'kelas', 'jurusan', 'rombel'])
+            ->latest()
+            ->paginate(10);
 
         return view('tu.wali-kelas.index', compact('waliKelas'));
     }
@@ -526,7 +531,12 @@ class TUController extends Controller
      */
     public function waliKelasCreate()
     {
-        return view('tu.wali-kelas-create');
+        $users = User::where('role', 'walikelas')->get();
+        $kelas = Kelas::all();
+        $jurusans = Jurusan::all();
+        $rombels = Rombel::all();
+        
+        return view('tu.wali-kelas.create', compact('users', 'kelas', 'jurusans', 'rombels'));
     }
 
     /**
@@ -535,19 +545,16 @@ class TUController extends Controller
     public function waliKelasStore(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'nomor_induk' => 'required|string|unique:users,nomor_induk',
-            'email' => 'required|string|email|max:255|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
+            'user_id' => 'required|exists:users,id',
+            'kelas_id' => 'required|exists:kelas,id',
+            'jurusan_id' => 'required|exists:jurusans,id',
+            'rombel_id' => 'required|exists:rombels,id',
+            'tahun_ajaran' => 'required|string|size:9',
+            'semester' => 'required|in:Ganjil,Genap',
+            'status' => 'required|in:Aktif,Tidak Aktif',
         ]);
 
-        User::create([
-            'name' => $request->name,
-            'nomor_induk' => $request->nomor_induk,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'walikelas',
-        ]);
+        WaliKelas::create($request->all());
         
         return redirect()->route('tu.wali-kelas')
             ->with('success', 'Data wali kelas berhasil ditambahkan.');
@@ -558,8 +565,13 @@ class TUController extends Controller
      */
     public function waliKelasEdit($id)
     {
-        $waliKelas = User::findOrFail($id);
-        return view('tu.wali-kelas-edit', compact('waliKelas'));
+        $waliKelas = WaliKelas::findOrFail($id);
+        $users = User::where('role', 'walikelas')->get();
+        $kelas = Kelas::all();
+        $jurusans = Jurusan::all();
+        $rombels = Rombel::all();
+        
+        return view('tu.wali-kelas.edit', compact('waliKelas', 'users', 'kelas', 'jurusans', 'rombels'));
     }
 
     /**
@@ -567,24 +579,19 @@ class TUController extends Controller
      */
     public function waliKelasUpdate(Request $request, $id)
     {
-        $waliKelas = User::findOrFail($id);
+        $waliKelas = WaliKelas::findOrFail($id);
         
         $request->validate([
-            'name' => 'required|string|max:255',
-            'nomor_induk' => 'required|string|unique:users,nomor_induk,' . $id,
-            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'user_id' => 'required|exists:users,id',
+            'kelas_id' => 'required|exists:kelas,id',
+            'jurusan_id' => 'required|exists:jurusans,id',
+            'rombel_id' => 'required|exists:rombels,id',
+            'tahun_ajaran' => 'required|string|size:9',
+            'semester' => 'required|in:Ganjil,Genap',
+            'status' => 'required|in:Aktif,Tidak Aktif',
         ]);
 
-        $data = $request->all();
-        
-        if ($request->filled('password')) {
-            $request->validate([
-                'password' => 'required|string|min:8|confirmed',
-            ]);
-            $data['password'] = Hash::make($request->password);
-        }
-
-        $waliKelas->update($data);
+        $waliKelas->update($request->all());
 
         return redirect()->route('tu.wali-kelas.detail', $id)
             ->with('success', 'Data wali kelas berhasil diperbarui.');
@@ -595,7 +602,7 @@ class TUController extends Controller
      */
     public function waliKelasDestroy($id)
     {
-        $waliKelas = User::findOrFail($id);
+        $waliKelas = WaliKelas::findOrFail($id);
         $waliKelas->delete();
 
         return redirect()->route('tu.wali-kelas')
@@ -607,10 +614,9 @@ class TUController extends Controller
      */
     public function waliKelasDetail($id)
     {
-        $waliKelas = User::findOrFail($id);
-        $siswaCount = DataSiswa::count(); // Total siswa (bisa disesuaikan dengan kelas yang diampu)
+        $waliKelas = WaliKelas::with(['user', 'kelas', 'jurusan', 'rombel'])->findOrFail($id);
         
-        return view('tu.wali-kelas-detail', compact('waliKelas', 'siswaCount'));
+        return view('tu.wali-kelas.show', compact('waliKelas'));
     }
     
     /**

@@ -108,6 +108,10 @@
                         <label class="form-label fw-semibold">Password</label>
                         <input type="password" name="password" class="form-control" required>
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Konfirmasi Password</label>
+                        <input type="password" name="password_confirmation" class="form-control" required>
+                    </div>
 
                     <!-- Data Ayah -->
                     <div class="col-12 mt-4">

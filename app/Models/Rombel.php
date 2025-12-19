@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Rombel extends Model
@@ -20,9 +21,9 @@ class Rombel extends Model
 
     public function kelas()
     {
-        return $this->belongsTo(Kelas::class);
+        return $this->belongsTo(Kelas::class, 'kelas_id');
     }
-
+    
     public function siswa()
     {
         return $this->hasMany(DataSiswa::class, 'rombel_id');
