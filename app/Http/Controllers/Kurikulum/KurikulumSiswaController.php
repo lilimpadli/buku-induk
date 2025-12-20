@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers\Kurikulum;
 
 use App\Http\Controllers\Controller;

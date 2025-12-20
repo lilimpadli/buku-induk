@@ -3,6 +3,188 @@
 @section('title', 'Data Diri Siswa')
 
 @section('content')
+<style>
+    /* ===================== STYLE DATA DIRI SISWA ===================== */
+    
+    :root {
+        --primary-color: #2F53FF;
+        --secondary-color: #6366F1;
+        --success-color: #10B981;
+        --warning-color: #F59E0B;
+        --danger-color: #EF4444;
+        --light-bg: #F8FAFC;
+        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    body {
+        background-color: var(--light-bg);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .container {
+        max-width: 1200px;
+    }
+
+    h3.fw-semibold {
+        font-size: 28px;
+        color: #1E293B;
+        position: relative;
+        padding-left: 15px;
+        margin-bottom: 20px;
+    }
+
+    h3.fw-semibold::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 70%;
+        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+        border-radius: 3px;
+    }
+
+    /* Card Styles */
+    .card {
+        border-radius: 16px;
+        border: none;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: var(--hover-shadow);
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    /* Section Headers */
+    h5.border-bottom {
+        font-size: 18px;
+        color: #1E293B;
+        font-weight: 600;
+        padding-bottom: 12px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #E2E8F0;
+        position: relative;
+    }
+
+    h5.border-bottom::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 80px;
+        height: 2px;
+        background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        border-radius: 1px;
+    }
+
+    /* Form Labels */
+    .form-label.fw-semibold {
+        color: #475569;
+        font-weight: 600;
+        margin-bottom: 6px;
+        font-size: 14px;
+    }
+
+    .form-control-plaintext {
+        color: #334155;
+        font-size: 15px;
+        padding: 10px 0;
+        border-bottom: 1px solid #E2E8F0;
+        border-radius: 0;
+    }
+
+    /* Buttons */
+    .btn {
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 0.5rem 1.2rem;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+    }
+
+    .btn-danger {
+        background-color: var(--danger-color);
+        border-color: var(--danger-color);
+    }
+
+    /* Empty State */
+    .fa-user-slash {
+        opacity: 0.5;
+    }
+
+    .text-muted.fw-semibold {
+        color: #64748B !important;
+    }
+
+    /* Image Styling */
+    .rounded.shadow {
+        border-radius: 12px;
+        border: 3px solid white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .rounded.shadow:hover {
+        transform: scale(1.03);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Timestamp */
+    small.text-muted {
+        font-size: 12px;
+        color: #94A3B8;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        h3.fw-semibold {
+            font-size: 24px;
+        }
+        
+        .btn {
+            padding: 0.4rem 1rem;
+            font-size: 14px;
+        }
+    }
+</style>
+
 <div class="container mt-4 mb-4">
     <div class="row">
 
@@ -98,11 +280,6 @@
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">Asal sekolah</label>
                                 <p class="form-control-plaintext">{{ $siswa->sekolah_asal }}</p>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Kelas</label>
-                                <p class="form-control-plaintext">{{ $siswa->kelas }}</p>
                             </div>
 
                             <div class="col-md-4">

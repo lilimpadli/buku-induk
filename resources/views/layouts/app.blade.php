@@ -29,12 +29,18 @@
         }
 
         .sidebar {
-            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
             background: var(--sidebar-bg);
             padding: 1.25rem 0.75rem;
             border-right: 1px solid rgba(47,83,255,0.06);
             width: 260px;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            overflow-y: auto;
+            transition: width 0.2s ease;
         }
 
         .sidebar-header {
@@ -64,23 +70,59 @@
 
         .sidebar .nav-link.active{ background: var(--accent); color:#fff; font-weight:600; }
 
-        .user-mini { text-align:center; padding:12px 6px; }
+        .user-mini { 
+            text-align:center; 
+            padding:12px 6px; 
+            border-bottom: 1px solid rgba(47,83,255,0.1);
+            margin-bottom: 15px;
+        }
+
+        .user-mini img {
+            border: 3px solid white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .user-mini img:hover {
+            transform: scale(1.05);
+        }
 
         /* collapsed body state */
         body.sidebar-collapsed .sidebar{ width:64px; }
         body.sidebar-collapsed .sidebar .nav-link span.label{ display:none; }
         body.sidebar-collapsed .sidebar .sidebar-header .brand span.title{ display:none; }
+        body.sidebar-collapsed .user-mini div { display:none; }
+        body.sidebar-collapsed .user-mini small { display:none; }
+        body.sidebar-collapsed .user-mini img {
+            width: 40px;
+            height: 40px;
+        }
 
         main {
             background: #f8f9fa;
             padding: 30px 28px;
+            margin-left: 260px;
             min-height: 100vh;
             transition: margin-left .2s ease;
         }
 
+        body.sidebar-collapsed main {
+            margin-left: 64px;
+        }
+
         @media (max-width: 991px){
-            .sidebar{ position:static; width:100%; }
-            body.sidebar-collapsed .sidebar{ width:100%; }
+            .sidebar{ 
+                position: static; 
+                width:100%; 
+                height: auto;
+            }
+            body.sidebar-collapsed .sidebar{ 
+                width:100%; 
+                height: auto;
+            }
+            main {
+                margin-left: 0;
+            }
         }
     </style>
 </head>
@@ -102,7 +144,7 @@
                                 <small class="text-muted">Sekolah</small>
                             </div>
                         </div>
-                        <button id="sidebarToggle" class="btn btn-sm btn-outline-secondary" title="Toggle sidebar"><i class="fas fa-angle-left"></i></button>
+                        
                     </div>
 
                     <div class="sidebar-search">
@@ -112,9 +154,9 @@
                     @auth
                         <div class="user-mini">
                             @if(isset(Auth::user()->photo) && Auth::user()->photo)
-                                <img src="{{ asset('storage/' . Auth::user()->photo) }}" class="rounded-circle mb-2" width="64" height="64" style="object-fit:cover;">
+                                <img src="{{ asset('storage/' . Auth::user()->photo) }}" class="rounded-circle mb-2" width="80" height="80" style="object-fit:cover;">
                             @else
-                                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->nama_lengkap ?? Auth::user()->name ?? '') }}&size=64" class="rounded-circle mb-2" width="64" height="64">
+                                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->nama_lengkap ?? Auth::user()->name ?? '') }}&size=80" class="rounded-circle mb-2" width="80" height="80">
                             @endif
                             <div style="font-weight:600;">{{ Auth::user()->nama_lengkap ?? Auth::user()->name ?? '-' }}</div>
                             <small class="text-muted">{{ ucfirst(Auth::user()->role) }}</small>
@@ -246,18 +288,7 @@
                         </div>
                     @endauth
 
-                    @guest
-                        <div class="text-center mb-4">
-                            <img src="https://ui-avatars.com/api/?name=Guest" class="rounded-circle mb-2" width="64" height="64">
-                            <h5 class="mb-0">Tamu</h5>
-                            <small class="text-muted">Silakan login</small>
-                        </div>
-
-                        <div class="px-2">
-                            <a href="{{ route('login') }}" class="nav-link">Login</a>
-                            <a href="{{ route('ppdb.index') }}" class="nav-link">PPDB</a>
-                        </div>
-                    @endguest
+                   
                 </div>
             </nav>
             @endunless

@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Hash;
 
 class SiswaController extends Controller
 {
@@ -481,4 +482,70 @@ class SiswaController extends Controller
 
         return $pdf->stream('Data Diri - ' . $siswa->nama_lengkap . '.pdf');
     }
+
+    /**
+ * Update profil siswa (nama)
+ */
+public function updateProfile(Request $request)
+{
+    $siswa = $this->getSiswaLogin();
+    
+    $request->validate([
+        'nama_lengkap' => 'required|string|max:255',
+    ]);
+    
+    $siswa->update([
+        'nama_lengkap' => $request->nama_lengkap,
+    ]);
+    
+    return redirect()->route('siswa.dashboard')->with('success', 'Nama berhasil diperbarui.');
+}
+
+/**
+ * Update email user
+ */
+public function updateEmail(Request $request)
+{
+    $user = Auth::user();
+    
+    $request->validate([
+        'email' => 'required|email|unique:users,email,' . $user->id,
+        'current_password' => 'required|string',
+    ]);
+    
+    // Verifikasi password saat ini
+    if (!Hash::check($request->current_password, $user->password)) {
+        return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.']);
+    }
+    
+    $user->update([
+        'email' => $request->email,
+    ]);
+    
+    return redirect()->route('siswa.dashboard')->with('success', 'Email berhasil diperbarui.');
+}
+
+/**
+ * Update password user
+ */
+public function updatePassword(Request $request)
+{
+    $user = Auth::user();
+    
+    $request->validate([
+        'current_password' => 'required|string',
+        'password' => 'required|string|min:8|confirmed',
+    ]);
+    
+    // Verifikasi password saat ini
+    if (!Hash::check($request->current_password, $user->password)) {
+        return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.']);
+    }
+    
+    $user->update([
+        'password' => Hash::make($request->password),
+    ]);
+    
+    return redirect()->route('siswa.dashboard')->with('success', 'Password berhasil diperbarui.');
+}
 }

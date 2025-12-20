@@ -3,6 +3,246 @@
 @section('title', 'Edit Data Diri Siswa')
 
 @section('content')
+<style>
+    /* ===================== STYLE EDIT DATA DIRI SISWA ===================== */
+    
+    :root {
+        --primary-color: #2F53FF;
+        --secondary-color: #6366F1;
+        --success-color: #10B981;
+        --warning-color: #F59E0B;
+        --danger-color: #EF4444;
+        --light-bg: #F8FAFC;
+        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    body {
+        background-color: var(--light-bg);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    h3.mb-4 {
+        font-size: 28px;
+        color: #1E293B;
+        position: relative;
+        padding-left: 15px;
+        margin-bottom: 25px !important;
+    }
+
+    h3.mb-4::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 70%;
+        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+        border-radius: 3px;
+    }
+
+    /* Card Styles */
+    .card {
+        border-radius: 16px;
+        border: none;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: var(--hover-shadow);
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    /* Progress Bar */
+    .progress {
+        background-color: #E2E8F0;
+        border-radius: 10px;
+        height: 8px !important;
+    }
+
+    .progress-bar {
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        border-radius: 10px;
+    }
+
+    .step-label {
+        font-weight: 500;
+        color: #94A3B8;
+        transition: color 0.3s;
+    }
+
+    .step-label.active {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    /* Form Styles */
+    h5.mb-3 {
+        font-size: 18px;
+        color: #1E293B;
+        font-weight: 600;
+        margin-bottom: 20px !important;
+        position: relative;
+        padding-left: 15px;
+    }
+
+    h5.mb-3::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 70%;
+        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+        border-radius: 2px;
+    }
+
+    h6.border-bottom {
+        font-size: 16px;
+        color: #1E293B;
+        font-weight: 600;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #E2E8F0;
+        position: relative;
+    }
+
+    h6.border-bottom::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        border-radius: 1px;
+    }
+
+    .form-label {
+        color: #475569;
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #E2E8F0;
+        padding: 10px 12px;
+        font-size: 14px;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(47, 83, 255, 0.1);
+    }
+
+    .form-control.is-invalid {
+        border-color: var(--danger-color);
+    }
+
+    /* Buttons */
+    .btn {
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 0.5rem 1.2rem;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+    }
+
+    .btn-success {
+        background-color: var(--success-color);
+        border-color: var(--success-color);
+    }
+
+    .btn-success:hover {
+        background-color: #059669;
+        border-color: #059669;
+    }
+
+    .btn-outline-secondary {
+        color: #64748B;
+        border-color: #E2E8F0;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #F1F5F9;
+        border-color: #CBD5E1;
+    }
+
+    .btn-secondary {
+        background-color: #64748B;
+        border-color: #64748B;
+    }
+
+    .btn-secondary:hover {
+        background-color: #475569;
+        border-color: #475569;
+    }
+
+    /* Image Styles */
+    .rounded {
+        border-radius: 12px;
+        border: 3px solid white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Error Messages */
+    .text-danger.small {
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        h3.mb-4 {
+            font-size: 24px;
+        }
+        
+        .btn {
+            padding: 0.4rem 1rem;
+            font-size: 14px;
+        }
+    }
+</style>
+
 <div class="container mt-3">
     <div class="row">
         <!-- Main Content -->
@@ -111,11 +351,7 @@
                                     @error('sekolah_asal')<div class="text-danger small">{{ $message }}</div>@enderror
                                 </div>
 
-                                <div class="col-md-4">
-                                    <label class="form-label fw-semibold">Kelas <span class="text-danger">*</span></label>
-                                    <input type="text" name="kelas" class="form-control step1-field" value="{{ $siswa->kelas ?? old('kelas') }}" required>
-                                    @error('kelas')<div class="text-danger small">{{ $message }}</div>@enderror
-                                </div>
+                                
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold">Tanggal Diterima <span class="text-danger">*</span></label>
@@ -248,18 +484,6 @@
 
     </div>
 </div>
-
-<style>
-    .step-label {
-        font-weight: 500;
-        color: #999;
-        transition: color 0.3s;
-    }
-    .step-label.active {
-        color: #0056b3;
-        font-weight: 600;
-    }
-</style>
 
 <script>
     let currentStep = 1;

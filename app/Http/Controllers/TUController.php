@@ -24,8 +24,9 @@ class TUController extends Controller
    public function dashboard()
 {
     // Statistik dasar
-    $totalSiswa = DataSiswa::count();
+     $totalSiswa = DataSiswa::count();
     $totalGuru = User::where('role', 'guru')->count(); // Ubah dari totalWaliKelas
+    $totalWaliKelas = User::where('role', 'walikelas')->count(); // <-- added
     $totalKelas = Kelas::count();
     // Jumlah wali kelas (dibutuhkan oleh view tu.dashboard)
     $totalWaliKelas = User::where('role', 'walikelas')->count();
@@ -74,6 +75,7 @@ class TUController extends Controller
     return view('tu.dashboard', compact(
         'totalSiswa', 
         'totalGuru', // Ubah dari totalWaliKelas
+        'totalWaliKelas', // <-- added
         'totalKelas',
         'totalWaliKelas',
         'jurusan', // Tambahkan ini

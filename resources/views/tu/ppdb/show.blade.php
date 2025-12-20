@@ -26,6 +26,12 @@
                     <li>Akta: {{ $entry->akta ? 'Ada' : 'Tidak' }}</li>
                     <li>Ijazah: {{ $entry->ijazah ? 'Ada' : 'Tidak' }}</li>
                 </ul>
+                
+                @if(session('success'))
+                <div class="alert alert-success mt-3">
+                    {!! session('success') !!}
+                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -44,12 +50,28 @@
 
                     <div class="mb-3">
                         <label class="form-label">Pilih Rombel</label>
-                        <select name="rombel_id" class="form-select">
+                        <select name="rombel_id" class="form-select" required>
                             <option value="">-- Pilih Rombel --</option>
                             @foreach($rombels as $r)
                                 <option value="{{ $r->id }}">{{ $r->nama }} @if($r->kelas) ({{ $r->kelas->tingkat }}) @endif</option>
                             @endforeach
                         </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">NIS (opsional, jika kosong sistem akan generate)</label>
+                        <input type="text" name="nis" class="form-control" value="{{ old('nis') }}" placeholder="Masukkan NIS jika ingin custom">
+                        <small class="text-muted">Jika dikosongkan, sistem akan generate NIS otomatis</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="createAccount" checked>
+                            <label class="form-check-label" for="createAccount">
+                                Buat akun login untuk siswa
+                            </label>
+                        </div>
+                        <small class="text-muted">Username dan password awal = NIS</small>
                     </div>
 
                     <button class="btn btn-primary w-100">Simpan & Buat NIS</button>

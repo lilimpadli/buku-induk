@@ -1,54 +1,71 @@
 @extends('layouts.app')
 
-@section('title','PPDB - Penugasan')
+@section('title', 'PPDB - Daftar Pendaftar')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="mb-0">PPDB - Pendaftar</h3>
-    <form class="d-flex" method="GET" action="{{ route('tu.ppdb.index') }}">
-        <input name="q" value="{{ $q ?? '' }}" class="form-control form-control-sm me-2" placeholder="Cari nama atau NISN">
-        <button class="btn btn-primary btn-sm">Cari</button>
-    </form>
-</div>
-
-@if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
-@endif
-
-<div class="row g-3">
-    @forelse($ppdb as $p)
-    <div class="col-md-6 col-lg-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex align-items-center gap-3">
-                    <div style="width:72px;height:72px;flex:0 0 72px;">
-                        @if($p->foto)
-                            <img src="{{ asset('storage/' . $p->foto) }}" class="rounded" style="width:72px;height:72px;object-fit:cover;">
-                        @else
-                            <div class="bg-secondary rounded text-white d-flex align-items-center justify-content-center" style="width:72px;height:72px;">No</div>
-                        @endif
-                    </div>
-                    <div>
-                        <h5 class="mb-0">{{ $p->nama_lengkap }}</h5>
-                        <small class="text-muted">NISN: {{ $p->nisn ?? '-' }}</small>
-                        <div class="mt-2"><strong>Jenis Kelamin:</strong> {{ $p->jenis_kelamin ?? '-' }}</div>
-                        <div class="mt-1"><strong>Jurusan:</strong> {{ $p->jurusan_id ? optional($p->jurusan)->nama : '-' }}</div>
-                    </div>
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Daftar Pendaftar PPDB</h5>
+            <a href="{{ route('ppdb.index') }}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-plus"></i> Tambah Pendaftar Baru
+            </a>
+        </div>
+        <div class="card-body">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {!! session('success') !!}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-            </div>
-            <div class="card-footer bg-white d-flex justify-content-between">
-                <a href="{{ route('tu.ppdb.show', $p->id) }}" class="btn btn-sm btn-outline-primary">Assign ke Rombel</a>
-                <small class="text-muted">{{ $p->created_at->format('d M Y') }}</small>
+            @endif
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nama Lengkap</th>
+                            <th>NISN</th>
+                            <th>Jalur</th>
+                            <th>Sesi</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($ppdbs as $ppdb)
+                            <tr>
+                                <td>{{ $ppdb->nama_lengkap }}</td>
+                                <td>{{ $ppdb->nisn ?? '-' }}</td>
+                                <td>{{ optional($ppdb->jalur)->nama_jalur ?? '-' }}</td>
+                                <td>{{ optional($ppdb->sesi)->tahun_ajaran ?? '-' }}</td>
+                                <td>
+                                    @if($ppdb->status == 'diterima')
+                                        <span class="badge bg-warning">Diterima</span>
+                                    @elseif($ppdb->status == 'aktif')
+                                        <span class="badge bg-success">Aktif</span>
+                                    @else
+                                        <span class="badge bg-secondary">{{ $ppdb->status }}</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($ppdb->status == 'diterima')
+                                        <a href="{{ route('tu.ppdb.assign.form', $ppdb->id) }}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-user-plus"></i> Assign Rombel
+                                        </a>
+                                    @else
+                                        <span class="text-muted">Sudah diproses</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center">Tidak ada data pendaftar</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-    @empty
-        <div class="col-12">
-            <div class="alert alert-info">Tidak ada pendaftar baru untuk ditugaskan.</div>
-        </div>
-    @endforelse
 </div>
-
-<div class="mt-4">{{ $ppdb->links() }}</div>
-
 @endsection

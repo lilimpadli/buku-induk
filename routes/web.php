@@ -15,14 +15,10 @@ use App\Http\Controllers\WaliKelas\InputNilaiRaportController;
 use App\Http\Controllers\WaliKelas\NilaiRaportController;
 use App\Http\Controllers\RaporController;
 
-
-
 // tu
 use App\Http\Controllers\TU\TambahKelasController;
 use App\Http\Controllers\TU\KelastuController;
 use App\Http\Controllers\TU\WaliKelasController;
-
-
 
 // KURIKULUM
 use App\Http\Controllers\Kurikulum\KurikulumDashboardController;
@@ -30,16 +26,13 @@ use App\Http\Controllers\Kurikulum\KurikulumSiswaController;
 use App\Http\Controllers\Kurikulum\KelasController;
 use App\Http\Controllers\Kurikulum\JurusanController;
 
-
 // KELAS KAPROG
 use App\Http\Controllers\KelaskaprogController;
- use App\Http\Controllers\KaprogController;
+use App\Http\Controllers\KaprogController;
 use App\Http\Controllers\KaprogGuruController;
 
 // PPDB
 use App\Http\Controllers\PpdbController;
-
-
 
 // TU
 use App\Http\Controllers\TUController;
@@ -47,6 +40,9 @@ use App\Http\Controllers\TUController;
 // KAPROG
 use App\Http\Controllers\Kaprog\KaprogDashboardController;
 use App\Http\Controllers\Kurikulum\KurikulumSiswaController as KurikulumKurikulumSiswaController;
+
+// Reset Password Siswa
+use App\Http\Controllers\Auth\SiswaResetPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,7 +71,6 @@ Route::prefix('rapor')->group(function () {
         ->name('rapor.cetak');
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | WEB MIDDLEWARE
@@ -92,6 +87,11 @@ Route::middleware('web')->group(function () {
     Route::post('/ppdb', [PpdbController::class, 'store'])->name('ppdb.store');
     Route::get('/ppdb/datasiswa/{id}', [PpdbController::class, 'fetchDataSiswa'])->name('ppdb.datasiswa');
 
+    // Reset password siswa (public)
+    Route::get('/siswa/reset-password', [SiswaResetPasswordController::class, 'showResetForm'])
+        ->name('siswa.password.reset.form');
+    Route::post('/siswa/reset-password', [SiswaResetPasswordController::class, 'reset'])
+        ->name('siswa.password.reset');
 
     /*
     |--------------------------------------------------------------------------
@@ -106,8 +106,6 @@ Route::middleware('web')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])
         ->middleware('auth')
         ->name('logout');
-
-
 
     /*
     |--------------------------------------------------------------------------
@@ -130,48 +128,50 @@ Route::middleware('web')->group(function () {
             };
         })->name('dashboard');
 
-
-
         /*
         |--------------------------------------------------------------------------
         | ROUTE SISWA
         |--------------------------------------------------------------------------
         */
-       Route::prefix('siswa')->name('siswa.')->group(function () {
-    // Dashboard
-    Route::get('/dashboard', [App\Http\Controllers\SiswaController::class, 'dashboard'])->name('dashboard');
+        Route::prefix('siswa')->name('siswa.')->group(function () {
+            // Dashboard
+            Route::get('/dashboard', [App\Http\Controllers\SiswaController::class, 'dashboard'])->name('dashboard');
 
-    // Data Diri
-    Route::get('/data-diri', [SiswaController::class, 'dataDiri'])->name('dataDiri');
-    Route::get('/data-diri/create', [SiswaController::class, 'create'])->name('dataDiri.create');
-    Route::post('/data-diri', [SiswaController::class, 'store'])->name('dataDiri.store');
-    Route::get('/data-diri/edit', [SiswaController::class, 'edit'])->name('dataDiri.edit');
-    Route::put('/data-diri', [SiswaController::class, 'update'])->name('dataDiri.update');
-    Route::get('/data-diri/export-pdf', [SiswaController::class, 'exportPDF'])->name('dataDiri.exportPDF');
+                // Route untuk update profil (names are relative to the 'siswa.' group)
+                Route::put('/profile', [SiswaController::class, 'updateProfile'])->name('updateProfile');
+                Route::put('/email', [SiswaController::class, 'updateEmail'])->name('updateEmail');
+                Route::put('/password', [SiswaController::class, 'updatePassword'])->name('updatePassword');
+                Route::post('/photo', [SiswaController::class, 'uploadPhoto'])->name('uploadPhoto');
 
-    // Raport - PERBAIKAN DI SINI
-    Route::get('/raport', [SiswaController::class, 'raport'])->name('raport');
-    Route::get('/raport/{semester}/{tahun}', [SiswaController::class, 'raportShow'])->name('raport.show');
-    Route::get('/raport/{semester}/{tahun}/pdf', [SiswaController::class, 'raportPDF'])->name('raport.pdf');
+            // Data Diri
+            Route::get('/data-diri', [SiswaController::class, 'dataDiri'])->name('dataDiri');
+            Route::get('/data-diri/create', [SiswaController::class, 'create'])->name('dataDiri.create');
+            Route::post('/data-diri', [SiswaController::class, 'store'])->name('dataDiri.store');
+            Route::get('/data-diri/edit', [SiswaController::class, 'edit'])->name('dataDiri.edit');
+            Route::put('/data-diri', [SiswaController::class, 'update'])->name('dataDiri.update');
+            Route::get('/data-diri/export-pdf', [SiswaController::class, 'exportPDF'])->name('dataDiri.exportPDF');
 
-    // Catatan
-    Route::get('/catatan', [SiswaController::class, 'catatan'])->name('catatan');
+            // Raport
+            Route::get('/raport', [SiswaController::class, 'raport'])->name('raport');
+            Route::get('/raport/{semester}/{tahun}', [SiswaController::class, 'raportShow'])->name('raport.show');
+            Route::get('/raport/{semester}/{tahun}/pdf', [SiswaController::class, 'raportPDF'])->name('raport.pdf');
 
-    // Upload foto profil siswa
-    Route::post('/profile/photo', [SiswaController::class, 'uploadPhoto'])->name('profile.photo');
+            // Catatan
+            Route::get('/catatan', [SiswaController::class, 'catatan'])->name('catatan');
 
-    // Cetak raport siswa sendiri
-    Route::get('/nilai_raport/{siswa_id}/{semester}/{tahun}/cetak', [NilaiRaportController::class, 'exportPdf'])->name('raport.cetak_pdf');
-});
+            // Upload foto profil siswa
+            Route::post('/profile/photo', [SiswaController::class, 'uploadPhoto'])->name('profile.photo');
 
-    // ROUTE GURU - profil guru dapat dilihat dan diedit oleh guru yang login
-    Route::prefix('guru')->name('guru.')->middleware('auth')->group(function () {
-        Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])->name('profile');
-        Route::get('/profile/edit', [App\Http\Controllers\GuruController::class, 'edit'])->name('profile.edit');
-        Route::put('/profile', [App\Http\Controllers\GuruController::class, 'update'])->name('profile.update');
-    });
+            // Cetak raport siswa sendiri
+            Route::get('/nilai_raport/{siswa_id}/{semester}/{tahun}/cetak', [NilaiRaportController::class, 'exportPdf'])->name('raport.cetak_pdf');
+        });
 
-
+        // ROUTE GURU
+        Route::prefix('guru')->name('guru.')->middleware('auth')->group(function () {
+            Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])->name('profile');
+            Route::get('/profile/edit', [App\Http\Controllers\GuruController::class, 'edit'])->name('profile.edit');
+            Route::put('/profile', [App\Http\Controllers\GuruController::class, 'update'])->name('profile.update');
+        });
 
         /*
         |--------------------------------------------------------------------------
@@ -183,14 +183,12 @@ Route::middleware('web')->group(function () {
             ->middleware('role:walikelas')
             ->group(function () {
 
-                /*
-        | Dashboard Wali Kelas
-        */
+                // Dashboard Wali Kelas
                 Route::get('/dashboard', [App\Http\Controllers\WaliKelasSiswaController::class, 'dashboard'])
                     ->name('dashboard');
 
-Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])
-            ->name('data_diri.profile');
+                Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])
+                    ->name('data_diri.profile');
 
                 Route::get('/siswa', [WaliKelasSiswaController::class, 'index'])
                     ->name('siswa.index');
@@ -255,55 +253,49 @@ Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])
         */
         Route::prefix('kaprog')->name('kaprog.')->group(function () {
 
-    // Dashboard (Kaprog)
-   
-    Route::get('/dashboard', [KaprogController::class, 'dashboard'])
-        ->name('dashboard');
+            // Dashboard (Kaprog)
+            Route::get('/dashboard', [KaprogController::class, 'dashboard'])
+                ->name('dashboard');
 
-    // View Raport
-    Route::get('/raport-siswa', fn() => view('kaprog.raport.raport'))
-        ->name('raport.siswa');
+            // View Raport
+            Route::get('/raport-siswa', fn() => view('kaprog.raport.raport'))
+                ->name('raport.siswa');
 
-    // Detail siswa (AJAX)
-    Route::get('/siswa/{id}/detail', [KurikulumDashboardController::class, 'detail'])
-        ->name('siswa.detail');
+            // Detail siswa (AJAX)
+            Route::get('/siswa/{id}/detail', [KurikulumDashboardController::class, 'detail'])
+                ->name('siswa.detail');
 
-    // Daftar kelas / rombel untuk kaprog
-    Route::get('/kelas', [KelaskaprogController::class, 'index'])->name('kelas.index');
-    Route::get('/kelas/{id}', [KelaskaprogController::class, 'show'])->name('kelas.show');
+            // Daftar kelas / rombel untuk kaprog
+            Route::get('/kelas', [KelaskaprogController::class, 'index'])->name('kelas.index');
+            Route::get('/kelas/{id}', [KelaskaprogController::class, 'show'])->name('kelas.show');
 
-    // Daftar guru untuk kaprog (hanya jurusan kaprog)
-    Route::get('/guru', [KaprogGuruController::class, 'index'])->name('guru.index');
-    Route::get('/guru/{id}', [KaprogGuruController::class, 'show'])->name('guru.show');
+            // Daftar guru untuk kaprog (hanya jurusan kaprog)
+            Route::get('/guru', [KaprogGuruController::class, 'index'])->name('guru.index');
+            Route::get('/guru/{id}', [KaprogGuruController::class, 'show'])->name('guru.show');
 
-    // Data diri kaprog
-    Route::get('/data-diri', [KaprogController::class, 'dataDiri'])->name('datapribadi.index');
-    Route::put('/data-diri', [KaprogController::class, 'updateDataDiri'])->name('datapribadi.update');
+            // Data diri kaprog
+            Route::get('/data-diri', [KaprogController::class, 'dataDiri'])->name('datapribadi.index');
+            Route::put('/data-diri', [KaprogController::class, 'updateDataDiri'])->name('datapribadi.update');
+        });
 
-    
+        // Raport list for kaprog (simple view)
+        Route::get('/raport-siswa', function () {
+            return view('kaprog.raport');
+        })->name('raport.siswa');
 
-});
+        // Alternate index route (some views reference kaprog.raport.index)
+        Route::get('/raport', function () {
+            return view('kaprog.raport');
+        })->name('raport.index');
 
-    // Raport list for kaprog (simple view)
-    Route::get('/raport-siswa', function () {
-        return view('kaprog.raport');
-    })->name('raport.siswa');
-
-    // Alternate index route (some views reference kaprog.raport.index)
-    Route::get('/raport', function () {
-        return view('kaprog.raport');
-    })->name('raport.index');
-
-    Route::get('/siswa/{id}/detail', [KaprogDashboardController::class, 'detail'])
-        ->name('siswa.detail');
-
-});
+        Route::get('/siswa/{id}/detail', [KaprogDashboardController::class, 'detail'])
+            ->name('siswa.detail');
 
         /*
-|--------------------------------------------------------------------------
-| ROUTE TU
-|--------------------------------------------------------------------------
-*/
+        |--------------------------------------------------------------------------
+        | ROUTE TU
+        |--------------------------------------------------------------------------
+        */
         Route::prefix('tu')->name('tu.')->group(function () {
             // Dashboard
             Route::get('/dashboard', [TUController::class, 'dashboard'])->name('dashboard');
@@ -333,19 +325,15 @@ Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])
             Route::get('/wali-kelas/{id}/edit', [TUController::class, 'waliKelasEdit'])->name('wali-kelas.edit');
             Route::put('/wali-kelas/{id}', [TUController::class, 'waliKelasUpdate'])->name('wali-kelas.update');
             Route::delete('/wali-kelas/{id}', [TUController::class, 'waliKelasDestroy'])->name('wali-kelas.destroy');
+
             // Route untuk laporan
             Route::get('/laporan-nilai', [TUController::class, 'laporanNilai'])->name('laporan.nilai');
 
             // PPDB (TU) - tampilkan pendaftar dan assign ke rombel
-            Route::get('/ppdb', [App\Http\Controllers\TU\PpdbController::class, 'index'])->name('ppdb.index');
-            Route::get('/ppdb/{id}/assign', [App\Http\Controllers\TU\PpdbController::class, 'show'])->name('ppdb.show');
-            Route::post('/ppdb/{id}/assign', [App\Http\Controllers\TU\PpdbController::class, 'assign'])->name('ppdb.assign');
+            Route::get('/ppdb', [PpdbController::class, 'tuIndex'])->name('ppdb.index');
+            Route::get('/ppdb/{id}/assign', [PpdbController::class, 'showAssignForm'])->name('ppdb.assign.form');
+            Route::post('/ppdb/{id}/assign', [PpdbController::class, 'assign'])->name('ppdb.assign');
         });
-
-
-
-
-
 
         /*
         |--------------------------------------------------------------------------
@@ -389,7 +377,7 @@ Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])
             Route::delete('/kelas/{id}', [KelasController::class, 'destroy'])
                 ->name('kelas.destroy');
 
-                Route::get('/kelas/{rombel}', [KelasController::class, 'show'])->name('kelas.show');
+            Route::get('/kelas/{rombel}', [KelasController::class, 'show'])->name('kelas.show');
 
             // RAPOR SISWA
             Route::get('/rapor', [App\Http\Controllers\Kurikulum\KurikulumRaportController::class, 'index'])
@@ -440,5 +428,5 @@ Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])
             Route::delete('/jurusan/{id}', [\App\Http\Controllers\Kurikulum\JurusanController::class, 'destroy'])
                 ->name('jurusan.destroy');
         });
-    }); 
-
+    });
+});
