@@ -11,6 +11,7 @@ use App\Models\Kehadiran;
 use App\Models\RaporInfo;
 use App\Models\KenaikanKelas;
 use App\Models\Rombel;
+use App\Models\Jurusan;
 use Illuminate\Http\Request;
 
 class InputNilaiRaportController extends Controller
@@ -22,19 +23,56 @@ class InputNilaiRaportController extends Controller
     }
 
     public function create($siswa_id)
-{
-    $siswa = DataSiswa::findOrFail($siswa_id);
+    {
+        $siswa = DataSiswa::findOrFail($siswa_id);
 
-    $kelompokA = MataPelajaran::where('kelompok', 'A')->orderBy('urutan')->get();
-    $kelompokB = MataPelajaran::where('kelompok', 'B')->orderBy('urutan')->get();
+        $kelompokA = MataPelajaran::where('kelompok', 'A')->orderBy('urutan')->get();
+        $kelompokB = MataPelajaran::where('kelompok', 'B')->orderBy('urutan')->get();
 
-    // <-- ambil rombels agar dropdown 'rombel tujuan' tersedia di view
-    $rombels = Rombel::orderBy('nama')->get();
+        // ambil jurusan + rombels beserta relasi kelas supaya bisa difilter per jurusan
+        $jurusans = Jurusan::orderBy('nama')->get();
+        $rombels = Rombel::with('kelas')->orderBy('nama')->get();
 
-    return view('walikelas.input_nilai_raport.create', compact(
-        'siswa', 'kelompokA', 'kelompokB', 'rombels'
-    ));
-}
+        // jika siswa punya rombel -> tentukan jurusan dan tingkat tujuan (naik kelas)
+        $rombelsFiltered = collect();
+        $currentJurusanId = null;
+        $targetTingkat = null;
+
+        if ($siswa->rombel && $siswa->rombel->kelas) {
+            $currentKelas = $siswa->rombel->kelas;
+            $currentJurusanId = $currentKelas->jurusan_id;
+            $currentTingkat = (string) $currentKelas->tingkat;
+
+            // dukung angka dan romawi (X,XI,XII)
+            $toInt = function($t) {
+                $map = ['I'=>1,'II'=>2,'III'=>3,'IV'=>4,'V'=>5,'VI'=>6,'VII'=>7,'VIII'=>8,'IX'=>9,'X'=>10,'XI'=>11,'XII'=>12];
+                $tUp = strtoupper(trim($t));
+                if (is_numeric($tUp)) return (int)$tUp;
+                if (isset($map[$tUp])) return $map[$tUp];
+                return null;
+            };
+
+            $fromInt = function($n) {
+                $map = [1=>'I',2=>'II',3=>'III',4=>'IV',5=>'V',6=>'VI',7=>'VII',8=>'VIII',9=>'IX',10=>'X',11=>'XI',12=>'XII'];
+                return $map[$n] ?? (string)$n;
+            };
+
+            $cur = $toInt($currentTingkat);
+            if ($cur !== null) {
+                $targetInt = $cur + 1;
+                $targetTingkat = $fromInt($targetInt);
+
+                // filter rombels yang punya kelas dengan jurusan yang sama dan tingkat == target
+                $rombelsFiltered = $rombels->filter(function($r) use ($currentJurusanId, $targetTingkat) {
+                    return $r->kelas && $r->kelas->jurusan_id == $currentJurusanId && (string)$r->kelas->tingkat == (string)$targetTingkat;
+                })->values();
+            }
+        }
+
+        return view('walikelas.input_nilai_raport.create', compact(
+            'siswa', 'kelompokA', 'kelompokB', 'rombels', 'jurusans', 'rombelsFiltered', 'currentJurusanId', 'targetTingkat'
+        ));
+    }
 
 
     public function store(Request $req, $siswa_id)
@@ -196,12 +234,47 @@ class InputNilaiRaportController extends Controller
 
         $kelompokA = MataPelajaran::where('kelompok','A')->orderBy('urutan')->get();
         $kelompokB = MataPelajaran::where('kelompok','B')->orderBy('urutan')->get();
-        $rombels   = Rombel::orderBy('nama')->get();
+
+        // juga kirim jurusan + rombels + rombelsFiltered untuk edit
+        $jurusans = Jurusan::orderBy('nama')->get();
+        $rombels   = Rombel::with('kelas')->orderBy('nama')->get();
+
+        // hitung rombelsFiltered sama seperti di create
+        $rombelsFiltered = collect();
+        $currentJurusanId = null;
+        $targetTingkat = null;
+
+        if ($siswa->rombel && $siswa->rombel->kelas) {
+            $currentKelas = $siswa->rombel->kelas;
+            $currentJurusanId = $currentKelas->jurusan_id;
+            $currentTingkat = (string) $currentKelas->tingkat;
+
+            $toInt = function($t) {
+                $map = ['I'=>1,'II'=>2,'III'=>3,'IV'=>4,'V'=>5,'VI'=>6,'VII'=>7,'VIII'=>8,'IX'=>9,'X'=>10,'XI'=>11,'XII'=>12];
+                $tUp = strtoupper(trim($t));
+                if (is_numeric($tUp)) return (int)$tUp;
+                if (isset($map[$tUp])) return $map[$tUp];
+                return null;
+            };
+            $fromInt = function($n) {
+                $map = [1=>'I',2=>'II',3=>'III',4=>'IV',5=>'V',6=>'VI',7=>'VII',8=>'VIII',9=>'IX',10=>'X',11=>'XI',12=>'XII'];
+                return $map[$n] ?? (string)$n;
+            };
+
+            $cur = $toInt($currentTingkat);
+            if ($cur !== null) {
+                $targetInt = $cur + 1;
+                $targetTingkat = $fromInt($targetInt);
+                $rombelsFiltered = $rombels->filter(function($r) use ($currentJurusanId, $targetTingkat) {
+                    return $r->kelas && $r->kelas->jurusan_id == $currentJurusanId && (string)$r->kelas->tingkat == (string)$targetTingkat;
+                })->values();
+            }
+        }
 
         return view('walikelas.input_nilai_raport.edit', compact(
             'siswa', 'nilai', 'ekstra', 'kehadiran', 'info',
             'kenaikan', 'kelompokA', 'kelompokB',
-            'semester', 'tahun', 'rombels'
+            'semester', 'tahun', 'rombels', 'jurusans', 'rombelsFiltered', 'currentJurusanId', 'targetTingkat'
         ));
     }
 }

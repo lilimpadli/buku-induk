@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Hash;
 
+
 class SiswaController extends Controller
 {
     /**
@@ -313,15 +314,29 @@ class SiswaController extends Controller
         ]);
 
         // Simpan pada disk `public` di folder `siswa_photos`
+
         $path = $request->file('foto')->store('siswa_photos', 'public');
 
-        // Hapus foto lama jika ada
+        // Hapus foto lama jika ada (pada table siswa)
         if ($siswa->foto && Storage::disk('public')->exists($siswa->foto)) {
             Storage::disk('public')->delete($siswa->foto);
         }
 
+        // Simpan path pada model DataSiswa
         $siswa->foto = $path;
         $siswa->save();
+
+        // Juga sinkronkan ke kolom `photo` pada tabel users agar sidebar menampilkan foto
+        $user = Auth::user();
+        if ($user) {
+            // Hapus foto lama pada users jika berbeda dan ada
+            if (!empty($user->photo) && $user->photo !== $path && Storage::disk('public')->exists($user->photo)) {
+                Storage::disk('public')->delete($user->photo);
+            }
+
+            $user->photo = $path;
+            $user->save();
+        }
 
         return redirect()->back()->with('success', 'Foto profil berhasil diperbarui.');
     }

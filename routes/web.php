@@ -407,25 +407,25 @@ Route::middleware('web')->group(function () {
                 ->name('kelas.update');
 
             // JURUSAN
-            Route::get('/jurusan', [\App\Http\Controllers\Kurikulum\JurusanController::class, 'index'])
+            Route::get('/jurusan', [JurusanController::class, 'index'])
                 ->name('jurusan.index');
 
-            Route::get('/jurusan/create', [\App\Http\Controllers\Kurikulum\JurusanController::class, 'create'])
+            Route::get('/jurusan/create', [JurusanController::class, 'create'])
                 ->name('jurusan.create');
 
-            Route::post('/jurusan', [\App\Http\Controllers\Kurikulum\JurusanController::class, 'store'])
+            Route::post('/jurusan', [JurusanController::class, 'store'])
                 ->name('jurusan.store');
 
-            Route::get('/jurusan/{id}', [\App\Http\Controllers\Kurikulum\JurusanController::class, 'show'])
+            Route::get('/jurusan/{id}', [JurusanController::class, 'show'])
                 ->name('jurusan.show');
 
-            Route::get('/jurusan/{id}/edit', [\App\Http\Controllers\Kurikulum\JurusanController::class, 'edit'])
+            Route::get('/jurusan/{id}/edit', [JurusanController::class, 'edit'])
                 ->name('jurusan.edit');
 
-            Route::put('/jurusan/{id}', [\App\Http\Controllers\Kurikulum\JurusanController::class, 'update'])
+            Route::put('/jurusan/{id}', [JurusanController::class, 'update'])
                 ->name('jurusan.update');
 
-            Route::delete('/jurusan/{id}', [\App\Http\Controllers\Kurikulum\JurusanController::class, 'destroy'])
+            Route::delete('/jurusan/{id}', [JurusanController::class, 'destroy'])
                 ->name('jurusan.destroy');
         });
     });

@@ -381,46 +381,36 @@
                 </select>
             </div>
 
-            <div class="col-md-4">
-                <label>Rombel Tujuan</label>
-                <select name="kenaikan[rombel_tujuan_id]" class="form-control">
-                    <option value="">-- Pilih Rombel --</option>
-                    @foreach($rombels as $r)
-                        <option value="{{ $r->id }}">{{ $r->nama }}</option>
-                    @endforeach
+            <div class="col-md-3">
+                <label>Jurusan</label>
+                <select id="jurusanSelect" class="form-control" disabled>
+                    <option value="">-- Jurusan Siswa --</option>
+                    @if(isset($jurusans))
+                        @foreach($jurusans as $j)
+                            <option value="{{ $j->id }}" {{ isset($currentJurusanId) && $currentJurusanId == $j->id ? 'selected' : '' }}>{{ $j->nama }}</option>
+                        @endforeach
+                    @endif
                 </select>
             </div>
+
+            <div class="col-md-4">
+                <label>Rombel Tujuan</label>
+                <select name="kenaikan[rombel_tujuan_id]" class="form-control" id="rombelSelect">
+                    <option value="">-- Pilih Rombel --</option>
+                    @php
+                        $source = (isset($rombelsFiltered) && $rombelsFiltered->count() > 0) ? $rombelsFiltered : $rombels;
+                    @endphp
+                    @foreach($source as $r)
+                        <option value="{{ $r->id }}">{{ $r->nama }} @if($r->kelas) ({{ $r->kelas->tingkat }} - {{ $r->kelas->jurusan->nama ?? '' }}) @endif</option>
+                    @endforeach
+                </select>
+                @if(isset($targetTingkat) && $targetTingkat)
+                    <small class="text-muted">Menampilkan rombel untuk tingkat: {{ $targetTingkat }}</small>
+                @endif
+            </div>
         </div>
 
-        {{-- ================== INFO RAPOR ================== --}}
-        <h5 class="mt-4 text-info">F. Info Rapor</h5>
-
-        <div class="row">
-            <div class="col-md-4">
-                <label>Wali Kelas</label>
-                <input type="text" name="info[wali_kelas]" class="form-control">
-            </div>
-
-            <div class="col-md-4">
-                <label>NIP Wali Kelas</label>
-                <input type="text" name="info[nip_wali]" class="form-control">
-            </div>
-
-            <div class="col-md-4">
-                <label>Kepala Sekolah</label>
-                <input type="text" name="info[kepsek]" class="form-control">
-            </div>
-
-            <div class="col-md-4 mt-3">
-                <label>NIP Kepala Sekolah</label>
-                <input type="text" name="info[nip_kepsek]" class="form-control">
-            </div>
-
-            <div class="col-md-4 mt-3">
-                <label>Tanggal Rapor</label>
-                <input type="date" name="info[tanggal_rapor]" class="form-control">
-            </div>
-        </div>
+        
 
         <button class="btn btn-success mt-4">Simpan Semua Data</button>
 

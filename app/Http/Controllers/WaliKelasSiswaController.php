@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\DataSiswa;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Rombel;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class WaliKelasSiswaController extends Controller
@@ -13,7 +15,41 @@ class WaliKelasSiswaController extends Controller
     // List siswa
     public function index()
     {
-        $siswa = DataSiswa::with(['ayah', 'ibu', 'wali'])->orderBy('nama_lengkap')->get();
+        $user = Auth::user();
+
+        // ambil daftar rombel yang dia pegang sebagai wali kelas
+        $rombelsIds = [];
+        if ($user) {
+            $assigns = $user->waliKelas()->get();
+            foreach ($assigns as $a) {
+                // jika kolom rombel_id ada dan terisi, gunakan itu
+                if (isset($a->rombel_id) && $a->rombel_id) {
+                    $rombelsIds[] = $a->rombel_id;
+                    continue;
+                }
+
+                // jika rombel_id tidak tersedia di tabel, gunakan kelas_id untuk ambil rombel terkait
+                if (isset($a->kelas_id) && $a->kelas_id) {
+                    $r = Rombel::where('kelas_id', $a->kelas_id)->pluck('id')->toArray();
+                    $rombelsIds = array_merge($rombelsIds, $r);
+                    continue;
+                }
+
+                // (tidak menggunakan fallback jurusan karena terlalu luas)
+            }
+
+            $rombelsIds = array_values(array_unique(array_filter($rombelsIds)));
+        }
+
+        if (!empty($rombelsIds)) {
+            $siswa = DataSiswa::with(['ayah', 'ibu', 'wali'])
+                ->whereIn('rombel_id', $rombelsIds)
+                ->orderBy('nama_lengkap')
+                ->get();
+        } else {
+            // jika tidak ada penugasan, kembalikan kosong supaya wali tidak melihat seluruh siswa
+            $siswa = collect();
+        }
         return view('walikelas.siswa.index', compact('siswa'));
     }
 

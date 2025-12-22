@@ -154,9 +154,9 @@
                     @auth
                         <div class="user-mini">
                             @if(isset(Auth::user()->photo) && Auth::user()->photo)
-                                <img src="{{ asset('storage/' . Auth::user()->photo) }}" class="rounded-circle mb-2" width="80" height="80" style="object-fit:cover;">
+                                <img src="{{ asset('storage/' . Auth::user()->photo) }}?v={{ time() }}" class="rounded-circle mb-2" width="80" height="80" style="object-fit:cover;" id="sidebarProfilePhoto">
                             @else
-                                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->nama_lengkap ?? Auth::user()->name ?? '') }}&size=80" class="rounded-circle mb-2" width="80" height="80">
+                                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->nama_lengkap ?? Auth::user()->name ?? '') }}&size=80" class="rounded-circle mb-2" width="80" height="80" id="sidebarProfilePhoto">
                             @endif
                             <div style="font-weight:600;">{{ Auth::user()->nama_lengkap ?? Auth::user()->name ?? '-' }}</div>
                             <small class="text-muted">{{ ucfirst(Auth::user()->role) }}</small>
