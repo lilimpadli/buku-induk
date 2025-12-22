@@ -11,6 +11,11 @@ use App\Models\Kelas;
 use App\Models\User;
 use App\Models\Rombel;
 use App\Models\Jurusan;
+// imports cleaned: DataSiswa and Request already imported above
+use App\Models\NilaiRaport;
+use App\Models\EkstrakurikulerSiswa;
+use App\Models\Kehadiran;
+use App\Models\RaporInfo;
 
 class KaprogController extends Controller
 {
@@ -78,6 +83,116 @@ class KaprogController extends Controller
         }
 
         return view('kaprog.dashboard', compact('totalSiswa', 'totalKelas', 'totalGuru', 'totalRombel', 'siswas', 'jurusan'));
+    }
+
+    // Daftar siswa untuk kaprog (per angkatan tabs)
+    public function siswaIndex(Request $request)
+    {
+        $user = Auth::user();
+        $guru = Guru::where('user_id', $user->id)->first();
+        $jurusanId = $guru ? $guru->jurusan_id : null;
+
+        $tingkats = ['X','XI','XII'];
+        $byTingkat = [];
+
+        foreach ($tingkats as $t) {
+            $q = DataSiswa::with('rombel.kelas')
+                ->whereHas('rombel.kelas', function ($q2) use ($t, $jurusanId) {
+                    $q2->where('tingkat', $t);
+                    if ($jurusanId) $q2->where('jurusan_id', $jurusanId);
+                })
+                ->orderBy('nama_lengkap');
+
+            $byTingkat[$t] = $q->get();
+        }
+
+        return view('kaprog.siswa.index', ['studentsByTingkat' => $byTingkat]);
+    }
+
+    // Show detail siswa
+    public function show($id)
+    {
+        $siswa = DataSiswa::with(['rombel.kelas.jurusan', 'ayah', 'ibu', 'wali'])->findOrFail($id);
+        return view('kaprog.siswa.show', compact('siswa'));
+    }
+
+    // Halaman raport siswa untuk kaprog
+    public function raportSiswa(Request $request)
+    {
+        $siswaId = $request->query('siswa_id');
+        if (!$siswaId) {
+            return redirect()->route('kaprog.siswa.index')->with('error', 'Pilih siswa terlebih dahulu untuk melihat raport.');
+        }
+
+        $siswa = DataSiswa::with('rombel.kelas.jurusan')->findOrFail($siswaId);
+
+        // Cek apakah siswa di jurusan kaprog
+        $user = Auth::user();
+        $guru = Guru::where('user_id', $user->id)->first();
+        if ($guru && $guru->jurusan_id && !$siswa->rombel || $siswa->rombel->kelas->jurusan_id != $guru->jurusan_id) {
+            return redirect()->route('kaprog.siswa.index')->with('error', 'Akses ditolak');
+        }
+
+        // Ambil daftar tahun ajaran unik untuk siswa ini
+        $raports = NilaiRaport::select('tahun_ajaran')
+            ->where('siswa_id', $siswa->id)
+            ->groupBy('tahun_ajaran')
+            ->orderBy('tahun_ajaran', 'desc')
+            ->get();
+
+        return view('kaprog.siswa.raport', compact('siswa', 'raports'));
+    }
+
+    // Detail raport siswa per semester untuk kaprog
+    public function raportShow($siswaId, $semester, $tahun)
+    {
+        $siswa = DataSiswa::with('rombel.kelas.jurusan')->findOrFail($siswaId);
+
+        // Cek akses
+        $user = Auth::user();
+        $guru = Guru::where('user_id', $user->id)->first();
+        if ($guru && $guru->jurusan_id && (!$siswa->rombel || $siswa->rombel->kelas->jurusan_id != $guru->jurusan_id)) {
+            abort(403);
+        }
+
+        $tahun = str_replace('-', '/', $tahun);
+
+        if (!in_array($semester, ['Ganjil', 'Genap'])) {
+            return redirect()->back()->with('error', 'Semester tidak valid');
+        }
+
+        $nilaiRaports = NilaiRaport::with('mapel')
+            ->where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->orderBy('mata_pelajaran_id')
+            ->get();
+
+        if ($nilaiRaports->isEmpty()) {
+            return redirect()->back()->with('error', 'Data raport tidak ditemukan');
+        }
+
+        $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->get();
+
+        $kehadiran = Kehadiran::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        $raporInfo = RaporInfo::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        $kenaikan = \App\Models\KenaikanKelas::with('rombelTujuan')->where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        return view('kaprog.siswa.raport-detail', compact('siswa', 'nilaiRaports', 'ekstra', 'kehadiran', 'raporInfo', 'kenaikan', 'semester', 'tahun'));
     }
 
     // Tampilkan form data diri kaprog (edit)

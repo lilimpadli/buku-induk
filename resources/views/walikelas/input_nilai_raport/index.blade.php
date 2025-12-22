@@ -234,6 +234,27 @@
             margin-top: 10px;
         }
     }
+
+    /* Rombel Header */
+    .rombel-header {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, rgba(47, 83, 255, 0.1), rgba(99, 102, 241, 0.1));
+        border-radius: 12px;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .rombel-section {
+        margin-bottom: 30px;
+    }
+
+    .rombel-section:last-child {
+        margin-bottom: 0;
+    }
+
 </style>
 
 <div class="container mt-4">
@@ -242,27 +263,32 @@
 
     <div class="card shadow">
         @if($siswas->count() > 0)
-            <div class="list-group list-group-flush">
-                @foreach ($siswas as $siswa)
-                    <a href="{{ route('walikelas.input_nilai_raport.create', $siswa->id) }}" 
-                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <div class="student-info">
-                            <div class="student-avatar">
-                                @if($siswa->foto)
-                                    <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}">
-                                @else
-                                    {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
-                                @endif
-                            </div>
-                            <div class="student-details">
-                                <strong>{{ $siswa->nama_lengkap }}</strong>
-                                <small>NIS: {{ $siswa->nis }} | NISN: {{ $siswa->nisn }} | Kelas: {{ $siswa->kelas }}</small>
-                            </div>
-                        </div>
-                        <span class="badge bg-primary">Input Nilai</span>
-                    </a>
-                @endforeach
-            </div>
+            @foreach($siswas as $rombel => $siswaList)
+                <div class="rombel-section mb-4">
+                    <h5 class="rombel-header">{{ $rombel }}</h5>
+                    <div class="list-group list-group-flush">
+                        @foreach ($siswaList as $siswa)
+                            <a href="{{ route('walikelas.input_nilai_raport.create', $siswa->id) }}" 
+                               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <div class="student-info">
+                                    <div class="student-avatar">
+                                        @if($siswa->foto)
+                                            <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}">
+                                        @else
+                                            {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
+                                        @endif
+                                    </div>
+                                    <div class="student-details">
+                                        <strong>{{ $siswa->nama_lengkap }}</strong>
+                                        <small>NIS: {{ $siswa->nis }} | NISN: {{ $siswa->nisn }}</small>
+                                    </div>
+                                </div>
+                                <span class="badge bg-primary">Input Nilai</span>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endforeach
         @else
             <div class="empty-state">
                 <i class="fas fa-clipboard-list"></i>

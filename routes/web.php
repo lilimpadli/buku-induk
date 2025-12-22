@@ -258,8 +258,8 @@ Route::middleware('web')->group(function () {
                 ->name('dashboard');
 
             // View Raport
-            Route::get('/raport-siswa', fn() => view('kaprog.raport.raport'))
-                ->name('raport.siswa');
+            Route::get('/raport-siswa', [KaprogController::class, 'raportSiswa'])
+                ->name('raport.siswa.old');
 
             // Detail siswa (AJAX)
             Route::get('/siswa/{id}/detail', [KurikulumDashboardController::class, 'detail'])
@@ -268,6 +268,10 @@ Route::middleware('web')->group(function () {
             // Daftar kelas / rombel untuk kaprog
             Route::get('/kelas', [KelaskaprogController::class, 'index'])->name('kelas.index');
             Route::get('/kelas/{id}', [KelaskaprogController::class, 'show'])->name('kelas.show');
+            // Daftar siswa per angkatan (X/XI/XII)
+            Route::get('/kelas/angkatan/{tingkat}', [KelaskaprogController::class, 'angkatan'])->name('kelas.angkatan');
+            // Kirim laporan tentang siswa (kaprog)
+            Route::post('/kelas/siswa/{id}/lapor', [KelaskaprogController::class, 'lapor'])->name('kelas.siswa.lapor');
 
             // Daftar guru untuk kaprog (hanya jurusan kaprog)
             Route::get('/guru', [KaprogGuruController::class, 'index'])->name('guru.index');
@@ -276,17 +280,19 @@ Route::middleware('web')->group(function () {
             // Data diri kaprog
             Route::get('/data-diri', [KaprogController::class, 'dataDiri'])->name('datapribadi.index');
             Route::put('/data-diri', [KaprogController::class, 'updateDataDiri'])->name('datapribadi.update');
+            // Daftar siswa (kaprog)
+            Route::get('/siswa', [KaprogController::class, 'siswaIndex'])->name('siswa.index');
+            Route::get('/siswa/{id}', [KaprogController::class, 'show'])->name('siswa.show');
+            // Raport siswa untuk kaprog
+            Route::get('/raport/siswa', [KaprogController::class, 'raportSiswa'])->name('raport.siswa');
+            Route::get('/raport/siswa/{siswaId}/{semester}/{tahun}', [KaprogController::class, 'raportShow'])->name('raport.show');
         });
 
         // Raport list for kaprog (simple view)
-        Route::get('/raport-siswa', function () {
-            return view('kaprog.raport');
-        })->name('raport.siswa');
+        // Removed duplicate
 
         // Alternate index route (some views reference kaprog.raport.index)
-        Route::get('/raport', function () {
-            return view('kaprog.raport');
-        })->name('raport.index');
+        Route::get('/raport', [KaprogController::class, 'raportSiswa'])->name('raport.index');
 
         Route::get('/siswa/{id}/detail', [KaprogDashboardController::class, 'detail'])
             ->name('siswa.detail');
@@ -331,6 +337,10 @@ Route::middleware('web')->group(function () {
 
             // PPDB (TU) - tampilkan pendaftar dan assign ke rombel
             Route::get('/ppdb', [PpdbController::class, 'tuIndex'])->name('ppdb.index');
+            Route::get('/ppdb/jurusan/{id}', [PpdbController::class, 'showJurusan'])->name('ppdb.jurusan.show');
+            Route::get('/ppdb/jurusan/{id}/pendaftar', [PpdbController::class, 'showPendaftarJurusan'])->name('ppdb.jurusan.pendaftar');
+            Route::get('/ppdb/jurusan/{jurusanId}/sesi/{sesiId}', [PpdbController::class, 'showPendaftarSesi'])->name('ppdb.jurusan.sesi.pendaftar');
+            Route::get('/ppdb/jurusan/{jurusanId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarJalur'])->name('ppdb.jurusan.jalur.pendaftar');
             Route::get('/ppdb/{id}/assign', [PpdbController::class, 'showAssignForm'])->name('ppdb.assign.form');
             Route::post('/ppdb/{id}/assign', [PpdbController::class, 'assign'])->name('ppdb.assign');
         });

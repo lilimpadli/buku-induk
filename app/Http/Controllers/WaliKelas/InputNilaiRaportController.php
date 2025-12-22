@@ -13,12 +13,51 @@ use App\Models\KenaikanKelas;
 use App\Models\Rombel;
 use App\Models\Jurusan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class InputNilaiRaportController extends Controller
 {
     public function index()
     {
-        $siswas = DataSiswa::orderBy('nama_lengkap')->get();
+        $user = Auth::user();
+
+        // ambil daftar rombel yang dia pegang sebagai wali kelas
+        $rombelsIds = [];
+        if ($user) {
+            $assigns = $user->waliKelas()->get();
+            foreach ($assigns as $a) {
+                // jika kolom rombel_id ada dan terisi, gunakan itu
+                if (isset($a->rombel_id) && $a->rombel_id) {
+                    $rombelsIds[] = $a->rombel_id;
+                    continue;
+                }
+
+                // jika rombel_id tidak tersedia di tabel, gunakan kelas_id untuk ambil rombel terkait
+                if (isset($a->kelas_id) && $a->kelas_id) {
+                    $r = Rombel::where('kelas_id', $a->kelas_id)->pluck('id')->toArray();
+                    $rombelsIds = array_merge($rombelsIds, $r);
+                    continue;
+                }
+
+                // (tidak menggunakan fallback jurusan karena terlalu luas)
+            }
+
+            $rombelsIds = array_values(array_unique(array_filter($rombelsIds)));
+        }
+
+        if (!empty($rombelsIds)) {
+            $siswas = DataSiswa::with('rombel')
+                ->whereIn('rombel_id', $rombelsIds)
+                ->orderBy('nama_lengkap')
+                ->get()
+                ->groupBy(function($siswa) {
+                    return $siswa->rombel ? $siswa->rombel->nama : 'Tidak ada rombel';
+                });
+        } else {
+            // jika tidak ada penugasan, kembalikan kosong supaya wali tidak melihat seluruh siswa
+            $siswas = collect();
+        }
+
         return view('walikelas.input_nilai_raport.index', compact('siswas'));
     }
 

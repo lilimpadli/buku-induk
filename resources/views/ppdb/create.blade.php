@@ -207,7 +207,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('ppdb.store') }}">
+                <form method="POST" action="{{ route('ppdb.store') }}" enctype="multipart/form-data">
                     @csrf
 
                     <div class="form-group">
@@ -240,6 +240,20 @@
                                     @endforeach
                                 </select>
                                 @error('jalur_ppdb_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Jurusan Pilihan</label>
+                                <select name="jurusan_id" class="form-select @error('jurusan_id') is-invalid @enderror">
+                                    <option value="">-- Pilih Jurusan --</option>
+                                    @foreach($jurusans as $j)
+                                        <option value="{{ $j->id }}" {{ old('jurusan_id') == $j->id || ($jurusan && $jurusan->id == $j->id) ? 'selected' : '' }}>
+                                            {{ $j->nama }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('jurusan_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -312,44 +326,91 @@
 
                     <div class="form-group">
                         <h5 class="section-title">
-                            <i class="fas fa-users"></i> Data Orang Tua
+                            <i class="fas fa-file-upload"></i> Upload Dokumen
                         </h5>
                         <div class="row">
                             <div class="col-md-6">
-                                <label class="form-label">Nama Ayah</label>
-                                <input type="text" name="nama_ayah" class="form-control @error('nama_ayah') is-invalid @enderror" 
-                                       value="{{ old('nama_ayah') }}" placeholder="Masukkan nama ayah">
-                                @error('nama_ayah')
+                                <label class="form-label">Foto <span class="required">*</span></label>
+                                <input type="file" id="foto" name="foto[]" class="form-control @error('foto') is-invalid @enderror" 
+                                       accept="image/*" required multiple onchange="previewMultiple(this, 'foto-preview-container')">
+                                <div id="foto-preview-container" class="mt-2"></div>
+                                @error('foto')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                                <small class="text-muted">Format: JPG, PNG, Max: 2MB per file</small>
+                                @error('foto')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="text-muted">Format: JPG, PNG, Max: 2MB</small>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Pekerjaan Ayah</label>
-                                <input type="text" name="pekerjaan_ayah" class="form-control @error('pekerjaan_ayah') is-invalid @enderror" 
-                                       value="{{ old('pekerjaan_ayah') }}" placeholder="Masukkan pekerjaan ayah">
-                                @error('pekerjaan_ayah')
+                                <label class="form-label">Kartu Keluarga (KK) <span class="required">*</span></label>
+                                <input type="file" id="kk" name="kk" class="form-control @error('kk') is-invalid @enderror" 
+                                       accept="image/*,.pdf" required onchange="previewFile(this, 'kk-preview')">
+                                <div class="mt-2">
+                                    <img id="kk-preview" src="#" alt="Preview KK" class="img-thumbnail" style="max-width: 150px; display: none;">
+                                    <div id="kk-preview-info" class="mt-2" style="display:none;"></div>
+                                    <button type="button" id="kk-remove" class="btn btn-sm btn-outline-secondary mt-2" style="display:none;" onclick="removeFile('kk','kk-preview')">
+                                        <i class="fas fa-trash"></i> Hapus
+                                    </button>
+                                </div>
+                                @error('kk')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                                <small class="text-muted">Format: JPG, PNG, PDF, Max: 2MB</small>
                             </div>
                         </div>
 
                         <div class="row mt-3">
                             <div class="col-md-6">
-                                <label class="form-label">Nama Ibu</label>
-                                <input type="text" name="nama_ibu" class="form-control @error('nama_ibu') is-invalid @enderror" 
-                                       value="{{ old('nama_ibu') }}" placeholder="Masukkan nama ibu">
-                                @error('nama_ibu')
+                                <label class="form-label">Akta Lahir <span class="required">*</span></label>
+                                <input type="file" id="akta" name="akta" class="form-control @error('akta') is-invalid @enderror" 
+                                       accept="image/*,.pdf" required onchange="previewFile(this, 'akta-preview')">
+                                <div class="mt-2">
+                                    <img id="akta-preview" src="#" alt="Preview Akta" class="img-thumbnail" style="max-width: 150px; display: none;">
+                                    <div id="akta-preview-info" class="mt-2" style="display:none;"></div>
+                                    <button type="button" id="akta-remove" class="btn btn-sm btn-outline-secondary mt-2" style="display:none;" onclick="removeFile('akta','akta-preview')">
+                                        <i class="fas fa-trash"></i> Hapus
+                                    </button>
+                                </div>
+                                @error('akta')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                                <small class="text-muted">Format: JPG, PNG, PDF, Max: 2MB</small>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Pekerjaan Ibu</label>
-                                <input type="text" name="pekerjaan_ibu" class="form-control @error('pekerjaan_ibu') is-invalid @enderror" 
-                                       value="{{ old('pekerjaan_ibu') }}" placeholder="Masukkan pekerjaan ibu">
-                                @error('pekerjaan_ibu')
+                                <label class="form-label">Ijazah/SKL <span class="required">*</span></label>
+                                <input type="file" id="ijazah" name="ijazah" class="form-control @error('ijazah') is-invalid @enderror" 
+                                       accept="image/*,.pdf" required onchange="previewFile(this, 'ijazah-preview')">
+                                <div class="mt-2">
+                                    <img id="ijazah-preview" src="#" alt="Preview Ijazah" class="img-thumbnail" style="max-width: 150px; display: none;">
+                                    <div id="ijazah-preview-info" class="mt-2" style="display:none;"></div>
+                                    <button type="button" id="ijazah-remove" class="btn btn-sm btn-outline-secondary mt-2" style="display:none;" onclick="removeFile('ijazah','ijazah-preview')">
+                                        <i class="fas fa-trash"></i> Hapus
+                                    </button>
+                                </div>
+                                @error('ijazah')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                                <small class="text-muted">Format: JPG, PNG, PDF, Max: 2MB</small>
                             </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <label class="form-label">Bukti Jalur</label>
+                            <input type="file" id="bukti_jalur" name="bukti_jalur" class="form-control @error('bukti_jalur') is-invalid @enderror" 
+                                   accept="image/*,.pdf" onchange="previewFile(this, 'bukti-jalur-preview')">
+                            <div class="mt-2">
+                                <img id="bukti-jalur-preview" src="#" alt="Preview Bukti Jalur" class="img-thumbnail" style="max-width: 150px; display: none;">
+                                <div id="bukti-jalur-preview-info" class="mt-2" style="display:none;"></div>
+                                <button type="button" id="bukti-jalur-remove" class="btn btn-sm btn-outline-secondary mt-2" style="display:none;" onclick="removeFile('bukti_jalur','bukti-jalur-preview')">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </button>
+                            </div>
+                            @error('bukti_jalur')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            <small class="text-muted">Format: JPG, PNG, PDF, Max: 2MB (jika ada)</small>
                         </div>
                     </div>
 
@@ -366,6 +427,131 @@
         </div>
     </div>
     
+    <!-- Preview JS -->
+    <script>
+        // preview for multiple files (used for `foto`)
+        function previewMultiple(input, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            const files = input.files ? Array.from(input.files) : [];
+
+            files.forEach((file, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'd-inline-block me-2 mb-2 text-center';
+
+                const url = URL.createObjectURL(file);
+
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.className = 'img-thumbnail';
+                    img.style.maxWidth = '150px';
+                    wrapper.appendChild(img);
+                    img.onload = function() { URL.revokeObjectURL(url); };
+                } else {
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.target = '_blank';
+                    link.textContent = file.name;
+                    wrapper.appendChild(link);
+                    setTimeout(() => URL.revokeObjectURL(url), 30000);
+                }
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn btn-sm btn-outline-secondary mt-1 d-block';
+                btn.innerHTML = '<i class="fas fa-trash"></i> Hapus';
+                btn.onclick = function() {
+                    removeSingleFile(input, index);
+                    previewMultiple(input, containerId);
+                };
+                wrapper.appendChild(btn);
+
+                container.appendChild(wrapper);
+            });
+        }
+
+        // remove a single file from a file input (uses DataTransfer)
+        function removeSingleFile(input, removeIndex) {
+            if (!input || !input.files) return;
+            const dt = new DataTransfer();
+            Array.from(input.files).forEach((file, i) => {
+                if (i !== removeIndex) dt.items.add(file);
+            });
+            input.files = dt.files;
+        }
+
+        function previewFile(input, previewId) {
+            const file = input.files && input.files[0];
+            const img = document.getElementById(previewId);
+            const infoId = previewId.replace('preview', 'preview-info');
+            const info = document.getElementById(infoId);
+            const removeId = previewId.replace('preview', 'remove');
+            const removeBtn = document.getElementById(removeId);
+
+            if (!file) {
+                if (img) { img.style.display = 'none'; img.src = '#'; }
+                if (info) { info.style.display = 'none'; info.innerHTML = ''; }
+                if (removeBtn) removeBtn.style.display = 'none';
+                return;
+            }
+
+            const url = URL.createObjectURL(file);
+
+            if (file.type.startsWith('image/')) {
+                if (img) {
+                    img.src = url;
+                    img.style.display = 'inline-block';
+                }
+                if (info) { info.style.display = 'none'; info.innerHTML = ''; }
+            } else {
+                if (img) { img.style.display = 'none'; img.src = '#'; }
+                if (info) {
+                    info.style.display = 'block';
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.target = '_blank';
+                    link.textContent = file.name;
+                    info.innerHTML = '';
+                    info.appendChild(link);
+                }
+            }
+
+            if (removeBtn) removeBtn.style.display = 'inline-block';
+
+            // revoke object URL after image loads to free memory
+            if (file.type.startsWith('image/')) {
+                img.onload = function() { URL.revokeObjectURL(url); };
+            } else {
+                // revoke after small timeout for non-images
+                setTimeout(() => URL.revokeObjectURL(url), 30000);
+            }
+        }
+
+        function removeFile(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const img = document.getElementById(previewId);
+            const infoId = previewId.replace('preview', 'preview-info');
+            const info = document.getElementById(infoId);
+            const removeId = previewId.replace('preview', 'remove');
+            const removeBtn = document.getElementById(removeId);
+
+            if (input) {
+                try {
+                    input.value = '';
+                } catch(e) {
+                    // fallback for security: replace input element
+                    const newInput = input.cloneNode(true);
+                    newInput.value = '';
+                    input.parentNode.replaceChild(newInput, input);
+                }
+            }
+            if (img) { img.style.display = 'none'; img.src = '#'; }
+            if (info) { info.style.display = 'none'; info.innerHTML = ''; }
+            if (removeBtn) removeBtn.style.display = 'none';
+        }
+    </script>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

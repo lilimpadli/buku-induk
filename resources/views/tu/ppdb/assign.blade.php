@@ -12,14 +12,28 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                             <h4>{{ $entry->nama_lengkap }}</h4>
                             <p class="text-muted">NISN: {{ $entry->nisn ?? '-' }}</p>
                         </div>
-                        <div class="col-md-6 text-end">
+                        <div class="col-md-4 text-end">
                             <span class="badge bg-warning fs-6">Status: {{ $entry->status }}</span>
                         </div>
                     </div>
+
+                    @if($entry->foto)
+                    <div class="row mb-3">
+                        <div class="col-md-12 text-center">
+                            <div class="mb-2">
+                                <strong>Foto Pendaftar</strong>
+                            </div>
+                            <img src="{{ asset('storage/' . $entry->foto) }}" 
+                                 alt="Foto {{ $entry->nama_lengkap }}" 
+                                 class="img-thumbnail" 
+                                 style="max-width: 200px; max-height: 250px;">
+                        </div>
+                    </div>
+                    @endif
 
                     <div class="row mb-3">
                         <div class="col-md-6">
@@ -29,6 +43,34 @@
                         <div class="col-md-6">
                             <strong>Jenis Kelamin</strong>
                             <div>{{ $entry->jenis_kelamin ?? '-' }}</div>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h6>Informasi PPDB</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Jurusan</strong>
+                            <div>{{ optional($entry->jurusan)->nama ?? '-' }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Sesi PPDB</strong>
+                            <div>{{ optional($entry->sesi)->tahun_ajaran ?? '-' }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Jalur PPDB</strong>
+                            <div>{{ optional($entry->jalur)->nama_jalur ?? '-' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Tahun Ajaran</strong>
+                            <div>{{ $entry->tahun_ajaran ?? '-' }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Tanggal Diterima</strong>
+                            <div>{{ $entry->tanggal_diterima ? date('d/m/Y', strtotime($entry->tanggal_diterima)) : '-' }}</div>
                         </div>
                     </div>
 
@@ -53,11 +95,51 @@
 
                     <hr>
                     <h6>Dokumen</h6>
-                    <ul>
-                        <li>KK: {{ $entry->kk ? 'Ada' : 'Tidak' }}</li>
-                        <li>Akta: {{ $entry->akta ? 'Ada' : 'Tidak' }}</li>
-                        <li>Ijazah: {{ $entry->ijazah ? 'Ada' : 'Tidak' }}</li>
-                    </ul>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><strong>KK:</strong>
+                                    @if($entry->kk)
+                                        <span class="text-success">✓ <a href="{{ asset('storage/' . $entry->kk) }}" target="_blank">Lihat File</a></span>
+                                    @else
+                                        <span class="text-danger">✗ Tidak ada</span>
+                                    @endif
+                                </li>
+                                <li><strong>Akta:</strong>
+                                    @if($entry->akta)
+                                        <span class="text-success">✓ <a href="{{ asset('storage/' . $entry->akta) }}" target="_blank">Lihat File</a></span>
+                                    @else
+                                        <span class="text-danger">✗ Tidak ada</span>
+                                    @endif
+                                </li>
+                                <li><strong>Ijazah:</strong>
+                                    @if($entry->ijazah)
+                                        <span class="text-success">✓ <a href="{{ asset('storage/' . $entry->ijazah) }}" target="_blank">Lihat File</a></span>
+                                    @else
+                                        <span class="text-danger">✗ Tidak ada</span>
+                                    @endif
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><strong>Foto:</strong>
+                                    @if($entry->foto)
+                                        <span class="text-success">✓ <a href="{{ asset('storage/' . $entry->foto) }}" target="_blank">Lihat File</a></span>
+                                    @else
+                                        <span class="text-danger">✗ Tidak ada</span>
+                                    @endif
+                                </li>
+                                <li><strong>Bukti Jalur:</strong>
+                                    @if($entry->bukti_jalur)
+                                        <span class="text-success">✓ <a href="{{ asset('storage/' . $entry->bukti_jalur) }}" target="_blank">Lihat File</a></span>
+                                    @else
+                                        <span class="text-danger">✗ Tidak ada</span>
+                                    @endif
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

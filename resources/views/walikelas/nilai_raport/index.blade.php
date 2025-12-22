@@ -253,6 +253,27 @@
             align-self: flex-start;
         }
     }
+
+    /* Kelas Header */
+    .kelas-header {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, rgba(47, 83, 255, 0.1), rgba(99, 102, 241, 0.1));
+        border-radius: 12px;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .kelas-section {
+        margin-bottom: 30px;
+    }
+
+    .kelas-section:last-child {
+        margin-bottom: 0;
+    }
+
 </style>
 
 <div class="container mt-4">
@@ -261,41 +282,41 @@
 
     <div class="card shadow">
         @if($siswas->count() > 0)
-            <div class="list-group list-group-flush">
+            @foreach($siswas as $kelas => $siswaList)
+                <div class="kelas-section mb-4">
+                    <h5 class="kelas-header">{{ $kelas }}</h5>
+                    <div class="list-group list-group-flush">
+                        @foreach ($siswaList as $siswa)
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="student-info">
+                                    <div class="student-avatar">
+                                        @if($siswa->foto)
+                                            <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}">
+                                        @else
+                                            {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
+                                        @endif
+                                    </div>
+                                    <div class="student-details">
+                                        <strong>{{ $siswa->nama_lengkap }}</strong>
+                                        <small>
+                                            NIS: {{ $siswa->nis }} |
+                                            NISN: {{ $siswa->nisn }}
+                                        </small>
+                                    </div>
+                                </div>
 
-                @foreach ($siswas as $siswa)
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-
-                        <div class="student-info">
-                            <div class="student-avatar">
-                                @if($siswa->foto)
-                                    <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}">
-                                @else
-                                    {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
-                                @endif
+                                <div class="text-end">
+                                    {{-- Tombol List Raport --}}
+                                    <a href="{{ route('walikelas.nilai_raport.list', $siswa->id) }}"
+                                       class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-file-alt me-1"></i> Semua Raport
+                                    </a>
+                                </div>
                             </div>
-                            <div class="student-details">
-                                <strong>{{ $siswa->nama_lengkap }}</strong>
-                                <small>
-                                    NIS: {{ $siswa->nis }} |
-                                    NISN: {{ $siswa->nisn }} |
-                                    Kelas: {{ $siswa->kelas }}
-                                </small>
-                            </div>
-                        </div>
-
-                        <div class="text-end">
-                            {{-- Tombol List Raport --}}
-                            <a href="{{ route('walikelas.nilai_raport.list', $siswa->id) }}"
-                               class="btn btn-secondary btn-sm">
-                                <i class="fas fa-file-alt me-1"></i> Semua Raport
-                            </a>
-                        </div>
-
+                        @endforeach
                     </div>
-                @endforeach
-
-            </div>
+                </div>
+            @endforeach
         @else
             <div class="empty-state">
                 <i class="fas fa-clipboard-list"></i>

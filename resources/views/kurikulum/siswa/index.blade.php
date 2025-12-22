@@ -14,7 +14,7 @@
         </a>
     </div>
 
-    <!-- CARD FILTER + TABEL -->
+    <!-- CARD TABEL -->
     <div class="card shadow-sm border-0" style="border-radius: 15px;">
         <div class="card-body">
             <!-- TABLE -->
@@ -22,11 +22,8 @@
                 <table class="table align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>NISN</th>
                             <th>NIS</th>
                             <th>Nama Lengkap</th>
-                            <th>Kelas</th>
-                            <th>Angkatan</th>
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>

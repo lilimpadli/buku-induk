@@ -197,7 +197,7 @@
                     <div class="form-section">
                         <form method="GET" action="{{ route('ppdb.create') }}">
                             <div class="row g-4">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label">Pilih Sesi PPDB</label>
                                     <select name="sesi" class="form-select form-select-lg" required>
                                         <option value="">-- Pilih Sesi --</option>
@@ -206,12 +206,21 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label">Pilih Jalur PPDB</label>
                                     <select name="jalur" class="form-select form-select-lg" required>
                                         <option value="">-- Pilih Jalur --</option>
                                         @foreach($jalurs as $jalur)
                                             <option value="{{ $jalur->id }}">{{ $jalur->nama_jalur }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Pilih Jurusan</label>
+                                    <select name="jurusan" class="form-select form-select-lg">
+                                        <option value="">-- Pilih Jurusan --</option>
+                                        @foreach($jurusans as $jurusan)
+                                            <option value="{{ $jurusan->id }}">{{ $jurusan->nama }}</option>
                                         @endforeach
                                     </select>
                                 </div>

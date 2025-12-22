@@ -1,142 +1,258 @@
 @extends('layouts.app')
 
-@section('title', 'View Report Program Keahlian')
+@section('title', 'Raport Siswa - ' . $siswa->nama_lengkap)
 
 @section('content')
+<style>
+    /* ===================== STYLE RAPORT SISWA ===================== */
+    
+    :root {
+        --primary-color: #2F53FF;
+        --secondary-color: #6366F1;
+        --success-color: #10B981;
+        --warning-color: #F59E0B;
+        --danger-color: #EF4444;
+        --light-bg: #F8FAFC;
+        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
 
-<h4 class="fw-bold mb-4">Dashboard Program Keahlian</h4>
+    body {
+        background-color: var(--light-bg);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
 
-<div class="card border-0 shadow-sm">
-    <div class="card-body p-4" style="background-color: #f8f9fa;">
+    .container {
+        max-width: 1200px;
+    }
+
+    /* Page Title */
+    h4.fw-bold {
+        font-size: 28px;
+        color: #1E293B;
+        position: relative;
+        padding-left: 15px;
+        margin-bottom: 25px !important;
+    }
+
+    h4.fw-bold::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 70%;
+        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+        border-radius: 3px;
+    }
+
+    /* Card Styles */
+    .card {
+        border-radius: 16px;
+        border: none;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+        background-color: #ffffff;
+    }
+
+    .card:hover {
+        box-shadow: var(--hover-shadow);
+        transform: translateY(-2px);
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    /* Form Styles */
+    .form-label {
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-select {
+        border-radius: 8px;
+        border: 1px solid #E2E8F0;
+        padding: 12px 15px;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(47, 83, 255, 0.1);
+    }
+
+    /* Button Styles */
+    .btn {
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 0.5rem 1.2rem;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-primary {
+        background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        border: none;
+        box-shadow: 0 4px 6px rgba(47, 83, 255, 0.25);
+    }
+
+    .btn-primary:hover {
+        box-shadow: 0 6px 8px rgba(47, 83, 255, 0.35);
+    }
+
+    /* Alert Styles */
+    .alert {
+        border-radius: 8px;
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .alert-danger {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+    }
+
+    /* Info Card */
+    .info-card {
+        background: linear-gradient(135deg, rgba(47, 83, 255, 0.05), rgba(99, 102, 241, 0.05));
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-card h5 {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-card p {
+        color: #64748B;
+        margin-bottom: 0;
+    }
+
+    /* Form Section */
+    .form-section {
+        background-color: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        h4.fw-bold {
+            font-size: 24px;
+        }
         
-        <h5 class="fw-bold mb-1">Lihat Laport Per program</h5>
-        <p class="text-muted mb-4">Lihat dan kelola Raport siswa untuk program keahlian anda.</p>
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
 
-        <!-- Search & Filter -->
-        <div class="row mb-4">
-            <div class="col-md-6 mb-3 mb-md-0">
-                <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0">
-                        <i class="fa-solid fa-search"></i>
-                    </span>
-                    <input type="text" class="form-control border-start-0" placeholder="Cari berdasarkan Nama atau NIS..." id="searchInput">
-                </div>
+<div class="container mt-4">
+    <h4 class="fw-bold mb-4">Raport Siswa: {{ $siswa->nama_lengkap }}</h4>
+
+    @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <div class="info-card">
+                <h5><i class="fas fa-info-circle me-2"></i>Informasi Penting</h5>
+                <p>Pilih tahun ajaran dan semester yang sesuai untuk melihat raport siswa. Pastikan data yang dipilih sudah tersedia dalam sistem.</p>
             </div>
-            <div class="col-md-6">
-                <select class="form-select">
-                    <option selected>Rekayasa Perangkat Lunak</option>
-                    <option>Teknik Komputer Jaringan</option>
-                    <option>Multimedia</option>
-                </select>
+            
+            <div class="form-section">
+                <h5 class="fw-bold mb-4">Pilih Tahun Ajaran dan Semester</h5>
+                
+                <form method="GET" action="" id="raportForm">
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="tahun_ajaran" class="form-label">Tahun Ajaran</label>
+                            <select name="tahun" id="tahun_ajaran" class="form-select" required>
+                                <option value="">-- Pilih Tahun Ajaran --</option>
+                                @foreach($raports as $r)
+                                    <option value="{{ str_replace('/', '-', $r->tahun_ajaran) }}">{{ $r->tahun_ajaran }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="semester" class="form-label">Semester</label>
+                            <select name="semester" id="semester" class="form-select" required>
+                                <option value="">-- Pilih Semester --</option>
+                                <option value="Ganjil">Ganjil</option>
+                                <option value="Genap">Genap</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-2"></i>Lihat Raport
+                    </button>
+                </form>
             </div>
         </div>
-
-        <!-- Table -->
-        <div class="bg-white rounded p-3">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr style="border-bottom: 2px solid #dee2e6;">
-                            <th class="text-muted fw-semibold" style="padding: 15px;">NO.</th>
-                            <th class="text-muted fw-semibold" style="padding: 15px;">NIS</th>
-                            <th class="text-muted fw-semibold" style="padding: 15px;">NAMA SISWA</th>
-                            <th class="text-muted fw-semibold" style="padding: 15px;">Kelas</th>
-                            <th class="text-muted fw-semibold" style="padding: 15px;">AKSI</th>
-                        </tr>
-                    </thead>
-                    <tbody id="siswaTable">
-                        <tr style="border-bottom: 1px solid #e9ecef;">
-                            <td style="padding: 18px;">1</td>
-                            <td style="padding: 18px;">232410218</td>
-                            <td style="padding: 18px;">Aditya Saputra Setiadi</td>
-                            <td style="padding: 18px;">XII PPLG 2</td>
-                            <td style="padding: 18px;">
-                                <button class="btn btn-primary btn-sm px-4 rounded-pill">Lihat Siswa</button>
-                            </td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid #e9ecef;">
-                            <td style="padding: 18px;">2</td>
-                            <td style="padding: 18px;">232410219</td>
-                            <td style="padding: 18px;">Lili Muhammad Padli</td>
-                            <td style="padding: 18px;">XII PPLG 2</td>
-                            <td style="padding: 18px;">
-                                <button class="btn btn-primary btn-sm px-4 rounded-pill">Lihat Siswa</button>
-                            </td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid #e9ecef;">
-                            <td style="padding: 18px;">3</td>
-                            <td style="padding: 18px;">232410220</td>
-                            <td style="padding: 18px;">Fitri Dewi Lestari</td>
-                            <td style="padding: 18px;">XII PPLG 3</td>
-                            <td style="padding: 18px;">
-                                <button class="btn btn-primary btn-sm px-4 rounded-pill">Lihat Siswa</button>
-                            </td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid #e9ecef;">
-                            <td style="padding: 18px;">4</td>
-                            <td style="padding: 18px;">232410221</td>
-                            <td style="padding: 18px;">Ihsan Nurfallah</td>
-                            <td style="padding: 18px;">XII PPLG 2</td>
-                            <td style="padding: 18px;">
-                                <button class="btn btn-primary btn-sm px-4 rounded-pill">Lihat Siswa</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 18px;">5</td>
-                            <td style="padding: 18px;">232410222</td>
-                            <td style="padding: 18px;">Raihani Salsabila Azzahra</td>
-                            <td style="padding: 18px;">XII PPLG 2</td>
-                            <td style="padding: 18px;">
-                                <button class="btn btn-primary btn-sm px-4 rounded-pill">Lihat Siswa</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            <nav class="mt-4">
-                <ul class="pagination justify-content-center mb-0">
-                    <li class="page-item disabled">
-                        <a class="page-link border-0" href="#"><</a>
-                    </li>
-                    <li class="page-item active">
-                        <a class="page-link border-0 rounded-circle mx-1" href="#" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">1</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link border-0 rounded-circle mx-1" href="#" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">2</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link border-0 rounded-circle mx-1" href="#" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">3</a>
-                    </li>
-                    <li class="page-item disabled">
-                        <a class="page-link border-0" href="#">...</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link border-0 rounded-circle mx-1" href="#" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">10</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link border-0" href="#">></a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-
     </div>
 </div>
-
 @endsection
 
 @push('scripts')
 <script>
-document.getElementById('searchInput').addEventListener('keyup', function() {
-    const searchTerm = this.value.toLowerCase();
-    const rows = document.querySelectorAll('#siswaTable tr');
-    
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? '' : 'none';
-    });
+document.getElementById('raportForm').addEventListener('submit', function(e) {
+    const tahun = document.getElementById('tahun_ajaran').value;
+    const semester = document.getElementById('semester').value;
+    if (!tahun || !semester) {
+        e.preventDefault();
+        
+        // Create a custom alert instead of using browser alert
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+        alertDiv.innerHTML = `
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Pilih tahun ajaran dan semester terlebih dahulu.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        // Insert the alert at the beginning of the card body
+        const cardBody = document.querySelector('.card-body');
+        cardBody.insertBefore(alertDiv, cardBody.firstChild);
+        
+        // Auto remove the alert after 5 seconds
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+        
+        return;
+    }
+    this.action = '/kaprog/raport/siswa/{{ $siswa->id }}/' + semester + '/' + tahun.replace('/', '-');
 });
 </script>
 @endpush

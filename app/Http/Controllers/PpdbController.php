@@ -27,21 +27,89 @@ class PpdbController extends Controller
     public function index()
     {
         return view('ppdb.index', [
-            'sesis'  => SesiPpdb::orderBy('tahun_ajaran', 'desc')->get(),
-            'jalurs' => JalurPpdb::orderBy('nama_jalur')->get(),
+            'sesis'    => SesiPpdb::orderBy('tahun_ajaran', 'desc')->get(),
+            'jalurs'   => JalurPpdb::orderBy('nama_jalur')->get(),
+            'jurusans' => Jurusan::orderBy('nama')->get(),
         ]);
     }
 
     // =========================
-    // DAFTAR PPDB UNTUK TU
+    // DAFTAR JURUSAN UNTUK TU
     // =========================
     public function tuIndex()
     {
-        $ppdbs = Ppdb::with(['jalur', 'sesi'])
+        $jurusans = Jurusan::orderBy('nama')->get();
+
+        return view('tu.ppdb.index', compact('jurusans'));
+    }
+
+    // =========================
+    // SHOW JURUSAN DENGAN SESI DAN JALUR
+    // =========================
+    public function showJurusan($id)
+    {
+        $jurusan = Jurusan::findOrFail($id);
+
+        // Ambil semua sesi dengan count pendaftar untuk jurusan ini
+        $sesis = SesiPpdb::withCount(['ppdb' => function($query) use ($id) {
+            $query->where('jurusan_id', $id);
+        }])->orderBy('tahun_ajaran', 'desc')->get();
+
+        // Ambil semua jalur dengan count pendaftar untuk jurusan ini
+        $jalurs = JalurPpdb::withCount(['ppdb' => function($query) use ($id) {
+            $query->where('jurusan_id', $id);
+        }])->orderBy('nama_jalur')->get();
+
+        return view('tu.ppdb.jurusan.show', compact('jurusan', 'sesis', 'jalurs'));
+    }
+
+    // =========================
+    // SHOW SEMUA PENDAFTAR JURUSAN
+    // =========================
+    public function showPendaftarJurusan($id)
+    {
+        $jurusan = Jurusan::findOrFail($id);
+
+        $pendaftars = Ppdb::with(['jalur', 'sesi', 'jurusan'])
+            ->where('jurusan_id', $id)
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('tu.ppdb.index', compact('ppdbs'));
+        return view('tu.ppdb.jurusan.pendaftar-jurusan', compact('jurusan', 'pendaftars'));
+    }
+
+    // =========================
+    // SHOW PENDAFTAR BERDASARKAN JURUSAN + SESI
+    // =========================
+    public function showPendaftarSesi($jurusanId, $sesiId)
+    {
+        $jurusan = Jurusan::findOrFail($jurusanId);
+        $sesi = SesiPpdb::findOrFail($sesiId);
+
+        $pendaftars = Ppdb::with(['jalur', 'sesi', 'jurusan'])
+            ->where('jurusan_id', $jurusanId)
+            ->where('sesi_ppdb_id', $sesiId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('tu.ppdb.jurusan.pendaftar-sesi', compact('jurusan', 'sesi', 'pendaftars'));
+    }
+
+    // =========================
+    // SHOW PENDAFTAR BERDASARKAN JURUSAN + JALUR
+    // =========================
+    public function showPendaftarJalur($jurusanId, $jalurId)
+    {
+        $jurusan = Jurusan::findOrFail($jurusanId);
+        $jalur = JalurPpdb::findOrFail($jalurId);
+
+        $pendaftars = Ppdb::with(['jalur', 'sesi', 'jurusan'])
+            ->where('jurusan_id', $jurusanId)
+            ->where('jalur_ppdb_id', $jalurId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('tu.ppdb.jurusan.pendaftar-jalur', compact('jurusan', 'jalur', 'pendaftars'));
     }
 
     // =========================
@@ -52,6 +120,7 @@ class PpdbController extends Controller
         return view('ppdb.create', [
             'sesi'        => $request->filled('sesi')  ? SesiPpdb::find($request->sesi)  : null,
             'jalur'       => $request->filled('jalur') ? JalurPpdb::find($request->jalur) : null,
+            'jurusan'     => $request->filled('jurusan') ? Jurusan::find($request->jurusan) : null,
             'sesis'       => SesiPpdb::orderBy('tahun_ajaran', 'desc')->get(),
             'jalurs'      => JalurPpdb::orderBy('nama_jalur')->get(),
             'jurusans'    => Jurusan::orderBy('nama')->get(),
@@ -63,6 +132,7 @@ class PpdbController extends Controller
     // =========================
     public function store(Request $request)
     {
+        Log::info('PPDB store called', $request->all());
         $validated = $request->validate([
             'nama_lengkap'   => 'required|string|max:255',
             'nisn'           => 'nullable|string|max:30',
@@ -76,10 +146,13 @@ class PpdbController extends Controller
 
             'jurusan_id'     => 'nullable|exists:jurusans,id',
 
-            'nama_ayah'      => 'nullable|string|max:255',
-            'pekerjaan_ayah' => 'nullable|string|max:255',
-            'nama_ibu'       => 'nullable|string|max:255',
-            'pekerjaan_ibu'  => 'nullable|string|max:255',
+            // File uploads
+            'foto'         => 'required|array|min:1',
+            'foto.*'       => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'kk'           => 'required|file|mimes:pdf,jpeg,png,jpg|max:2048',
+            'akta'         => 'required|file|mimes:pdf,jpeg,png,jpg|max:2048',
+            'ijazah'       => 'required|file|mimes:pdf,jpeg,png,jpg|max:2048',
+            'bukti_jalur'  => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
         ]);
 
         // NORMALISASI ENUM JK
@@ -89,9 +162,34 @@ class PpdbController extends Controller
             $validated['jenis_kelamin'] = 'Perempuan';
         }
 
+        // HANDLE FILE UPLOADS
+        $filePaths = [];
+        $files = ['kk', 'akta', 'ijazah', 'bukti_jalur'];
+
+        // Handle single files
+        foreach ($files as $file) {
+            if ($request->hasFile($file)) {
+                $uploadedFile = $request->file($file);
+                $filename = time() . '_' . $file . '_' . uniqid() . '.' . $uploadedFile->getClientOriginalExtension();
+                $path = $uploadedFile->storeAs('ppdb/' . $file, $filename, 'public');
+                $filePaths[$file] = $path;
+            }
+        }
+
+        // Handle multiple foto files (take only first one)
+        if ($request->hasFile('foto')) {
+            $fotoFiles = $request->file('foto');
+            if (is_array($fotoFiles) && count($fotoFiles) > 0) {
+                $firstFoto = $fotoFiles[0]; // Take only first foto
+                $filename = time() . '_foto_' . uniqid() . '.' . $firstFoto->getClientOriginalExtension();
+                $path = $firstFoto->storeAs('ppdb/foto', $filename, 'public');
+                $filePaths['foto'] = $path;
+            }
+        }
+
         // SIMPAN DATA
         try {
-            Ppdb::create(array_merge($validated, [
+            Ppdb::create(array_merge($validated, $filePaths, [
                 'status' => 'diterima',
             ]));
 
@@ -112,7 +210,7 @@ class PpdbController extends Controller
     // =========================
     public function showAssignForm($id)
     {
-        $entry = Ppdb::findOrFail($id);
+        $entry = Ppdb::with(['jurusan', 'sesi', 'jalur'])->findOrFail($id);
         $rombels = Rombel::with(['kelas', 'guru'])->orderBy('nama')->get();
 
         return view('tu.ppdb.assign', compact('entry', 'rombels'));

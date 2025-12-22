@@ -63,15 +63,58 @@ class WaliKelasSiswaController extends Controller
     // Dashboard wali kelas
     public function dashboard()
     {
-        $total = DataSiswa::count();
-        $recent = DataSiswa::with(['ayah', 'ibu', 'wali'])->orderBy('created_at', 'desc')->limit(6)->get();
+        $user = Auth::user();
 
-        $byGender = DataSiswa::select('jenis_kelamin', DB::raw('count(*) as total'))
-            ->groupBy('jenis_kelamin')
-            ->pluck('total', 'jenis_kelamin')
-            ->toArray();
+        // ambil daftar rombel yang dia pegang sebagai wali kelas
+        $rombelsIds = [];
+        if ($user) {
+            $assigns = $user->waliKelas()->get();
+            foreach ($assigns as $a) {
+                // jika kolom rombel_id ada dan terisi, gunakan itu
+                if (isset($a->rombel_id) && $a->rombel_id) {
+                    $rombelsIds[] = $a->rombel_id;
+                    continue;
+                }
 
-        return view('walikelas.dashboard', compact('total', 'recent', 'byGender'));
+                // jika rombel_id tidak tersedia di tabel, gunakan kelas_id untuk ambil rombel terkait
+                if (isset($a->kelas_id) && $a->kelas_id) {
+                    $r = Rombel::where('kelas_id', $a->kelas_id)->pluck('id')->toArray();
+                    $rombelsIds = array_merge($rombelsIds, $r);
+                    continue;
+                }
+
+                // (tidak menggunakan fallback jurusan karena terlalu luas)
+            }
+
+            $rombelsIds = array_values(array_unique(array_filter($rombelsIds)));
+        }
+
+        if (!empty($rombelsIds)) {
+            $total = DataSiswa::whereIn('rombel_id', $rombelsIds)->count();
+            $recent = DataSiswa::with(['ayah', 'ibu', 'wali', 'rombel'])
+                ->whereIn('rombel_id', $rombelsIds)
+                ->orderBy('created_at', 'desc')
+                ->limit(6)
+                ->get();
+
+            $byGender = DataSiswa::whereIn('rombel_id', $rombelsIds)
+                ->select('jenis_kelamin', DB::raw('count(*) as total'))
+                ->groupBy('jenis_kelamin')
+                ->pluck('total', 'jenis_kelamin')
+                ->toArray();
+
+            // Group recent by rombel
+            $recentGrouped = $recent->groupBy(function($siswa) {
+                return $siswa->rombel ? $siswa->rombel->nama : 'Tidak ada rombel';
+            });
+        } else {
+            $total = 0;
+            $recent = collect();
+            $recentGrouped = collect();
+            $byGender = [];
+        }
+
+        return view('walikelas.dashboard', compact('total', 'recent', 'recentGrouped', 'byGender'));
     }
 
     // Export data siswa ke PDF (untuk wali kelas)

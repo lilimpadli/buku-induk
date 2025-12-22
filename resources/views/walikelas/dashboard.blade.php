@@ -84,27 +84,32 @@
             <div class="card shadow-sm h-100">
                 <div class="card-body">
                     <h6 class="card-title mb-3">Siswa Terbaru</h6>
-                    @if(!empty($recent) && $recent->count() > 0)
-                        <div class="list-group list-group-flush">
-                            @foreach($recent as $r)
-                                <div class="list-group-item d-flex align-items-center">
-                                    <div class="avatar me-3">
-                                        @if($r->foto)
-                                            <img src="{{ asset('storage/' . $r->foto) }}" alt="" class="rounded-circle" style="width:48px;height:48px;object-fit:cover;">
-                                        @else
-                                            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:48px;height:48px;font-weight:700;">{{ strtoupper(substr($r->nama_lengkap,0,1)) }}</div>
-                                        @endif
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <div class="fw-bold">{{ $r->nama_lengkap }}</div>
-                                        <div class="small text-muted">NIS: {{ $r->nis ?? '-' }} • {{ $r->created_at ? $r->created_at->format('Y-m-d') : '-' }}</div>
-                                    </div>
-                                    <div class="text-end">
-                                        <a href="{{ route('walikelas.siswa.show', $r->id) }}" class="btn btn-sm btn-outline-primary">Detail</a>
-                                    </div>
+                    @if(!empty($recentGrouped) && $recentGrouped->count() > 0)
+                        @foreach($recentGrouped as $rombel => $siswaList)
+                            <div class="rombel-section mb-3">
+                                <h6 class="rombel-header">{{ $rombel }}</h6>
+                                <div class="list-group list-group-flush">
+                                    @foreach($siswaList as $r)
+                                        <div class="list-group-item d-flex align-items-center">
+                                            <div class="avatar me-3">
+                                                @if($r->foto)
+                                                    <img src="{{ asset('storage/' . $r->foto) }}" alt="" class="rounded-circle" style="width:48px;height:48px;object-fit:cover;">
+                                                @else
+                                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:48px;height:48px;font-weight:700;">{{ strtoupper(substr($r->nama_lengkap,0,1)) }}</div>
+                                                @endif
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="fw-bold">{{ $r->nama_lengkap }}</div>
+                                                <div class="small text-muted">NIS: {{ $r->nis ?? '-' }} • {{ $r->created_at ? $r->created_at->format('Y-m-d') : '-' }}</div>
+                                            </div>
+                                            <div class="text-end">
+                                                <a href="{{ route('walikelas.siswa.show', $r->id) }}" class="btn btn-sm btn-outline-primary">Detail</a>
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
-                            @endforeach
-                        </div>
+                            </div>
+                        @endforeach
                     @else
                         <p class="text-muted">Belum ada siswa baru.</p>
                     @endif
@@ -155,4 +160,24 @@
     .avatar img{ border-radius:6px; }
     .list-group-item{ border-radius:10px; margin-bottom:8px; }
     .list-group-item:last-child{ margin-bottom:0; }
+
+    /* Rombel Header */
+    .rombel-header {
+        font-size: 14px;
+        font-weight: 600;
+        color: #2F53FF;
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        background: rgba(47, 83, 255, 0.1);
+        border-radius: 8px;
+        border-left: 3px solid #2F53FF;
+    }
+
+    .rombel-section {
+        margin-bottom: 20px;
+    }
+
+    .rombel-section:last-child {
+        margin-bottom: 0;
+    }
 </style>

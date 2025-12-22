@@ -210,8 +210,12 @@
                                         <i class="fas fa-gauge"></i> <span class="label ms-2">Dashboard</span>
                                     </a>
 
-                                    <a href="{{ route('kaprog.datapribadi.index') }}" class="nav-link {{ request()->routeIs('kaprog.raport.*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Diri">
+                                    <a href="{{ route('kaprog.datapribadi.index') }}" class="nav-link {{ request()->routeIs('kaprog.datapribadi.*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Diri">
                                         <i class="fas fa-id-card"></i> <span class="label ms-2">Data Diri</span>
+                                    </a>
+
+                                    <a href="{{ route('kaprog.siswa.index') }}" class="nav-link {{ request()->routeIs('kaprog.siswa.*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Siswa">
+                                        <i class="fas fa-users"></i> <span class="label ms-2">Data Siswa</span>
                                     </a>
 
                                     <a href="{{ route('kaprog.kelas.index') }}" class="nav-link {{ request()->routeIs('kaprog.raport.*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Kelas">
