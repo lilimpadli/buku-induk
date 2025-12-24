@@ -447,8 +447,8 @@
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             const val = this.dataset.kelas;
-            document.getElementById('kelasInput').value = val === 'all' ? '' : val;
-            // submit the parent form
+            // set the input exactly to 'all' / '10' / '11' / '12' so server receives the expected value
+            document.getElementById('kelasInput').value = val;
             this.closest('form').submit();
         });
     });
@@ -504,35 +504,24 @@
     const jurusanChart = new Chart(jurusanCtx, {
         type: 'doughnut',
         data: {
-            labels: [
-                'Teknik Informatika',
-                'Teknik Mesin',
-                'Teknik Elektro',
-                'Akuntansi',
-                'Perhotelan'
-            ],
+            labels: {!! json_encode($rombelLabels ?? []) !!},
             datasets: [{
-                data: [
-                    {{ $jurusanTI ?? 25 }},
-                    {{ $jurusanTM ?? 30 }},
-                    {{ $jurusanTE ?? 20 }},
-                    {{ $jurusanAK ?? 15 }},
-                    {{ $jurusanPH ?? 10 }}
-                ],
-                backgroundColor: [
-                    'rgba(47, 83, 255, 0.7)',
-                    'rgba(99, 102, 241, 0.7)',
-                    'rgba(16, 185, 129, 0.7)',
-                    'rgba(245, 158, 11, 0.7)',
-                    'rgba(239, 68, 68, 0.7)'
-                ],
-                borderColor: [
-                    'rgba(47, 83, 255, 1)',
-                    'rgba(99, 102, 241, 1)',
-                    'rgba(16, 185, 129, 1)',
-                    'rgba(245, 158, 11, 1)',
-                    'rgba(239, 68, 68, 1)'
-                ],
+                data: {!! json_encode($rombelCounts ?? []) !!},
+                backgroundColor: (function(){
+                    // generate a color palette based on number of rombels
+                    const base = ["47,83,255","99,102,241","16,185,129","245,158,11","239,68,68","14,165,233","168,85,247","236,72,153"];
+                    const colors = [];
+                    const n = ({{ json_encode($rombelCounts ?? []) }}).length || 0;
+                    for (let i=0;i<n;i++) colors.push(`rgba(${base[i % base.length]},0.75)`);
+                    return colors;
+                })(),
+                borderColor: (function(){
+                    const base = ["47,83,255","99,102,241","16,185,129","245,158,11","239,68,68","14,165,233","168,85,247","236,72,153"];
+                    const colors = [];
+                    const n = ({{ json_encode($rombelCounts ?? []) }}).length || 0;
+                    for (let i=0;i<n;i++) colors.push(`rgba(${base[i % base.length]},1)`);
+                    return colors;
+                })(),
                 borderWidth: 1
             }]
         },

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Guru;
 use App\Models\DataSiswa;
 use App\Models\Kelas;
@@ -36,6 +37,9 @@ class KaprogController extends Controller
             $totalRombel = 0;
             $siswas = collect();
             $jurusan = null;
+            $siswaKelas10 = $siswaKelas11 = $siswaKelas12 = 0;
+            $rombelLabels = [];
+            $rombelCounts = [];
         } else {
             $jurusan = Jurusan::find($jurusanId);
 
@@ -52,23 +56,46 @@ class KaprogController extends Controller
                 });
             }
 
-            // Apply kelas filter (10/11/12)
+            // Apply kelas filter (10/11/12) using related rombel->kelas.tingkat
             if ($kelasFilter) {
-                if ($kelasFilter == '12') {
-                    $siswasQuery->where('kelas', 'like', 'XII%');
-                } elseif ($kelasFilter == '11') {
-                    $siswasQuery->where('kelas', 'like', 'XI%')->where('kelas', 'not like', 'XII%');
-                } elseif ($kelasFilter == '10') {
-                    // kelas yang bukan XI atau XII, assume starts with 'X' but not XI/XII
-                    $siswasQuery->where('kelas', 'like', 'X%')
-                        ->where('kelas', 'not like', 'XI%')
-                        ->where('kelas', 'not like', 'XII%');
+                if (in_array($kelasFilter, ['10', '11', '12'])) {
+                    $tingkatMap = ['10' => 'X', '11' => 'XI', '12' => 'XII'];
+                    $desired = $tingkatMap[$kelasFilter];
+                    $siswasQuery->whereHas('rombel.kelas', function ($kq) use ($desired, $jurusanId) {
+                        $kq->where('tingkat', $desired);
+                        if ($jurusanId) {
+                            $kq->where('jurusan_id', $jurusanId);
+                        }
+                    });
+                } elseif ($kelasFilter === 'all') {
+                    // no extra filter
                 }
             }
 
             $siswas = $siswasQuery->orderBy('nama_lengkap')->get();
 
             $totalSiswa = $siswas->count();
+
+            // Chart data: jumlah siswa per tingkat (X/XI/XII) untuk jurusan
+            $siswaKelas10 = DataSiswa::whereHas('rombel.kelas', function ($q) use ($jurusanId) {
+                $q->where('tingkat', 'X')->where('jurusan_id', $jurusanId);
+            })->count();
+
+            $siswaKelas11 = DataSiswa::whereHas('rombel.kelas', function ($q) use ($jurusanId) {
+                $q->where('tingkat', 'XI')->where('jurusan_id', $jurusanId);
+            })->count();
+
+            $siswaKelas12 = DataSiswa::whereHas('rombel.kelas', function ($q) use ($jurusanId) {
+                $q->where('tingkat', 'XII')->where('jurusan_id', $jurusanId);
+            })->count();
+
+            // Chart data: rombel labels and siswa counts for the current jurusan
+            $rombels = Rombel::whereHas('kelas', function ($q) use ($jurusanId) {
+                $q->where('jurusan_id', $jurusanId);
+            })->withCount('siswa')->get();
+
+            $rombelLabels = $rombels->pluck('nama')->toArray();
+            $rombelCounts = $rombels->pluck('siswa_count')->toArray();
 
             // Total kelas (kelas table untuk jurusan)
             $totalKelas = Kelas::where('jurusan_id', $jurusanId)->count();
@@ -82,7 +109,10 @@ class KaprogController extends Controller
             $totalGuru = Guru::where('jurusan_id', $jurusanId)->count();
         }
 
-        return view('kaprog.dashboard', compact('totalSiswa', 'totalKelas', 'totalGuru', 'totalRombel', 'siswas', 'jurusan'));
+        return view('kaprog.dashboard', compact(
+            'totalSiswa', 'totalKelas', 'totalGuru', 'totalRombel', 'siswas', 'jurusan',
+            'siswaKelas10','siswaKelas11','siswaKelas12','rombelLabels','rombelCounts'
+        ));
     }
 
     // Daftar siswa untuk kaprog (per angkatan tabs)
@@ -217,6 +247,7 @@ class KaprogController extends Controller
             'tanggal_lahir' => 'nullable|date',
             'jenis_kelamin' => 'nullable|string|max:30',
             'alamat' => 'nullable|string',
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
         $request->validate(['photo' => 'nullable|image|max:2048']);
@@ -236,6 +267,11 @@ class KaprogController extends Controller
                 Storage::disk('public')->delete($user->photo);
             }
             $user->photo = $path;
+        }
+
+        // Update password jika diisi
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->input('password'));
         }
 
         $user->save();

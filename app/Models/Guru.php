@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Rombel;
 
 class Guru extends Model
 {
@@ -42,4 +43,9 @@ class Guru extends Model
     {
         return $this->hasMany(Rombel::class, 'guru_id');
     }
+
+    public function waliKelas()
+{
+    return $this->hasMany(Rombel::class, 'guru_id');
+}
 }

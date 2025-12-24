@@ -297,6 +297,32 @@
 <div class="container-fluid">
 
     <h3 class="dashboard-title">Selamat Datang, {{ $siswa->nama_lengkap ?? Auth::user()->name }}!</h3>
+
+    <p class="subtitle">
+        Kelas kamu:
+        @if($siswa && $siswa->rombel)
+            @php
+                $tingkat = strtoupper($siswa->rombel->kelas->tingkat ?? '');
+                $rombelNama = $siswa->rombel->nama ?? '';
+
+                // Format rombel: if like "rpl1" -> "RPL 1", otherwise use title case (e.g. "Gim")
+                $rombelDisplay = '';
+                if(!empty($rombelNama)){
+                    if(preg_match('/^([a-zA-Z]+)\s*([0-9]+)$/', $rombelNama, $m)){
+                        $rombelDisplay = strtoupper($m[1]) . ' ' . $m[2];
+                    } else {
+                        $rombelDisplay = ucwords(strtolower($rombelNama));
+                    }
+                }
+
+                $kelasDisplay = trim(  ' ' . $rombelDisplay);
+            @endphp
+            {{ $kelasDisplay ?: '-' }}
+        @else
+            -
+        @endif
+    </p>
+
     <p class="subtitle">Wali kelas kamu: {{ $siswa && $siswa->rombel && $siswa->rombel->guru ? $siswa->rombel->guru->nama : 'Belum ditentukan' }}</p>
 
     <!-- ========================= NILAI RINGKASAN ========================= -->

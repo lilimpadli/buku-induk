@@ -257,6 +257,17 @@
                             @endif
                         </div>
 
+                        <div class="mb-3">
+                            <label class="form-label">Password Baru (opsional)</label>
+                            <input type="password" name="password" class="form-control" autocomplete="new-password" placeholder="Kosongkan jika tidak ingin mengubah password">
+                            <small class="text-muted">Biarkan kosong jika tidak ingin mengubah password.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Konfirmasi Password</label>
+                            <input type="password" name="password_confirmation" class="form-control" autocomplete="new-password" placeholder="Konfirmasi password baru">
+                        </div>
+
                         <div class="d-flex justify-content-end">
                             <a href="{{ route('guru.profile') }}" class="btn btn-secondary me-2">Batal</a>
                             <button class="btn btn-primary" type="submit">Simpan</button>
