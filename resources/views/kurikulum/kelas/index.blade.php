@@ -6,12 +6,6 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>Daftar Kelas</h3>
-        <div>
-            <a href="{{ route('tu.kelas.create') }}" class="btn btn-primary me-2">
-                <i class="fas fa-plus"></i> Tambah Kelas
-            </a>
-            <a href="{{ route('tu.dashboard') }}" class="btn btn-secondary">Kembali</a>
-        </div>
     </div>
 
     <div class="card shadow">
@@ -35,7 +29,7 @@
                                 <td>{{ optional($k->jurusan)->nama }}</td>
                                 <td>{{ $k->rombels->count() }}</td>
                                 <td>
-                                    <a href="{{ route('tu.kelas.detail', $k->id) }}" class="btn btn-sm btn-info">Detail</a>
+                                    <a href="{{ route('kurikulum.kelas.show', $k->id) }}" class="btn btn-sm btn-info">Lihat</a>
                                 </td>
                             </tr>
                         @empty

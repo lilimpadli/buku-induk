@@ -161,6 +161,8 @@ Route::middleware('web')->group(function () {
 
             // Upload foto profil siswa
             Route::post('/profile/photo', [SiswaController::class, 'uploadPhoto'])->name('profile.photo');
+                // Hapus foto profil
+                Route::delete('/profile/photo', [SiswaController::class, 'deletePhoto'])->name('profile.photo.delete');
 
             // Cetak raport siswa sendiri
             Route::get('/nilai_raport/{siswa_id}/{semester}/{tahun}/cetak', [NilaiRaportController::class, 'exportPdf'])->name('raport.cetak_pdf');
@@ -205,6 +207,8 @@ Route::middleware('web')->group(function () {
                     ->name('nilai_raport.index');
                 Route::get('/nilai-raport/list/{id}', [NilaiRaportController::class, 'list'])
                     ->name('nilai_raport.list');
+                Route::get('/nilai-raport/{siswa_id}/{semester}/{tahun}/pdf', [NilaiRaportController::class, 'exportPdf'])
+                    ->name('nilai_raport.pdf');
                 Route::get('/nilai-raport/show', [NilaiRaportController::class, 'show'])
                     ->name('nilai_raport.show');
 
@@ -314,6 +318,11 @@ Route::middleware('web')->group(function () {
             Route::get('/siswa/{id}/edit', [TUController::class, 'siswaEdit'])->name('siswa.edit');
             Route::put('/siswa/{id}', [TUController::class, 'siswaUpdate'])->name('siswa.update');
             Route::delete('/siswa/{id}', [TUController::class, 'siswaDestroy'])->name('siswa.destroy');
+
+            // Route untuk guru (TU management)
+            Route::get('/guru', [TUController::class, 'guruIndex'])->name('guru.index');
+            Route::get('/guru/create', [TUController::class, 'guruCreate'])->name('guru.create');
+            Route::post('/guru', [TUController::class, 'guruStore'])->name('guru.store');
 
             // Route untuk kelas
             Route::get('/kelas', [TUController::class, 'kelas'])->name('kelas');

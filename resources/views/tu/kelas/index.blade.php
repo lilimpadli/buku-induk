@@ -6,12 +6,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>Daftar Kelas</h3>
-        <div>
-            <a href="{{ route('tu.kelas.create') }}" class="btn btn-primary me-2">
-                <i class="fas fa-plus"></i> Tambah Kelas
-            </a>
-            <a href="{{ route('tu.dashboard') }}" class="btn btn-secondary">Kembali</a>
-        </div>
+        <!-- Hapus tombol Tambah Kelas dan Kembali -->
     </div>
 
     <div class="card shadow">
@@ -20,24 +15,28 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
+                            <th>#</th>
                             <th>Tingkat</th>
                             <th>Jurusan</th>
+                            <th>Jumlah Rombel</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($kelas as $k)
+                        @forelse($kelas as $k)
                             <tr>
+                                <td>{{ $loop->iteration }}</td>
                                 <td>{{ $k->tingkat }}</td>
-                                <td>{{ $k->jurusan->nama }}</td>
+                                <td>{{ optional($k->jurusan)->nama }}</td>
+                                <td>{{ $k->rombels->count() }}</td>
                                 <td>
-                                   <a href="{{ route('tu.kelas.detail', $k->id) }}" class="btn btn-sm btn-info">
-    <i class="fas fa-eye"></i> Detail
-</a>
-                                    </a>
+                                    <!-- Ganti tombol Detail menjadi Lihat -->
+                                    <a href="{{ route('tu.kelas.detail', $k->id) }}" class="btn btn-sm btn-info">Lihat</a>
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr><td colspan="5" class="text-center">Belum ada kelas</td></tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

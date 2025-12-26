@@ -241,17 +241,12 @@
                                         <i class="fas fa-users"></i> <span class="label ms-2">ppdb</span>
                                     </a>
 
-
-                                    <a class="nav-link {{ request()->is('tu/wali-kelas*') ? 'active' : '' }}" href="{{ route('tu.wali-kelas') }}" data-bs-toggle="tooltip" title="Wali Kelas">
-                                        <i class="fas fa-chalkboard-teacher"></i> <span class="label ms-2">Wali Kelas</span>
-                                    </a>
-
-                                    <a class="nav-link {{ request()->is('tu/laporan-nilai*') ? 'active' : '' }}" href="{{ route('tu.laporan.nilai') }}" data-bs-toggle="tooltip" title="Laporan Nilai">
-                                        <i class="fas fa-chart-line"></i> <span class="label ms-2">Laporan Nilai</span>
-                                    </a>
-
                                     <a class="nav-link {{ request()->is('tu/kelas') ? 'active' : '' }}" href="{{ route('tu.kelas') }}" data-bs-toggle="tooltip" title="Manajemen Kelas">
                                         <i class="fas fa-plus-circle"></i> <span class="label ms-2">Manajemen Kelas</span>
+                                    </a>
+
+                                    <a class="nav-link {{ request()->is('tu.guru.index') ? 'active' : '' }}" href="{{ route('tu.guru.index') }}" data-bs-toggle="tooltip" title="Data Guru">
+                                        <i class="fas fa-plus-circle"></i> <span class="label ms-2">Data Guru</span>
                                     </a>
                                 @endif
 

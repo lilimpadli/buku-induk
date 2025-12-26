@@ -253,7 +253,18 @@
                         </div>
                     </div>
 
-                    <span class="badge bg-primary">Lihat Rapor</span>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('walikelas.nilai_raport.show', [
+                                'siswa_id' => $siswa->id,
+                                'semester' => $r->semester,
+                                'tahun' => $r->tahun_ajaran
+                            ]) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye me-1"></i> Lihat
+                        </a>
+                        <a href="{{ route('walikelas.nilai_raport.pdf', [$siswa->id, $r->semester, str_replace('/', '-', $r->tahun_ajaran)]) }}" target="_blank" class="btn btn-sm btn-primary">
+                            <i class="fas fa-file-pdf me-1"></i> Cetak PDF
+                        </a>
+                    </div>
 
                 </a>
             </div>

@@ -13,6 +13,7 @@ use App\Models\MataPelajaran;
 use App\Models\Rombel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class NilaiRaportController extends Controller
 {
@@ -58,6 +59,61 @@ class NilaiRaportController extends Controller
         }
 
         return view('walikelas.nilai_raport.index', compact('siswas'));
+    }
+
+    public function exportPdf($siswa_id, $semester, $tahun)
+    {
+        if (!$siswa_id || !$semester || !$tahun) {
+            abort(404, 'Parameter tidak lengkap.');
+        }
+
+        // convert tahun from URL-safe format (e.g. 2025-2026) back to stored format (2025/2026)
+        $tahun = str_replace('-', '/', $tahun);
+
+        $siswa = DataSiswa::findOrFail($siswa_id);
+
+        $nilaiRaports = NilaiRaport::with('mapel')
+            ->where('siswa_id', $siswa_id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->orderBy('mata_pelajaran_id')
+            ->get();
+
+        if ($nilaiRaports->isEmpty()) {
+            return redirect()->route('walikelas.nilai_raport.list', $siswa->id)
+                ->with('error', 'Data raport untuk semester ' . $semester . ' tahun ajaran ' . $tahun . ' tidak ditemukan');
+        }
+
+        $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa_id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->get();
+
+        $kehadiran = Kehadiran::where('siswa_id', $siswa_id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        $info = RaporInfo::where('siswa_id', $siswa_id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        $kenaikan = KenaikanKelas::with('rombelTujuan')
+            ->where('siswa_id', $siswa_id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        $pdf = Pdf::loadView('walikelas.nilai_raport.pdf', compact(
+            'siswa', 'semester', 'tahun', 'nilaiRaports', 'ekstra', 'kehadiran', 'info', 'kenaikan'
+        ))->setPaper('A4', 'portrait');
+
+        $safeNama = str_replace(['/', '\\'], '-', $siswa->nama_lengkap);
+        $safeTahun = str_replace(['/', '\\'], '-', $tahun);
+        $filename = 'Raport - ' . $safeNama . ' - ' . $semester . ' - ' . $safeTahun . '.pdf';
+
+        return $pdf->stream($filename);
     }
 
     public function list($id)

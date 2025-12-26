@@ -342,6 +342,38 @@ class SiswaController extends Controller
     }
 
     /**
+     * Hapus foto profil siswa
+     */
+    public function deletePhoto(Request $request)
+    {
+        $siswa = $this->getSiswaLogin();
+
+        if (!$siswa) {
+            return redirect()->back()->with('error', 'Data siswa tidak ditemukan.');
+        }
+
+        // Hapus file foto siswa jika ada
+        if ($siswa->foto && Storage::disk('public')->exists($siswa->foto)) {
+            Storage::disk('public')->delete($siswa->foto);
+        }
+
+        $siswa->foto = null;
+        $siswa->save();
+
+        // Sinkronkan juga kolom photo pada users
+        $user = Auth::user();
+        if ($user) {
+            if (!empty($user->photo) && Storage::disk('public')->exists($user->photo)) {
+                Storage::disk('public')->delete($user->photo);
+            }
+            $user->photo = null;
+            $user->save();
+        }
+
+        return redirect()->back()->with('success', 'Foto profil berhasil dihapus.');
+    }
+
+    /**
      * ============================
      *       RAPORT SISWA
      * ============================

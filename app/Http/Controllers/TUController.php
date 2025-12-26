@@ -15,6 +15,8 @@ use App\Models\Rombel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use App\Models\Guru;
+use Illuminate\Support\Facades\Validator;
 
 class TUController extends Controller
 {
@@ -96,6 +98,76 @@ class TUController extends Controller
     {
         $siswas = DataSiswa::with(['user', 'ayah', 'ibu', 'wali'])->latest()->paginate(10);
         return view('tu.siswa', compact('siswas'));
+    }
+
+    /**
+     * Daftar guru untuk TU
+     */
+    public function guruIndex()
+    {
+        $gurus = Guru::with('user')->latest()->paginate(15);
+        return view('tu.guru.index', compact('gurus'));
+    }
+
+    /**
+     * Form tambah guru
+     */
+    public function guruCreate()
+    {
+        $jurusan = Jurusan::all();
+        return view('tu.guru.create', compact('jurusan'));
+    }
+
+    /**
+     * Simpan guru (user + guru)
+     */
+    public function guruStore(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required|string|max:100',
+            'nik' => 'required|string|max:50|unique:users,nomor_induk',
+            'nip' => 'required|string|max:30|unique:gurus,nip',
+            'tempat_lahir' => 'nullable|string|max:100',
+            'tanggal_lahir' => 'nullable|date',
+            'jenis_kelamin' => 'required|in:L,P',
+            'alamat' => 'nullable|string',
+            'jurusan_id' => 'nullable|exists:jurusans,id',
+            'email' => 'nullable|email|unique:users,email',
+            'telepon' => 'nullable|string|max:30',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // create user (use NIK as nomor_induk)
+            $user = User::create([
+                'name' => $request->nama,
+                'nomor_induk' => $request->nik,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'guru',
+            ]);
+
+            // create guru record
+            $guru = Guru::create([
+                'nama' => $request->nama,
+                'nip' => $request->nip,
+                'email' => $request->email,
+                'telepon' => $request->telepon ?? null,
+                'tempat_lahir' => $request->tempat_lahir,
+                'tanggal_lahir' => $request->tanggal_lahir,
+                'jenis_kelamin' => $request->jenis_kelamin,
+                'alamat' => $request->alamat,
+                'jurusan_id' => $request->jurusan_id,
+                'user_id' => $user->id,
+            ]);
+
+            DB::commit();
+            return redirect()->route('tu.guru.index')->with('success', 'Guru berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
     
     /**
@@ -200,7 +272,6 @@ class TUController extends Controller
             $siswa->alamat = $request->alamat;
             $siswa->no_hp = $request->no_hp;
             $siswa->sekolah_asal = $request->sekolah_asal;
-            $siswa->kelas = $request->kelas;
             $siswa->tanggal_diterima = $request->tanggal_diterima;
             $siswa->ayah_id = $ayah->id;
             $siswa->ibu_id = $ibu->id;
@@ -292,7 +363,6 @@ class TUController extends Controller
             $siswa->alamat = $request->alamat;
             $siswa->no_hp = $request->no_hp;
             $siswa->sekolah_asal = $request->sekolah_asal;
-            $siswa->kelas = $request->kelas;
             $siswa->tanggal_diterima = $request->tanggal_diterima;
             
             // Update user data
@@ -433,7 +503,7 @@ class TUController extends Controller
     public function kelas()
     {
         $kelas = Kelas::with(['jurusan', 'rombels', 'waliKelas.user'])->get();
-        return view('tu.kelas', compact('kelas'));
+        return view('tu.kelas.index', compact('kelas'));
     }
 
     /**
@@ -464,16 +534,24 @@ class TUController extends Controller
     /**
      * Halaman detail kelas
      */
-    public function kelasDetail($id)
+    public function kelasDetail(Request $request, $id)
     {
-        $kelas = Kelas::with([
-            'jurusan',
-            'rombels.siswa' => function($query) {
-                $query->with(['ayah', 'ibu', 'wali']);
-            }
-        ])->findOrFail($id);
+        $kelas = Kelas::with('jurusan')->findOrFail($id);
 
-        return view('tu.kelas-detail', compact('kelas'));
+        $query = Rombel::with(['siswa' => function($q) {
+            $q->with(['ayah', 'ibu', 'wali']);
+        }, 'guru'])
+        ->where('kelas_id', $id);
+
+        if ($request->filled('q')) {
+            $q = $request->get('q');
+            $query->where('nama', 'like', "%{$q}%");
+        }
+
+        // Return all rombels for the kelas (no pagination) so UI can show/ search all
+        $rombels = $query->get();
+
+        return view('tu.kelas-detail', compact('kelas', 'rombels'));
     }
 
     /**
@@ -521,7 +599,10 @@ class TUController extends Controller
      */
     public function waliKelas()
     {
-        $waliKelas = WaliKelas::with(['user', 'kelas', 'jurusan', 'rombel'])
+        $waliKelas = WaliKelas::with(['user', 'rombel.kelas'])
+            ->whereHas('user', function ($q) {
+                $q->where('role', 'walikelas');
+            })
             ->latest()
             ->paginate(10);
 

@@ -1,14 +1,40 @@
-1. Siswa ✅
-2. Wali kelas : 
-* cetak raport malah not found jiirr, si link nya lagi yang bermasalah...)
+1. Siswa : ✅
+2. Wali kelas : ✅
 3. TU : 
 * gak bisa nambah siswa(jir)
-* PPDB belum kah(?)
 * Nilai raport belum muncul
 * tu jadi di guru bisa edit, ngeditnya tuh bisa nentuin guru itu jadi apa kecuali siswa, misal ke kelas mau ngewali kelasan mana, lamun kaprog mau di jurusan mana
-4. Kurikulum 
+4. Kurikulum :
 * Manajemen jurusan, jurusan dpib masih ada 2
 * Belum ada fitur tambah akun dan daftar guru
 * Belum bisa lihat raport
 * Di tambah siswa hapus pilih user, paling nambah table nis sama nisn, sama kurang lengkap data yang dibutuhin
-5. Kaprog✅
+5. Kaprog : ✅
+
+review
+1. Siswa
+* Data diri di status keluarga jadiin drop down 
+* Foto dan status keluarga error / gak kesimpen
+* Munculin pesan error (kalo misal ada file yang belom di upload)
+* Di tahun ajar tambahin kelas berapa (halaman liat raport)
+* TTD hasil cetak raport 
+* Pop up setiap aksi
+2. TU
+* Pop up setiap aksi 
+* Filter buat data siswa dan guru
+* Tambahkan menu pencarian 
+* Status aktif tidak aktif siswa
+* Tambahkan export Exel data siswa
+3. Kurikulum 
+* Pop up setiap aksi 
+* Tambahkan export Exel data guru
+* Sesi PPDB tambahin buat nonaktif dan gak aktif
+4. Wali kelas
+* Pop up setiap aksi 
+* Raport di wali kelas, pindahin kelas ke table raport
+* TTD hasil cetak raport 
+5. Landing page 
+* Bagian di deskripsi PPDB tambahin data base
+6. Kaprog✅
+7. All
+* Tampilannya harus sesuai (TU dan kurikulum)

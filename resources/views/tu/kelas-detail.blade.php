@@ -56,45 +56,55 @@
     {{-- DAFTAR ROMBEL --}}
     <div class="card shadow">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Daftar Rombel</h5>
-            <span class="badge bg-primary">
-                Total {{ $kelas->rombels->sum(fn($r) => $r->siswa->count()) }} Siswa
-            </span>
-        </div>
-
-        <div class="card-body">
-
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Nama Rombel</th>
-                            <th>Jumlah Siswa</th>
-                            <th>Wali Kelas</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($kelas->rombels as $rombel)
-                        <tr>
-                            <td>{{ $rombel->nama }}</td>
-                            <td>{{ $rombel->siswa->count() }} siswa</td>
-                            <td>{{ $rombel->waliKelas->name ?? '-' }}</td>
-                            <td>
-                                <button 
-                                    class="btn btn-sm btn-primary"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modalRombel{{ $rombel->id }}">
-                                    <i class="fas fa-users"></i> Lihat Siswa
-                                </button>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                <h5 class="mb-0">Daftar Rombel</h5>
+                <div class="d-flex align-items-center">
+                    <form class="me-3" method="GET" action="{{ route('tu.kelas.detail', $kelas->id) }}">
+                        <div class="input-group">
+                            <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-sm" placeholder="Cari rombel...">
+                            <button class="btn btn-sm btn-outline-secondary" type="submit">Cari</button>
+                        </div>
+                    </form>
+                    <span class="badge bg-primary">
+                        Total {{ $rombels->sum(fn($r) => $r->siswa->count()) }} Siswa
+                    </span>
+                </div>
             </div>
 
-        </div>
+            <div class="card-body">
+
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Nama Rombel</th>
+                                <th>Jumlah Siswa</th>
+                                <th>Wali Kelas</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($rombels as $rombel)
+                            <tr>
+                                <td>{{ $rombel->nama }}</td>
+                                <td>{{ $rombel->siswa->count() }} siswa</td>
+                                <td>{{ $rombel->waliKelas->name ?? '-' }}</td>
+                                <td>
+                                    <button 
+                                        class="btn btn-sm btn-primary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalRombel{{ $rombel->id }}">
+                                        <i class="fas fa-users"></i> Lihat Siswa
+                                    </button>
+                                </td>
+                            </tr>
+                            @empty
+                                <tr><td colspan="4" class="text-center">Belum ada rombel.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
     </div>
 
 </div>
@@ -103,7 +113,7 @@
 {{-- ========================= --}}
 {{-- MODAL SEMUA ROMBEL        --}}
 {{-- ========================= --}}
-@foreach ($kelas->rombels as $rombel)
+@foreach ($rombels as $rombel)
 <div class="modal fade" id="modalRombel{{ $rombel->id }}" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
