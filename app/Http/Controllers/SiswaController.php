@@ -477,7 +477,11 @@ class SiswaController extends Controller
             'kenaikan'
         ))->setPaper('A4', 'portrait');
 
-        return $pdf->stream('Raport - ' . $siswa->nama_lengkap . ' - ' . $semester . ' - ' . $tahun . '.pdf');
+        // filename for Content-Disposition must not contain '/' or '\\', sanitize it
+        $safeTahun = str_replace(["/", "\\"], '-', $tahun);
+        $filename = 'Raport - ' . $siswa->nama_lengkap . ' - ' . $semester . ' - ' . $safeTahun . '.pdf';
+
+        return $pdf->stream($filename);
     }
 
     public function catatan()

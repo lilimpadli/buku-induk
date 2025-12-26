@@ -1,0 +1,14 @@
+1. Siswa ✅
+2. Wali kelas : 
+* cetak raport malah not found jiirr, si link nya lagi yang bermasalah...)
+3. TU : 
+* gak bisa nambah siswa(jir)
+* PPDB belum kah(?)
+* Nilai raport belum muncul
+* tu jadi di guru bisa edit, ngeditnya tuh bisa nentuin guru itu jadi apa kecuali siswa, misal ke kelas mau ngewali kelasan mana, lamun kaprog mau di jurusan mana
+4. Kurikulum 
+* Manajemen jurusan, jurusan dpib masih ada 2
+* Belum ada fitur tambah akun dan daftar guru
+* Belum bisa lihat raport
+* Di tambah siswa hapus pilih user, paling nambah table nis sama nisn, sama kurang lengkap data yang dibutuhin
+5. Kaprog✅
