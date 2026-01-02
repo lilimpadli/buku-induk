@@ -65,8 +65,46 @@ class InputNilaiRaportController extends Controller
     {
         $siswa = DataSiswa::findOrFail($siswa_id);
 
-        $kelompokA = MataPelajaran::where('kelompok', 'A')->orderBy('urutan')->get();
-        $kelompokB = MataPelajaran::where('kelompok', 'B')->orderBy('urutan')->get();
+        // default: all mapel by kelompok
+        $kelompokA = MataPelajaran::where('kelompok', 'A')->orderBy('urutan');
+        $kelompokB = MataPelajaran::where('kelompok', 'B')->orderBy('urutan');
+
+        // jika siswa memiliki rombel->kelas, filter mapel berdasarkan tingkat angkatan
+        if ($siswa->rombel && $siswa->rombel->kelas) {
+            $currentKelas = $siswa->rombel->kelas;
+            $currentTingkat = (string) $currentKelas->tingkat;
+
+            $toInt = function($t) {
+                $map = ['I'=>1,'II'=>2,'III'=>3,'IV'=>4,'V'=>5,'VI'=>6,'VII'=>7,'VIII'=>8,'IX'=>9,'X'=>10,'XI'=>11,'XII'=>12];
+                $tUp = strtoupper(trim($t));
+                if (is_numeric($tUp)) return (int)$tUp;
+                if (isset($map[$tUp])) return $map[$tUp];
+                return null;
+            };
+            $fromInt = function($n) {
+                $map = [1=>'I',2=>'II',3=>'III',4=>'IV',5=>'V',6=>'VI',7=>'VII',8=>'VIII',9=>'IX',10=>'X',11=>'XI',12=>'XII'];
+                return $map[$n] ?? (string)$n;
+            };
+
+            $opts = [(string)$currentTingkat];
+            $cur = $toInt($currentTingkat);
+            if ($cur !== null) {
+                $opts[] = (string) $cur;
+                $opts[] = $fromInt($cur);
+            }
+            $opts = array_values(array_unique(array_filter($opts)));
+
+            $kelompokA = $kelompokA->whereHas('tingkats', function($q) use ($opts) {
+                $q->whereIn('tingkat', $opts);
+            });
+
+            $kelompokB = $kelompokB->whereHas('tingkats', function($q) use ($opts) {
+                $q->whereIn('tingkat', $opts);
+            });
+        }
+
+        $kelompokA = $kelompokA->get();
+        $kelompokB = $kelompokB->get();
 
         // ambil jurusan + rombels beserta relasi kelas supaya bisa difilter per jurusan
         $jurusans = Jurusan::orderBy('nama')->get();
@@ -271,8 +309,44 @@ class InputNilaiRaportController extends Controller
             ->where('tahun_ajaran', $tahun)
             ->first();
 
-        $kelompokA = MataPelajaran::where('kelompok','A')->orderBy('urutan')->get();
-        $kelompokB = MataPelajaran::where('kelompok','B')->orderBy('urutan')->get();
+        // default: all mapel by kelompok, but prefer filtering by siswa rombel->kelas->tingkat
+        $kelompokA = MataPelajaran::where('kelompok','A')->orderBy('urutan');
+        $kelompokB = MataPelajaran::where('kelompok','B')->orderBy('urutan');
+
+        if ($siswa->rombel && $siswa->rombel->kelas) {
+            $currentKelas = $siswa->rombel->kelas;
+            $currentTingkat = (string) $currentKelas->tingkat;
+
+            $toInt = function($t) {
+                $map = ['I'=>1,'II'=>2,'III'=>3,'IV'=>4,'V'=>5,'VI'=>6,'VII'=>7,'VIII'=>8,'IX'=>9,'X'=>10,'XI'=>11,'XII'=>12];
+                $tUp = strtoupper(trim($t));
+                if (is_numeric($tUp)) return (int)$tUp;
+                if (isset($map[$tUp])) return $map[$tUp];
+                return null;
+            };
+            $fromInt = function($n) {
+                $map = [1=>'I',2=>'II',3=>'III',4=>'IV',5=>'V',6=>'VI',7=>'VII',8=>'VIII',9=>'IX',10=>'X',11=>'XI',12=>'XII'];
+                return $map[$n] ?? (string)$n;
+            };
+
+            $opts = [(string)$currentTingkat];
+            $cur = $toInt($currentTingkat);
+            if ($cur !== null) {
+                $opts[] = (string) $cur;
+                $opts[] = $fromInt($cur);
+            }
+            $opts = array_values(array_unique(array_filter($opts)));
+
+            $kelompokA = $kelompokA->whereHas('tingkats', function($q) use ($opts) {
+                $q->whereIn('tingkat', $opts);
+            });
+            $kelompokB = $kelompokB->whereHas('tingkats', function($q) use ($opts) {
+                $q->whereIn('tingkat', $opts);
+            });
+        }
+
+        $kelompokA = $kelompokA->get();
+        $kelompokB = $kelompokB->get();
 
         // juga kirim jurusan + rombels + rombelsFiltered untuk edit
         $jurusans = Jurusan::orderBy('nama')->get();

@@ -21,4 +21,10 @@ class Jurusan extends Model
     {
         return $this->hasMany(\App\Models\Kelas::class, 'jurusan_id');
     }
+
+    // Relasi: satu jurusan punya banyak guru
+    public function gurus()
+    {
+        return $this->hasMany(\App\Models\Guru::class, 'jurusan_id');
+    }
 }

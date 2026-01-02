@@ -30,14 +30,14 @@
         <tr>
             <th>NISN</th>
             <td>{{ $siswa->nisn }}</td>
-            <th>Semester</th>
-            <td>{{ $semester }}</td>
+            <th>Jurusan</th>
+            <td>{{ $siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan ? $siswa->rombel->kelas->jurusan->nama : '-' }}</td>
         </tr>
         <tr>
+            <th>Semester</th>
+            <td>{{ $semester }}</td>
             <th>Tahun Pelajaran</th>
             <td>{{ $tahun }}</td>
-            <th></th>
-            <td></td>
         </tr>
     </table>
 

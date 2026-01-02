@@ -1,63 +1,68 @@
 @extends('layouts.app')
 
-@section('title', 'Manajemen Siswa')
+@section('title', 'Daftar Siswa')
 
 @section('content')
-<div class="container-fluid">
-    <h2 class="fw-bold mb-1">Manajemen Data Siswa</h2>
-    <p class="text-muted mb-4">Kelola data siswa dengan mudah. Anda dapat menambah, mengubah, dan menghapus data.</p>
-
-    <!-- BUTTON AKSI -->
-    <div class="d-flex gap-2 mb-4">
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Daftar Siswa</h3>
         <a href="{{ route('kurikulum.data-siswa.create') }}" class="btn btn-primary">
-            <i class="fa fa-plus me-2"></i> Input Data Siswa
+            <i class="fas fa-plus me-1"></i> Tambah Siswa
         </a>
     </div>
 
-    <!-- CARD TABEL -->
-    <div class="card shadow-sm border-0" style="border-radius: 15px;">
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <div class="card shadow">
         <div class="card-body">
-            <!-- TABLE -->
             <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead class="table-light">
+                <table class="table table-striped">
+                    <thead>
                         <tr>
                             <th>NIS</th>
                             <th>Nama Lengkap</th>
-                            <th class="text-center">Aksi</th>
+                            <th>Kelas</th>
+                            <th>Jenis Kelamin</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($siswa as $item)
-                        <tr>
-                            <td>{{ $item->nisn }}</td>
-                            <td>{{ $item->nis }}</td>
-                            <td>{{ $item->nama_lengkap }}</td>
-                            <td>{{ $item->rombel->nama ?? '-' }}</td>
-                            <td>{{ $item->tanggal_diterima }}</td>
-                            <td class="text-center">
-                                <a href="{{ route('kurikulum.data-siswa.show', $item->id) }}" class="text-dark me-2" title="Lihat">
-                                    <i class="fa fa-eye"></i>
-                                </a>
-                                <a href="{{ route('kurikulum.data-siswa.edit', $item->id) }}" class="text-dark me-2" title="Edit">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <form action="{{ route('kurikulum.data-siswa.destroy', $item->id) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-danger" title="Hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="6" class="text-center">Tidak ada data siswa</td>
-                        </tr>
-                        @endforelse
+                        @foreach ($siswas as $siswa)
+                            <tr>
+                                <td>{{ $siswa->nis }}</td>
+                                <td>{{ $siswa->nama_lengkap }}</td>
+                                <td>{{ $siswa->kelas }}</td>
+                                <td>{{ $siswa->jenis_kelamin }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ route('kurikulum.data-siswa.show', $siswa->id) }}" class="btn btn-sm btn-info" title="Detail">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('kurikulum.data-siswa.edit', $siswa->id) }}" class="btn btn-sm btn-warning" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('kurikulum.data-siswa.destroy', $siswa->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data siswa ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
+            </div>
+            
+            <div class="d-flex justify-content-center mt-3">
+                {{ $siswas->links() }}
             </div>
         </div>
     </div>

@@ -233,25 +233,20 @@
                                         <i class="fas fa-gauge"></i> <span class="label ms-2">Dashboard</span>
                                     </a>
 
-                                    <a class="nav-link {{ request()->is('tu/siswa*') ? 'active' : '' }}" href="{{ route('tu.siswa') }}" data-bs-toggle="tooltip" title="Data Siswa">
+                                    <a class="nav-link {{ request()->is('tu/siswa*') ? 'active' : '' }}" href="{{ route('tu.siswa.index') }}" data-bs-toggle="tooltip" title="Data Siswa">
                                         <i class="fas fa-users"></i> <span class="label ms-2">Data Siswa</span>
                                     </a>
 
 <a class="nav-link {{ request()->is('tu/siswa*') ? 'active' : '' }}" href="{{ route('tu.ppdb.index') }}" data-bs-toggle="tooltip" title="Data Siswa">
-                                        <i class="fas fa-users"></i> <span class="label ms-2">ppdb</span>
+                                        <i class="fas fa-users"></i> <span class="label ms-2">PPDB</span>
                                     </a>
 
-
-                                    <a class="nav-link {{ request()->is('tu/wali-kelas*') ? 'active' : '' }}" href="{{ route('tu.wali-kelas') }}" data-bs-toggle="tooltip" title="Wali Kelas">
-                                        <i class="fas fa-chalkboard-teacher"></i> <span class="label ms-2">Wali Kelas</span>
-                                    </a>
-
-                                    <a class="nav-link {{ request()->is('tu/laporan-nilai*') ? 'active' : '' }}" href="{{ route('tu.laporan.nilai') }}" data-bs-toggle="tooltip" title="Laporan Nilai">
-                                        <i class="fas fa-chart-line"></i> <span class="label ms-2">Laporan Nilai</span>
-                                    </a>
-
-                                    <a class="nav-link {{ request()->is('tu/kelas') ? 'active' : '' }}" href="{{ route('tu.kelas') }}" data-bs-toggle="tooltip" title="Manajemen Kelas">
+                                    <a class="nav-link {{ request()->is('tu/kelas') ? 'active' : '' }}" href="{{ route('tu.kelas.index') }}" data-bs-toggle="tooltip" title="Manajemen Kelas">
                                         <i class="fas fa-plus-circle"></i> <span class="label ms-2">Manajemen Kelas</span>
+                                    </a>
+
+                                    <a class="nav-link {{ request()->is('tu.guru.index') ? 'active' : '' }}" href="{{ route('tu.guru.index') }}" data-bs-toggle="tooltip" title="Data Guru">
+                                        <i class="fas fa-plus-circle"></i> <span class="label ms-2">Data Guru</span>
                                     </a>
                                 @endif
 
@@ -269,13 +264,23 @@
                                         <i class="fas fa-users"></i> <span class="label ms-2">Manajemen Siswa</span>
                                     </a>
 
+                                    <a href="{{ route('kurikulum.ppdb.index') }}" class="nav-link {{ request()->routeIs('kurikulum.ppdb*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen PPDB">
+                                        <i class="fas fa-users"></i> <span class="label ms-2">PPDB</span>
+                                    </a>
+
                                      <a href="{{ route('kurikulum.jurusan.index') }}" class="nav-link {{ request()->routeIs('kurikulum.jurusan*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Jurusan">
                                         <i class="fas fa-users"></i> <span class="label ms-2">Manajemen Jurusan</span>
                                     </a>
 
-                                    <a href="{{ route('kurikulum.rapor.index') }}" class="nav-link {{ request()->routeIs('kurikulum.rapor*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Lihat Nilai Raport">
-                                        <i class="fas fa-file-lines"></i> <span class="label ms-2">Lihat Nilai Raport</span>
+                                     <a href="{{ route('kurikulum.guru.index') }}" class="nav-link {{ request()->routeIs('kurikulum.guru*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Guru">
+                                        <i class="fas fa-users"></i> <span class="label ms-2">Manajemen Guru</span>
                                     </a>
+
+                                      <a href="{{ route('kurikulum.mata-pelajaran.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mata-pelajaran*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Mata Pelajaran">
+                                        <i class="fas fa-users"></i> <span class="label ms-2">Manajemen Mata Pelajaran</span>
+                                    </a>
+
+                                    
                                 @endif
 
                             </nav>

@@ -268,7 +268,6 @@
                         <tr>
                             <th>No</th>
                             <th>Mata Pelajaran</th>
-                            <th>KKM</th>
                             <th>Nilai Akhir</th>
                             <th>Capaian Kompetensi</th>
                         </tr>
@@ -278,7 +277,6 @@
                             <tr>
                                 <td class="text-center">{{ $index + 1 }}</td>
                                 <td>{{ $nilai->mapel->nama }}</td>
-                                <td class="text-center">{{ $nilai->mapel->kkm }}</td>
                                 <td class="text-center">{{ $nilai->nilai_akhir }}</td>
                                 <td>{{ $nilai->deskripsi }}</td>
                             </tr>
@@ -299,7 +297,6 @@
                         <tr>
                             <th>No</th>
                             <th>Mata Pelajaran</th>
-                            <th>KKM</th>
                             <th>Nilai Akhir</th>
                             <th>Capaian Kompetensi</th>
                         </tr>
@@ -309,7 +306,6 @@
                             <tr>
                                 <td class="text-center">{{ $index + 1 }}</td>
                                 <td>{{ $nilai->mapel->nama }}</td>
-                                <td class="text-center">{{ $nilai->mapel->kkm }}</td>
                                 <td class="text-center">{{ $nilai->nilai_akhir }}</td>
                                 <td>{{ $nilai->deskripsi }}</td>
                             </tr>

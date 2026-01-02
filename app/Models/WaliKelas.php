@@ -38,6 +38,14 @@ class WaliKelas extends Model
 
     public function rombel()
     {
-        return $this->belongsTo(Rombel::class, 'rombel_id');
+        // The `gurus` table doesn't have a `rombel_id` column.
+        // Rombel records reference the guru via `guru_id`, so provide
+        // a hasOne (primary rombel) and hasMany (all rombels) relations.
+        return $this->hasOne(Rombel::class, 'guru_id', 'id');
+    }
+
+    public function rombels()
+    {
+        return $this->hasMany(Rombel::class, 'guru_id', 'id');
     }
 }

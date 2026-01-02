@@ -71,6 +71,13 @@
                                                     <a href="{{ route('siswa.raport.show', ['semester' => 'Genap', 'tahun' => str_replace('/','-',$raport->tahun_ajaran)]) }}" class="btn btn-outline-primary">
                                                         <i class="fas fa-file-alt me-2"></i> Semester Genap
                                                     </a>
+
+                                                    <a href="{{ route('siswa.raport.pdf', ['semester' => 'Ganjil', 'tahun' => str_replace('/','-',$raport->tahun_ajaran)]) }}" class="btn btn-outline-danger" target="_blank">
+                                                        <i class="bi bi-file-earmark-pdf me-2"></i> Cetak PDF Ganjil
+                                                    </a>
+                                                    <a href="{{ route('siswa.raport.pdf', ['semester' => 'Genap', 'tahun' => str_replace('/','-',$raport->tahun_ajaran)]) }}" class="btn btn-outline-danger" target="_blank">
+                                                        <i class="bi bi-file-earmark-pdf me-2"></i> Cetak PDF Genap
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>

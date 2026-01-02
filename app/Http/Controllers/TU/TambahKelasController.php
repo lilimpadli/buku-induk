@@ -39,6 +39,6 @@ class TambahKelasController extends Controller
 
         Kelas::create($validated);
         
-        return redirect()->route('tu.kelas')->with('success', 'Kelas berhasil ditambahkan');
+        return redirect()->route('tu.kelas.index')->with('success', 'Kelas berhasil ditambahkan');
     }
 }

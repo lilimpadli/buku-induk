@@ -161,6 +161,8 @@ Route::middleware('web')->group(function () {
 
             // Upload foto profil siswa
             Route::post('/profile/photo', [SiswaController::class, 'uploadPhoto'])->name('profile.photo');
+                // Hapus foto profil
+                Route::delete('/profile/photo', [SiswaController::class, 'deletePhoto'])->name('profile.photo.delete');
 
             // Cetak raport siswa sendiri
             Route::get('/nilai_raport/{siswa_id}/{semester}/{tahun}/cetak', [NilaiRaportController::class, 'exportPdf'])->name('raport.cetak_pdf');
@@ -205,6 +207,8 @@ Route::middleware('web')->group(function () {
                     ->name('nilai_raport.index');
                 Route::get('/nilai-raport/list/{id}', [NilaiRaportController::class, 'list'])
                     ->name('nilai_raport.list');
+                Route::get('/nilai-raport/{siswa_id}/{semester}/{tahun}/pdf', [NilaiRaportController::class, 'exportPdf'])
+                    ->name('nilai_raport.pdf');
                 Route::get('/nilai-raport/show', [NilaiRaportController::class, 'show'])
                     ->name('nilai_raport.show');
 
@@ -306,20 +310,34 @@ Route::middleware('web')->group(function () {
             // Dashboard
             Route::get('/dashboard', [TUController::class, 'dashboard'])->name('dashboard');
 
+            // Route untuk guru (TU management)
+            Route::get('/guru', [TUController::class, 'guruIndex'])->name('guru.index');
+            Route::get('/guru/create', [TUController::class, 'guruCreate'])->name('guru.create');
+            Route::post('/guru', [TUController::class, 'guruStore'])->name('guru.store');
+            Route::get('/guru/{id}/edit', [TUController::class, 'guruEdit'])->name('guru.edit');
+            Route::put('/guru/{id}', [TUController::class, 'guruUpdate'])->name('guru.update');
+            Route::delete('/guru/{id}', [TUController::class, 'guruDestroy'])->name('guru.destroy');
+
             // Route untuk siswa
-            Route::get('/siswa', [TUController::class, 'siswa'])->name('siswa');
+            Route::get('/siswa', [TUController::class, 'siswa'])->name('siswa.index');
             Route::get('/siswa/create', [TUController::class, 'siswaCreate'])->name('siswa.create');
             Route::post('/siswa', [TUController::class, 'siswaStore'])->name('siswa.store');
             Route::get('/siswa/{id}', [TUController::class, 'siswaDetail'])->name('siswa.detail');
+            Route::get('/siswa/{id}/raport', [TUController::class, 'siswaRaport'])->name('siswa.raport');
             Route::get('/siswa/{id}/edit', [TUController::class, 'siswaEdit'])->name('siswa.edit');
             Route::put('/siswa/{id}', [TUController::class, 'siswaUpdate'])->name('siswa.update');
             Route::delete('/siswa/{id}', [TUController::class, 'siswaDestroy'])->name('siswa.destroy');
 
+            // Route untuk guru (TU management)
+            Route::get('/guru', [TUController::class, 'guruIndex'])->name('guru.index');
+            Route::get('/guru/create', [TUController::class, 'guruCreate'])->name('guru.create');
+            Route::post('/guru', [TUController::class, 'guruStore'])->name('guru.store');
+
             // Route untuk kelas
-            Route::get('/kelas', [TUController::class, 'kelas'])->name('kelas');
+            Route::get('/kelas', [TUController::class, 'kelas'])->name('kelas.index');
             Route::get('/kelas/create', [TUController::class, 'kelasCreate'])->name('kelas.create');
             Route::post('/kelas', [TUController::class, 'kelasStore'])->name('kelas.store');
-            Route::get('/kelas/{id}', [TUController::class, 'kelasDetail'])->name('kelas.detail');
+            Route::get('/kelas/{id}', [TUController::class, 'kelasDetail'])->name('kelas.show');
             Route::get('/kelas/{id}/edit', [TUController::class, 'kelasEdit'])->name('kelas.edit');
             Route::put('/kelas/{id}', [TUController::class, 'kelasUpdate'])->name('kelas.update');
             Route::delete('/kelas/{id}', [TUController::class, 'kelasDestroy'])->name('kelas.destroy');
@@ -343,6 +361,17 @@ Route::middleware('web')->group(function () {
             Route::get('/ppdb/jurusan/{jurusanId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarJalur'])->name('ppdb.jurusan.jalur.pendaftar');
             Route::get('/ppdb/{id}/assign', [PpdbController::class, 'showAssignForm'])->name('ppdb.assign.form');
             Route::post('/ppdb/{id}/assign', [PpdbController::class, 'assign'])->name('ppdb.assign');
+
+            // Nilai Raport (TU) - mimic walikelas routes for TU role
+            Route::get('/nilai-raport', [TUController::class, 'nilaiRaportIndex'] ?? [TUController::class, 'nilaiRaportIndex'])->name('nilai_raport.index');
+            Route::get('/nilai-raport/list/{id}', [TUController::class, 'siswaRaport'])->name('nilai_raport.list');
+            Route::get('/nilai-raport/show', [TUController::class, 'nilaiRaportShow'])->name('nilai_raport.show');
+            Route::get('/nilai-raport/edit', [TUController::class, 'nilaiRaportEdit'])->name('nilai_raport.edit');
+            Route::put('/nilai-raport/update', [TUController::class, 'nilaiRaportUpdate'])->name('nilai_raport.update');
+            Route::delete('/nilai-raport/delete', [TUController::class, 'nilaiRaportDestroy'])->name('nilai_raport.destroy');
+
+            // Cetak rapor (TU)
+            Route::get('/rapor/{siswa_id}/{semester}/{tahun}/cetak', [\App\Http\Controllers\RaporController::class, 'cetakRapor'])->name('rapor.cetak');
         });
 
         /*
@@ -352,8 +381,44 @@ Route::middleware('web')->group(function () {
         */
         Route::prefix('kurikulum')->name('kurikulum.')->group(function () {
 
+            // PPDB (Kurikulum) - allow Kurikulum users to manage PPDB
+            Route::get('/ppdb', [PpdbController::class, 'index'])->name('ppdb.index');
+
             Route::get('/dashboard', [KurikulumDashboardController::class, 'index'])
                 ->name('dashboard');
+
+            // Guru management (Kurikulum)
+            Route::get('/guru', [App\Http\Controllers\Kurikulum\GuruController::class, 'index'])
+                ->name('guru.index');
+
+            // Backwards-compatible "manage" routes used by views/controllers
+            Route::prefix('guru/manage')->name('guru.manage.')->group(function () {
+                Route::get('/', [App\Http\Controllers\Kurikulum\GuruController::class, 'index'])->name('index');
+                Route::get('/create', [App\Http\Controllers\Kurikulum\GuruController::class, 'create'])->name('create');
+                Route::post('/', [App\Http\Controllers\Kurikulum\GuruController::class, 'store'])->name('store');
+                Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\GuruController::class, 'edit'])->name('edit');
+                Route::put('/{id}', [App\Http\Controllers\Kurikulum\GuruController::class, 'update'])->name('update');
+                Route::delete('/{id}', [App\Http\Controllers\Kurikulum\GuruController::class, 'destroy'])->name('destroy');
+            });
+
+            // Mata Pelajaran (Kurikulum)
+            Route::prefix('mata-pelajaran')->name('mata-pelajaran.')->group(function () {
+                Route::get('/', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'index'])->name('index');
+                Route::get('/create', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'create'])->name('create');
+                Route::post('/', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'store'])->name('store');
+                Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'edit'])->name('edit');
+                Route::put('/{id}', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'update'])->name('update');
+                Route::delete('/{id}', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'destroy'])->name('destroy');
+            });
+
+            // PPDB (Kurikulum) - jurusan and assign routes
+            Route::get('/ppdb', [PpdbController::class, 'index'])->name('ppdb.index');
+            Route::get('/ppdb/jurusan/{id}', [PpdbController::class, 'showJurusan'])->name('ppdb.jurusan.show');
+            Route::get('/ppdb/jurusan/{id}/pendaftar', [PpdbController::class, 'showPendaftarJurusan'])->name('ppdb.jurusan.pendaftar');
+            Route::get('/ppdb/jurusan/{jurusanId}/sesi/{sesiId}', [PpdbController::class, 'showPendaftarSesi'])->name('ppdb.jurusan.sesi.pendaftar');
+            Route::get('/ppdb/jurusan/{jurusanId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarJalur'])->name('ppdb.jurusan.jalur.pendaftar');
+            Route::get('/ppdb/{id}/assign', [PpdbController::class, 'showAssignForm'])->name('ppdb.assign.form');
+            Route::post('/ppdb/{id}/assign', [PpdbController::class, 'assign'])->name('ppdb.assign');
 
             Route::get('/siswa', [KurikulumSiswaController::class, 'index'])
                 ->name('siswa.index');

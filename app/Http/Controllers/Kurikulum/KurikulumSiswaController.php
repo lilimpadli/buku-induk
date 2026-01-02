@@ -7,24 +7,29 @@ use App\Http\Controllers\Controller;
 use App\Models\DataSiswa;
 use App\Models\User;
 use App\Models\Rombel;
+use App\Models\Kelas;
+use App\Models\Jurusan;
 use Illuminate\Http\Request;
 
 class KurikulumSiswaController extends Controller
 {
     public function index()
     {
-        $siswa = DataSiswa::with(['user', 'ayah', 'ibu', 'wali', 'rombel'])
+        $siswas = DataSiswa::with(['user', 'ayah', 'ibu', 'wali', 'rombel'])
             ->latest()
             ->paginate(15);
 
-        return view('kurikulum.siswa.index', compact('siswa'));
+        return view('kurikulum.siswa.index', compact('siswas'));
     }
 
     public function create()
     {
         $users = User::where('role', 'siswa')->get();
         $rombels = Rombel::all();
-        return view('kurikulum.siswa.create', compact('users','rombels'));
+        $kelas = Kelas::with('jurusan')->get();
+        $jurusans = Jurusan::all();
+
+        return view('kurikulum.siswa.create', compact('users','rombels','kelas','jurusans'));
     }
 
     public function store(Request $request)
@@ -57,7 +62,10 @@ class KurikulumSiswaController extends Controller
         $siswa = DataSiswa::findOrFail($id);
         $users = User::where('role', 'siswa')->get();
         $rombels = Rombel::all();
-        return view('kurikulum.siswa.edit', compact('siswa','users','rombels'));
+        $kelas = Kelas::with('jurusan')->get();
+        $jurusans = Jurusan::all();
+
+        return view('kurikulum.siswa.edit', compact('siswa','users','rombels','kelas','jurusans'));
     }
 
     public function update(Request $request, $id)

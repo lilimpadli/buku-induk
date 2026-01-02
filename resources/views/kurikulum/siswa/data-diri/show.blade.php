@@ -4,8 +4,56 @@
 
 @section('content')
 <div class="container-fluid">
-    <h2 class="fw-bold mb-1">Detail Siswa</h2>
-    <p class="text-muted mb-4">{{ $siswa->nama_lengkap }}</p>
+    <div class="d-flex align-items-start justify-content-between">
+        <div>
+            <h2 class="fw-bold mb-1">Detail Siswa</h2>
+            <p class="text-muted mb-4">{{ $siswa->nama_lengkap }}</p>
+        </div>
+        <div class="ms-3">
+            <a href="{{ route('tu.siswa.edit', $siswa->id) }}" class="btn btn-warning me-2">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{{ route('tu.siswa.raport', $siswa->id) }}" class="btn btn-primary">
+                <i class="fas fa-file-alt"></i> Raport
+            </a>
+        </div>
+    </div>
+
+        @if(session('success') || session('error'))
+                <!-- Flash modal -->
+                <div class="modal fade" id="flashModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-sm modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Status</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                @if(session('success'))
+                                        <div class="text-success">{{ session('success') }}</div>
+                                @else
+                                        <div class="text-danger">{{ session('error') }}</div>
+                                @endif
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                                try {
+                                        var m = new bootstrap.Modal(document.getElementById('flashModal'));
+                                        m.show();
+                                } catch (e) {
+                                        // fallback
+                                        var msg = {!! json_encode(session('success') ?? session('error')) !!};
+                                        if (msg) alert(msg);
+                                }
+                        });
+                </script>
+        @endif
 
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" id="siswaTabs" role="tablist">
@@ -150,9 +198,5 @@
         </div>
     </div>
 
-    <div class="mt-4">
-        <a href="{{ route('kurikulum.siswa.index') }}" class="btn btn-secondary">Kembali</a>
-        <a href="{{ route('kurikulum.data-siswa.edit', $siswa->id) }}" class="btn btn-primary">Edit Siswa</a>
-    </div>
 </div>
 @endsection

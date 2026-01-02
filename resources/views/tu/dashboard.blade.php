@@ -86,13 +86,13 @@
             <div class="card shadow">
                 <div class="card-body">
                     <div class="d-flex flex-wrap gap-2">
-                        <a href="{{ route('tu.kelas') }}" class="btn btn-primary">
+                        <a href="{{ route('tu.kelas.index') }}" class="btn btn-primary">
                             <i class="fas fa-school me-2"></i> Kelola Kelas
                         </a>
                         <a href="{{ route('tu.wali-kelas') }}" class="btn btn-success">
                             <i class="fas fa-chalkboard-teacher me-2"></i> Kelola Wali Kelas
                         </a>
-                        <a href="{{ route('tu.siswa') }}" class="btn btn-info">
+                        <a href="{{ route('tu.siswa.index') }}" class="btn btn-info">
                             <i class="fas fa-users me-2"></i> Kelola Siswa
                         </a>
                         <a href="{{ route('tu.laporan.nilai') }}" class="btn btn-warning">
@@ -139,7 +139,7 @@
                         </table>
                     </div>
                     <div class="text-end">
-                        <a href="{{ route('tu.siswa') }}" class="btn btn-sm btn-primary">Lihat Semua</a>
+                        <a href="{{ route('tu.siswa.index') }}" class="btn btn-sm btn-primary">Lihat Semua</a>
                     </div>
                 </div>
             </div>
@@ -225,7 +225,7 @@
             <div class="card shadow">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Ringkasan Kelas</h5>
-                    <a href="{{ route('tu.kelas') }}" class="btn btn-sm btn-primary">Lihat Semua</a>
+                    <a href="{{ route('tu.kelas.index') }}" class="btn btn-sm btn-primary">Lihat Semua</a>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">

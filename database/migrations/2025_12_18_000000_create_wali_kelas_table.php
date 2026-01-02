@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('wali_kelas', function (Blueprint $table) {
+        if (! Schema::hasTable('wali_kelas')) {
+            Schema::create('wali_kelas', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('kelas_id')->nullable();
@@ -23,7 +24,8 @@ return new class extends Migration
             $table->foreign('kelas_id')->references('id')->on('kelas')->onDelete('set null');
             $table->foreign('jurusan_id')->references('id')->on('jurusans')->onDelete('set null');
             $table->foreign('rombel_id')->references('id')->on('rombels')->onDelete('set null');
-        });
+            });
+        }
     }
 
     public function down()

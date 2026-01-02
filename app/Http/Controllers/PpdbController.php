@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+use Illuminate\Support\Str;
 
 class PpdbController extends Controller
 {
@@ -26,11 +27,17 @@ class PpdbController extends Controller
     // =========================
     public function index()
     {
-        return view('ppdb.index', [
+        $data = [
             'sesis'    => SesiPpdb::orderBy('tahun_ajaran', 'desc')->get(),
             'jalurs'   => JalurPpdb::orderBy('nama_jalur')->get(),
             'jurusans' => Jurusan::orderBy('nama')->get(),
-        ]);
+        ];
+
+        if (request()->routeIs('kurikulum.*')) {
+            return view('kurikulum.ppdb.index', $data);
+        }
+
+        return view('ppdb.index', $data);
     }
 
     // =========================
@@ -60,6 +67,10 @@ class PpdbController extends Controller
             $query->where('jurusan_id', $id);
         }])->orderBy('nama_jalur')->get();
 
+        if (request()->routeIs('kurikulum.*')) {
+            return view('kurikulum.ppdb.jurusan.show', compact('jurusan', 'sesis', 'jalurs'));
+        }
+
         return view('tu.ppdb.jurusan.show', compact('jurusan', 'sesis', 'jalurs'));
     }
 
@@ -74,6 +85,10 @@ class PpdbController extends Controller
             ->where('jurusan_id', $id)
             ->orderBy('created_at', 'desc')
             ->get();
+
+        if (request()->routeIs('kurikulum.*')) {
+            return view('kurikulum.ppdb.jurusan.pendaftar-jurusan', compact('jurusan', 'pendaftars'));
+        }
 
         return view('tu.ppdb.jurusan.pendaftar-jurusan', compact('jurusan', 'pendaftars'));
     }
@@ -92,6 +107,10 @@ class PpdbController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        if (request()->routeIs('kurikulum.*')) {
+            return view('kurikulum.ppdb.jurusan.pendaftar-sesi', compact('jurusan', 'sesi', 'pendaftars'));
+        }
+
         return view('tu.ppdb.jurusan.pendaftar-sesi', compact('jurusan', 'sesi', 'pendaftars'));
     }
 
@@ -108,6 +127,10 @@ class PpdbController extends Controller
             ->where('jalur_ppdb_id', $jalurId)
             ->orderBy('created_at', 'desc')
             ->get();
+
+        if (request()->routeIs('kurikulum.*')) {
+            return view('kurikulum.ppdb.jurusan.pendaftar-jalur', compact('jurusan', 'jalur', 'pendaftars'));
+        }
 
         return view('tu.ppdb.jurusan.pendaftar-jalur', compact('jurusan', 'jalur', 'pendaftars'));
     }
@@ -213,6 +236,10 @@ class PpdbController extends Controller
         $entry = Ppdb::with(['jurusan', 'sesi', 'jalur'])->findOrFail($id);
         $rombels = Rombel::with(['kelas', 'guru'])->orderBy('nama')->get();
 
+        if (request()->routeIs('kurikulum.*')) {
+            return view('kurikulum.ppdb.assign', compact('entry', 'rombels'));
+        }
+
         return view('tu.ppdb.assign', compact('entry', 'rombels'));
     }
 
@@ -317,7 +344,9 @@ class PpdbController extends Controller
         }
 
         // Berikan informasi login ke admin
-        return redirect()->route('tu.ppdb.index')
+        $redirectRoute = request()->routeIs('kurikulum.*') ? 'kurikulum.ppdb.index' : 'tu.ppdb.index';
+
+        return redirect()->route($redirectRoute)
             ->with('success', "PPDB terassign ke rombel {$rombel->nama} dan NIS dibuat: {$nis}.<br>
         Akun login telah dibuat:<br>
         Username: {$nis}<br>

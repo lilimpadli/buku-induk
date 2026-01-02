@@ -8,12 +8,17 @@ use App\Models\WaliKelas;
 use App\Models\Kelas;
 use App\Models\Rombel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class WaliKelasController extends Controller
 {
     public function index()
     {
         $waliKelas = WaliKelas::with(['user', 'kelas', 'rombel'])
+            ->whereHas('user', function($q) {
+                $q->where('role', 'walikelas');
+            })
             ->latest()
             ->paginate(10);
             
@@ -22,26 +27,46 @@ class WaliKelasController extends Controller
 
     public function create()
     {
-        $users = User::where('role', 'walikelas')->get();
         $kelas = Kelas::all();
         $rombels = Rombel::all();
-        
-        return view('tu.wali-kelas.create', compact('users', 'kelas', 'rombels'));
+
+        return view('tu.wali-kelas.create', compact('kelas', 'rombels'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'nama' => 'required|string|max:255',
+            'nomor_induk' => 'required|string|max:100|unique:users,nomor_induk',
+            'email' => 'nullable|email|unique:users,email',
             'kelas_id' => 'required|exists:kelas,id',
             'rombel_id' => 'required|exists:rombels,id',
-            'tahun_ajaran' => 'required|string|size:9',
-            'semester' => 'required|in:Ganjil,Genap',
-            'status' => 'required|in:Aktif,Tidak Aktif',
+            'tahun_ajaran' => 'nullable|string|size:9',
+            'semester' => 'nullable|in:Ganjil,Genap',
+            'status' => 'nullable|in:Aktif,Tidak Aktif',
         ]);
 
-        WaliKelas::create($validated);
-        
+        // create or find user by nomor_induk
+        $user = User::firstWhere('nomor_induk', $validated['nomor_induk']);
+        if (! $user) {
+            $user = User::create([
+                'name' => $validated['nama'],
+                'nomor_induk' => $validated['nomor_induk'],
+                'email' => $validated['email'] ?? null,
+                'password' => Hash::make(Str::random(12)),
+                'role' => 'walikelas',
+            ]);
+        }
+
+        WaliKelas::create([
+            'user_id' => $user->id,
+            'kelas_id' => $validated['kelas_id'],
+            'rombel_id' => $validated['rombel_id'],
+            'tahun_ajaran' => $validated['tahun_ajaran'] ?? null,
+            'semester' => $validated['semester'] ?? null,
+            'status' => $validated['status'] ?? 'Aktif',
+        ]);
+
         return redirect()->route('tu.wali-kelas')->with('success', 'Wali kelas berhasil ditambahkan');
     }
 
