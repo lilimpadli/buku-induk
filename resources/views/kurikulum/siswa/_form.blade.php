@@ -1,14 +1,16 @@
 @php
     $siswa = $siswa ?? null;
-    $selected_kelas = old('kelas_id', optional(optional($siswa)->rombel->kelas)->id);
+    $selected_kelas = old('kelas_id', optional(optional(optional($siswa)->rombel)->kelas)->id);
     $selected_rombel = old('rombel_id', $siswa->rombel_id ?? null);
-    $selected_jurusan = old('jurusan_id', optional(optional(optional($siswa)->rombel->kelas)->jurusan)->id);
+    $selected_jurusan = old('jurusan_id', optional(optional(optional(optional($siswa)->rombel)->kelas)->jurusan)->id);
 @endphp
 
 <div class="row g-3">
     <div class="col-12">
         <h5 class="border-bottom pb-2 fw-semibold">Data Akun Siswa</h5>
     </div>
+
+    {{-- If you want to create a new user account automatically, do not select an existing user here. --}}
 
     <div class="col-md-6">
         <label class="form-label fw-semibold">Nama Lengkap</label>
@@ -23,6 +25,16 @@
     <div class="col-md-3">
         <label class="form-label fw-semibold">NISN</label>
         <input type="text" name="nisn" class="form-control" value="{{ old('nisn', $siswa->nisn ?? '') }}">
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold">Tempat Lahir</label>
+        <input type="text" name="tempat_lahir" class="form-control" value="{{ old('tempat_lahir', $siswa->tempat_lahir ?? '') }}" required>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold">Tanggal Lahir</label>
+        <input type="date" name="tanggal_lahir" class="form-control" value="{{ old('tanggal_lahir', $siswa->tanggal_lahir ?? '') }}" required>
     </div>
 
     <div class="col-md-4">
@@ -44,7 +56,7 @@
         <select name="kelas_id" id="kelasSelect" class="form-select">
             <option value="">-- Pilih Kelas --</option>
             @foreach($kelas as $k)
-                <option value="{{ $k->id }}" data-jurusan="{{ $k->jurusan_id }}" {{ (string)$selected_kelas === (string)$k->id ? 'selected' : '' }}>{{ $k->tingkat }} {{ $k->jurusan->nama ?? '' }}</option>
+                <option value="{{ $k->id }}" data-jurusan="{{ $k->jurusan_id }}" {{ (string)$selected_kelas === (string)$k->id ? 'selected' : '' }}>{{ $k->tingkat }} {{ optional($k->jurusan)->nama ?? '' }}</option>
             @endforeach
         </select>
     </div>

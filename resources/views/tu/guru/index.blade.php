@@ -18,6 +18,7 @@
                             <th>Nama</th>
                             <th>NIK</th>
                             <th>NIP</th>
+                            <th>Mengajar (Kelas / Rombel)</th>
                             <th>Email</th>
                         </tr>
                     </thead>
@@ -28,6 +29,22 @@
                                 <td>{{ $g->nama }}</td>
                                 <td>{{ optional($g->user)->nomor_induk }}</td>
                                 <td>{{ $g->nip }}</td>
+                                <td>
+                                    @if($g->rombels && $g->rombels->count())
+                                        <ul class="mb-0">
+                                            @foreach($g->rombels as $r)
+                                                <li>
+                                                    @php
+                                                        $kelas = $r->kelas;
+                                                    @endphp
+                                                    {{ $kelas?->tingkat ? $kelas->tingkat . ' - ' . ($kelas->jurusan->nama ?? '') : '-' }} / {{ $r->nama }}
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
                                 <td>{{ $g->email }}</td>
                             </tr>
                         @empty

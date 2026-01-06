@@ -280,6 +280,12 @@
     <h3>Nilai Raport Siswa</h3>
     <p>Pilih siswa untuk melihat daftar raport berdasarkan semester.</p>
 
+    <form method="GET" class="mb-3 d-flex gap-2" action="">
+        <input type="text" name="q" value="{{ request('q', $search ?? '') }}" class="form-control" placeholder="Cari nama / NIS / NISN">
+        <button class="btn btn-primary" type="submit">Cari</button>
+        <a href="{{ route('walikelas.nilai_raport.index') }}" class="btn btn-outline-secondary">Reset</a>
+    </form>
+
     <div class="card shadow">
         @if($siswas->count() > 0)
             @foreach($siswas as $kelas => $siswaList)

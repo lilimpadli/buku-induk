@@ -8,14 +8,17 @@ use App\Models\DataSiswa;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Rombel;
+use App\Models\KenaikanKelas;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class WaliKelasSiswaController extends Controller
 {
     // List siswa
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        $search = $request->query('q');
+        $jenisKelamin = $request->query('jenis_kelamin');
 
         // ambil daftar rombel yang dia pegang sebagai wali kelas
         $rombelsIds = [];
@@ -42,15 +45,34 @@ class WaliKelasSiswaController extends Controller
         }
 
         if (!empty($rombelsIds)) {
-            $siswa = DataSiswa::with(['ayah', 'ibu', 'wali'])
+            // exclude students who have been promoted or graduated
+            $excludedIds = KenaikanKelas::whereIn('status', ['lulus', 'naik'])->pluck('siswa_id')->unique()->filter()->toArray();
+
+            $query = DataSiswa::with(['ayah', 'ibu', 'wali'])
                 ->whereIn('rombel_id', $rombelsIds)
-                ->orderBy('nama_lengkap')
-                ->get();
+                ->when(!empty($excludedIds), function($q) use ($excludedIds) {
+                    return $q->whereNotIn('id', $excludedIds);
+                })
+                ->when($search, function($q) use ($search) {
+                    $like = '%' . $search . '%';
+                    return $q->where(function($qq) use ($like) {
+                        $qq->where('nama_lengkap', 'like', $like)
+                           ->orWhere('nisn', 'like', $like)
+                           ->orWhere('nomor_induk', 'like', $like);
+                    });
+                })
+                ->when(in_array($jenisKelamin, ['L', 'P']), function($q) use ($jenisKelamin) {
+                    return $q->where('jenis_kelamin', $jenisKelamin);
+                })
+                ->orderBy('nama_lengkap');
+
+            $siswa = $query->paginate(15)->appends($request->query());
         } else {
             // jika tidak ada penugasan, kembalikan kosong supaya wali tidak melihat seluruh siswa
             $siswa = collect();
         }
-        return view('walikelas.siswa.index', compact('siswa'));
+
+        return view('walikelas.siswa.index', compact('siswa', 'search', 'jenisKelamin'));
     }
 
     // Detail siswa
@@ -90,14 +112,26 @@ class WaliKelasSiswaController extends Controller
         }
 
         if (!empty($rombelsIds)) {
-            $total = DataSiswa::whereIn('rombel_id', $rombelsIds)->count();
+            $excludedIds = KenaikanKelas::whereIn('status', ['lulus', 'naik'])->pluck('siswa_id')->unique()->filter()->toArray();
+
+            $total = DataSiswa::whereIn('rombel_id', $rombelsIds)
+                ->when(!empty($excludedIds), function($q) use ($excludedIds) {
+                    return $q->whereNotIn('id', $excludedIds);
+                })->count();
+
             $recent = DataSiswa::with(['ayah', 'ibu', 'wali', 'rombel'])
                 ->whereIn('rombel_id', $rombelsIds)
+                ->when(!empty($excludedIds), function($q) use ($excludedIds) {
+                    return $q->whereNotIn('id', $excludedIds);
+                })
                 ->orderBy('created_at', 'desc')
                 ->limit(6)
                 ->get();
 
             $byGender = DataSiswa::whereIn('rombel_id', $rombelsIds)
+                ->when(!empty($excludedIds), function($q) use ($excludedIds) {
+                    return $q->whereNotIn('id', $excludedIds);
+                })
                 ->select('jenis_kelamin', DB::raw('count(*) as total'))
                 ->groupBy('jenis_kelamin')
                 ->pluck('total', 'jenis_kelamin')

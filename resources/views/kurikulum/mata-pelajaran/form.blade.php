@@ -31,6 +31,18 @@
                 </div>
 
                 <div class="mb-3">
+                    <label class="form-label">Jurusan (opsional)</label>
+                    @php $selJur = old('jurusan_id', $mapel->jurusan_id ?? ''); @endphp
+                    <select name="jurusan_id" class="form-select @error('jurusan_id') is-invalid @enderror">
+                        <option value="">Semua Jurusan</option>
+                        @foreach(($jurusans ?? collect()) as $j)
+                            <option value="{{ $j->id }}" {{ (string)$selJur === (string)$j->id ? 'selected' : '' }}>{{ $j->nama }}</option>
+                        @endforeach
+                    </select>
+                    @error('jurusan_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="mb-3">
                     <label class="form-label">Urutan</label>
                     <input type="number" name="urutan" class="form-control @error('urutan') is-invalid @enderror" value="{{ old('urutan', $mapel->urutan ?? '') }}">
                     @error('urutan')<div class="invalid-feedback">{{ $message }}</div>@enderror

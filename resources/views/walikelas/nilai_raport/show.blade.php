@@ -32,14 +32,14 @@
         position: relative;
         padding-left: 15px;
         margin-bottom: 20px !important;
-    }
-
-    h3::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
+                    @foreach($kelompokA as $m)
+                <tr>
+                    <td class="text-center">{{ $loop->iteration }}</td>
+                    <td>{{ $m->nama ?? '-' }}</td>
+                    <td class="text-center">{{ optional($nilaiMap->get($m->id))->kkm ?? '-' }}</td>
+                    <td>{{ optional($nilaiMap->get($m->id))->nilai ?? '-' }}</td>
+                </tr>
+            @endforeach
         width: 5px;
         height: 70%;
         background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
@@ -55,14 +55,14 @@
     .table {
         margin-bottom: 25px;
         border-radius: 12px;
-        overflow: hidden;
-        box-shadow: var(--card-shadow);
-        background-color: white;
-    }
-
-    .table-bordered {
-        border: 1px solid #E2E8F0;
-    }
+            @foreach($kelompokB as $m)
+                <tr>
+                    <td class="text-center">{{ $loop->iteration }}</td>
+                    <td>{{ $m->nama ?? '-' }}</td>
+                    <td class="text-center">{{ optional($nilaiMap->get($m->id))->kkm ?? '-' }}</td>
+                    <td>{{ optional($nilaiMap->get($m->id))->nilai ?? '-' }}</td>
+                </tr>
+            @endforeach
 
     .table-bordered th,
     .table-bordered td {
@@ -262,7 +262,12 @@
             <th width="30%">Nama Peserta Didik</th>
             <td>{{ strtoupper($siswa->nama_lengkap) }}</td>
             <th width="30%">Kelas</th>
-            <td>{{ $siswa->rombel->nama ?? '-' }}</td>
+            <td>
+                @php
+                    $rombelNama = $rombelRaport->nama ?? optional($nilaiRaports->first())->rombel->nama ?? $siswa->rombel->nama ?? '-';
+                @endphp
+                {{ $rombelNama }}
+            </td>
         </tr>
         <tr>
             <th>NISN</th>

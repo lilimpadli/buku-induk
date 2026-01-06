@@ -36,6 +36,8 @@ use App\Http\Controllers\PpdbController;
 
 // TU
 use App\Http\Controllers\TUController;
+use App\Http\Controllers\TU\KelulusanController;
+use App\Http\Controllers\TU\AlumniController;
 
 // KAPROG
 use App\Http\Controllers\Kaprog\KaprogDashboardController;
@@ -235,6 +237,10 @@ Route::middleware('web')->group(function () {
                 Route::post('input-nilai-raport/{siswa_id}/update', [InputNilaiRaportController::class, 'update'])
                     ->name('input_nilai_raport.update');
 
+                // delete raport for a siswa/semester/tahun
+                Route::post('input-nilai-raport/{siswa_id}/delete', [InputNilaiRaportController::class, 'destroy'])
+                    ->name('input_nilai_raport.delete');
+
                 // Form Ekstra / Kehadiran / Info
                 Route::get('/rapor/ekstra/{siswa_id}', [RaporController::class, 'formEkstra'])
                     ->name('rapor.ekstra.form');
@@ -372,6 +378,15 @@ Route::middleware('web')->group(function () {
 
             // Cetak rapor (TU)
             Route::get('/rapor/{siswa_id}/{semester}/{tahun}/cetak', [\App\Http\Controllers\RaporController::class, 'cetakRapor'])->name('rapor.cetak');
+
+            // Kelulusan & Alumni (TU)
+            Route::get('/kelulusan', [KelulusanController::class, 'index'])->name('kelulusan.index');
+            Route::get('/kelulusan/rombel/{rombelId}/{tahun}', [KelulusanController::class, 'showRombel'])->name('kelulusan.rombel.show');
+
+            Route::get('/alumni', [AlumniController::class, 'index'])->name('alumni.index');
+            Route::get('/alumni/{id}', [AlumniController::class, 'show'])->name('alumni.show');
+            
+            // (cleaned duplicate kelulusan routes)
         });
 
         /*
@@ -502,6 +517,17 @@ Route::middleware('web')->group(function () {
 
             Route::delete('/jurusan/{id}', [JurusanController::class, 'destroy'])
                 ->name('jurusan.destroy');
+
+            // Kelulusan & Alumni (reuse TU controllers for data views)
+            Route::get('/kelulusan', [\App\Http\Controllers\TU\KelulusanController::class, 'index'])
+                ->name('kelulusan.index');
+            Route::get('/kelulusan/rombel/{rombelId}/{tahun}', [\App\Http\Controllers\TU\KelulusanController::class, 'showRombel'])
+                ->name('kelulusan.rombel.show');
+
+            Route::get('/alumni', [\App\Http\Controllers\TU\AlumniController::class, 'index'])
+                ->name('alumni.index');
+            Route::get('/alumni/{id}', [\App\Http\Controllers\TU\AlumniController::class, 'show'])
+                ->name('alumni.show');
         });
     });
 });

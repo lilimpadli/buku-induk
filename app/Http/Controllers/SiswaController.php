@@ -420,6 +420,26 @@ class SiswaController extends Controller
                 ->with('error', 'Data raport untuk semester ' . $semester . ' tahun ajaran ' . $tahun . ' tidak ditemukan');
         }
 
+        // derive historical kelas/rombel from nilaiRaports if available
+        $kelasRaport = null;
+        $rombelRaport = null;
+        $firstRaport = $nilaiRaports->first();
+        if ($firstRaport) {
+            if (isset($firstRaport->kelas) && $firstRaport->kelas) {
+                $kelasRaport = $firstRaport->kelas;
+            }
+            if (isset($firstRaport->rombel) && $firstRaport->rombel) {
+                $rombelRaport = $firstRaport->rombel;
+            }
+        }
+
+        if (!$kelasRaport && $siswa->rombel && $siswa->rombel->kelas) {
+            $kelasRaport = $siswa->rombel->kelas;
+        }
+        if (!$rombelRaport && $siswa->rombel) {
+            $rombelRaport = $siswa->rombel;
+        }
+
         $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa->id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
@@ -448,7 +468,9 @@ class SiswaController extends Controller
             'ekstra',
             'kehadiran',
             'info',
-            'kenaikan'
+            'kenaikan',
+            'kelasRaport',
+            'rombelRaport'
         ));
     }
 

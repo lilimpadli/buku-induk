@@ -43,20 +43,39 @@ class RaporController extends Controller
             'nilai' => 'required|array'
         ]);
 
-        foreach ($req->nilai as $mapel_id => $nilaiAkhir) {
+        $siswa = DataSiswa::findOrFail($siswa_id);
 
-            NilaiRaport::updateOrCreate(
-                [
+        foreach ($req->nilai as $mapel_id => $nilaiAkhir) {
+            $where = [
+                'siswa_id' => $siswa_id,
+                'mata_pelajaran_id' => $mapel_id,
+                'semester' => $req->semester,
+                'tahun_ajaran' => $req->tahun_ajaran,
+            ];
+
+            $existing = NilaiRaport::where($where)->first();
+            if ($existing) {
+                $existing->nilai_akhir = $nilaiAkhir;
+                $existing->deskripsi = $req->deskripsi[$mapel_id] ?? $existing->deskripsi;
+                if (empty($existing->rombel_id)) {
+                    $existing->rombel_id = $siswa->rombel_id ?? null;
+                }
+                if (empty($existing->kelas_id)) {
+                    $existing->kelas_id = $siswa->rombel && $siswa->rombel->kelas ? $siswa->rombel->kelas->id : null;
+                }
+                $existing->save();
+            } else {
+                NilaiRaport::create([
                     'siswa_id' => $siswa_id,
                     'mata_pelajaran_id' => $mapel_id,
                     'semester' => $req->semester,
                     'tahun_ajaran' => $req->tahun_ajaran,
-                ],
-                [
                     'nilai_akhir' => $nilaiAkhir,
                     'deskripsi' => $req->deskripsi[$mapel_id] ?? null,
-                ]
-            );
+                    'rombel_id' => $siswa->rombel_id ?? null,
+                    'kelas_id' => $siswa->rombel && $siswa->rombel->kelas ? $siswa->rombel->kelas->id : null,
+                ]);
+            }
         }
 
         return back()->with('success', 'Nilai rapor berhasil disimpan.');

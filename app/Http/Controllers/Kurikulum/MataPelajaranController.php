@@ -5,32 +5,49 @@ namespace App\Http\Controllers\Kurikulum;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\MataPelajaran;
+use Illuminate\Support\Facades\Schema;
 
 class MataPelajaranController extends Controller
 {
     public function index(Request $request)
     {
         $tingkat = $request->query('tingkat');
+        $jurusan = $request->query('jurusan');
 
-        if ($tingkat) {
-            $mapels = MataPelajaran::whereHas('tingkats', function($q) use ($tingkat) {
-                $q->where('tingkat', intval($tingkat));
-            })->orderBy('urutan')->get();
-        } else {
-            $mapels = MataPelajaran::orderBy('urutan')->get();
+        // available jurusans for the filter dropdown
+        $jurusans = \App\Models\Jurusan::orderBy('nama')->get();
+
+        $query = MataPelajaran::query();
+
+        if ($jurusan) {
+            // only apply jurusan filter if the column exists in the table
+            if (Schema::hasColumn('mata_pelajarans', 'jurusan_id')) {
+                $query->where('jurusan_id', $jurusan);
+            }
+            // otherwise skip jurusan filtering (legacy schema)
         }
 
-        return view('kurikulum.mata-pelajaran.index', compact('mapels', 'tingkat'));
+        if ($tingkat) {
+            $query->whereHas('tingkats', function($q) use ($tingkat) {
+                $q->where('tingkat', intval($tingkat));
+            });
+        }
+
+        $mapels = $query->orderBy('urutan')->get();
+
+        return view('kurikulum.mata-pelajaran.index', compact('mapels', 'tingkat', 'jurusans', 'jurusan'));
     }
 
     public function create()
     {
         $mapel = new MataPelajaran();
+        $jurusans = \App\Models\Jurusan::orderBy('nama')->get();
         return view('kurikulum.mata-pelajaran.form', [
             'mapel' => $mapel,
             'action' => route('kurikulum.mata-pelajaran.store'),
             'method' => 'POST',
-            'title' => 'Tambah Mata Pelajaran'
+            'title' => 'Tambah Mata Pelajaran',
+            'jurusans' => $jurusans,
         ]);
     }
 
@@ -39,7 +56,8 @@ class MataPelajaranController extends Controller
         $data = $request->validate([
             'nama' => 'required|string|max:255',
             'kelompok' => 'required|in:A,B',
-            'urutan' => 'nullable|integer'
+            'urutan' => 'nullable|integer',
+            'jurusan_id' => 'nullable|exists:jurusans,id'
         ]);
 
         $mapel = MataPelajaran::create($data);
@@ -58,11 +76,13 @@ class MataPelajaranController extends Controller
     public function edit($id)
     {
         $mapel = MataPelajaran::findOrFail($id);
+        $jurusans = \App\Models\Jurusan::orderBy('nama')->get();
         return view('kurikulum.mata-pelajaran.form', [
             'mapel' => $mapel,
             'action' => route('kurikulum.mata-pelajaran.update', $mapel->id),
             'method' => 'PUT',
-            'title' => 'Edit Mata Pelajaran'
+            'title' => 'Edit Mata Pelajaran',
+            'jurusans' => $jurusans,
         ]);
     }
 
@@ -73,7 +93,8 @@ class MataPelajaranController extends Controller
         $data = $request->validate([
             'nama' => 'required|string|max:255',
             'kelompok' => 'required|in:A,B',
-            'urutan' => 'nullable|integer'
+            'urutan' => 'nullable|integer',
+            'jurusan_id' => 'nullable|exists:jurusans,id'
         ]);
 
         $mapel->update($data);

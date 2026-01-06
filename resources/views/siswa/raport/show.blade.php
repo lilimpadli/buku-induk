@@ -241,9 +241,9 @@
                 </tr>
                 <tr>
                     <th>Kelas</th>
-                    <td>{{ $siswa->rombel->nama ?? '-' }}</td>
+                    <td>{{ $rombelRaport->nama ?? ($siswa->rombel->nama ?? '-') }}</td>
                     <th>Jurusan</th>
-                    <td>{{ $siswa->rombel->kelas->jurusan->nama ?? '-' }}</td>
+                    <td>{{ optional($kelasRaport->jurusan)->nama ?? ($siswa->rombel->kelas->jurusan->nama ?? '-') }}</td>
                 </tr>
                 <tr>
                     <th>Semester</th>

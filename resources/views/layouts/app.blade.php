@@ -248,6 +248,17 @@
                                     <a class="nav-link {{ request()->is('tu.guru.index') ? 'active' : '' }}" href="{{ route('tu.guru.index') }}" data-bs-toggle="tooltip" title="Data Guru">
                                         <i class="fas fa-plus-circle"></i> <span class="label ms-2">Data Guru</span>
                                     </a>
+
+                                     <!-- MENU BARU -->
+    <hr class="my-2">
+    <div class="text-muted small px-3 mb-2">MANAJEMEN LULUSAN</div>
+    <a href="{{ route('tu.kelulusan.index') }}" class="nav-link {{ request()->routeIs('tu.kelulusan*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Kelulusan">
+        <i class="fas fa-graduation-cap"></i> <span class="label ms-2">Data Kelulusan</span>
+    </a>
+
+    <a href="{{ route('tu.alumni.index') }}" class="nav-link {{ request()->routeIs('tu.alumni*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Alumni">
+        <i class="fas fa-user-friends"></i> <span class="label ms-2">Data Alumni</span>
+    </a>
                                 @endif
 
                                 {{-- ROLE: KURIKULUM --}}
@@ -279,6 +290,17 @@
                                       <a href="{{ route('kurikulum.mata-pelajaran.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mata-pelajaran*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Mata Pelajaran">
                                         <i class="fas fa-users"></i> <span class="label ms-2">Manajemen Mata Pelajaran</span>
                                     </a>
+
+                                    <!-- MENU BARU -->
+    <hr class="my-2">
+    <div class="text-muted small px-3 mb-2">MANAJEMEN LULUSAN</div>
+    <a href="{{ route('kurikulum.kelulusan.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kelulusan*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Kelulusan">
+        <i class="fas fa-graduation-cap"></i> <span class="label ms-2">Data Kelulusan</span>
+    </a>
+
+    <a href="{{ route('kurikulum.alumni.index') }}" class="nav-link {{ request()->routeIs('kurikulum.alumni*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Alumni">
+        <i class="fas fa-user-friends"></i> <span class="label ms-2">Data Alumni</span>
+    </a>
 
                                     
                                 @endif

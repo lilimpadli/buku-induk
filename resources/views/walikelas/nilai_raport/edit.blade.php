@@ -258,10 +258,21 @@
         @csrf
         @method('PUT')
 
-        <!-- Tambahkan input hidden untuk parameter -->
+        <!-- Semester & Tahun (lihat, tidak bisa diubah di edit) -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <label class="fw-bold">Semester</label>
+                <input type="text" class="form-control" value="{{ $semester }}" readonly>
+                <input type="hidden" name="semester" value="{{ $semester }}">
+            </div>
+            <div class="col-md-3">
+                <label class="fw-bold">Tahun Ajaran</label>
+                <input type="text" class="form-control" value="{{ $tahun }}" readonly>
+                <input type="hidden" name="tahun_ajaran" value="{{ $tahun }}">
+            </div>
+        </div>
+
         <input type="hidden" name="siswa_id" value="{{ $siswa->id }}">
-        <input type="hidden" name="semester" value="{{ $semester }}">
-        <input type="hidden" name="tahun" value="{{ $tahun }}">
         <!-- Identitas Siswa -->
         <div class="card mb-4">
             <div class="card-header">
@@ -431,23 +442,33 @@
                 <div class="row">
                     <div class="col-md-6">
                         <label>Status</label>
-                        <select name="kenaikan[status]" class="form-control">
-                            <option value="Naik Kelas" {{ $kenaikan->status == 'Naik Kelas' ? 'selected' : '' }}>Naik</option>
-                            <option value="Tidak Naik" {{ $kenaikan->status == 'Tidak Naik' ? 'selected' : '' }}>Tidak Naik
-                            <option value="Lulus" {{ $kenaikan->status == 'Lulus' ? 'selected' : '' }}>Lulus
-                            </option>
+                        @php
+                            $kStatus = strtolower(str_replace([' ', '_'], '', trim($kenaikan->status ?? '')));
+                        @endphp
+                        <select name="kenaikan[status]" class="form-control" id="statusKenaikanSelect">
+                            <option value="Naik Kelas" {{ in_array($kStatus, ['naik','naikkelas']) ? 'selected' : '' }}>Naik Kelas</option>
+                            <option value="Tidak Naik" {{ in_array($kStatus, ['tidaknaik','tidak']) ? 'selected' : '' }}>Tidak Naik</option>
+                            <option value="Lulus" {{ in_array($kStatus, ['lulus','lulusan']) ? 'selected' : '' }}>Lulus</option>
                         </select>
                     </div>
                     <div class="col-md-6">
                         <label>Ke Kelas</label>
-                        <select name="kenaikan[rombel_tujuan_id]" class="form-control">
+                        @php
+                            $rombelSource = isset($rombelsFiltered) && $rombelsFiltered->count() > 0 ? $rombelsFiltered : $rombels;
+                            $statusNorm = strtolower(str_replace([' ', '_'], '', trim($kenaikan->status ?? '')));
+                            $rombelDisabled = ($semester && strtolower($semester) === 'ganjil') || ($statusNorm !== 'naikkelas');
+                        @endphp
+                        <select name="kenaikan[rombel_tujuan_id]" class="form-control" id="rombelTujuanSelect" {{ $rombelDisabled ? 'disabled' : '' }}>
                             <option value="">-- Pilih Kelas --</option>
-                            @foreach($rombels as $rombel)
-                                <option value="{{ $rombel->id }}" {{ $kenaikan->rombel_tujuan_id == $rombel->id ? 'selected' : '' }}>
-                                    {{ $rombel->nama }}
+                            @foreach($rombelSource as $rombel)
+                                <option value="{{ $rombel->id }}" {{ ($kenaikan->rombel_tujuan_id == $rombel->id) ? 'selected' : '' }}>
+                                    {{ $rombel->nama }} @if(isset($rombel->kelas)) ({{ $rombel->kelas->tingkat }} - {{ $rombel->kelas->jurusan->nama ?? '' }}) @endif
                                 </option>
                             @endforeach
                         </select>
+                        @if(isset($targetTingkat) && $targetTingkat)
+                            <small class="text-muted">Menampilkan rombel untuk tingkat: {{ $targetTingkat }}</small>
+                        @endif
                     </div>
                 </div>
                 <div class="mt-3">
@@ -502,7 +523,17 @@
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-save"></i> Simpan Perubahan
             </button>
+
+            <button type="button" id="btn-delete-rapor" class="btn btn-danger ms-2">
+                <i class="fas fa-trash"></i> Hapus Rapor
+            </button>
         </div>
+    </form>
+
+    <form id="form-delete-rapor" action="{{ route('walikelas.input_nilai_raport.delete', $siswa->id) }}" method="POST" style="display:none;">
+        @csrf
+        <input type="hidden" name="semester" value="{{ $semester }}">
+        <input type="hidden" name="tahun_ajaran" value="{{ $tahun }}">
     </form>
 </div>
 @endsection
@@ -549,6 +580,30 @@
                     e.target.closest('.ekstra-row').remove();
                 }
             });
+
+                // Toggle rombel select enabled state based on status and semester
+                function updateRombelState() {
+                    const statusEl = document.getElementById('statusKenaikanSelect');
+                    const rombelEl = document.getElementById('rombelTujuanSelect');
+                    if (!statusEl || !rombelEl) return;
+                    const statusNorm = (statusEl.value || '').toString().toLowerCase().replace(/\s|_/g, '');
+                    const semester = '{{$semester}}'.toString().toLowerCase();
+                    if (semester === 'ganjil' || statusNorm !== 'naikkelas') {
+                        rombelEl.disabled = true;
+                    } else {
+                        rombelEl.disabled = false;
+                    }
+                }
+
+                document.getElementById('statusKenaikanSelect')?.addEventListener('change', updateRombelState);
+                // initial state
+                updateRombelState();
+
+                // Delete rapor confirmation
+                document.getElementById('btn-delete-rapor')?.addEventListener('click', function() {
+                    if (!confirm('Yakin ingin menghapus semua data raport untuk semester "' + '{{ $semester }}' + '" tahun "' + '{{ $tahun }}' + '"?')) return;
+                    document.getElementById('form-delete-rapor').submit();
+                });
         });
     </script>
 @endpush

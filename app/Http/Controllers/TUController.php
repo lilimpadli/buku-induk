@@ -100,15 +100,15 @@ class TUController extends Controller
      * Daftar guru untuk TU
      */
     public function guruIndex()
-{
-    // Fetch a paginated list of all Guru models, with their associated User data.
-    $gurus = Guru::with('user')
-        ->orderBy('nama')
-        ->paginate(10); // The view uses pagination, so we paginate here.
+    {
+        // Fetch a paginated list of all Guru models, with their associated User data
+        // and the rombels they teach (including the rombel's kelas and jurusan).
+        $gurus = Guru::with(['user', 'rombels.kelas.jurusan'])
+            ->orderBy('nama')
+            ->paginate(10);
 
-    // Pass the $gurus variable to the view.
-    return view('tu.guru.index', compact('gurus'));
-}
+        return view('tu.guru.index', compact('gurus'));
+    }
 
     /**
      * Form tambah guru
@@ -435,12 +435,28 @@ class TUController extends Controller
                     continue;
                 }
 
-                $data = [
-                    'nilai_akhir' => $hasNilai ? $value['nilai_akhir'] : ($existing->nilai_akhir ?? null),
-                    'deskripsi'   => $hasDeskripsi ? $value['deskripsi'] : ($existing->deskripsi ?? null),
-                ];
-
-                NilaiRaport::updateOrCreate($where, $data);
+                if ($existing) {
+                    $existing->nilai_akhir = $hasNilai ? $value['nilai_akhir'] : ($existing->nilai_akhir ?? null);
+                    $existing->deskripsi = $hasDeskripsi ? $value['deskripsi'] : ($existing->deskripsi ?? null);
+                    if (empty($existing->rombel_id)) {
+                        $existing->rombel_id = $siswa->rombel_id ?? null;
+                    }
+                    if (empty($existing->kelas_id)) {
+                        $existing->kelas_id = $siswa->rombel && $siswa->rombel->kelas ? $siswa->rombel->kelas->id : null;
+                    }
+                    $existing->save();
+                } else {
+                    NilaiRaport::create([
+                        'siswa_id' => $siswa->id,
+                        'mata_pelajaran_id' => $mapel_id,
+                        'semester' => $semester,
+                        'tahun_ajaran' => $trimmedTahun,
+                        'nilai_akhir' => $hasNilai ? $value['nilai_akhir'] : null,
+                        'deskripsi' => $hasDeskripsi ? $value['deskripsi'] : null,
+                        'rombel_id' => $siswa->rombel_id ?? null,
+                        'kelas_id' => $siswa->rombel && $siswa->rombel->kelas ? $siswa->rombel->kelas->id : null,
+                    ]);
+                }
             }
         }
 

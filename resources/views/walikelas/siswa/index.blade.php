@@ -219,10 +219,21 @@
 
     <h3 class="mb-3">Daftar Siswa</h3>
 
+    <form method="GET" class="mb-3 d-flex gap-2" action="">
+        <input type="text" name="q" value="{{ request('q', $search ?? '') }}" class="form-control" placeholder="Cari nama / NISN / No. Induk">
+        <select name="jenis_kelamin" class="form-select" style="width:140px">
+            <option value="">Semua</option>
+            <option value="L" {{ (request('jenis_kelamin', $jenisKelamin ?? '') == 'L') ? 'selected' : '' }}>Laki-laki</option>
+            <option value="P" {{ (request('jenis_kelamin', $jenisKelamin ?? '') == 'P') ? 'selected' : '' }}>Perempuan</option>
+        </select>
+        <button class="btn btn-primary" type="submit">Filter</button>
+        <a href="{{ route('walikelas.siswa.index') }}" class="btn btn-outline-secondary">Reset</a>
+    </form>
+
     <div class="card shadow">
         @if($siswa->count() > 0)
             <div class="list-group list-group-flush">
-                @foreach ($siswa as $s)
+                    @foreach ($siswa as $s)
                     <a href="{{ route('walikelas.siswa.show', $s->id) }}"
                        class="list-group-item list-group-item-action">
                         <div class="student-info">
@@ -244,6 +255,11 @@
                     </a>
                 @endforeach
             </div>
+            @if(method_exists($siswa, 'links'))
+                <div class="p-3">
+                    {{ $siswa->links() }}
+                </div>
+            @endif
         @else
             <div class="empty-state">
                 <i class="fas fa-user-graduate"></i>

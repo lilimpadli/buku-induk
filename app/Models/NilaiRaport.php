@@ -9,6 +9,8 @@ class NilaiRaport extends Model
 {
     use HasFactory;
 
+    protected $table = 'nilai_raports';
+
     protected $fillable = [
         'siswa_id',
         'mata_pelajaran_id',
@@ -16,6 +18,8 @@ class NilaiRaport extends Model
         'tahun_ajaran',
         'nilai_akhir',
         'deskripsi',
+        'kelas_id',
+        'rombel_id',
     ];
 
     public function siswa()
@@ -28,5 +32,15 @@ class NilaiRaport extends Model
         return $this->belongsTo(MataPelajaran::class, 'mata_pelajaran_id');
     }
 
-    
+    // 🔥 INI YANG WAJIB (PENYEBAB ERROR KAMU)
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class, 'kelas_id');
+    }
+
+    // (opsional tapi disarankan)
+    public function rombel()
+    {
+        return $this->belongsTo(Rombel::class, 'rombel_id');
+    }
 }

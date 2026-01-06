@@ -13,6 +13,7 @@ class MataPelajaran extends Model
         'nama',
         'kelompok',
         'urutan',
+        'jurusan_id',
     ];
 
     public function nilai()
@@ -25,8 +26,10 @@ class MataPelajaran extends Model
     return $this->belongsTo(Jurusan::class, 'jurusan_id');
 }
 
-    public function tingkats()
-    {
-        return $this->hasMany(MataPelajaranTingkat::class, 'mata_pelajaran_id');
-    }
+    
+
+   public function tingkats()
+{
+    return $this->hasMany(MataPelajaranTingkat::class, 'mata_pelajaran_id');
+}
 }
