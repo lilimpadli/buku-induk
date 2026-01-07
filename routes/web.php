@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
+use App\Models\PpdbTimeline;
 
 // AUTH
 use App\Http\Controllers\Auth\LoginController;
@@ -81,7 +84,54 @@ Route::prefix('rapor')->group(function () {
 
 Route::middleware('web')->group(function () {
 
-    Route::get('/', fn() => view('welcome'))->name('home');
+    Route::get('/', function () {
+        // default structure
+        $ppdb = [
+            'tahap1' => [
+                'title' => 'Pendaftaran Tahap 1',
+                'pendaftaran' => '10 - 16 Juni 2025',
+                'sanggah' => '10-17 Juni 2025',
+                'rapat' => '18 Juni 2025',
+                'pengumuman' => '19 Juni 2025 (09:00 WIB)',
+                'daftar_ulang' => '20-23 Juni 2025',
+                'open' => true,
+            ],
+            'tahap2' => [
+                'title' => 'Pendaftaran Tahap 2',
+                'pendaftaran' => '24 Juni - 1 Juli 2025',
+                'sanggah' => '24 Juni - 2 Juli 2025',
+                'tes' => '2-7 Juli 2025',
+                'rapat' => '8 Juli 2025',
+                'pengumuman' => '9 Juli 2025 (15:00 WIB)',
+                'daftar_ulang' => '10-11 Juli 2025',
+                'open' => false,
+            ],
+        ];
+
+        try {
+            if (Schema::hasTable('ppdb_timelines')) {
+                $rows = PpdbTimeline::whereIn('stage', ['tahap1', 'tahap2'])->get()->keyBy('stage');
+
+                if ($rows->has('tahap1')) {
+                    $r = $rows->get('tahap1')->toArray();
+                    foreach (['title','pendaftaran','sanggah','rapat','pengumuman','daftar_ulang','open'] as $k) {
+                        if (array_key_exists($k, $r)) $ppdb['tahap1'][$k] = $r[$k];
+                    }
+                }
+
+                if ($rows->has('tahap2')) {
+                    $r = $rows->get('tahap2')->toArray();
+                    foreach (['title','pendaftaran','sanggah','tes','rapat','pengumuman','daftar_ulang','open'] as $k) {
+                        if (array_key_exists($k, $r)) $ppdb['tahap2'][$k] = $r[$k];
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // if DB not ready, fall back to defaults
+        }
+
+        return view('welcome', ['ppdb' => $ppdb]);
+    })->name('home');
 
     // PPDB public routes (sesi -> jalur -> form)
     Route::get('/ppdb', [PpdbController::class, 'index'])->name('ppdb.index');
@@ -364,7 +414,10 @@ Route::middleware('web')->group(function () {
             Route::get('/ppdb/jurusan/{id}', [PpdbController::class, 'showJurusan'])->name('ppdb.jurusan.show');
             Route::get('/ppdb/jurusan/{id}/pendaftar', [PpdbController::class, 'showPendaftarJurusan'])->name('ppdb.jurusan.pendaftar');
             Route::get('/ppdb/jurusan/{jurusanId}/sesi/{sesiId}', [PpdbController::class, 'showPendaftarSesi'])->name('ppdb.jurusan.sesi.pendaftar');
+            Route::get('/ppdb/sesi/{sesiId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarSesiJalur'])->name('ppdb.sesi.jalur.pendaftar');
+            Route::get('/ppdb/jurusan/{jurusanId}/sesi/{sesiId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarJurusanSesiJalur'])->name('ppdb.jurusan.sesi.jalur.pendaftar');
             Route::get('/ppdb/jurusan/{jurusanId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarJalur'])->name('ppdb.jurusan.jalur.pendaftar');
+            Route::get('/ppdb/sesi/{sesiId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarSesiJalur'])->name('ppdb.sesi.jalur.pendaftar');
             Route::get('/ppdb/{id}/assign', [PpdbController::class, 'showAssignForm'])->name('ppdb.assign.form');
             Route::post('/ppdb/{id}/assign', [PpdbController::class, 'assign'])->name('ppdb.assign');
 
@@ -398,6 +451,10 @@ Route::middleware('web')->group(function () {
 
             // PPDB (Kurikulum) - allow Kurikulum users to manage PPDB
             Route::get('/ppdb', [PpdbController::class, 'index'])->name('ppdb.index');
+            // Kurikulum: edit PPDB timeline
+            Route::get('/ppdb/timeline', [App\Http\Controllers\Kurikulum\PpdbTimelineController::class, 'edit'])->name('ppdb.timeline');
+            Route::get('/ppdb/timeline/edit', [App\Http\Controllers\Kurikulum\PpdbTimelineController::class, 'edit'])->name('ppdb.timeline.edit');
+            Route::post('/ppdb/timeline', [App\Http\Controllers\Kurikulum\PpdbTimelineController::class, 'update'])->name('ppdb.timeline.update');
 
             Route::get('/dashboard', [KurikulumDashboardController::class, 'index'])
                 ->name('dashboard');
@@ -431,6 +488,7 @@ Route::middleware('web')->group(function () {
             Route::get('/ppdb/jurusan/{id}', [PpdbController::class, 'showJurusan'])->name('ppdb.jurusan.show');
             Route::get('/ppdb/jurusan/{id}/pendaftar', [PpdbController::class, 'showPendaftarJurusan'])->name('ppdb.jurusan.pendaftar');
             Route::get('/ppdb/jurusan/{jurusanId}/sesi/{sesiId}', [PpdbController::class, 'showPendaftarSesi'])->name('ppdb.jurusan.sesi.pendaftar');
+            Route::get('/ppdb/sesi/{sesiId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarSesiJalur'])->name('ppdb.sesi.jalur.pendaftar');
             Route::get('/ppdb/jurusan/{jurusanId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarJalur'])->name('ppdb.jurusan.jalur.pendaftar');
             Route::get('/ppdb/{id}/assign', [PpdbController::class, 'showAssignForm'])->name('ppdb.assign.form');
             Route::post('/ppdb/{id}/assign', [PpdbController::class, 'assign'])->name('ppdb.assign');

@@ -600,7 +600,7 @@
                 <p class="section-subtitle">Platform digital terpadu untuk administrasi sekolah modern</p>
             </div>
 
-            <div class="row">
+            <div class="row align-items-start g-4">
                 <div class="col-md-4 mb-4">
                     <div class="info-card">
                         <div class="info-card-icon">
@@ -640,111 +640,163 @@
         </div>
     </section>
 
-    <!-- PPDB SECTION -->
-    <section class="ppdb-section" id="ppdb">
-        <div class="container ppdb-content">
-            <h2 class="ppdb-title">
-                <i class="fas fa-calendar-alt me-3"></i>
-                PPDB 2025/2026
-            </h2>
-            <p class="ppdb-subtitle">Sistem Penerimaan Murid Baru - Tahun Ajaran 2025/2026</p>
+   <!-- PPDB SECTION -->
+<section class="ppdb-section" id="ppdb">
+    <div class="container ppdb-content">
+        <h2 class="ppdb-title">
+            <i class="fas fa-calendar-alt me-3"></i>
+            PPDB 2025/2026
+        </h2>
+        <p class="ppdb-subtitle">Sistem Penerimaan Murid Baru - Tahun Ajaran 2025/2026</p>
 
-            <div class="row">
-                <div class="col-lg-6 mb-4">
-                    <div class="timeline-card">
+        <div class="row align-items-stretch g-4">
+            <div class="col-lg-6 mb-4 d-flex">
+                <div class="timeline-card flex-fill">
+                    <span class="timeline-badge">TAHAP 1</span>
+                    <h3 class="timeline-title">Pendaftaran Tahap 1</h3>
+                    <div class="timeline-date">
+                        <i class="fas fa-calendar-check"></i>
+                        10 - 16 Juni 2025
+                    </div>
+                    
+                    <div class="timeline-detail">
+                        <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
+                        <strong>Pendaftaran & Verifikasi:</strong> 10-16 Juni 2025
+                    </div>
+                    <div class="timeline-detail">
+                        <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
+                        <strong>Masa Sanggah:</strong> 10-17 Juni 2025
+                    </div>
+                    <div class="timeline-detail">
+                        <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
+                        <strong>Rapat Dewan Guru:</strong> 18 Juni 2025
+                    </div>
+                    <div class="timeline-detail">
+                        <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
+                        <strong>Pengumuman Hasil:</strong> 19 Juni 2025 (09:00 WIB)
+                    </div>
+                    <div class="timeline-detail">
+                        <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
+                        <strong>Daftar Ulang:</strong> 20-23 Juni 2025
+                    </div>
+
+                    <div class="mt-3 p-3 bg-light rounded">
+                        <strong>Jalur & Kuota Tahap 1:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li><strong>Domisili Terdekat:</strong> 10%</li>
+                            <li><strong>Afirmasi:</strong> 30% (KETM 25%, PDBK 5%)</li>
+                            <li><strong>Mutasi:</strong> 5% (Perpindahan 2%, Anak Guru 3%)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mb-4 d-flex">
+                <div class="timeline-card flex-fill">
+                    <span class="timeline-badge">TAHAP 2</span>
+                    <h3 class="timeline-title">Pendaftaran Tahap 2 — Belum Dibuka</h3>
+                    <div class="timeline-date">
+                        <i class="fas fa-clock"></i>
+                        Pendaftaran Tahap 2 belum dibuka.
+                    </div>
+                    <div class="mt-3 p-3 bg-light rounded">
+                        Pantau pengumuman resmi untuk jadwal pembukaan Tahap 2.
+                    </div>
+                </div>
+            </div>
+        </div>
+            <div class="row align-items-stretch g-4">
+                @php
+                    $ppdbData = $ppdb ?? null;
+                    $t1 = $ppdbData['tahap1'] ?? null;
+                    $t2 = $ppdbData['tahap2'] ?? null;
+                @endphp
+
+                <div class="col-lg-6 mb-4 d-flex">
+                    <div class="timeline-card flex-fill">
                         <span class="timeline-badge">TAHAP 1</span>
-                        <h3 class="timeline-title">Pendaftaran Tahap 1</h3>
+                        <h3 class="timeline-title">{{ $t1['title'] ?? 'Pendaftaran Tahap 1' }} @if(!empty($t1['open'])) — Terbuka @else @endif</h3>
                         <div class="timeline-date">
                             <i class="fas fa-calendar-check"></i>
-                            10 - 16 Juni 2025
+                            {{ $t1['pendaftaran'] ?? 'Periode belum diset' }}
                         </div>
-                        
+
+                        @if(!empty($t1['pendaftaran']))
                         <div class="timeline-detail">
                             <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Pendaftaran & Verifikasi:</strong> 10-16 Juni 2025
+                            <strong>Pendaftaran & Verifikasi:</strong> {{ $t1['pendaftaran'] }}
                         </div>
+                        @endif
+
+                        @if(!empty($t1['sanggah']))
                         <div class="timeline-detail">
                             <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Masa Sanggah:</strong> 10-17 Juni 2025
+                            <strong>Masa Sanggah:</strong> {{ $t1['sanggah'] }}
                         </div>
+                        @endif
+
+                        @if(!empty($t1['rapat']))
                         <div class="timeline-detail">
                             <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Rapat Dewan Guru:</strong> 18 Juni 2025
+                            <strong>Rapat Dewan Guru:</strong> {{ $t1['rapat'] }}
                         </div>
+                        @endif
+
+                        @if(!empty($t1['pengumuman']))
                         <div class="timeline-detail">
                             <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Pengumuman Hasil:</strong> 19 Juni 2025 (09:00 WIB)
+                            <strong>Pengumuman Hasil:</strong> {{ $t1['pengumuman'] }}
                         </div>
+                        @endif
+
+                        @if(!empty($t1['daftar_ulang']))
                         <div class="timeline-detail">
                             <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Daftar Ulang:</strong> 20-23 Juni 2025
+                            <strong>Daftar Ulang:</strong> {{ $t1['daftar_ulang'] }}
                         </div>
+                        @endif
 
                         <div class="mt-3 p-3 bg-light rounded">
                             <strong>Jalur & Kuota Tahap 1:</strong>
                             <ul class="mb-0 mt-2">
-                                <li><strong>Domisili Terdekat:</strong> 10%</li>
-                                <li><strong>Afirmasi:</strong> 30% (KETM 25%, PDBK 5%)</li>
-                                <li><strong>Mutasi:</strong> 5% (Perpindahan 2%, Anak Guru 3%)</li>
+                                <li>Domisili Terdekat: 10%</li>
+                                <li>Afirmasi: 30% (KETM 25%, PDBK 5%)</li>
+                                <li>Mutasi: 5% (Perpindahan 2%, Anak Guru 3%)</li>
                             </ul>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-6 mb-4">
-                    <div class="timeline-card">
+                <div class="col-lg-6 mb-4 d-flex">
+                    <div class="timeline-card flex-fill">
                         <span class="timeline-badge">TAHAP 2</span>
-                        <h3 class="timeline-title">Pendaftaran Tahap 2</h3>
+                        <h3 class="timeline-title">
+                            {{ $t2['title'] ?? 'Pendaftaran Tahap 2' }}
+                            @if(!empty($t2['open'])) — Terbuka @else — Belum Dibuka @endif
+                        </h3>
                         <div class="timeline-date">
-                            <i class="fas fa-calendar-check"></i>
-                            24 Juni - 1 Juli 2025
+                            <i class="fas {{ !empty($t2['open']) ? 'fa-calendar-check' : 'fa-clock' }}"></i>
+                            {{ $t2['pendaftaran'] ?? (!empty($t2['open']) ? 'Periode terbuka' : 'Pendaftaran Tahap 2 belum dibuka.') }}
                         </div>
-                        
-                        <div class="timeline-detail">
-                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Pendaftaran & Verifikasi:</strong> 24 Juni - 1 Juli 2025
-                        </div>
-                        <div class="timeline-detail">
-                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Masa Sanggah:</strong> 24 Juni - 2 Juli 2025
-                        </div>
-                        <div class="timeline-detail">
-                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Tes Minat Bakat:</strong> 2-7 Juli 2025
-                        </div>
-                        <div class="timeline-detail">
-                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Rapat Dewan Guru:</strong> 8 Juli 2025
-                        </div>
-                        <div class="timeline-detail">
-                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Pengumuman Hasil:</strong> 9 Juli 2025 (15:00 WIB)
-                        </div>
-                        <div class="timeline-detail">
-                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Daftar Ulang:</strong> 10-11 Juli 2025
-                        </div>
-
                         <div class="mt-3 p-3 bg-light rounded">
-                            <strong>Jalur & Kuota Tahap 2:</strong>
-                            <ul class="mb-0 mt-2">
-                                <li><strong>Prestasi:</strong> 55%</li>
-                                <li><strong>Akademik:</strong> 50% (Nilai Rapor 30%, Kelas Industri 20%)</li>
-                                <li><strong>Non Akademik:</strong> 5% (Prestasi 4%, Kepemimpinan 1%)</li>
-                            </ul>
+                            @if(!empty($t2['open']))
+                                Lakukan pendaftaran sesuai ketentuan untuk Tahap 2.
+                            @else
+                                Pantau pengumuman resmi untuk jadwal pembukaan Tahap 2.
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="alert-box">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                <strong>PENTING:</strong> Pendaftaran dapat dilakukan secara <strong>DARING</strong> melalui 
-                <a href="https://spmb.jabarprov.go.id" style="color: #003d82; text-decoration: underline;"><strong>spmb.jabarprov.go.id</strong></a>
-                (08:00-20:00 WIB) atau <strong>LURING</strong> di Sekretariat SPMB SMKN 1 Kawali (08:00-14:00 WIB)
-            </div>
+        <div class="alert-box">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>PENTING:</strong> Pendaftaran dapat dilakukan secara <strong>DARING</strong> melalui 
+            <a href="https://spmb.jabarprov.go.id" style="color: #003d82; text-decoration: underline;"><strong>spmb.jabarprov.go.id</strong></a>
+            (08:00-20:00 WIB) atau <strong>LURING</strong> di Sekretariat SPMB SMKN 1 Kawali (08:00-14:00 WIB)
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- PROGRAM SECTION -->
     <section class="program-section" id="program">

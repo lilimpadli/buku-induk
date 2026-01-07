@@ -210,7 +210,7 @@
             <th width="30%">Nama Peserta Didik</th>
             <td>{{ strtoupper($siswa->nama_lengkap) }}</td>
             <th width="30%">Kelas</th>
-            <td>{{ $siswa->rombel->nama ?? '-' }}</td>
+            <td>{{ $rombelRaport->nama ?? $siswa->rombel->nama ?? '-' }}</td>
         </tr>
         <tr>
             <th>NISN</th>

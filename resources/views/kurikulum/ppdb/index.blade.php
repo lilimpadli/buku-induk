@@ -19,6 +19,8 @@
                 </div>
             @endif
 
+            <!-- Tahap sections removed — showing jurusan only -->
+
             <div class="row">
                 @forelse ($jurusans as $jurusan)
                     <div class="col-md-4 mb-4">

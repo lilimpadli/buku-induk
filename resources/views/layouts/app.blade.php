@@ -15,6 +15,8 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
+    @stack('styles')
+
     <style>
         /* Layout */
         :root{
@@ -276,6 +278,10 @@
                                     </a>
 
                                     <a href="{{ route('kurikulum.ppdb.index') }}" class="nav-link {{ request()->routeIs('kurikulum.ppdb*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen PPDB">
+                                        <i class="fas fa-users"></i> <span class="label ms-2">PPDB</span>
+                                    </a>
+
+                                      <a href="{{ route('kurikulum.ppdb.timeline') }}" class="nav-link {{ request()->routeIs('kurikulum.ppdb.timeline') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Timeline PPDB">
                                         <i class="fas fa-users"></i> <span class="label ms-2">PPDB</span>
                                     </a>
 

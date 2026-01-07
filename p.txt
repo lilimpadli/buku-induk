@@ -38,3 +38,73 @@ review
 6. Kaprog✅
 7. All
 * Tampilannya harus sesuai (TU dan kurikulum)
+
+
+  @if(!empty($tahapCounts))
+                <div class="mb-4 d-flex gap-3">
+                    <div class="badge bg-primary p-3">Tahap 1: {{ $tahapCounts['tahap1'] ?? 0 }} pendaftar</div>
+                    <div class="badge bg-secondary p-3">Tahap 2: {{ $tahapCounts['tahap2'] ?? 0 }} pendaftar</div>
+                </div>
+            @endif
+
+            @if(!empty($tahapSessions))
+                <div class="row mb-4">
+                    <div class="col-12 mb-3">
+                        <h5>Tahap 1</h5>
+                    </div>
+                    @foreach($tahapSessions['tahap1'] as $sesi)
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ $sesi->tahun_ajaran }} - {{ $sesi->nama_sesi }}</h6>
+                                    <p class="mb-2">Total pendaftar: <strong>{{ $sesi->ppdb_count }}</strong></p>
+                                    <p>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#sesi-{{ $sesi->id }}" aria-expanded="false" aria-controls="sesi-{{ $sesi->id }}">
+                                            Lihat Jalur & Pendaftar
+                                        </button>
+                                    </p>
+                                    <div class="collapse mt-3" id="sesi-{{ $sesi->id }}">
+                                        <ul class="list-group">
+                                            @foreach($sesi->jalurs as $jalur)
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <a href="{{ route('ppdb.sesi.jalur.pendaftar', ['sesiId' => $sesi->id, 'jalurId' => $jalur->id]) }}">{{ $jalur->nama_jalur }}</a>
+                                                    <span class="badge bg-primary rounded-pill">{{ $jalur->ppdb_count }}</span>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+
+                    <div class="col-12 mt-4 mb-3">
+                        <h5>Tahap 2</h5>
+                    </div>
+                    @foreach($tahapSessions['tahap2'] as $sesi)
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ $sesi->tahun_ajaran }} - {{ $sesi->nama_sesi }}</h6>
+                                    <p class="mb-2">Total pendaftar: <strong>{{ $sesi->ppdb_count }}</strong></p>
+                                    <p>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#sesi-{{ $sesi->id }}" aria-expanded="false" aria-controls="sesi-{{ $sesi->id }}">
+                                            Lihat Jalur & Pendaftar
+                                        </button>
+                                    </p>
+                                    <div class="collapse mt-3" id="sesi-{{ $sesi->id }}">
+                                        <ul class="list-group">
+                                            @foreach($sesi->jalurs as $jalur)
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <a href="{{ route('ppdb.sesi.jalur.pendaftar', ['sesiId' => $sesi->id, 'jalurId' => $jalur->id]) }}">{{ $jalur->nama_jalur }}</a>
+                                                    <span class="badge bg-primary rounded-pill">{{ $jalur->ppdb_count }}</span>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif

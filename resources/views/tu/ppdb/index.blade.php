@@ -5,9 +5,9 @@
 @section('content')
 <div class="container-fluid">
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Daftar Jurusan PPDB</h5>
-            <a href="{{ route('ppdb.index') }}" class="btn btn-sm btn-outline-primary">
+            <a href="{{ route('ppdb.create') }}" class="btn btn-sm btn-outline-primary">
                 <i class="fas fa-plus"></i> Tambah Pendaftar Baru
             </a>
         </div>
@@ -18,6 +18,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
+
+            <!-- Tahap sections removed — showing jurusan only -->
 
             <div class="row">
                 @forelse ($jurusans as $jurusan)

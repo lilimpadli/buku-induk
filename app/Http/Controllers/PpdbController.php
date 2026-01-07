@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\JalurPpdb;
 use App\Models\SesiPpdb;
 use App\Models\Jurusan;
+use App\Models\PpdbTimeline;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
@@ -27,13 +28,103 @@ class PpdbController extends Controller
     // =========================
     public function index()
     {
+        $allSesis = SesiPpdb::orderBy('tahun_ajaran', 'desc')->get();
+
+        if (Schema::hasTable('ppdb_timelines')) {
+            $opens = PpdbTimeline::pluck('open', 'stage')->toArray();
+            $hasTahap1 = !empty($opens['tahap1']);
+            $hasTahap2 = !empty($opens['tahap2']);
+
+            $sesis = $allSesis->filter(function($s) use ($hasTahap1, $hasTahap2) {
+                // Prefer explicit stage column on sesi; fallback to name matching
+                if (!empty($s->stage)) {
+                    $stage = strtolower(trim($s->stage));
+                    if ($stage === 'tahap1') return $hasTahap1;
+                    if ($stage === 'tahap2') return $hasTahap2;
+                    return false;
+                }
+
+                $name = strtolower(trim($s->nama_sesi ?? ''));
+                $isTahap1 = (strpos($name, 'tahap 1') !== false || strpos($name, 'tahap1') !== false || strpos($name, 'sesi 1') !== false || strpos($name, 'sesi1') !== false);
+                $isTahap2 = (strpos($name, 'tahap 2') !== false || strpos($name, 'tahap2') !== false || strpos($name, 'sesi 2') !== false || strpos($name, 'sesi2') !== false);
+
+                // If both tahap open, include everything (including undecided)
+                if ($hasTahap1 && $hasTahap2) return true;
+
+                // If only satu tahap terbuka, only show sessions matching that tahap
+                if ($hasTahap1 && !$hasTahap2) return $isTahap1;
+                if ($hasTahap2 && !$hasTahap1) return $isTahap2;
+
+                // none open -> hide all
+                return false;
+            })->values();
+        } else {
+            $sesis = $allSesis;
+        }
+
         $data = [
-            'sesis'    => SesiPpdb::orderBy('tahun_ajaran', 'desc')->get(),
+            'sesis'    => $sesis,
             'jalurs'   => JalurPpdb::orderBy('nama_jalur')->get(),
             'jurusans' => Jurusan::orderBy('nama')->get(),
         ];
 
         if (request()->routeIs('kurikulum.*')) {
+            // enrich all sesi (not only filtered) with ppdb counts and jalur counts for kurikulum view
+            $allSessions = SesiPpdb::orderBy('tahun_ajaran', 'desc')->get();
+            $sesisDetailed = $allSessions->map(function($sesi) {
+                $sesi->ppdb_count = Ppdb::where('sesi_ppdb_id', $sesi->id)->count();
+                $sesi->jalurs = JalurPpdb::withCount(['ppdb' => function($q) use ($sesi) {
+                    $q->where('sesi_ppdb_id', $sesi->id);
+                }])->orderBy('nama_jalur')->get();
+                return $sesi;
+            });
+
+            // counts per tahap (prefer explicit stage, fallback to name matching)
+            $tahapCounts = ['tahap1' => 0, 'tahap2' => 0];
+            $allSessions = SesiPpdb::all();
+            foreach ($allSessions as $s) {
+                $count = Ppdb::where('sesi_ppdb_id', $s->id)->count();
+                if (!empty($s->stage)) {
+                    $st = strtolower(trim($s->stage));
+                    if ($st === 'tahap1') $tahapCounts['tahap1'] += $count;
+                    if ($st === 'tahap2') $tahapCounts['tahap2'] += $count;
+                    continue;
+                }
+                $name = strtolower(trim($s->nama_sesi ?? ''));
+                if (str_contains($name, 'tahap 1') || str_contains($name, 'tahap1') || str_contains($name, 'sesi 1') || str_contains($name, 'sesi1')) {
+                    $tahapCounts['tahap1'] += $count;
+                } elseif (str_contains($name, 'tahap 2') || str_contains($name, 'tahap2') || str_contains($name, 'sesi 2') || str_contains($name, 'sesi2')) {
+                    $tahapCounts['tahap2'] += $count;
+                }
+            }
+
+            $data['sesisDetailed'] = $sesisDetailed;
+            $data['tahapCounts'] = $tahapCounts;
+
+            // group sesiDetailed by tahap for view convenience
+            $tahapSessions = ['tahap1' => collect(), 'tahap2' => collect()];
+            foreach ($sesisDetailed as $sesi) {
+                if (!empty($sesi->stage)) {
+                    $st = strtolower(trim($sesi->stage));
+                    if ($st === 'tahap1') $tahapSessions['tahap1']->push($sesi);
+                    elseif ($st === 'tahap2') $tahapSessions['tahap2']->push($sesi);
+                    else $tahapSessions['tahap1']->push($sesi);
+                    continue;
+                }
+
+                $name = strtolower(trim($sesi->nama_sesi ?? ''));
+                if (str_contains($name, 'tahap 1') || str_contains($name, 'tahap1') || str_contains($name, 'sesi 1') || str_contains($name, 'sesi1')) {
+                    $tahapSessions['tahap1']->push($sesi);
+                } elseif (str_contains($name, 'tahap 2') || str_contains($name, 'tahap2') || str_contains($name, 'sesi 2') || str_contains($name, 'sesi2')) {
+                    $tahapSessions['tahap2']->push($sesi);
+                } else {
+                    // default to tahap1 if undecided
+                    $tahapSessions['tahap1']->push($sesi);
+                }
+            }
+
+            $data['tahapSessions'] = $tahapSessions;
+
             return view('kurikulum.ppdb.index', $data);
         }
 
@@ -62,10 +153,51 @@ class PpdbController extends Controller
             $query->where('jurusan_id', $id);
         }])->orderBy('tahun_ajaran', 'desc')->get();
 
-        // Ambil semua jalur dengan count pendaftar untuk jurusan ini
+        // for each sesi, attach jalurs with counts filtered by jurusan + sesi
+        $sesis->transform(function($sesi) use ($id) {
+            $sesi->jalurs = JalurPpdb::withCount(['ppdb' => function($q) use ($id, $sesi) {
+                $q->where('jurusan_id', $id)->where('sesi_ppdb_id', $sesi->id);
+            }])->orderBy('nama_jalur')->get();
+            return $sesi;
+        });
+
+        // Ambil semua jalur dengan count pendaftar untuk jurusan ini (overall)
         $jalurs = JalurPpdb::withCount(['ppdb' => function($query) use ($id) {
             $query->where('jurusan_id', $id);
         }])->orderBy('nama_jalur')->get();
+
+        // group sesi into tahap1 / tahap2 for the view
+        $tahapSessions = ['tahap1' => collect(), 'tahap2' => collect()];
+        $tahap1Keywords = ['tahap 1','tahap1','sesi 1','sesi1','sesi-1'];
+        $tahap2Keywords = ['tahap 2','tahap2','sesi 2','sesi2','sesi-2'];
+        foreach ($sesis as $sesi) {
+            // prefer explicit stage field on sesi
+            if (!empty($sesi->stage)) {
+                $st = strtolower(trim($sesi->stage));
+                if ($st === 'tahap1') { $tahapSessions['tahap1']->push($sesi); continue; }
+                if ($st === 'tahap2') { $tahapSessions['tahap2']->push($sesi); continue; }
+            }
+
+            $name = strtolower(trim($sesi->nama_sesi ?? ''));
+            $isTahap1 = false;
+            foreach ($tahap1Keywords as $k) {
+                if (strpos($name, $k) !== false) { $isTahap1 = true; break; }
+            }
+            if ($isTahap1) {
+                $tahapSessions['tahap1']->push($sesi);
+                continue;
+            }
+            $isTahap2 = false;
+            foreach ($tahap2Keywords as $k) {
+                if (strpos($name, $k) !== false) { $isTahap2 = true; break; }
+            }
+            if ($isTahap2) {
+                $tahapSessions['tahap2']->push($sesi);
+                continue;
+            }
+            // default: push to tahap1
+            $tahapSessions['tahap1']->push($sesi);
+        }
 
         if (request()->routeIs('kurikulum.*')) {
             return view('kurikulum.ppdb.jurusan.show', compact('jurusan', 'sesis', 'jalurs'));
@@ -136,15 +268,80 @@ class PpdbController extends Controller
     }
 
     // =========================
+    // SHOW PENDAFTAR BERDASARKAN SESI + JALUR (KURIKULUM)
+    // =========================
+    public function showPendaftarSesiJalur($sesiId, $jalurId)
+    {
+        $sesi = SesiPpdb::findOrFail($sesiId);
+        $jalur = JalurPpdb::findOrFail($jalurId);
+
+        $pendaftars = Ppdb::with(['jalur', 'sesi', 'jurusan'])
+            ->where('sesi_ppdb_id', $sesiId)
+            ->where('jalur_ppdb_id', $jalurId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('kurikulum.ppdb.sesi_jalur_pendaftar', compact('sesi', 'jalur', 'pendaftars'));
+    }
+
+    // =========================
+    // SHOW PENDAFTAR BERDASARKAN JURUSAN + SESI + JALUR (KURIKULUM)
+    // =========================
+    public function showPendaftarJurusanSesiJalur($jurusanId, $sesiId, $jalurId)
+    {
+        $jurusan = Jurusan::findOrFail($jurusanId);
+        $sesi = SesiPpdb::findOrFail($sesiId);
+        $jalur = JalurPpdb::findOrFail($jalurId);
+
+        $pendaftars = Ppdb::with(['jalur', 'sesi', 'jurusan'])
+            ->where('jurusan_id', $jurusanId)
+            ->where('sesi_ppdb_id', $sesiId)
+            ->where('jalur_ppdb_id', $jalurId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('kurikulum.ppdb.jurusan.pendaftar-jalur', compact('jurusan', 'sesi', 'jalur', 'pendaftars'));
+    }
+
+    // =========================
     // FORM INPUT PPDB (PUBLIC)
     // =========================
     public function create(Request $request)
     {
+        $allSesis = SesiPpdb::orderBy('tahun_ajaran', 'desc')->get();
+
+        if (Schema::hasTable('ppdb_timelines')) {
+            $opens = PpdbTimeline::pluck('open', 'stage')->toArray();
+            $hasTahap1 = !empty($opens['tahap1']);
+            $hasTahap2 = !empty($opens['tahap2']);
+
+            $sesis = $allSesis->filter(function($s) use ($hasTahap1, $hasTahap2) {
+                // prefer explicit stage on sesi
+                if (!empty($s->stage)) {
+                    $st = strtolower(trim($s->stage));
+                    if ($st === 'tahap1') return $hasTahap1;
+                    if ($st === 'tahap2') return $hasTahap2;
+                    return false;
+                }
+
+                $name = strtolower($s->nama_sesi ?? '');
+                $isTahap1 = (strpos($name, 'tahap 1') !== false || strpos($name, 'tahap1') !== false || strpos($name, 'sesi 1') !== false || strpos($name, 'sesi1') !== false);
+                $isTahap2 = (strpos($name, 'tahap 2') !== false || strpos($name, 'tahap2') !== false || strpos($name, 'sesi 2') !== false || strpos($name, 'sesi2') !== false);
+
+                if ($hasTahap1 && $hasTahap2) return true;
+                if ($hasTahap1 && !$hasTahap2) return $isTahap1;
+                if ($hasTahap2 && !$hasTahap1) return $isTahap2;
+                return false;
+            })->values();
+        } else {
+            $sesis = $allSesis;
+        }
+
         return view('ppdb.create', [
             'sesi'        => $request->filled('sesi')  ? SesiPpdb::find($request->sesi)  : null,
             'jalur'       => $request->filled('jalur') ? JalurPpdb::find($request->jalur) : null,
             'jurusan'     => $request->filled('jurusan') ? Jurusan::find($request->jurusan) : null,
-            'sesis'       => SesiPpdb::orderBy('tahun_ajaran', 'desc')->get(),
+            'sesis'       => $sesis,
             'jalurs'      => JalurPpdb::orderBy('nama_jalur')->get(),
             'jurusans'    => Jurusan::orderBy('nama')->get(),
         ]);
@@ -234,7 +431,20 @@ class PpdbController extends Controller
     public function showAssignForm($id)
     {
         $entry = Ppdb::with(['jurusan', 'sesi', 'jalur'])->findOrFail($id);
-        $rombels = Rombel::with(['kelas', 'guru'])->orderBy('nama')->get();
+        // Only show rombels that belong to the same jurusan as the PPDB entry
+        // and are for Kelas 10 (tingkat = 10)
+        $rombels = Rombel::with(['kelas', 'guru'])
+            ->whereHas('kelas', function($q) use ($entry) {
+                $q->where('jurusan_id', $entry->jurusan_id)
+                  ->where(function($q2) {
+                      $q2->where('tingkat', 10)
+                         ->orWhere('tingkat', '10')
+                         ->orWhere('tingkat', 'X')
+                         ->orWhere('tingkat', 'x');
+                  });
+            })
+            ->orderBy('nama')
+            ->get();
 
         if (request()->routeIs('kurikulum.*')) {
             return view('kurikulum.ppdb.assign', compact('entry', 'rombels'));
@@ -315,13 +525,14 @@ class PpdbController extends Controller
                 'wali_id'         => $waliId,
             ]);
 
-            // Buat User untuk siswa - TANPA nisn
+            // Buat User untuk siswa - password awal default '12345678'
+            $defaultPassword = '12345678';
             $user = User::create([
                 'name'         => $siswa->nama_lengkap,
                 'nomor_induk'  => $nis,
                 'role'         => 'siswa',
                 'email'        => null,
-                'password'     => bcrypt($nis), // Password awal = NIS
+                'password'     => bcrypt($defaultPassword),
             ]);
 
             // Hubungkan user dengan data siswa
@@ -350,7 +561,7 @@ class PpdbController extends Controller
             ->with('success', "PPDB terassign ke rombel {$rombel->nama} dan NIS dibuat: {$nis}.<br>
         Akun login telah dibuat:<br>
         Username: {$nis}<br>
-        Password: {$nis}<br>
+        Password: 12345678<br>
         <small>Informasikan ke siswa untuk segera mengganti password</small>");
     }
     // =========================

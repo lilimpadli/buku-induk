@@ -202,6 +202,12 @@ class KaprogController extends Controller
             return redirect()->back()->with('error', 'Data raport tidak ditemukan');
         }
 
+        // Derive historical kelas/rombel from saved NilaiRaport rows so
+        // we can show the class context as it was when the raport was recorded.
+        $firstNilai = $nilaiRaports->first();
+        $kelasRaport = $firstNilai->kelas ?? ($siswa->rombel->kelas ?? null);
+        $rombelRaport = $firstNilai->rombel ?? ($siswa->rombel ?? null);
+
         $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa->id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
@@ -222,7 +228,7 @@ class KaprogController extends Controller
             ->where('tahun_ajaran', $tahun)
             ->first();
 
-        return view('kaprog.siswa.raport-detail', compact('siswa', 'nilaiRaports', 'ekstra', 'kehadiran', 'raporInfo', 'kenaikan', 'semester', 'tahun'));
+        return view('kaprog.siswa.raport-detail', compact('siswa', 'nilaiRaports', 'ekstra', 'kehadiran', 'raporInfo', 'kenaikan', 'semester', 'tahun', 'kelasRaport', 'rombelRaport'));
     }
 
     // Tampilkan form data diri kaprog (edit)

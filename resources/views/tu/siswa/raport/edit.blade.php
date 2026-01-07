@@ -239,21 +239,33 @@
 </style>
 
 <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3>Edit Rapor — {{ $siswa->nama_lengkap }}</h3>
-            <a href="{{ $backRoute ?? route('tu.nilai_raport.show', ['siswa_id' => $siswa->id, 'semester' => $semester, 'tahun' => $tahun]) }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left"></i> Kembali
-            </a>
-        </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Edit Rapor — {{ $siswa->nama_lengkap }}</h3>
+        <a href="{{ $backRoute ?? route('tu.nilai_raport.show', ['siswa_id' => $siswa->id, 'semester' => $semester, 'tahun' => $tahun]) }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
 
     <form action="{{ $formAction ?? route('tu.nilai_raport.update', ['siswa_id' => $siswa->id, 'semester' => $semester, 'tahun' => $tahun]) }}" method="POST">
         @csrf
         @method('PUT')
 
+        <!-- Semester & Tahun (lihat, tidak bisa diubah di edit) -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <label class="fw-bold">Semester</label>
+                <input type="text" class="form-control" value="{{ $semester }}" readonly>
+                <input type="hidden" name="semester" value="{{ $semester }}">
+            </div>
+            <div class="col-md-3">
+                <label class="fw-bold">Tahun Ajaran</label>
+                <input type="text" class="form-control" value="{{ $tahun }}" readonly>
+                <input type="hidden" name="tahun_ajaran" value="{{ $tahun }}">
+            </div>
+        </div>
+
         <!-- Tambahkan input hidden untuk parameter -->
         <input type="hidden" name="siswa_id" value="{{ $siswa->id }}">
-        <input type="hidden" name="semester" value="{{ $semester }}">
-        <input type="hidden" name="tahun" value="{{ $tahun }}">
         <!-- Identitas Siswa -->
         <div class="card mb-4">
             <div class="card-header">
@@ -265,7 +277,7 @@
                         <th width="30%">Nama Peserta Didik</th>
                         <td>{{ $siswa->nama_lengkap }}</td>
                         <th width="30%">Kelas</th>
-                        <td>{{ $siswa->rombel->nama ?? '-' }}</td>
+                        <td>{{ $rombelRaport->nama ?? $siswa->rombel->nama ?? '-' }}</td>
                     </tr>
                     <tr>
                         <th>NISN</th>
@@ -298,25 +310,21 @@
                             <th>Capaian Kompetensi</th>
                         </tr>
                     </thead>
-                        <tbody>
-                        @forelse($kelompokA as $mapel)
+                    <tbody>
+                        @foreach($kelompokA as $mapel)
                             <tr>
                                 <td>{{ $mapel->urutan }}</td>
                                 <td>{{ $mapel->nama }}</td>
                                 <td>
                                     <input type="number" name="nilai[{{ $mapel->id }}][nilai_akhir]" class="form-control"
-                                        value="{{ old('nilai.'.$mapel->id.'.nilai_akhir', optional($nilai[$mapel->id] ?? null)->nilai_akhir ?? '') }}" min="0" max="100">
+                                        value="{{ $nilai[$mapel->id]->nilai_akhir ?? '' }}" min="0" max="100">
                                 </td>
                                 <td>
                                     <textarea name="nilai[{{ $mapel->id }}][deskripsi]" class="form-control"
-                                        rows="2">{{ old('nilai.'.$mapel->id.'.deskripsi', optional($nilai[$mapel->id] ?? null)->deskripsi ?? '') }}</textarea>
+                                        rows="2">{{ $nilai[$mapel->id]->deskripsi ?? '' }}</textarea>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="text-center text-muted">Tidak ada mata pelajaran pada kelompok A</td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -338,24 +346,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($kelompokB as $mapel)
+                        @foreach($kelompokB as $mapel)
                             <tr>
                                 <td>{{ $mapel->urutan }}</td>
                                 <td>{{ $mapel->nama }}</td>
                                 <td>
                                     <input type="number" name="nilai[{{ $mapel->id }}][nilai_akhir]" class="form-control"
-                                        value="{{ old('nilai.'.$mapel->id.'.nilai_akhir', optional($nilai[$mapel->id] ?? null)->nilai_akhir ?? '') }}" min="0" max="100">
+                                        value="{{ $nilai[$mapel->id]->nilai_akhir ?? '' }}" min="0" max="100">
                                 </td>
                                 <td>
                                     <textarea name="nilai[{{ $mapel->id }}][deskripsi]" class="form-control"
-                                        rows="2">{{ old('nilai.'.$mapel->id.'.deskripsi', optional($nilai[$mapel->id] ?? null)->deskripsi ?? '') }}</textarea>
+                                        rows="2">{{ $nilai[$mapel->id]->deskripsi ?? '' }}</textarea>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="text-center text-muted">Tidak ada mata pelajaran pada kelompok B</td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -431,17 +435,17 @@
                     <div class="col-md-4">
                         <label>Sakit</label>
                         <input type="number" name="hadir[sakit]" class="form-control"
-                            value="{{ old('hadir.sakit', $kehadiran->sakit ?? 0) }}" min="0">
+                            value="{{ $kehadiran->sakit ?? 0 }}" min="0">
                     </div>
                     <div class="col-md-4">
                         <label>Izin</label>
-                        <input type="number" name="hadir[izin]" class="form-control" value="{{ old('hadir.izin', $kehadiran->izin ?? 0) }}"
+                        <input type="number" name="hadir[izin]" class="form-control" value="{{ $kehadiran->izin ?? 0 }}"
                             min="0">
                     </div>
                     <div class="col-md-4">
                         <label>Tanpa Keterangan</label>
                         <input type="number" name="hadir[alpa]" class="form-control"
-                            value="{{ old('hadir.alpa', $kehadiran->tanpa_keterangan ?? 0) }}" min="0">
+                            value="{{ $kehadiran->tanpa_keterangan ?? 0 }}" min="0">
                     </div>
                 </div>
             </div>
@@ -456,28 +460,39 @@
                 <div class="row">
                     <div class="col-md-6">
                         <label>Status</label>
-                            <select name="kenaikan[status]" class="form-control">
-                                <option value="Naik Kelas" {{ old('kenaikan.status', optional($kenaikan)->status) == 'Naik Kelas' ? 'selected' : '' }}>Naik</option>
-                                <option value="Tidak Naik" {{ old('kenaikan.status', optional($kenaikan)->status) == 'Tidak Naik' ? 'selected' : '' }}>Tidak Naik</option>
-                                <option value="Lulus" {{ old('kenaikan.status', optional($kenaikan)->status) == 'Lulus' ? 'selected' : '' }}>Lulus</option>
+                        @php
+                            $kStatus = strtolower(str_replace([' ', '_'], '', trim($kenaikan->status ?? '')));
+                        @endphp
+                        <select name="kenaikan[status]" class="form-control" id="statusKenaikanSelect">
+                            <option value="Naik Kelas" {{ in_array($kStatus, ['naik','naikkelas']) ? 'selected' : '' }}>Naik Kelas</option>
+                            <option value="Tidak Naik" {{ in_array($kStatus, ['tidaknaik','tidak']) ? 'selected' : '' }}>Tidak Naik</option>
+                            <option value="Lulus" {{ in_array($kStatus, ['lulus','lulusan']) ? 'selected' : '' }}>Lulus</option>
                         </select>
                     </div>
                     <div class="col-md-6">
                         <label>Ke Kelas</label>
-                            <select name="kenaikan[rombel_tujuan_id]" class="form-control">
-                                <option value="">-- Pilih Kelas --</option>
-                                @foreach($rombels as $rombel)
-                                    <option value="{{ $rombel->id }}" {{ old('kenaikan.rombel_tujuan_id', optional($kenaikan)->rombel_tujuan_id) == $rombel->id ? 'selected' : '' }}>
-                                    {{ $rombel->nama }}
+                        @php
+                            $rombelSource = isset($rombelsFiltered) && $rombelsFiltered->count() > 0 ? $rombelsFiltered : $rombels;
+                            $statusNorm = strtolower(str_replace([' ', '_'], '', trim($kenaikan->status ?? '')));
+                            $rombelDisabled = ($semester && strtolower($semester) === 'ganjil') || ($statusNorm !== 'naikkelas');
+                        @endphp
+                        <select name="kenaikan[rombel_tujuan_id]" class="form-control" id="rombelTujuanSelect" {{ $rombelDisabled ? 'disabled' : '' }}>
+                            <option value="">-- Pilih Kelas --</option>
+                            @foreach($rombelSource as $rombel)
+                                <option value="{{ $rombel->id }}" {{ ($kenaikan->rombel_tujuan_id == $rombel->id) ? 'selected' : '' }}>
+                                    {{ $rombel->nama }} @if(isset($rombel->kelas)) ({{ $rombel->kelas->tingkat }} - {{ $rombel->kelas->jurusan->nama ?? '' }}) @endif
                                 </option>
                             @endforeach
                         </select>
+                        @if(isset($targetTingkat) && $targetTingkat)
+                            <small class="text-muted">Menampilkan rombel untuk tingkat: {{ $targetTingkat }}</small>
+                        @endif
                     </div>
                 </div>
                 <div class="mt-3">
                     <label>Catatan</label>
-                        <textarea name="kenaikan[catatan]" class="form-control"
-                            rows="2">{{ old('kenaikan.catatan', optional($kenaikan)->catatan ?? '') }}</textarea>
+                    <textarea name="kenaikan[catatan]" class="form-control"
+                        rows="2">{{ $kenaikan->catatan ?? '' }}</textarea>
                 </div>
             </div>
         </div>
@@ -492,31 +507,31 @@
                     <div class="col-md-6">
                         <label>Wali Kelas</label>
                         <input type="text" name="info[wali_kelas]" class="form-control"
-                            value="{{ old('info.wali_kelas', $info->wali_kelas ?? '') }}">
+                            value="{{ $info->wali_kelas ?? '' }}">
                     </div>
                     <div class="col-md-6">
                         <label>NIP Wali Kelas</label>
                         <input type="text" name="info[nip_wali]" class="form-control"
-                            value="{{ old('info.nip_wali', $info->nip_wali ?? '') }}">
+                            value="{{ $info->nip_wali ?? '' }}">
                     </div>
                 </div>
                 <div class="row mt-3">
                     <div class="col-md-6">
                         <label>Kepala Sekolah</label>
                         <input type="text" name="info[kepsek]" class="form-control"
-                            value="{{ old('info.kepsek', $info->kepala_sekolah ?? '') }}">
+                            value="{{ $info->kepala_sekolah ?? '' }}">
                     </div>
                     <div class="col-md-6">
                         <label>NIP Kepala Sekolah</label>
                         <input type="text" name="info[nip_kepsek]" class="form-control"
-                            value="{{ old('info.nip_kepsek', $info->nip_kepsek ?? '') }}">
+                            value="{{ $info->nip_kepsek ?? '' }}">
                     </div>
                 </div>
                 <div class="row mt-3">
                     <div class="col-md-6">
                         <label>Tanggal Rapor</label>
                         <input type="date" name="info[tanggal_rapor]" class="form-control"
-                            value="{{ old('info.tanggal_rapor', $info->tanggal_rapor ?? date('Y-m-d')) }}">
+                            value="{{ $info->tanggal_rapor ?? date('Y-m-d') }}">
                     </div>
                 </div>
             </div>
@@ -532,12 +547,9 @@
         </div>
     </form>
     
-    <form id="form-delete-rapor" action="{{ $deleteAction ?? route('tu.nilai_raport.destroy') }}" method="POST" style="display:none;">
+    <form id="form-delete-rapor" action="{{ $deleteAction ?? route('tu.nilai_raport.destroy', ['siswa_id' => $siswa->id, 'semester' => $semester, 'tahun' => $tahun]) }}" method="POST" style="display:none;">
         @csrf
         @method('DELETE')
-        <input type="hidden" name="siswa_id" value="{{ $siswa->id }}">
-        <input type="hidden" name="semester" value="{{ $semester }}">
-        <input type="hidden" name="tahun" value="{{ $tahun }}">
     </form>
 </div>
 @endsection
@@ -584,6 +596,24 @@
                     e.target.closest('.ekstra-row').remove();
                 }
             });
+
+            // Toggle rombel select enabled state based on status and semester
+            function updateRombelState() {
+                const statusEl = document.getElementById('statusKenaikanSelect');
+                const rombelEl = document.getElementById('rombelTujuanSelect');
+                if (!statusEl || !rombelEl) return;
+                const statusNorm = (statusEl.value || '').toString().toLowerCase().replace(/\s|_/g, '');
+                const semester = '{{$semester}}'.toString().toLowerCase();
+                if (semester === 'ganjil' || statusNorm !== 'naikkelas') {
+                    rombelEl.disabled = true;
+                } else {
+                    rombelEl.disabled = false;
+                }
+            }
+
+            document.getElementById('statusKenaikanSelect')?.addEventListener('change', updateRombelState);
+            // initial state
+            updateRombelState();
         });
 
         // Konfirmasi hapus rapor

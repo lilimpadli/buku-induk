@@ -164,7 +164,7 @@
                         @csrf
 
                         <div class="mb-3">
-                            <label class="form-label">Pilih Rombel <span class="text-danger">*</span></label>
+                            <label class="form-label">Pilih Rombel (Kelas X, sesuai jurusan) <span class="text-danger">*</span></label>
                             <select name="rombel_id" class="form-select @error('rombel_id') is-invalid @enderror" required>
                                 <option value="">-- Pilih Rombel --</option>
                                 @foreach($rombels as $r)
@@ -178,6 +178,10 @@
                             @error('rombel_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <small class="text-muted d-block mt-1">Hanya menampilkan rombel Kelas X pada jurusan pendaftar.</small>
+                            @if($rombels->isEmpty())
+                                <div class="alert alert-warning mt-2">Tidak ada rombel Kelas X untuk jurusan ini. Buat rombel Kelas X terlebih dahulu atau pilih jurusan lain.</div>
+                            @endif
                         </div>
 
                         <div class="mb-3">
@@ -201,7 +205,7 @@
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-primary" {{ $rombels->isEmpty() ? 'disabled' : '' }}>
                                 <i class="fas fa-save"></i> Simpan & Buat NIS
                             </button>
                             <a href="{{ route('tu.ppdb.index') }}" class="btn btn-outline-secondary">
