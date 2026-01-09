@@ -243,7 +243,7 @@
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">Tanggal Lahir</label>
                                 <p class="form-control-plaintext">
-                                    {{ \Carbon\Carbon::parse($siswa->tanggal_lahir)->translatedFormat('d F Y') }}
+                                    {{ \Carbon\Carbon::parse($siswa->tanggal_lahir)->translatedFormat('d/m/Y') }}
                                 </p>
                             </div>
 
@@ -285,7 +285,7 @@
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">Tanggal Diterima</label>
                                 <p class="form-control-plaintext">
-                                    {{ \Carbon\Carbon::parse($siswa->tanggal_diterima)->translatedFormat('d F Y') }}
+                                    {{ \Carbon\Carbon::parse($siswa->tanggal_diterima)->translatedFormat('d/m/Y') }}
                                 </p>
                             </div>
 

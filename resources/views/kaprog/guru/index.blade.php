@@ -195,6 +195,15 @@
     <h3>Guru - Jurusan: {{ $jurusan->nama }}</h3>
 
     <div class="row mt-3">
+        <div class="col-12 mb-3">
+            <form method="GET" action="{{ route('kaprog.guru.index') }}" class="d-flex">
+                <input type="text" name="search" value="{{ $search ?? '' }}" class="form-control me-2" placeholder="Cari nama, NIP, atau email...">
+                <button type="submit" class="btn btn-primary btn-sm me-2">Cari</button>
+                <a href="{{ route('kaprog.guru.index') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+            </form>
+        </div>
+
+        
         @forelse($gurus as $g)
             <div class="col-md-6 mb-3">
                 <div class="card h-100">
@@ -227,7 +236,7 @@
                             @forelse($rombelList as $r)
                                 <li>
                                     <strong>{{ $r->nama }}</strong>
-                                    — Kelas {{ optional($r->kelas)->tingkat ?? '-' }}
+                                     Kelas {{ optional($r->kelas)->tingkat ?? '-' }}
 
                                     <br>
                                     <small class="text-muted">

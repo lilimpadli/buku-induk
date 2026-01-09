@@ -21,12 +21,25 @@ class KaprogGuruController extends Controller
 
         $jurusan = $guru->jurusan;
 
-        // Ambil semua guru yang terdaftar pada jurusan ini, beserta user dan rombels (kelas + siswa)
-        $gurus = Guru::with(['user', 'rombels.kelas', 'rombels.siswa'])
-            ->where('jurusan_id', $jurusan->id)
-            ->get();
+        // Ambil query dan terapkan pencarian jika ada
+        $search = $request->query('search', '');
 
-        return view('kaprog.guru.index', compact('jurusan', 'gurus'));
+        $gurusQuery = Guru::with(['user', 'rombels.kelas', 'rombels.siswa'])
+            ->where('jurusan_id', $jurusan->id);
+
+        if ($search) {
+            $gurusQuery->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('nip', 'like', "%{$search}%")
+                  ->orWhereHas('user', function ($uq) use ($search) {
+                      $uq->where('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $gurus = $gurusQuery->orderBy('nama')->get();
+
+        return view('kaprog.guru.index', compact('jurusan', 'gurus', 'search'));
     }
 
     // Tampilkan detail guru dan rombel yang dia ampu (terbatas pada jurusan kaprog)

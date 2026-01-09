@@ -198,6 +198,74 @@
     <div class="content-card">
         <h3 class="page-title">Daftar Siswa - Kaprog</h3>
 
+        <!-- Search & Filter Section -->
+        <div class="card mb-3" style="border: 1px solid #E2E8F0; border-radius: 8px;">
+            <div class="card-body" style="background-color: #F8FAFC;">
+                <form method="GET" action="{{ route('kaprog.siswa.index') }}" class="row g-3">
+                    <!-- Search Box -->
+                    <div class="col-md-5">
+                        <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Cari Siswa</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background-color: white; border: 1px solid #E2E8F0;">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input 
+                                type="text" 
+                                name="search" 
+                                class="form-control" 
+                                placeholder="Nama, NIS, atau NISN..." 
+                                value="{{ $search }}"
+                                style="border: 1px solid #E2E8F0;"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Filter Tingkat -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Tingkat</label>
+                        <select name="tingkat" class="form-select" style="border: 1px solid #E2E8F0;">
+                            <option value="">-- Semua Tingkat --</option>
+                            <option value="X" {{ $filterTingkat == 'X' ? 'selected' : '' }}>Kelas X</option>
+                            <option value="XI" {{ $filterTingkat == 'XI' ? 'selected' : '' }}>Kelas XI</option>
+                            <option value="XII" {{ $filterTingkat == 'XII' ? 'selected' : '' }}>Kelas XII</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter Rombel -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Rombel</label>
+                        <select name="rombel" class="form-select" style="border: 1px solid #E2E8F0;">
+                            <option value="">-- Semua Rombel --</option>
+                            @foreach($allRombels as $rombel)
+                                @php
+                                    $rombelNama = $rombel->nama ?? null;
+                                    $tingkatVal = optional($rombel->kelas)->tingkat ?? null;
+                                    $rombelWithoutTingkat = $rombelNama ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama) : null;
+                                    $rombelWithoutTingkat = $rombelWithoutTingkat ? trim($rombelWithoutTingkat) : null;
+                                    $formattedRombel = $rombelWithoutTingkat ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat) : ($rombelNama ?? '');
+                                @endphp
+                                <option value="{{ $rombel->id }}" {{ $filterRombel == $rombel->id ? 'selected' : '' }}>
+                                    {{ $tingkatVal ? $tingkatVal . ' ' . $formattedRombel : $formattedRombel }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100" style="background: linear-gradient(to right, #2F53FF, #6366F1); border: none;">
+                            <i class="bi bi-search"></i> Cari
+                        </button>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <a href="{{ route('kaprog.siswa.index') }}" class="btn btn-secondary w-100" style="background-color: #E2E8F0; color: #475569; border: none;">
+                            <i class="bi bi-arrow-counterclockwise"></i> Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <a class="nav-link active" id="tab-X" data-bs-toggle="tab" href="#pane-X" role="tab" aria-controls="pane-X" aria-selected="true">Kelas X</a>
@@ -214,6 +282,8 @@
             @foreach(['X','XI','XII'] as $t)
             <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="pane-{{ $t }}" role="tabpanel" aria-labelledby="tab-{{ $t }}">
                 <div class="table-responsive mt-3">
+                    @php $list = $studentsByTingkat[$t] ?? collect(); @endphp
+                    @if($list->count() > 0)
                     <table class="table">
                         <thead>
                             <tr>
@@ -225,8 +295,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php $list = $studentsByTingkat[$t] ?? collect(); @endphp
-                            @forelse($list as $i => $s)
+                            @foreach($list as $i => $s)
                             <tr>
                                 <th scope="row">{{ $i + 1 }}</th>
                                 <td>{{ $s->nama_lengkap }}</td>
@@ -238,19 +307,16 @@
                                     </a>
                                 </td>
                             </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5">
-                                    <div class="empty-state">
-                                        <i class="fas fa-user-graduate"></i>
-                                        <h5>Tidak ada siswa pada angkatan {{ $t }}</h5>
-                                        <p>Belum ada siswa yang terdaftar untuk angkatan ini.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
+                    @else
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h5>Tidak ada siswa di Kelas {{ $t }}</h5>
+                        <p>Tidak ada siswa yang sesuai dengan pencarian atau filter yang Anda pilih.</p>
+                    </div>
+                    @endif
                 </div>
             </div>
             @endforeach

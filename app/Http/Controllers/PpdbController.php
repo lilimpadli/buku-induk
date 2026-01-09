@@ -414,7 +414,7 @@ class PpdbController extends Controller
             ]));
 
             return redirect()
-                ->route('ppdb.index')
+                ->route('ppdb.create')
                 ->with('success', 'Data PPDB berhasil disimpan.');
         } catch (Throwable $e) {
             Log::error('PPDB store failed: ' . $e->getMessage(), [

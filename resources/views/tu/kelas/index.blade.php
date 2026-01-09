@@ -254,17 +254,47 @@
     @endif
 
     <!-- FILTER + BUTTON -->
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <form action="{{ route('kurikulum.kelas.index') }}" method="GET" class="d-flex">
-            <div class="input-group" style="max-width: 280px;">
-                <input type="text" name="search" class="form-control" placeholder="Cari rombel" value="{{ request('search') }}">
-                <button class="btn btn-outline-secondary" type="submit">
-                    <i class="fa fa-search"></i>
-                </button>
-            </div>
-        </form>
-        
-        <a href="{{ route('kurikulum.kelas.create') }}" class="btn btn-primary">
+    <div class="card mb-4" style="border: 1px solid #E2E8F0; border-radius: 8px;">
+        <div class="card-body" style="background-color: #F8FAFC;">
+            <form action="{{ route('tu.kelas.index') }}" method="GET" class="row g-3 align-items-end">
+                <!-- Search -->
+                <div class="col-md-5">
+                    <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Cari Rombel</label>
+                    <div class="input-group">
+                        <span class="input-group-text" style="background:white;border:1px solid #E2E8F0;"><i class="bi bi-search"></i></span>
+                        <input type="text" name="search" class="form-control" placeholder="Nama rombel, tingkat, jurusan..." value="{{ $search ?? '' }}" style="border:1px solid #E2E8F0;">
+                    </div>
+                </div>
+
+                <!-- Filter Jurusan -->
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Jurusan</label>
+                    <select name="jurusan" class="form-select" style="border:1px solid #E2E8F0;">
+                        <option value="">-- Semua Jurusan --</option>
+                        @foreach(($allJurusans ?? collect()) as $j)
+                            <option value="{{ $j->id }}" {{ (isset($jurusan_id) && $jurusan_id == $j->id) ? 'selected' : '' }}>
+                                {{ $j->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Buttons -->
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Cari
+                    </button>
+                    <a href="{{ route('tu.kelas.index') }}" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOMBOL TAMBAH ROMBEL -->
+    <div class="mb-4">
+        <a href="{{ route('tu.kelas.create') }}" class="btn btn-primary">
             <i class="fa fa-plus me-2"></i> Tambah Rombel
         </a>
     </div>
@@ -290,7 +320,7 @@
                         </div>
                         
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('kurikulum.kelas.show', $rombel->id) }}" 
+                            <a href="{{ route('tu.kelas.show', $rombel->id) }}" 
                                class="btn {{ $rombel->id == 5 ? 'btn-light' : 'btn-outline-primary' }} btn-sm">
                                 <i class="fas fa-info-circle me-1"></i> Detail
                             </a>
@@ -301,7 +331,7 @@
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $rombel->id }}">
                                     <li>
-                                        <a class="dropdown-item" href="{{ route('kurikulum.kelas.edit', $rombel->id) }}">
+                                        <a class="dropdown-item" href="{{ route('tu.kelas.edit', $rombel->id) }}">
                                             <i class="fa fa-edit me-2"></i> Edit
                                         </a>
                                     </li>
@@ -309,7 +339,7 @@
                                         <hr class="dropdown-divider">
                                     </li>
                                     <li>
-                                        <form action="{{ route('kurikulum.kelas.destroy', $rombel->id) }}" method="POST">
+                                        <form action="{{ route('tu.kelas.destroy', $rombel->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">

@@ -208,7 +208,7 @@
             <h2 class="fw-bold mb-1">Detail Rombel</h2>
             <p class="text-muted mb-0">{{ $rombel->nama }}</p>
         </div>
-        <a href="{{ request()->header('referer') ?: route('kurikulum.kelas.index') }}" class="btn btn-outline-secondary">
+        <a href="{{ request()->header('referer') ?: route('tu.kelas.index') }}" class="btn btn-outline-secondary">
             <i class="fa fa-arrow-left me-2"></i> Kembali
         </a>
     </div>

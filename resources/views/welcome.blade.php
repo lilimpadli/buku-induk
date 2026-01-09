@@ -649,62 +649,7 @@
         </h2>
         <p class="ppdb-subtitle">Sistem Penerimaan Murid Baru - Tahun Ajaran 2025/2026</p>
 
-        <div class="row align-items-stretch g-4">
-            <div class="col-lg-6 mb-4 d-flex">
-                <div class="timeline-card flex-fill">
-                    <span class="timeline-badge">TAHAP 1</span>
-                    <h3 class="timeline-title">Pendaftaran Tahap 1</h3>
-                    <div class="timeline-date">
-                        <i class="fas fa-calendar-check"></i>
-                        10 - 16 Juni 2025
-                    </div>
-                    
-                    <div class="timeline-detail">
-                        <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                        <strong>Pendaftaran & Verifikasi:</strong> 10-16 Juni 2025
-                    </div>
-                    <div class="timeline-detail">
-                        <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                        <strong>Masa Sanggah:</strong> 10-17 Juni 2025
-                    </div>
-                    <div class="timeline-detail">
-                        <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                        <strong>Rapat Dewan Guru:</strong> 18 Juni 2025
-                    </div>
-                    <div class="timeline-detail">
-                        <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                        <strong>Pengumuman Hasil:</strong> 19 Juni 2025 (09:00 WIB)
-                    </div>
-                    <div class="timeline-detail">
-                        <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                        <strong>Daftar Ulang:</strong> 20-23 Juni 2025
-                    </div>
-
-                    <div class="mt-3 p-3 bg-light rounded">
-                        <strong>Jalur & Kuota Tahap 1:</strong>
-                        <ul class="mb-0 mt-2">
-                            <li><strong>Domisili Terdekat:</strong> 10%</li>
-                            <li><strong>Afirmasi:</strong> 30% (KETM 25%, PDBK 5%)</li>
-                            <li><strong>Mutasi:</strong> 5% (Perpindahan 2%, Anak Guru 3%)</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-6 mb-4 d-flex">
-                <div class="timeline-card flex-fill">
-                    <span class="timeline-badge">TAHAP 2</span>
-                    <h3 class="timeline-title">Pendaftaran Tahap 2 — Belum Dibuka</h3>
-                    <div class="timeline-date">
-                        <i class="fas fa-clock"></i>
-                        Pendaftaran Tahap 2 belum dibuka.
-                    </div>
-                    <div class="mt-3 p-3 bg-light rounded">
-                        Pantau pengumuman resmi untuk jadwal pembukaan Tahap 2.
-                    </div>
-                </div>
-            </div>
-        </div>
+       
             <div class="row align-items-stretch g-4">
                 @php
                     $ppdbData = $ppdb ?? null;
@@ -715,7 +660,12 @@
                 <div class="col-lg-6 mb-4 d-flex">
                     <div class="timeline-card flex-fill">
                         <span class="timeline-badge">TAHAP 1</span>
-                        <h3 class="timeline-title">{{ $t1['title'] ?? 'Pendaftaran Tahap 1' }} @if(!empty($t1['open'])) — Terbuka @else @endif</h3>
+                        <h3 class="timeline-title">{{ $t1['title'] ?? 'Pendaftaran Tahap 1' }} @if(!empty($t1['open'])) — Terbuka @else — Ditutup @endif</h3>
+                        @if(empty($t1['open']))
+                        <div class="alert alert-danger mt-3" role="alert">
+                            <strong>Perhatian:</strong> Tahap 1 telah ditutup. Pendaftaran Tahap 1 saat ini tidak tersedia.
+                        </div>
+                        @endif
                         <div class="timeline-date">
                             <i class="fas fa-calendar-check"></i>
                             {{ $t1['pendaftaran'] ?? 'Periode belum diset' }}
@@ -770,21 +720,72 @@
                 <div class="col-lg-6 mb-4 d-flex">
                     <div class="timeline-card flex-fill">
                         <span class="timeline-badge">TAHAP 2</span>
+                        @php
+                            $t2_open = !empty($t2['open']);
+                            $t2_has_dates = !empty($t2['pendaftaran']) || !empty($t2['sanggah']) || !empty($t2['tes']) || !empty($t2['rapat']) || !empty($t2['pengumuman']) || !empty($t2['daftar_ulang']);
+                        @endphp
+
                         <h3 class="timeline-title">
                             {{ $t2['title'] ?? 'Pendaftaran Tahap 2' }}
-                            @if(!empty($t2['open'])) — Terbuka @else — Belum Dibuka @endif
+                            @if($t2_open) — Terbuka @elseif($t2_has_dates) — Ditutup @else — Belum Dibuka @endif
                         </h3>
-                        <div class="timeline-date">
-                            <i class="fas {{ !empty($t2['open']) ? 'fa-calendar-check' : 'fa-clock' }}"></i>
-                            {{ $t2['pendaftaran'] ?? (!empty($t2['open']) ? 'Periode terbuka' : 'Pendaftaran Tahap 2 belum dibuka.') }}
-                        </div>
-                        <div class="mt-3 p-3 bg-light rounded">
-                            @if(!empty($t2['open']))
-                                Lakukan pendaftaran sesuai ketentuan untuk Tahap 2.
+
+                        @if(!$t2_open)
+                            @if($t2_has_dates)
+                                <div class="alert alert-danger mt-3" role="alert">
+                                    <strong>Perhatian:</strong> Tahap 2 telah ditutup. Pendaftaran Tahap 2 saat ini tidak tersedia.
+                                </div>
                             @else
-                                Pantau pengumuman resmi untuk jadwal pembukaan Tahap 2.
+                                <div class="alert alert-warning mt-3" role="alert">
+                                    <strong>Info:</strong> Tahap 2 belum dibuka. Pantau pengumuman resmi untuk jadwal pembukaan Tahap 2.
+                                </div>
                             @endif
+                        @endif
+
+                        @if(!empty($t2['pendaftaran']))
+                        <div class="timeline-detail">
+                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
+                            <strong>Pendaftaran & Verifikasi:</strong> {{ $t2['pendaftaran'] }}
                         </div>
+                        @endif
+
+                        @if(!empty($t2['sanggah']))
+                        <div class="timeline-detail">
+                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
+                            <strong>Masa Sanggah:</strong> {{ $t2['sanggah'] }}
+                        </div>
+                        @endif
+
+                        @if(!empty($t2['rapat']))
+                        <div class="timeline-detail">
+                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
+                            <strong>Rapat Dewan Guru:</strong> {{ $t2['rapat'] }}
+                        </div>
+                        @endif
+
+                        @if(!empty($t2['pengumuman']))
+                        <div class="timeline-detail">
+                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
+                            <strong>Pengumuman Hasil:</strong> {{ $t2['pengumuman'] }}
+                        </div>
+                        @endif
+
+                        @if(!empty($t2['daftar_ulang']))
+                        <div class="timeline-detail">
+                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
+                            <strong>Daftar Ulang:</strong> {{ $t2['daftar_ulang'] }}
+                        </div>
+                        @endif
+
+                        <div class="mt-3 p-3 bg-light rounded">
+                            <strong>Jalur & Kuota Tahap 1:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Domisili Terdekat: 10%</li>
+                                <li>Afirmasi: 30% (KETM 25%, PDBK 5%)</li>
+                                <li>Mutasi: 5% (Perpindahan 2%, Anak Guru 3%)</li>
+                            </ul>
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>

@@ -15,7 +15,7 @@
                     <h4 class="fw-bold text-center mb-1">Form Tambah Kelas</h4>
                     <p class="text-muted text-center mb-4">Isi data untuk menambah kelas baru.</p>
 
-                    <form action="{{ route('kurikulum.kelas.store') }}" method="POST">
+                    <form action="{{ route('tu.kelas.store') }}" method="POST">
                         @csrf
 
                         <!-- TINGKAT -->
@@ -72,7 +72,7 @@
 
                         <!-- TOMBOL AKSI -->
                         <div class="d-flex justify-content-between gap-2 mt-4">
-                            <a href="{{ route('kurikulum.kelas.index') }}" class="btn btn-light btn-lg flex-fill">Tutup</a>
+                            <a href="{{ route('tu.kelas.index') }}" class="btn btn-light btn-lg flex-fill">Tutup</a>
                             <button type="submit" class="btn btn-primary btn-lg flex-fill">Simpan Data</button>
                         </div>
 

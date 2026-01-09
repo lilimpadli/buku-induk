@@ -122,21 +122,63 @@ class KaprogController extends Controller
         $guru = Guru::where('user_id', $user->id)->first();
         $jurusanId = $guru ? $guru->jurusan_id : null;
 
+        // Get search dan filter params
+        $search = $request->query('search', '');
+        $filterTingkat = $request->query('tingkat', '');
+        $filterRombel = $request->query('rombel', '');
+
         $tingkats = ['X','XI','XII'];
         $byTingkat = [];
+        $allRombels = [];
+
+        // Get semua rombels untuk filter dropdown
+        if ($jurusanId) {
+            $allRombels = Rombel::whereHas('kelas', function ($q) use ($jurusanId) {
+                $q->where('jurusan_id', $jurusanId);
+            })->orderBy('nama')->get();
+        }
 
         foreach ($tingkats as $t) {
             $q = DataSiswa::with('rombel.kelas')
                 ->whereHas('rombel.kelas', function ($q2) use ($t, $jurusanId) {
                     $q2->where('tingkat', $t);
                     if ($jurusanId) $q2->where('jurusan_id', $jurusanId);
-                })
-                ->orderBy('nama_lengkap');
+                });
 
-            $byTingkat[$t] = $q->get();
+            // Apply search filter
+            if ($search) {
+                $q->where(function ($w) use ($search) {
+                    $w->where('nama_lengkap', 'like', "%{$search}%")
+                      ->orWhere('nis', 'like', "%{$search}%")
+                      ->orWhere('nisn', 'like', "%{$search}%");
+                });
+            }
+
+            // Apply tingkat filter
+            if ($filterTingkat && $filterTingkat !== 'all') {
+                if ($filterTingkat !== $t) {
+                    $byTingkat[$t] = collect();
+                    continue;
+                }
+            }
+
+            // Apply rombel filter
+            if ($filterRombel) {
+                $q->whereHas('rombel', function ($r) use ($filterRombel) {
+                    $r->where('id', $filterRombel);
+                });
+            }
+
+            $byTingkat[$t] = $q->orderBy('nama_lengkap')->get();
         }
 
-        return view('kaprog.siswa.index', ['studentsByTingkat' => $byTingkat]);
+        return view('kaprog.siswa.index', [
+            'studentsByTingkat' => $byTingkat,
+            'search' => $search,
+            'filterTingkat' => $filterTingkat,
+            'filterRombel' => $filterRombel,
+            'allRombels' => $allRombels
+        ]);
     }
 
     // Show detail siswa

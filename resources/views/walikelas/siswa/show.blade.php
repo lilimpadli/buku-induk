@@ -214,7 +214,7 @@
         </div>
         <div>
             <a href="{{ route('walikelas.siswa.index') }}" class="btn btn-outline-secondary">Kembali</a>
-            <a href="{{ route('walikelas.siswa.show', $s->id) }}?edit=1" class="btn btn-primary">Edit</a>
+          
         </div>
     </div>
 

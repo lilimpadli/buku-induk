@@ -93,8 +93,35 @@ class TUController extends Controller
      */
     public function siswa()
     {
-        $siswas = DataSiswa::with(['user', 'ayah', 'ibu', 'wali'])->latest()->paginate(10);
-        return view('tu.siswa.index', compact('siswas'));
+        $query = DataSiswa::with(['user', 'ayah', 'ibu', 'wali'])->latest();
+
+        $tingkat = request()->query('tingkat', null);
+        if ($tingkat) {
+            $query->whereHas('rombel.kelas', function ($q) use ($tingkat) {
+                $q->where('tingkat', $tingkat);
+            });
+        }
+
+        // Search and rombel filters
+        $search = request()->query('search', null);
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_lengkap', 'like', "%{$search}%")
+                  ->orWhere('nis', 'like', "%{$search}%")
+                  ->orWhere('nisn', 'like', "%{$search}%");
+            });
+        }
+
+        $filterRombel = request()->query('rombel', null);
+        if ($filterRombel) {
+            $query->where('rombel_id', $filterRombel);
+        }
+
+        $allRombels = Rombel::with('kelas')->orderBy('nama')->get();
+
+        $siswas = $query->paginate(10)->withQueryString();
+
+        return view('tu.siswa.index', compact('siswas', 'search', 'allRombels', 'filterRombel'));
     }
 
     /**
@@ -104,11 +131,31 @@ class TUController extends Controller
     {
         // Fetch a paginated list of all Guru models, with their associated User data
         // and the rombels they teach (including the rombel's kelas and jurusan).
+        $search = request('search');
+        $jurusan_id = request('jurusan');
+        
         $gurus = Guru::with(['user', 'rombels.kelas.jurusan'])
-            ->orderBy('nama')
-            ->paginate(10);
+            ->when($search, function($query) use($search) {
+                $query->where(function($q) use($search) {
+                    $q->where('nama', 'like', "%{$search}%")
+                      ->orWhere('nip', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%")
+                      ->orWhereHas('user', function($uq) use($search) {
+                          $uq->where('email', 'like', "%{$search}%");
+                      });
+                });
+            })
+            ->when($jurusan_id, function($query) use($jurusan_id) {
+                $query->where('jurusan_id', $jurusan_id);
+            })
+            // Order by kaprog role first, then by nama
+            ->orderByRaw("FIELD(user_id, (SELECT id FROM users WHERE role = 'kaprog' AND id = user_id)) DESC, nama")
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('tu.guru.index', compact('gurus'));
+        $allJurusans = Jurusan::orderBy('nama')->get();
+
+        return view('tu.guru.index', compact('gurus', 'search', 'jurusan_id', 'allJurusans'));
     }
 
     /**
@@ -209,6 +256,15 @@ class TUController extends Controller
             DB::rollBack();
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Tampilkan detail guru
+     */
+    public function guruShow($id)
+    {
+        $guru = Guru::with(['user', 'rombels.kelas.jurusan'])->findOrFail($id);
+        return view('tu.guru.show', compact('guru'));
     }
     
     /**
@@ -957,6 +1013,7 @@ class TUController extends Controller
 {
     // 获取 Rombel 数据而不是 Kelas
     $search = request('search');
+    $jurusan_id = request('jurusan');
     
     $rombels = Rombel::with(['kelas.jurusan', 'guru'])
         ->when($search, function($query) use($search) {
@@ -968,11 +1025,18 @@ class TUController extends Controller
                         });
                   });
         })
+        ->when($jurusan_id, function($query) use($jurusan_id) {
+            $query->whereHas('kelas', function($q) use($jurusan_id) {
+                $q->where('jurusan_id', $jurusan_id);
+            });
+        })
         ->orderBy('nama')
         ->paginate(12)
         ->withQueryString();
 
-    return view('tu.kelas.index', compact('rombels'));
+    $allJurusans = Jurusan::orderBy('nama')->get();
+
+    return view('tu.kelas.index', compact('rombels', 'allJurusans', 'search', 'jurusan_id'));
 }
 
     /**

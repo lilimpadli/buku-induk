@@ -241,7 +241,11 @@
 
                         <div class="mb-3">
                             <label class="form-label">Jenis Kelamin</label>
-                            <input type="text" name="jenis_kelamin" class="form-control" value="{{ old('jenis_kelamin', $guru->jenis_kelamin ?? '') }}">
+                            <select name="jenis_kelamin" class="form-select" required>
+                                <option value="">-- Pilih --</option>
+                                <option value="L" {{ (old('jenis_kelamin', $guru->jenis_kelamin ?? '')) == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                                <option value="P" {{ (old('jenis_kelamin', $guru->jenis_kelamin ?? '')) == 'P' ? 'selected' : '' }}>Perempuan</option>
+                            </select>
                         </div>
 
                         <div class="mb-3">

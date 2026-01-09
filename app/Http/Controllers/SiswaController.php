@@ -193,6 +193,10 @@ class SiswaController extends Controller
             'tempat_lahir'     => 'required|string|max:255',
             'tanggal_lahir'    => 'required|date',
             'agama'            => 'required|string|max:50',
+            'status_keluarga'  => 'required|string|max:50',
+            'anak_ke'          => 'required|integer|min:1',
+            'sekolah_asal'     => 'required|string|max:255',
+            'tanggal_diterima' => 'required|date',
             'alamat'           => 'required|string',
             'no_hp'            => 'required|string|max:20',
 
@@ -223,6 +227,10 @@ class SiswaController extends Controller
             'tempat_lahir' => $request->tempat_lahir,
             'tanggal_lahir' => $request->tanggal_lahir,
             'agama' => $request->agama,
+            'status_keluarga' => $request->status_keluarga,
+            'anak_ke' => $request->anak_ke,
+            'sekolah_asal' => $request->sekolah_asal,
+            'tanggal_diterima' => $request->tanggal_diterima,
             'alamat' => $request->alamat,
             'no_hp' => $request->no_hp,
         ]);

@@ -277,7 +277,7 @@
         </tr>
         <tr>
             <th>Sekolah</th>
-            <td>SMK NEGERI 1 X</td>
+            <td>SMK NEGERI 1 KAWALI</td>
             <th>Tahun Pelajaran</th>
             <td>{{ $tahun }}</td>
         </tr>

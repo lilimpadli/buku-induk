@@ -15,9 +15,12 @@ class KelasController extends Controller
         // Query dasar dengan relasi
         $query = Rombel::with(['kelas.jurusan', 'guru']);
         
+        // Get search and filter parameters
+        $search = $request->get('search', '');
+        $jurusan_id = $request->get('jurusan', '');
+        
         // Filter berdasarkan pencarian
-        if ($request->has('search') && !empty($request->search)) {
-            $search = $request->search;
+        if (!empty($search)) {
             $query->where('nama', 'like', '%' . $search . '%')
                   ->orWhereHas('kelas', function($q) use ($search) {
                       $q->where('tingkat', 'like', '%' . $search . '%');
@@ -30,13 +33,20 @@ class KelasController extends Controller
                   });
         }
         
+        // Filter berdasarkan jurusan
+        if (!empty($jurusan_id)) {
+            $query->whereHas('kelas', function($q) use ($jurusan_id) {
+                $q->where('jurusan_id', $jurusan_id);
+            });
+        }
+        
+        // Get all jurusans for dropdown
+        $allJurusans = Jurusan::all();
+        
         // Dapatkan hasil dengan pagination
-        $rombels = $query->paginate(12);
+        $rombels = $query->paginate(12)->withQueryString();
         
-        // Pertahankan parameter query string di pagination links
-        $rombels->appends($request->query());
-        
-        return view('kurikulum.manajemen-kelas.index', compact('rombels'));
+        return view('kurikulum.manajemen-kelas.index', compact('rombels', 'search', 'jurusan_id', 'allJurusans'));
     }
 
     public function create()

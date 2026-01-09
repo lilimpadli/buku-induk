@@ -370,6 +370,7 @@ Route::middleware('web')->group(function () {
             Route::get('/guru', [TUController::class, 'guruIndex'])->name('guru.index');
             Route::get('/guru/create', [TUController::class, 'guruCreate'])->name('guru.create');
             Route::post('/guru', [TUController::class, 'guruStore'])->name('guru.store');
+            Route::get('/guru/{id}', [TUController::class, 'guruShow'])->name('guru.show');
             Route::get('/guru/{id}/edit', [TUController::class, 'guruEdit'])->name('guru.edit');
             Route::put('/guru/{id}', [TUController::class, 'guruUpdate'])->name('guru.update');
             Route::delete('/guru/{id}', [TUController::class, 'guruDestroy'])->name('guru.destroy');

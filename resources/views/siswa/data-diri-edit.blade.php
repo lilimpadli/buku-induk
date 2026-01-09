@@ -321,7 +321,12 @@
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold">Status Keluarga <span class="text-danger">*</span></label>
-                                    <input type="text" name="status_keluarga" class="form-control step1-field" value="{{ $siswa->status_keluarga ?? old('status_keluarga') }}" required>
+                                    <select name="status_keluarga" class="form-select step1-field" required>
+                                        <option value="">-- Pilih --</option>
+                                        <option value="Anak Kandung" {{ ($siswa->status_keluarga ?? old('status_keluarga')) == 'Anak Kandung' ? 'selected' : '' }}>Anak Kandung</option>
+                                        <option value="Anak Tiri" {{ ($siswa->status_keluarga ?? old('status_keluarga')) == 'Anak Tiri' ? 'selected' : '' }}>Anak Tiri</option>
+                                        <option value="Anak Angkat" {{ ($siswa->status_keluarga ?? old('status_keluarga')) == 'Anak Angkat' ? 'selected' : '' }}>Anak Angkat</option>
+                                    </select>
                                     @error('status_keluarga')<div class="text-danger small">{{ $message }}</div>@enderror
                                 </div>
 

@@ -15,13 +15,44 @@ use Illuminate\Database\QueryException;
 
 class KurikulumSiswaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $siswas = DataSiswa::with(['user', 'ayah', 'ibu', 'wali', 'rombel'])
-            ->latest()
-            ->paginate(15);
+        // Get filter parameters
+        $tingkat = $request->get('tingkat', '');
+        $search = $request->get('search', '');
+        $filterRombel = $request->get('rombel', '');
 
-        return view('kurikulum.siswa.index', compact('siswas'));
+        // Query dasar dengan relasi
+        $query = DataSiswa::with(['user', 'ayah', 'ibu', 'wali', 'rombel.kelas.jurusan']);
+
+        // Filter by tingkat (kelas level)
+        if (!empty($tingkat)) {
+            $query->whereHas('rombel.kelas', function ($q) use ($tingkat) {
+                $q->where('tingkat', $tingkat);
+            });
+        }
+
+        // Filter by rombel
+        if (!empty($filterRombel)) {
+            $query->where('rombel_id', $filterRombel);
+        }
+
+        // Filter by search (nama, NIS, NISN)
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_lengkap', 'like', "%{$search}%")
+                  ->orWhere('nis', 'like', "%{$search}%")
+                  ->orWhere('nisn', 'like', "%{$search}%");
+            });
+        }
+
+        // Get all rombels for dropdown
+        $allRombels = Rombel::with('kelas.jurusan')->get();
+
+        // Get results with pagination
+        $siswas = $query->latest()->paginate(15)->withQueryString();
+
+        return view('kurikulum.siswa.index', compact('siswas', 'tingkat', 'search', 'filterRombel', 'allRombels'));
     }
 
     public function create()
@@ -182,7 +213,7 @@ class KurikulumSiswaController extends Controller
     public function show($id)
     {
         $siswa = DataSiswa::with('user','rombel','ayah','ibu','wali')->findOrFail($id);
-        return view('kurikulum.siswa.show', compact('siswa'));
+        return view('kurikulum.siswa.data-diri.show', compact('siswa'));
     }
 
     

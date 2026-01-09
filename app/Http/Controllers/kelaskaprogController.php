@@ -40,20 +40,42 @@ class KelaskaprogController extends Controller
     }
 
     // Tampilkan detail rombel (siswa yang berada di rombel ini)
-    public function show($id)
+    public function show($id, Request $request)
     {
         $rombel = Rombel::with('kelas.jurusan')->findOrFail($id);
 
+        // Get search dan filter params
+        $search = $request->query('search', '');
+        $filterJenisKelamin = $request->query('jenis_kelamin', '');
+
         // Ambil siswa di rombel ini, pastikan rombel->kelas->jurusan sesuai
-        $siswa = DataSiswa::with('rombel')
+        $siswaQuery = DataSiswa::with('rombel')
             ->where('rombel_id', $rombel->id)
             ->whereHas('rombel.kelas', function ($q) use ($rombel) {
                 $q->where('jurusan_id', $rombel->kelas->jurusan_id);
-            })
-            ->orderBy('nama_lengkap')
-            ->get();
+            });
 
-        return view('kaprog.kelas.show', compact('rombel', 'siswa'));
+        // Apply search filter
+        if ($search) {
+            $siswaQuery->where(function ($w) use ($search) {
+                $w->where('nama_lengkap', 'like', "%{$search}%")
+                  ->orWhere('nis', 'like', "%{$search}%")
+                  ->orWhere('nisn', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply jenis kelamin filter
+        if ($filterJenisKelamin) {
+            // The stored values may be 'L'/'P' or full labels; try both
+            $siswaQuery->where(function($q) use ($filterJenisKelamin) {
+                $q->where('jenis_kelamin', $filterJenisKelamin)
+                  ->orWhere('jenis_kelamin', $filterJenisKelamin == 'Laki-laki' ? 'L' : ($filterJenisKelamin == 'Perempuan' ? 'P' : null));
+            });
+        }
+
+        $siswa = $siswaQuery->orderBy('nama_lengkap')->get();
+
+        return view('kaprog.kelas.show', compact('rombel', 'siswa', 'search', 'filterJenisKelamin'));
     }
 
     // Tampilkan daftar siswa berdasarkan angkatan/tingkat (X, XI, XII)

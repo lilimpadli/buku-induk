@@ -248,6 +248,52 @@
         </div>
     </div>
 
+    <!-- Search & Filter Section -->
+    <div class="card mb-3" style="border: 1px solid #E2E8F0; border-radius: 8px;">
+        <div class="card-body" style="background-color: #F8FAFC;">
+            <form method="GET" action="{{ route('kaprog.kelas.show', $rombel->id) }}" class="row g-3">
+                <!-- Search Box -->
+                <div class="col-md-7">
+                    <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Cari Siswa</label>
+                    <div class="input-group">
+                        <span class="input-group-text" style="background-color: white; border: 1px solid #E2E8F0;">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input 
+                            type="text" 
+                            name="search" 
+                            class="form-control" 
+                            placeholder="Nama, NIS, atau NISN..." 
+                            value="{{ $search }}"
+                            style="border: 1px solid #E2E8F0;"
+                        >
+                    </div>
+                </div>
+
+                <!-- Filter Jenis Kelamin -->
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Jenis Kelamin</label>
+                    <select name="jenis_kelamin" class="form-select" style="border: 1px solid #E2E8F0;">
+                        <option value="">-- Semua --</option>
+                        <option value="Laki-laki" {{ $filterJenisKelamin == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                        <option value="Perempuan" {{ $filterJenisKelamin == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                    </select>
+                </div>
+
+                <!-- Buttons -->
+                <div class="col-md-2 d-flex gap-2 align-items-end">
+                    <button type="submit" class="btn btn-primary flex-grow-1" style="background: linear-gradient(to right, #2F53FF, #6366F1); border: none;">
+                        <i class="bi bi-search"></i> Cari
+                    </button>
+                    <a href="{{ route('kaprog.kelas.show', $rombel->id) }}" class="btn btn-secondary flex-grow-1" style="background-color: #E2E8F0; color: #475569; border: none;">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Students Table -->
     <div class="card">
         <div class="card-body">
             <h6 class="card-title">Daftar Siswa ({{ $siswa->count() }})</h6>
@@ -255,8 +301,8 @@
                 <table class="table table-sm">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Nama</th>
+                            <th>No</th>
+                            <th>Nama Lengkap</th>
                             <th>NIS</th>
                             <th>Rombel</th>
                             <th>Aksi</th>

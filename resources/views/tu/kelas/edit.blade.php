@@ -132,7 +132,7 @@
     <div class="card shadow-sm border-0">
         <div class="card-body p-4">
 
-            <form action="{{ route('kurikulum.kelas.update', $rombel->id) }}" method="POST">
+            <form action="{{ route('tu.kelas.update', $rombel->id) }}" method="POST">
                 @csrf
                 @method('PUT')
 
@@ -187,7 +187,7 @@
                 </div>
 
                 <div class="d-flex justify-content-end mt-4 gap-2">
-                    <a href="{{ route('kurikulum.kelas.index') }}" class="btn btn-light">
+                    <a href="{{ route('tu.kelas.index') }}" class="btn btn-light">
                         <i class="fas fa-times me-2"></i> Batal
                     </a>
                     <button type="submit" class="btn btn-primary">
