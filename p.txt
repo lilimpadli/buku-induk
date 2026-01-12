@@ -1,9 +1,10 @@
-1. Siswa : ✅
-2. Wali kelas : ✅
+1. Siswa : gak bisa edit data, gak kesimpen
+2. Wali kelas : 
 3. TU : 
 * gak bisa nambah siswa(jir)
 * Nilai raport belum muncul
 * tu jadi di guru bisa edit, ngeditnya tuh bisa nentuin guru itu jadi apa kecuali siswa, misal ke kelas mau ngewali kelasan mana, lamun kaprog mau di jurusan mana
+* TU di data kelas error
 4. Kurikulum :
 * Manajemen jurusan, jurusan dpib masih ada 2
 * Belum ada fitur tambah akun dan daftar guru

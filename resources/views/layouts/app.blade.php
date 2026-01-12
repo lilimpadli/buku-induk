@@ -212,7 +212,7 @@
                                         <i class="fas fa-gauge"></i> <span class="label ms-2">Dashboard</span>
                                     </a>
 
-                                    <a href="{{ route('kaprog.datapribadi.index') }}" class="nav-link {{ request()->routeIs('kaprog.datapribadi.*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Diri">
+                                    <a href="{{ route('kaprog.datapribadi.index') }}" class="nav-link {{ request()->routeIs('kaprog.datapribadi*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Diri">
                                         <i class="fas fa-id-card"></i> <span class="label ms-2">Data Diri</span>
                                     </a>
 
@@ -220,11 +220,11 @@
                                         <i class="fas fa-users"></i> <span class="label ms-2">Data Siswa</span>
                                     </a>
 
-                                    <a href="{{ route('kaprog.kelas.index') }}" class="nav-link {{ request()->routeIs('kaprog.raport.*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Kelas">
+                                    <a href="{{ route('kaprog.kelas.index') }}" class="nav-link {{ request()->routeIs('kaprog.kelas*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Kelas">
                                         <i class="fas fa-chalkboard"></i> <span class="label ms-2">Data Kelas</span>
                                     </a>
 
-                                    <a href="{{ route('kaprog.guru.index') }}" class="nav-link {{ request()->routeIs('kaprog.raport.*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Guru">
+                                    <a href="{{ route('kaprog.guru.index') }}" class="nav-link {{ request()->routeIs('kaprog.guru*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Guru">
                                         <i class="fas fa-user-tie"></i> <span class="label ms-2">Guru</span>
                                     </a>
                                 @endif
@@ -235,19 +235,19 @@
                                         <i class="fas fa-gauge"></i> <span class="label ms-2">Dashboard</span>
                                     </a>
 
-                                    <a class="nav-link {{ request()->is('tu/siswa*') ? 'active' : '' }}" href="{{ route('tu.siswa.index') }}" data-bs-toggle="tooltip" title="Data Siswa">
+                                    <a class="nav-link {{ request()->routeIs('tu.siswa*') ? 'active' : '' }}" href="{{ route('tu.siswa.index') }}" data-bs-toggle="tooltip" title="Data Siswa">
                                         <i class="fas fa-users"></i> <span class="label ms-2">Data Siswa</span>
                                     </a>
 
-<a class="nav-link {{ request()->is('tu/siswa*') ? 'active' : '' }}" href="{{ route('tu.ppdb.index') }}" data-bs-toggle="tooltip" title="Data Siswa">
+                                    <a class="nav-link {{ request()->routeIs('tu.ppdb*') ? 'active' : '' }}" href="{{ route('tu.ppdb.index') }}" data-bs-toggle="tooltip" title="PPDB">
                                         <i class="fas fa-users"></i> <span class="label ms-2">PPDB</span>
                                     </a>
 
-                                    <a class="nav-link {{ request()->is('tu/kelas') ? 'active' : '' }}" href="{{ route('tu.kelas.index') }}" data-bs-toggle="tooltip" title="Manajemen Kelas">
+                                    <a class="nav-link {{ request()->routeIs('tu.kelas*') ? 'active' : '' }}" href="{{ route('tu.kelas.index') }}" data-bs-toggle="tooltip" title="Manajemen Kelas">
                                         <i class="fas fa-plus-circle"></i> <span class="label ms-2">Manajemen Kelas</span>
                                     </a>
 
-                                    <a class="nav-link {{ request()->is('tu.guru.index') ? 'active' : '' }}" href="{{ route('tu.guru.index') }}" data-bs-toggle="tooltip" title="Data Guru">
+                                    <a class="nav-link {{ request()->routeIs('tu.guru*') ? 'active' : '' }}" href="{{ route('tu.guru.index') }}" data-bs-toggle="tooltip" title="Data Guru">
                                         <i class="fas fa-plus-circle"></i> <span class="label ms-2">Data Guru</span>
                                     </a>
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\TU;
 use App\Http\Controllers\Controller;
 use App\Models\Jurusan;
 use App\Models\Kelas;
+use App\Models\Rombel;
 use Illuminate\Http\Request;
 
 class TambahKelasController extends Controller
@@ -14,8 +15,8 @@ class TambahKelasController extends Controller
      */
     public function index()
     {
-        $kelas = Kelas::with('jurusan')->get();
-        return view('tu.kelas.index', compact('kelas'));
+        $rombels = Rombel::with(['kelas.jurusan', 'guru'])->paginate(12);
+        return view('tu.kelas.index', compact('rombels'));
     }
 
     /**

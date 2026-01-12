@@ -522,7 +522,7 @@ class TUController extends Controller
 
         $rombels = Rombel::orderBy('nama')->get();
 
-        return view('tu.siswa.raport.edit', compact('siswa','semester','tahunParam','tahun','nilai','kelompokA','kelompokB','ekstra','kehadiran','info','kenaikan','rombels'));
+        return view('tu.siswa.raport.edit', compact('siswa','semester','tahunParam','tahun','nilai','kelompokA','kelompokB','ekstra','kehadiran','info','kenaikan','rombels','kelasRaport','rombelRaport'));
     }
 
     public function nilaiRaportUpdate(Request $request)

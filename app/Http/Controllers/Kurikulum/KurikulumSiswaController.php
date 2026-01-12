@@ -51,8 +51,22 @@ class KurikulumSiswaController extends Controller
         // Get all rombels for dropdown
         $allRombels = Rombel::with('kelas.jurusan')->get();
 
-        // Get results with pagination
-        $siswas = $query->latest()->paginate(15)->withQueryString();
+        // Ensure we select distinct data_siswa rows (prevents duplicates if joins are present)
+        if (config('app.debug')) {
+            \DB::enableQueryLog();
+        }
+
+        $siswas = $query->select('data_siswa.*')->distinct()->latest()->paginate(15)->withQueryString();
+
+        if (config('app.debug')) {
+            \Log::info('KurikulumSiswaController::index queries', \DB::getQueryLog());
+            try {
+                $ids = $siswas->pluck('id')->toArray();
+                \Log::info('KurikulumSiswaController::index result_ids', $ids);
+            } catch (\Throwable $e) {
+                \Log::info('KurikulumSiswaController::index result_ids error', ['err' => $e->getMessage()]);
+            }
+        }
 
         return view('kurikulum.siswa.index', compact('siswas', 'tingkat', 'search', 'filterRombel', 'allRombels'));
     }
@@ -291,6 +305,7 @@ class KurikulumSiswaController extends Controller
     \Log::info('Pemetaan Kolom: ' . json_encode($map));
 
     $created = 0;
+    $updated = 0;
     $skipped = 0;
     $errors = [];
 
@@ -413,18 +428,33 @@ class KurikulumSiswaController extends Controller
         }
 
         try {
-            // --- PERUBAHAN KRUSIAL DI SINI ---
-            // Gunakan $nomorInduk untuk field 'nis'. Ini menjamin nilainya selalu sama.
-            DataSiswa::create([
+            // Cegah duplikat: jika DataSiswa sudah ada untuk user ini atau nis yang sama,
+            // lakukan update alih-alih membuat record baru.
+            $existingData = null;
+            if ($user && $user->id) {
+                $existingData = DataSiswa::where('user_id', $user->id)->first();
+            }
+
+            if (!$existingData && !empty($nomorInduk)) {
+                $existingData = DataSiswa::where('nis', $nomorInduk)->first();
+            }
+
+            $payload = [
                 'user_id' => $user->id,
                 'nama_lengkap' => $nama,
-                'nis' => $nomorInduk, // <--- INI YANG DIUBAH
+                'nis' => $nomorInduk,
                 'nisn' => $nisn,
                 'jenis_kelamin' => $jenis,
                 'rombel_id' => $rombelId,
-            ]);
+            ];
 
-            $created++;
+            if ($existingData) {
+                $existingData->update($payload);
+                $updated++;
+            } else {
+                DataSiswa::create($payload);
+                $created++;
+            }
         } catch (\Throwable $e) {
             $errors[] = "Baris " . ($r+1) . ": gagal menyimpan siswa ({$e->getMessage()}).";
             $skipped++;
@@ -432,7 +462,7 @@ class KurikulumSiswaController extends Controller
         }
     }
 
-    $msg = "Import selesai. Dibuat: {$created}. Dilewati: {$skipped}.";
+    $msg = "Import selesai. Dibuat: {$created}. Diperbarui: {$updated}. Dilewati: {$skipped}.";
     if (!empty($errors)) {
         $msg .= ' Beberapa peringatan: ' . implode(' | ', array_slice($errors,0,10));
     }

@@ -19,9 +19,9 @@
     <div class="mb-3">
         @php $currentTingkat = request()->query('tingkat', ''); @endphp
         <div class="btn-group" role="group">
-            <a href="{{ request()->url() }}?tingkat=X" class="btn btn-sm {{ $currentTingkat == 'X' ? 'btn-primary' : 'btn-outline-secondary' }}">Kelas X</a>
-            <a href="{{ request()->url() }}?tingkat=XI" class="btn btn-sm {{ $currentTingkat == 'XI' ? 'btn-primary' : 'btn-outline-secondary' }}">Kelas XI</a>
-            <a href="{{ request()->url() }}?tingkat=XII" class="btn btn-sm {{ $currentTingkat == 'XII' ? 'btn-primary' : 'btn-outline-secondary' }}">Kelas XII</a>
+            <a href="{{ request()->fullUrlWithQuery(['tingkat' => 'X', 'page' => 1]) }}" class="btn btn-sm {{ $currentTingkat == 'X' ? 'btn-primary' : 'btn-outline-secondary' }}">Kelas X</a>
+            <a href="{{ request()->fullUrlWithQuery(['tingkat' => 'XI', 'page' => 1]) }}" class="btn btn-sm {{ $currentTingkat == 'XI' ? 'btn-primary' : 'btn-outline-secondary' }}">Kelas XI</a>
+            <a href="{{ request()->fullUrlWithQuery(['tingkat' => 'XII', 'page' => 1]) }}" class="btn btn-sm {{ $currentTingkat == 'XII' ? 'btn-primary' : 'btn-outline-secondary' }}">Kelas XII</a>
             <a href="{{ route('kurikulum.siswa.index') }}" class="btn btn-sm btn-outline-secondary">Semua</a>
         </div>
     </div>
@@ -75,6 +75,9 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
+                            @if(config('app.debug'))
+                                <th>ID</th>
+                            @endif
                             <th>NIS</th>
                             <th>Nama Lengkap</th>
                             <th>Kelas</th>
@@ -85,6 +88,9 @@
                     <tbody>
                         @foreach ($siswas as $siswa)
                             <tr>
+                                    @if(config('app.debug'))
+                                        <td><small class="text-muted">{{ $siswa->id }}</small></td>
+                                    @endif
                                     <td>{{ $siswa->nis }}</td>
                                     <td>{{ $siswa->nama_lengkap }}</td>
                                     <td>
