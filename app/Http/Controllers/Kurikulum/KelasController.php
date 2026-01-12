@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Kurikulum;
 
 use App\Http\Controllers\Controller;
+use App\Models\Guru;
 use App\Models\Rombel;
 use App\Models\Kelas;
 use App\Models\Jurusan;
@@ -52,8 +53,8 @@ class KelasController extends Controller
     public function create()
     {
         $tingkats = [10, 11, 12];
-        $jurusans = \App\Models\Jurusan::all();
-        $gurus = \App\Models\Guru::all();
+        $jurusans = Jurusan::all();
+        $gurus = Guru::all();
         return view('kurikulum.manajemen-kelas.create', compact('tingkats', 'jurusans', 'gurus'));
     }
 
@@ -98,8 +99,8 @@ class KelasController extends Controller
     {
         $rombel = Rombel::findOrFail($id);
         $tingkats = [10, 11, 12];
-        $jurusans = \App\Models\Jurusan::all();
-        $gurus = \App\Models\Guru::all();
+        $jurusans = Jurusan::all();
+        $gurus = Guru::all();
         return view('kurikulum.manajemen-kelas.edit', compact('rombel', 'tingkats', 'jurusans', 'gurus'));
     }
 

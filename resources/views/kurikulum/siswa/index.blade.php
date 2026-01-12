@@ -6,9 +6,14 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>Daftar Siswa</h3>
-        <a href="{{ route('kurikulum.data-siswa.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-1"></i> Tambah Siswa
-        </a>
+        <div>
+            <a href="{{ route('kurikulum.data-siswa.create') }}" class="btn btn-primary me-2">
+                <i class="fas fa-plus me-1"></i> Tambah Siswa
+            </a>
+            <a href="{{ route('kurikulum.siswa.import.form') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-file-import me-1"></i> Import Excel
+            </a>
+        </div>
     </div>
 
     <div class="mb-3">

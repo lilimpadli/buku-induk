@@ -431,7 +431,7 @@ Route::middleware('web')->group(function () {
             Route::delete('/nilai-raport/delete', [TUController::class, 'nilaiRaportDestroy'])->name('nilai_raport.destroy');
 
             // Cetak rapor (TU)
-            Route::get('/rapor/{siswa_id}/{semester}/{tahun}/cetak', [\App\Http\Controllers\RaporController::class, 'cetakRapor'])->name('rapor.cetak');
+            Route::get('/rapor/{siswa_id}/{semester}/{tahun}/cetak', [RaporController::class, 'cetakRapor'])->name('rapor.cetak');
 
             // Kelulusan & Alumni (TU)
             Route::get('/kelulusan', [KelulusanController::class, 'index'])->name('kelulusan.index');
@@ -496,6 +496,12 @@ Route::middleware('web')->group(function () {
 
             Route::get('/siswa', [KurikulumSiswaController::class, 'index'])
                 ->name('siswa.index');
+
+            // Import siswa (Excel) - show form and process
+            Route::get('/siswa/import', [KurikulumSiswaController::class, 'importForm'])
+                ->name('siswa.import.form');
+            Route::post('/siswa/import', [KurikulumSiswaController::class, 'import'])
+                ->name('siswa.import');
 
             // Data Siswa
             Route::get('/siswa/create', [KurikulumSiswaController::class, 'create'])
@@ -578,14 +584,14 @@ Route::middleware('web')->group(function () {
                 ->name('jurusan.destroy');
 
             // Kelulusan & Alumni (reuse TU controllers for data views)
-            Route::get('/kelulusan', [\App\Http\Controllers\TU\KelulusanController::class, 'index'])
+            Route::get('/kelulusan', [KelulusanController::class, 'index'])
                 ->name('kelulusan.index');
-            Route::get('/kelulusan/rombel/{rombelId}/{tahun}', [\App\Http\Controllers\TU\KelulusanController::class, 'showRombel'])
+            Route::get('/kelulusan/rombel/{rombelId}/{tahun}', [KelulusanController::class, 'showRombel'])
                 ->name('kelulusan.rombel.show');
 
-            Route::get('/alumni', [\App\Http\Controllers\TU\AlumniController::class, 'index'])
+            Route::get('/alumni', [AlumniController::class, 'index'])
                 ->name('alumni.index');
-            Route::get('/alumni/{id}', [\App\Http\Controllers\TU\AlumniController::class, 'show'])
+            Route::get('/alumni/{id}', [AlumniController::class, 'show'])
                 ->name('alumni.show');
         });
     });

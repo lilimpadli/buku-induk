@@ -10,18 +10,21 @@ use App\Models\Rombel;
 
 /**
  * @property int $id
- * @property string $nomor_induk
  * @property string $name
+ * @property string $nomor_induk
  * @property string $nisn
- * @property string $role
+ * @property string $email
+ * @property string $password
  * @property string|null $photo
+ * @property string $role
+ * @property string|null $remember_token
  */
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    use HasFactory, Notifiable;
+    
 
     protected $fillable = [
         'name',
