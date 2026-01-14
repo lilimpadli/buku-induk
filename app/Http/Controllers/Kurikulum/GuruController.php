@@ -10,15 +10,32 @@ use App\Models\User;
 
 class GuruController extends Controller
 {
-   public function index()
-{
-    $jurusans = Jurusan::with([
-        'gurus.user',
-        'gurus.rombels.kelas'
-    ])->orderBy('nama')->get();
+   public function index(Request $request)
+   {
+       $search = $request->query('search', '');
+       $jurusan_id = $request->query('jurusan', '');
 
-    return view('kurikulum.guru.index', compact('jurusans'));
-}
+       $allJurusans = Jurusan::orderBy('nama')->get();
+
+       $query = Guru::with(['rombels.kelas.jurusan', 'user'])
+           ->orderBy('nama');
+
+       if (!empty($search)) {
+           $query->where(function($q) use ($search) {
+               $q->where('nama', 'like', "%{$search}%")
+                 ->orWhere('nip', 'like', "%{$search}%")
+                 ->orWhere('email', 'like', "%{$search}%");
+           });
+       }
+
+       if (!empty($jurusan_id)) {
+           $query->where('jurusan_id', $jurusan_id);
+       }
+
+       $gurus = $query->paginate(15)->withQueryString();
+
+       return view('kurikulum.guru.index', compact('gurus', 'allJurusans', 'jurusan_id', 'search'));
+   }
 
 
     public function create()
@@ -225,6 +242,12 @@ class GuruController extends Controller
         return redirect()
             ->route('kurikulum.guru.manage.index')
             ->with('success', 'Guru berhasil diperbarui');
+    }
+
+    public function show($id)
+    {
+        $guru = Guru::with(['user', 'rombels.kelas.jurusan'])->findOrFail($id);
+        return view('kurikulum.guru.show', compact('guru'));
     }
 
     public function destroy($id)

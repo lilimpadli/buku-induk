@@ -239,11 +239,7 @@
             <a href="{{ route('walikelas.nilai_raport.list', $siswa->id) }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
-            <a href="{{ route('walikelas.rapor.cetak', [
-                'siswa_id' => $siswa->id,
-                'semester' => $semester,
-                'tahun' => $tahun
-            ]) }}" class="btn btn-primary" target="_blank">
+            <a href="{{ route('walikelas.nilai_raport.pdf', [$siswa->id, $semester, str_replace('/', '-', $tahun)]) }}" class="btn btn-primary" target="_blank">
                 Cetak PDF
             </a>
             <a href="{{ route('walikelas.nilai_raport.edit', [
@@ -374,12 +370,14 @@
         </table>
 
         {{-- Kenaikan --}}
-        <h5 class="fw-bold mt-4">E. Kenaikan Kelas</h5>
-        <p><b>Status:</b> {{ $kenaikan->status ?? 'Belum Ditentukan' }}</p>
-        @if(isset($kenaikan->rombelTujuan))
-            <p><b>Ke Kelas:</b> {{ $kenaikan->rombelTujuan->nama }}</p>
+        @if(strtolower($semester) !== 'ganjil')
+            <h5 class="fw-bold mt-4">E. Kenaikan Kelas</h5>
+            <p><b>Status:</b> {{ $kenaikan->status ?? 'Belum Ditentukan' }}</p>
+            @if(isset($kenaikan->rombelTujuan))
+                <p><b>Ke Kelas:</b> {{ $kenaikan->rombelTujuan->nama }}</p>
+            @endif
+            <p><b>Catatan:</b> {{ $kenaikan->catatan ?? '-' }}</p>
         @endif
-        <p><b>Catatan:</b> {{ $kenaikan->catatan ?? '-' }}</p>
 
         
     </div>

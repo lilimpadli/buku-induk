@@ -469,6 +469,7 @@ Route::middleware('web')->group(function () {
                 Route::get('/', [App\Http\Controllers\Kurikulum\GuruController::class, 'index'])->name('index');
                 Route::get('/create', [App\Http\Controllers\Kurikulum\GuruController::class, 'create'])->name('create');
                 Route::post('/', [App\Http\Controllers\Kurikulum\GuruController::class, 'store'])->name('store');
+                Route::get('/{id}', [App\Http\Controllers\Kurikulum\GuruController::class, 'show'])->name('show');
                 Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\GuruController::class, 'edit'])->name('edit');
                 Route::put('/{id}', [App\Http\Controllers\Kurikulum\GuruController::class, 'update'])->name('update');
                 Route::delete('/{id}', [App\Http\Controllers\Kurikulum\GuruController::class, 'destroy'])->name('destroy');

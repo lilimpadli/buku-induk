@@ -316,22 +316,24 @@
         </tr>
     </table>
      {{-- Kenaikan --}}
-        <h5 class="fw-bold mt-4">E. Kenaikan Kelas</h5>
-    <table class="table table-bordered" style="width: 50%">
-        <tr>
-            <th>Status</th>
-            <td>{{ $kenaikan->status ?? 'Belum Ditentukan' }}</td>
-        </tr>
-        @if(isset($kenaikan->rombelTujuan))
-        <tr>
-            <th>Ke Kelas</th>
-            <td>{{ $kenaikan->rombelTujuan->nama }}</td>
-        </tr>
+        @if(strtolower($semester) !== 'ganjil')
+            <h5 class="fw-bold mt-4">E. Kenaikan Kelas</h5>
+            <table class="table table-bordered" style="width: 50%">
+                <tr>
+                    <th>Status</th>
+                    <td>{{ $kenaikan->status ?? 'Belum Ditentukan' }}</td>
+                </tr>
+                @if(isset($kenaikan->rombelTujuan))
+                <tr>
+                    <th>Ke Kelas</th>
+                    <td>{{ $kenaikan->rombelTujuan->nama }}</td>
+                </tr>
+                @endif
+                <tr>
+                    <th>Catatan</th>
+                    <td>{{ $kenaikan->catatan ?? '-' }}</td>
+                </tr>
+            </table>
         @endif
-        <tr>
-            <th>Catatan</th>
-            <td>{{ $kenaikan->catatan ?? '-' }}</td>
-        </tr>
-    </table>
 </div>
 @endsection

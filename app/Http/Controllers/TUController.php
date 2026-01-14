@@ -451,6 +451,7 @@ class TUController extends Controller
         if ($siswa->rombel && $siswa->rombel->kelas) {
             // try derive kelas from existing raport rows; fallback to siswa->rombel->kelas
             $kelasRaport = $nilaiRaports->first()?->kelas ?? $siswa->rombel->kelas;
+            $rombelRaport = $nilaiRaports->first()?->rombel ?? ($siswa->rombel ?? null);
             $tingkat = $kelasRaport ? (string) $kelasRaport->tingkat : null;
             $currentJurusanId = $kelasRaport->jurusan_id ?? null;
 

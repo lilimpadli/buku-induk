@@ -268,7 +268,7 @@
             <div class="col-md-3">
                 <label class="fw-bold">Tahun Ajaran</label>
                 <input type="text" class="form-control" value="{{ $tahun }}" readonly>
-                <input type="hidden" name="tahun_ajaran" value="{{ $tahun }}">
+                <input type="hidden" name="tahun" value="{{ $tahun }}">
             </div>
         </div>
 
@@ -382,6 +382,7 @@
                     @foreach($ekstra as $index => $e)
                         <div class="row mb-3 ekstra-row">
                             <div class="col-md-4">
+                                <input type="hidden" name="ekstra[{{ $index }}][id]" value="{{ $e->id }}">
                                 <input type="text" name="ekstra[{{ $index }}][nama_ekstra]" class="form-control"
                                     placeholder="Nama Ekstrakurikuler" value="{{ $e->nama_ekstra }}">
                             </div>
@@ -434,6 +435,7 @@
         </div>
 
         <!-- Kenaikan Kelas -->
+        <div id="kenaikan-card" style="{{ strtolower($semester) === 'ganjil' ? 'display:none;' : '' }}">
         <div class="card mb-4">
             <div class="card-header">
                 <h5>E. Kenaikan Kelas</h5>
@@ -471,6 +473,8 @@
                         @endif
                     </div>
                 </div>
+            </div>
+        </div>
                 <div class="mt-3">
                     <label>Catatan</label>
                     <textarea name="kenaikan[catatan]" class="form-control"
@@ -533,7 +537,7 @@
     <form id="form-delete-rapor" action="{{ route('walikelas.input_nilai_raport.delete', $siswa->id) }}" method="POST" style="display:none;">
         @csrf
         <input type="hidden" name="semester" value="{{ $semester }}">
-        <input type="hidden" name="tahun_ajaran" value="{{ $tahun }}">
+        <input type="hidden" name="tahun" value="{{ $tahun }}">
     </form>
 </div>
 @endsection
@@ -585,13 +589,16 @@
                 function updateRombelState() {
                     const statusEl = document.getElementById('statusKenaikanSelect');
                     const rombelEl = document.getElementById('rombelTujuanSelect');
+                    const kenaikanCard = document.getElementById('kenaikan-card');
                     if (!statusEl || !rombelEl) return;
                     const statusNorm = (statusEl.value || '').toString().toLowerCase().replace(/\s|_/g, '');
                     const semester = '{{$semester}}'.toString().toLowerCase();
                     if (semester === 'ganjil' || statusNorm !== 'naikkelas') {
                         rombelEl.disabled = true;
+                        if (kenaikanCard) kenaikanCard.style.display = 'none';
                     } else {
                         rombelEl.disabled = false;
+                        if (kenaikanCard) kenaikanCard.style.display = '';
                     }
                 }
 

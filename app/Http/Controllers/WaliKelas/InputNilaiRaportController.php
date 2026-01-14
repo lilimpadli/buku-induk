@@ -329,16 +329,17 @@ class InputNilaiRaportController extends Controller
                 );
 
                 // Apply actual move only when not Ganjil and status indicates promotion
-                if (strtolower($semester) !== 'ganjil' && $status === 'Naik Kelas') {
-                    $target = $req->kenaikan['rombel_tujuan_id'] ?? null;
-                    if ($target) {
-                        $s = DataSiswa::find($siswa_id);
-                        if ($s) {
-                            $s->rombel_id = $target;
-                            $s->save();
+                    if (strtolower($semester) !== 'ganjil' && $status === 'Naik Kelas') {
+                        // prefer submitted target, fallback to saved kenaikan record
+                        $target = $req->kenaikan['rombel_tujuan_id'] ?? ($kenaikan->rombel_tujuan_id ?? null);
+                        if ($target) {
+                            $s = DataSiswa::find($siswa_id);
+                            if ($s) {
+                                $s->rombel_id = $target;
+                                $s->save();
+                            }
                         }
                     }
-                }
             }
         }
 

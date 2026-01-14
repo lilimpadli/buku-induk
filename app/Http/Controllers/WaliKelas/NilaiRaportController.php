@@ -623,7 +623,8 @@ class NilaiRaportController extends Controller
 
                 // Apply actual move only when not Ganjil and status indicates promotion
                 if (strtolower($semester) !== 'ganjil' && $status === 'Naik Kelas') {
-                    $target = $request->kenaikan['rombel_tujuan_id'] ?? null;
+                    // prefer the submitted rombel_tujuan_id, fallback to the saved kenaikan record
+                    $target = $request->kenaikan['rombel_tujuan_id'] ?? ($kenaikan->rombel_tujuan_id ?? null);
                     if ($target) {
                         $s = DataSiswa::find($siswa->id);
                         if ($s) {

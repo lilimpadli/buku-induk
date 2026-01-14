@@ -377,16 +377,18 @@
     </div>
 
     <!-- Kenaikan Kelas -->
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Kenaikan Kelas</h5>
-            <p><strong>Status:</strong> {{ $kenaikan->status ?? 'Belum Ditentukan' }}</p>
-            @if(isset($kenaikan->rombelTujuan))
-                <p><strong>Ke Kelas:</strong> {{ $kenaikan->rombelTujuan->nama }}</p>
-            @endif
-            <p><strong>Catatan:</strong> {{ $kenaikan->catatan ?? '-' }}</p>
+    @if(strtolower($semester) !== 'ganjil')
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Kenaikan Kelas</h5>
+                <p><strong>Status:</strong> {{ $kenaikan->status ?? 'Belum Ditentukan' }}</p>
+                @if(isset($kenaikan->rombelTujuan))
+                    <p><strong>Ke Kelas:</strong> {{ $kenaikan->rombelTujuan->nama }}</p>
+                @endif
+                <p><strong>Catatan:</strong> {{ $kenaikan->catatan ?? '-' }}</p>
+            </div>
         </div>
-    </div>
+    @endif
 
 </div>
 @endsection

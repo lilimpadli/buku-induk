@@ -10,6 +10,8 @@ class EkstrakurikulerSiswa extends Model
 
     protected $fillable = [
         'siswa_id',
+        'semester',
+        'tahun_ajaran',
         'nama_ekstra',
         'predikat',
         'keterangan',

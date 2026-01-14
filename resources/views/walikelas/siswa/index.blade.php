@@ -255,11 +255,7 @@
                     </a>
                 @endforeach
             </div>
-            @if(method_exists($siswa, 'links'))
-                <div class="p-3">
-                    {{ $siswa->links() }}
-                </div>
-            @endif
+            {{-- menampilkan semua siswa, pagination dinonaktifkan --}}
         @else
             <div class="empty-state">
                 <i class="fas fa-user-graduate"></i>

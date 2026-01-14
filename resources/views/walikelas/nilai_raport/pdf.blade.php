@@ -119,19 +119,23 @@
 <!-- ================= HALAMAN 2 ================= -->
 <div class="page-break"></div>
 
-<!-- IDENTITAS SISWA (HALAMAN 2 - FORMAT BAWAH) -->
+<!-- IDENTITAS SISWA (HALAMAN 2 - SAMAKAN DENGAN VIEW) -->
 <table class="no-border" style="margin-bottom:15px;">
     <tr>
-        <td width="25%">Nama Peserta Didik</td>
-        <td width="75%">: <b>{{ strtoupper($siswa->nama_lengkap) }}</b></td>
+        <td width="30%">Nama Peserta Didik</td>
+        <td width="70%">: <b>{{ strtoupper($siswa->nama_lengkap) }}</b></td>
     </tr>
     <tr>
-        <td>Nomor Induk / NISN</td>
-        <td>: {{ $siswa->nis }} / {{ $siswa->nisn }}</td>
+        <td>NISN</td>
+        <td>: {{ $siswa->nisn }}</td>
     </tr>
     <tr>
         <td>Kelas</td>
         <td>: {{ $siswa->rombel->nama ?? '-' }}</td>
+    </tr>
+    <tr>
+        <td>Sekolah</td>
+        <td>: {{ $info->nama_sekolah ?? 'SMK NEGERI 1 X' }}</td>
     </tr>
     <tr>
         <td>Tahun Pelajaran</td>
@@ -172,12 +176,14 @@
             </table>
         </td>
         <td width="60%" valign="top">
-            <table>
-                <tr><th>Catatan Wali Kelas</th></tr>
-                <tr>
-                    <td style="height:90px;">{{ $kenaikan->catatan ?? '' }}</td>
-                </tr>
-            </table>
+            @if(strtolower($semester) !== 'ganjil')
+                <table>
+                    <tr><th>Catatan Wali Kelas</th></tr>
+                    <tr>
+                        <td style="height:90px;">{{ $kenaikan->catatan ?? '' }}</td>
+                    </tr>
+                </table>
+            @endif
         </td>
     </tr>
 </table>

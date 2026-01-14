@@ -58,15 +58,15 @@ class WaliKelasSiswaController extends Controller
                     return $q->where(function($qq) use ($like) {
                         $qq->where('nama_lengkap', 'like', $like)
                            ->orWhere('nisn', 'like', $like)
-                           ->orWhere('nomor_induk', 'like', $like);
+                           ->orWhere('nis', 'like', $like);
                     });
                 })
                 ->when(in_array($jenisKelamin, ['L', 'P']), function($q) use ($jenisKelamin) {
                     return $q->where('jenis_kelamin', $jenisKelamin);
                 })
                 ->orderBy('nama_lengkap');
-
-            $siswa = $query->paginate(15)->appends($request->query());
+            // Ambil semua hasil tanpa pagination sesuai permintaan
+            $siswa = $query->get();
         } else {
             // jika tidak ada penugasan, kembalikan kosong supaya wali tidak melihat seluruh siswa
             $siswa = collect();
@@ -119,6 +119,7 @@ class WaliKelasSiswaController extends Controller
                     return $q->whereNotIn('id', $excludedIds);
                 })->count();
 
+            // Ambil siswa terbaru hanya dari rombel yang dipegang wali kelas
             $recent = DataSiswa::with(['ayah', 'ibu', 'wali', 'rombel'])
                 ->whereIn('rombel_id', $rombelsIds)
                 ->when(!empty($excludedIds), function($q) use ($excludedIds) {

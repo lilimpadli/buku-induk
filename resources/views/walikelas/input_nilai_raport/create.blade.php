@@ -233,7 +233,7 @@
         <div class="row mb-4">
             <div class="col-md-3">
                 <label class="fw-bold">Semester</label>
-                <select name="semester" class="form-control" required>
+                <select id="semesterSelect" name="semester" class="form-control" required>
                     <option value="Ganjil">Ganjil</option>
                     <option value="Genap">Genap</option>
                 </select>
@@ -369,9 +369,10 @@
         </div>
 
         {{-- ================== KENAIKAN KELAS ================== --}}
-        <h5 class="mt-4 text-danger">E. Kenaikan Kelas</h5>
+        <div id="kenaikan-section" style="display:none;">
+            <h5 class="mt-4 text-danger">E. Kenaikan Kelas</h5>
 
-        <div class="row mt-2">
+            <div class="row mt-2">
             <div class="col-md-3">
                 <label>Status</label>
                 <select class="form-control" name="kenaikan[status]">
@@ -408,9 +409,8 @@
                     <small class="text-muted">Menampilkan rombel untuk tingkat: {{ $targetTingkat }}</small>
                 @endif
             </div>
+            </div>
         </div>
-
-        
 
         <button class="btn btn-success mt-4">Simpan Semua Data</button>
 
@@ -418,3 +418,23 @@
 
 </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const semesterEl = document.getElementById('semesterSelect');
+            const kenaikanSection = document.getElementById('kenaikan-section');
+            const updateVisibility = () => {
+                if (!semesterEl || !kenaikanSection) return;
+                const val = (semesterEl.value || '').toString().toLowerCase();
+                if (val === 'genap') {
+                    kenaikanSection.style.display = '';
+                } else {
+                    kenaikanSection.style.display = 'none';
+                }
+            };
+            semesterEl?.addEventListener('change', updateVisibility);
+            updateVisibility();
+        });
+    </script>
+@endpush

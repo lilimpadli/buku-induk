@@ -126,6 +126,86 @@
                 margin-left: 0;
             }
         }
+        /* Ensure pagination icons/chevrons keep a normal size */
+        .pagination .page-link svg,
+        .pagination .page-link i,
+        .pagination svg,
+        .pagination i,
+        .page-link .bi,
+        .pagination .page-item .page-link > * {
+            display: inline-block !important;
+            width: auto !important;
+            height: auto !important;
+            max-width: 1.2em !important;
+            max-height: 1.2em !important;
+            font-size: 1rem !important;
+            line-height: 1 !important;
+            vertical-align: -0.125em !important;
+        }
+
+        /* Make sure pagination links keep compact padding */
+        .pagination .page-link,
+        .pagination .page-item a,
+        .pagination .page-item button {
+            padding: .375rem .6rem !important;
+            min-width: 2.2rem !important;
+        }
+
+        /* Global safety clamps for icons inside main content to prevent accidental huge icons */
+        main svg,
+        main i.fas,
+        main i.far,
+        main i.fad,
+        main i.fal,
+        main i.fab,
+        main .bi {
+            max-width: 1.5rem !important;
+            max-height: 1.5rem !important;
+            width: auto !important;
+            height: auto !important;
+            font-size: 1rem !important;
+        }
+
+        /* Specific override for empty-state icons which in views sometimes set large sizes */
+        main .empty-state i,
+        .empty-state i {
+            font-size: 2rem !important;
+            max-width: 2rem !important;
+            max-height: 2rem !important;
+            display: inline-block !important;
+        }
+        
+        /* Perbaikan untuk dropdown menu */
+        .dropdown-menu {
+            border: 1px solid rgba(0,0,0,.1);
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+        }
+        
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .dropdown-item i {
+            width: 20px;
+            margin-right: 8px;
+        }
+        
+        /* Perbaikan untuk tautan aktif */
+        .sidebar .nav-link.active {
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        /* Perbaikan untuk judul submenu */
+        .sidebar .nav-subtitle {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 0.05em;
+        }
     </style>
 </head>
 
@@ -220,11 +300,11 @@
                                         <i class="fas fa-users"></i> <span class="label ms-2">Data Siswa</span>
                                     </a>
 
-                                    <a href="{{ route('kaprog.kelas.index') }}" class="nav-link {{ request()->routeIs('kaprog.kelas*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Kelas">
+                                    <a href="{{ route('kaprog.kelas.index') }}" class="nav-link {{ request()->routeIs('kaprog.kelas.*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Kelas">
                                         <i class="fas fa-chalkboard"></i> <span class="label ms-2">Data Kelas</span>
                                     </a>
 
-                                    <a href="{{ route('kaprog.guru.index') }}" class="nav-link {{ request()->routeIs('kaprog.guru*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Guru">
+                                    <a href="{{ route('kaprog.guru.index') }}" class="nav-link {{ request()->routeIs('kaprog.guru.*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Guru">
                                         <i class="fas fa-user-tie"></i> <span class="label ms-2">Guru</span>
                                     </a>
                                 @endif
@@ -251,16 +331,16 @@
                                         <i class="fas fa-plus-circle"></i> <span class="label ms-2">Data Guru</span>
                                     </a>
 
-                                     <!-- MENU BARU -->
-    <hr class="my-2">
-    <div class="text-muted small px-3 mb-2">MANAJEMEN LULUSAN</div>
-    <a href="{{ route('tu.kelulusan.index') }}" class="nav-link {{ request()->routeIs('tu.kelulusan*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Kelulusan">
-        <i class="fas fa-graduation-cap"></i> <span class="label ms-2">Data Kelulusan</span>
-    </a>
+                                    <!-- MENU BARU -->
+                                    <hr class="my-2">
+                                    <div class="nav-subtitle">MANAJEMEN LULUSAN</div>
+                                    <a href="{{ route('tu.kelulusan.index') }}" class="nav-link {{ request()->routeIs('tu.kelulusan*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Kelulusan">
+                                        <i class="fas fa-graduation-cap"></i> <span class="label ms-2">Data Kelulusan</span>
+                                    </a>
 
-    <a href="{{ route('tu.alumni.index') }}" class="nav-link {{ request()->routeIs('tu.alumni*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Alumni">
-        <i class="fas fa-user-friends"></i> <span class="label ms-2">Data Alumni</span>
-    </a>
+                                    <a href="{{ route('tu.alumni.index') }}" class="nav-link {{ request()->routeIs('tu.alumni*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Alumni">
+                                        <i class="fas fa-user-friends"></i> <span class="label ms-2">Data Alumni</span>
+                                    </a>
                                 @endif
 
                                 {{-- ROLE: KURIKULUM --}}
@@ -277,38 +357,39 @@
                                         <i class="fas fa-users"></i> <span class="label ms-2">Manajemen Siswa</span>
                                     </a>
 
-                                    <a href="{{ route('kurikulum.ppdb.index') }}" class="nav-link {{ request()->routeIs('kurikulum.ppdb*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen PPDB">
-                                        <i class="fas fa-users"></i> <span class="label ms-2">PPDB</span>
+                                    <!-- Dropdown Menu untuk PPDB -->
+                                    <div class="dropdown">
+                                        <a class="nav-link dropdown-toggle {{ request()->is('kurikulum/ppdb*') ? 'active' : '' }}" href="#" id="ppdbDropdownKurikulum" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-users"></i> <span class="label ms-2">PPDB</span>
+                                        </a>
+                                        <ul class="dropdown-menu" aria-labelledby="ppdbDropdownKurikulum">
+                                            <li><a class="dropdown-item" href="{{ route('kurikulum.ppdb.index') }}"><i class="fas fa-list"></i> Data PPDB</a></li>
+                                            <li><a class="dropdown-item" href="{{ route('kurikulum.ppdb.timeline') }}"><i class="fas fa-clock"></i> Timeline PPDB</a></li>
+                                        </ul>
+                                    </div>
+
+                                    <a href="{{ route('kurikulum.jurusan.index') }}" class="nav-link {{ request()->routeIs('kurikulum.jurusan*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Jurusan">
+                                        <i class="fas fa-school"></i> <span class="label ms-2">Manajemen Jurusan</span>
                                     </a>
 
-                                      <a href="{{ route('kurikulum.ppdb.timeline') }}" class="nav-link {{ request()->routeIs('kurikulum.ppdb.timeline') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Timeline PPDB">
-                                        <i class="fas fa-users"></i> <span class="label ms-2">PPDB</span>
+                                    <a href="{{ route('kurikulum.guru.index') }}" class="nav-link {{ request()->routeIs('kurikulum.guru*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Guru">
+                                        <i class="fas fa-user-tie"></i> <span class="label ms-2">Manajemen Guru</span>
                                     </a>
 
-                                     <a href="{{ route('kurikulum.jurusan.index') }}" class="nav-link {{ request()->routeIs('kurikulum.jurusan*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Jurusan">
-                                        <i class="fas fa-users"></i> <span class="label ms-2">Manajemen Jurusan</span>
-                                    </a>
-
-                                     <a href="{{ route('kurikulum.guru.index') }}" class="nav-link {{ request()->routeIs('kurikulum.guru*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Guru">
-                                        <i class="fas fa-users"></i> <span class="label ms-2">Manajemen Guru</span>
-                                    </a>
-
-                                      <a href="{{ route('kurikulum.mata-pelajaran.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mata-pelajaran*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Mata Pelajaran">
-                                        <i class="fas fa-users"></i> <span class="label ms-2">Manajemen Mata Pelajaran</span>
+                                    <a href="{{ route('kurikulum.mata-pelajaran.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mata-pelajaran*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Mata Pelajaran">
+                                        <i class="fas fa-book"></i> <span class="label ms-2">Manajemen Mata Pelajaran</span>
                                     </a>
 
                                     <!-- MENU BARU -->
-    <hr class="my-2">
-    <div class="text-muted small px-3 mb-2">MANAJEMEN LULUSAN</div>
-    <a href="{{ route('kurikulum.kelulusan.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kelulusan*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Kelulusan">
-        <i class="fas fa-graduation-cap"></i> <span class="label ms-2">Data Kelulusan</span>
-    </a>
+                                    <hr class="my-2">
+                                    <div class="nav-subtitle">MANAJEMEN LULUSAN</div>
+                                    <a href="{{ route('kurikulum.kelulusan.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kelulusan*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Kelulusan">
+                                        <i class="fas fa-graduation-cap"></i> <span class="label ms-2">Data Kelulusan</span>
+                                    </a>
 
-    <a href="{{ route('kurikulum.alumni.index') }}" class="nav-link {{ request()->routeIs('kurikulum.alumni*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Alumni">
-        <i class="fas fa-user-friends"></i> <span class="label ms-2">Data Alumni</span>
-    </a>
-
-                                    
+                                    <a href="{{ route('kurikulum.alumni.index') }}" class="nav-link {{ request()->routeIs('kurikulum.alumni*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Alumni">
+                                        <i class="fas fa-user-friends"></i> <span class="label ms-2">Data Alumni</span>
+                                    </a>
                                 @endif
 
                             </nav>
@@ -332,6 +413,7 @@
 
             <!-- MAIN CONTENT -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                @include('partials._alerts')
                 @yield('content')
             </main>
 
@@ -361,6 +443,12 @@
                     });
                 });
             }
+            
+            // Inisialisasi dropdown Bootstrap
+            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'))
+            var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl)
+            });
         });
     </script>
 

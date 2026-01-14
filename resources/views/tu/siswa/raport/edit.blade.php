@@ -451,6 +451,7 @@
             </div>
         </div>
 
+        <div id="kenaikan-card" style="{{ strtolower($semester) === 'ganjil' ? 'display:none;' : '' }}">
         <!-- Kenaikan Kelas -->
         <div class="card mb-4">
             <div class="card-header">
@@ -604,10 +605,13 @@
                 if (!statusEl || !rombelEl) return;
                 const statusNorm = (statusEl.value || '').toString().toLowerCase().replace(/\s|_/g, '');
                 const semester = '{{$semester}}'.toString().toLowerCase();
+                const kenaikanCard = document.getElementById('kenaikan-card');
                 if (semester === 'ganjil' || statusNorm !== 'naikkelas') {
                     rombelEl.disabled = true;
+                    if (kenaikanCard) kenaikanCard.style.display = 'none';
                 } else {
                     rombelEl.disabled = false;
+                    if (kenaikanCard) kenaikanCard.style.display = '';
                 }
             }
 

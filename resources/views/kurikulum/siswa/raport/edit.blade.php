@@ -447,6 +447,7 @@
             </div>
         </div>
 
+        <div id="kenaikan-card" style="{{ strtolower($semester) === 'ganjil' ? 'display:none;' : '' }}">
         <!-- Kenaikan Kelas -->
         <div class="card mb-4">
             <div class="card-header">
@@ -456,7 +457,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <label>Status</label>
-                            <select name="kenaikan[status]" class="form-control">
+                            <select id="statusKenaikanSelect" name="kenaikan[status]" class="form-control">
                                 <option value="Naik Kelas" {{ old('kenaikan.status', optional($kenaikan)->status) == 'Naik Kelas' ? 'selected' : '' }}>Naik</option>
                                 <option value="Tidak Naik" {{ old('kenaikan.status', optional($kenaikan)->status) == 'Tidak Naik' ? 'selected' : '' }}>Tidak Naik</option>
                                 <option value="Lulus" {{ old('kenaikan.status', optional($kenaikan)->status) == 'Lulus' ? 'selected' : '' }}>Lulus</option>
@@ -464,7 +465,7 @@
                     </div>
                     <div class="col-md-6">
                         <label>Ke Kelas</label>
-                            <select name="kenaikan[rombel_tujuan_id]" class="form-control">
+                            <select id="rombelTujuanSelect" name="kenaikan[rombel_tujuan_id]" class="form-control">
                                 <option value="">-- Pilih Kelas --</option>
                                 @foreach($rombels as $rombel)
                                     <option value="{{ $rombel->id }}" {{ old('kenaikan.rombel_tujuan_id', optional($kenaikan)->rombel_tujuan_id) == $rombel->id ? 'selected' : '' }}>
@@ -480,6 +481,7 @@
                             rows="2">{{ old('kenaikan.catatan', optional($kenaikan)->catatan ?? '') }}</textarea>
                 </div>
             </div>
+        </div>
         </div>
 
         <!-- Info Rapor -->
@@ -584,6 +586,27 @@
                     e.target.closest('.ekstra-row').remove();
                 }
             });
+
+            // Toggle rombel select enabled state and Kenaikan card visibility based on status and semester
+            function updateRombelState() {
+                const statusEl = document.getElementById('statusKenaikanSelect');
+                const rombelEl = document.getElementById('rombelTujuanSelect');
+                const kenaikanCard = document.getElementById('kenaikan-card');
+                if (!statusEl || !rombelEl) return;
+                const statusNorm = (statusEl.value || '').toString().toLowerCase().replace(/\s|_/g, '');
+                const semester = '{{$semester}}'.toString().toLowerCase();
+                if (semester === 'ganjil' || statusNorm !== 'naikkelas') {
+                    rombelEl.disabled = true;
+                    if (kenaikanCard) kenaikanCard.style.display = 'none';
+                } else {
+                    rombelEl.disabled = false;
+                    if (kenaikanCard) kenaikanCard.style.display = '';
+                }
+            }
+
+            document.getElementById('statusKenaikanSelect')?.addEventListener('change', updateRombelState);
+            // initial state
+            updateRombelState();
         });
 
         // Konfirmasi hapus rapor
