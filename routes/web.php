@@ -2,21 +2,30 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Schema;
 use App\Models\PpdbTimeline;
 
-// AUTH
+/*
+|--------------------------------------------------------------------------
+| AUTH
+|--------------------------------------------------------------------------
+*/
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\SiswaResetPasswordController;
+
+/*
+|--------------------------------------------------------------------------
+| CONTROLLERS
+|--------------------------------------------------------------------------
+*/
+use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\RaporController;
+use App\Http\Controllers\PpdbController;
 
 // SISWA
-use App\Http\Controllers\SiswaController;
-
-// WALI KELAS
 use App\Http\Controllers\WaliKelasSiswaController;
 use App\Http\Controllers\WaliKelas\InputNilaiRaportController;
 use App\Http\Controllers\WaliKelas\NilaiRaportController;
-use App\Http\Controllers\RaporController;
 
 // tu
 use App\Http\Controllers\TU\TambahKelasController;
@@ -34,9 +43,6 @@ use App\Http\Controllers\KelaskaprogController;
 use App\Http\Controllers\KaprogController;
 use App\Http\Controllers\KaprogGuruController;
 
-// PPDB
-use App\Http\Controllers\PpdbController;
-
 // TU
 use App\Http\Controllers\TUController;
 use App\Http\Controllers\TU\KelulusanController;
@@ -44,10 +50,6 @@ use App\Http\Controllers\TU\AlumniController;
 
 // KAPROG
 use App\Http\Controllers\Kaprog\KaprogDashboardController;
-use App\Http\Controllers\Kurikulum\KurikulumSiswaController as KurikulumKurikulumSiswaController;
-
-// Reset Password Siswa
-use App\Http\Controllers\Auth\SiswaResetPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,10 +80,9 @@ Route::prefix('rapor')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| WEB MIDDLEWARE
+| PUBLIC ROUTES
 |--------------------------------------------------------------------------
 */
-
 Route::middleware('web')->group(function () {
 
     Route::get('/', function () {
@@ -145,11 +146,7 @@ Route::middleware('web')->group(function () {
     Route::post('/siswa/reset-password', [SiswaResetPasswordController::class, 'reset'])
         ->name('siswa.password.reset');
 
-    /*
-    |--------------------------------------------------------------------------
-    | AUTH (LOGIN)
-    |--------------------------------------------------------------------------
-    */
+    // Login
     Route::middleware('guest')->group(function () {
         Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
         Route::post('/login', [LoginController::class, 'login'])->name('login.process');
@@ -158,42 +155,45 @@ Route::middleware('web')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])
         ->middleware('auth')
         ->name('logout');
+});
+
+/*
+|--------------------------------------------------------------------------
+| AUTHENTICATED ROUTES
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
+
+    // Redirect dashboard sesuai role
+    Route::get('/dashboard', function () {
+        return match (Auth::user()->role) {
+            'siswa'       => redirect()->route('siswa.dashboard'),
+            'guru'        => redirect()->route('guru.dashboard'),
+            'walikelas'   => redirect()->route('walikelas.dashboard'),
+            'kaprog'      => redirect()->route('kaprog.dashboard'),
+            'tu'          => redirect()->route('tu.dashboard'),
+            'kurikulum'   => redirect()->route('kurikulum.dashboard'),
+            'calon_siswa' => redirect()->route('calon.dashboard'),
+            default       => abort(403, 'Role tidak dikenali'),
+        };
+    })->name('dashboard');
 
     /*
     |--------------------------------------------------------------------------
-    | ROUTE SETELAH LOGIN
+    | SISWA
     |--------------------------------------------------------------------------
     */
-    Route::middleware('auth')->group(function () {
+    Route::prefix('siswa')
+        ->name('siswa.')
+        ->middleware('role:siswa')
+        ->group(function () {
 
-        // Redirect dashboard berdasarkan role
-        Route::get('/dashboard', function () {
-
-            return match (Auth::user()->role) {
-                'siswa'       => redirect()->route('siswa.dashboard'),
-                'walikelas'   => redirect()->route('walikelas.dashboard'),
-                'kaprog'      => redirect()->route('kaprog.dashboard'),
-                'tu'          => redirect()->route('tu.dashboard'),
-                'kurikulum'   => redirect()->route('kurikulum.dashboard'),
-                'calon_siswa' => redirect()->route('calon.dashboard'),
-                default       => abort(403, 'Role tidak dikenali'),
-            };
-        })->name('dashboard');
-
-        /*
-        |--------------------------------------------------------------------------
-        | ROUTE SISWA
-        |--------------------------------------------------------------------------
-        */
-        Route::prefix('siswa')->name('siswa.')->group(function () {
-            // Dashboard
-            Route::get('/dashboard', [App\Http\Controllers\SiswaController::class, 'dashboard'])->name('dashboard');
-
-                // Route untuk update profil (names are relative to the 'siswa.' group)
-                Route::put('/profile', [SiswaController::class, 'updateProfile'])->name('updateProfile');
-                Route::put('/email', [SiswaController::class, 'updateEmail'])->name('updateEmail');
-                Route::put('/password', [SiswaController::class, 'updatePassword'])->name('updatePassword');
-                Route::post('/photo', [SiswaController::class, 'uploadPhoto'])->name('uploadPhoto');
+            Route::get('/dashboard', [SiswaController::class, 'dashboard'])->name('dashboard');
+            // Route untuk update profil (names are relative to the 'siswa.' group)
+            Route::put('/profile', [SiswaController::class, 'updateProfile'])->name('updateProfile');
+            Route::put('/email', [SiswaController::class, 'updateEmail'])->name('updateEmail');
+            Route::put('/password', [SiswaController::class, 'updatePassword'])->name('updatePassword');
+            Route::post('/photo', [SiswaController::class, 'uploadPhoto'])->name('uploadPhoto');
 
             // Data Diri
             Route::get('/data-diri', [SiswaController::class, 'dataDiri'])->name('dataDiri');
@@ -213,105 +213,135 @@ Route::middleware('web')->group(function () {
 
             // Upload foto profil siswa
             Route::post('/profile/photo', [SiswaController::class, 'uploadPhoto'])->name('profile.photo');
-                // Hapus foto profil
-                Route::delete('/profile/photo', [SiswaController::class, 'deletePhoto'])->name('profile.photo.delete');
+            // Hapus foto profil
+            Route::delete('/profile/photo', [SiswaController::class, 'deletePhoto'])->name('profile.photo.delete');
 
             // Cetak raport siswa sendiri
             Route::get('/nilai_raport/{siswa_id}/{semester}/{tahun}/cetak', [NilaiRaportController::class, 'exportPdf'])->name('raport.cetak_pdf');
         });
 
-        // ROUTE GURU
-        Route::prefix('guru')->name('guru.')->middleware('auth')->group(function () {
-            Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])->name('profile');
-            Route::get('/profile/edit', [App\Http\Controllers\GuruController::class, 'edit'])->name('profile.edit');
-            Route::put('/profile', [App\Http\Controllers\GuruController::class, 'update'])->name('profile.update');
-        });
+    /*
+    |--------------------------------------------------------------------------
+    | GURU
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('guru')
+        ->name('guru.')
+        ->middleware('role:guru')
+        ->group(function () {
 
-        /*
-        |--------------------------------------------------------------------------
-        | ROUTE WALIKELAS
-        |--------------------------------------------------------------------------
-        */
-        Route::prefix('walikelas')
-            ->name('walikelas.')
-            ->middleware('role:walikelas')
-            ->group(function () {
+            Route::get('/dashboard', [\App\Http\Controllers\Guru\GuruDashboardController::class, 'index'])
+                ->name('dashboard');
 
-                // Dashboard Wali Kelas
-                Route::get('/dashboard', [App\Http\Controllers\WaliKelasSiswaController::class, 'dashboard'])
-                    ->name('dashboard');
-
-                Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])
-                    ->name('data_diri.profile');
-
-                Route::get('/siswa', [WaliKelasSiswaController::class, 'index'])
-                    ->name('siswa.index');
-
-                Route::get('/siswa/{id}', [WaliKelasSiswaController::class, 'show'])
-                    ->name('siswa.show');
-
-                // Export data siswa (PDF)
-                Route::get('/siswa/{id}/export-pdf', [WaliKelasSiswaController::class, 'exportPdf'])
-                    ->name('siswa.exportPDF');
-
-                // Nilai Raport
-                Route::get('/nilai-raport', [NilaiRaportController::class, 'index'])
-                    ->name('nilai_raport.index');
-                Route::get('/nilai-raport/list/{id}', [NilaiRaportController::class, 'list'])
-                    ->name('nilai_raport.list');
-                Route::get('/nilai-raport/{siswa_id}/{semester}/{tahun}/pdf', [NilaiRaportController::class, 'exportPdf'])
-                    ->name('nilai_raport.pdf');
-                Route::get('/nilai-raport/show', [NilaiRaportController::class, 'show'])
-                    ->name('nilai_raport.show');
-
-                // Edit dan Update Rapor
-                Route::get('/nilai-raport/edit', [NilaiRaportController::class, 'edit'])
-                    ->name('nilai_raport.edit');
-
-                Route::put('/nilai-raport/update', [NilaiRaportController::class, 'update'])
-                    ->name('nilai_raport.update');
-
-                // Cetak rapor final
-                Route::get('/rapor/{siswa_id}/{semester}/{tahun}/cetak', [RaporController::class, 'cetakRapor'])
-                    ->name('rapor.cetak');
-
-                // Input Nilai Raport
-                Route::get('/input-nilai-raport', [InputNilaiRaportController::class, 'index'])
-                    ->name('input_nilai_raport.index');
-                Route::get('/input-nilai-raport/create/{siswa_id}', [InputNilaiRaportController::class, 'create'])
-                    ->name('input_nilai_raport.create');
-                Route::post('/input-nilai-raport/store/{siswa_id}', [InputNilaiRaportController::class, 'store'])
-                    ->name('input_nilai_raport.store');
-                Route::get('input-nilai-raport/{siswa_id}/edit', [InputNilaiRaportController::class, 'edit'])
-                    ->name('input_nilai_raport.edit');
-                Route::post('input-nilai-raport/{siswa_id}/update', [InputNilaiRaportController::class, 'update'])
-                    ->name('input_nilai_raport.update');
-
-                // delete raport for a siswa/semester/tahun
-                Route::post('input-nilai-raport/{siswa_id}/delete', [InputNilaiRaportController::class, 'destroy'])
-                    ->name('input_nilai_raport.delete');
-
-                // Form Ekstra / Kehadiran / Info
-                Route::get('/rapor/ekstra/{siswa_id}', [RaporController::class, 'formEkstra'])
-                    ->name('rapor.ekstra.form');
-                Route::post('/rapor/ekstra/{siswa_id}', [RaporController::class, 'simpanEkstra'])
-                    ->name('rapor.ekstra.simpan');
-                Route::get('/rapor/kehadiran/{siswa_id}', [RaporController::class, 'formKehadiran'])
-                    ->name('rapor.kehadiran.form');
-                Route::post('/rapor/kehadiran/{siswa_id}', [RaporController::class, 'simpanKehadiran'])
-                    ->name('rapor.kehadiran.simpan');
-                Route::get('/rapor/info/{siswa_id}', [RaporController::class, 'formInfo'])
-                    ->name('rapor.info.form');
-                Route::post('/rapor/info/{siswa_id}', [RaporController::class, 'simpanInfo'])
-                    ->name('rapor.info.simpan');
+            // Profile Management - Use GuruProfileController
+            Route::prefix('profile')->name('profile')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Guru\GuruProfileController::class, 'show'])->name('');
+                Route::get('/edit', [\App\Http\Controllers\Guru\GuruProfileController::class, 'edit'])->name('.edit');
+                Route::put('/', [\App\Http\Controllers\Guru\GuruProfileController::class, 'update'])->name('.update');
             });
 
-        /*
-        |--------------------------------------------------------------------------
-        | ROUTE KAPROG
-        |--------------------------------------------------------------------------
-        */
-        Route::prefix('kaprog')->name('kaprog.')->group(function () {
+            // Kelas Management
+            Route::prefix('kelas')->name('kelas.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Guru\GuruKelasController::class, 'index'])->name('index');
+                Route::get('/{rombelId}', [\App\Http\Controllers\Guru\GuruKelasController::class, 'show'])->name('show');
+                Route::get('/{rombelId}/mata-pelajaran', [\App\Http\Controllers\Guru\GuruKelasController::class, 'mataPelajaran'])->name('mata-pelajaran');
+            });
+
+            // Siswa Management
+            Route::prefix('siswa')->name('siswa.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Guru\GuruSiswaController::class, 'index'])->name('index');
+                Route::get('/{siswaId}', [\App\Http\Controllers\Guru\GuruSiswaController::class, 'show'])->name('show');
+            });
+        });
+
+    /*
+    |--------------------------------------------------------------------------
+    | WALI KELAS
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('walikelas')
+        ->name('walikelas.')
+        ->middleware('role:walikelas')
+        ->group(function () {
+
+            // Dashboard Wali Kelas
+            Route::get('/dashboard', [WaliKelasSiswaController::class, 'dashboard'])
+                ->name('dashboard');
+
+            Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])
+                ->name('data_diri.profile');
+
+            Route::get('/siswa', [WaliKelasSiswaController::class, 'index'])
+                ->name('siswa.index');
+
+            Route::get('/siswa/{id}', [WaliKelasSiswaController::class, 'show'])
+                ->name('siswa.show');
+
+            // Export data siswa (PDF)
+            Route::get('/siswa/{id}/export-pdf', [WaliKelasSiswaController::class, 'exportPdf'])
+                ->name('siswa.exportPDF');
+
+            // Nilai Raport
+            Route::get('/nilai-raport', [NilaiRaportController::class, 'index'])
+                ->name('nilai_raport.index');
+            Route::get('/nilai-raport/list/{id}', [NilaiRaportController::class, 'list'])
+                ->name('nilai_raport.list');
+            Route::get('/nilai-raport/{siswa_id}/{semester}/{tahun}/pdf', [NilaiRaportController::class, 'exportPdf'])
+                ->name('nilai_raport.pdf');
+            Route::get('/nilai-raport/show', [NilaiRaportController::class, 'show'])
+                ->name('nilai_raport.show');
+
+            // Edit dan Update Rapor
+            Route::get('/nilai-raport/edit', [NilaiRaportController::class, 'edit'])
+                ->name('nilai_raport.edit');
+
+            Route::put('/nilai-raport/update', [NilaiRaportController::class, 'update'])
+                ->name('nilai_raport.update');
+
+            // Cetak rapor final
+            Route::get('/rapor/{siswa_id}/{semester}/{tahun}/cetak', [RaporController::class, 'cetakRapor'])
+                ->name('rapor.cetak');
+
+            // Input Nilai Raport
+            Route::get('/input-nilai-raport', [InputNilaiRaportController::class, 'index'])
+                ->name('input_nilai_raport.index');
+            Route::get('/input-nilai-raport/create/{siswa_id}', [InputNilaiRaportController::class, 'create'])
+                ->name('input_nilai_raport.create');
+            Route::post('/input-nilai-raport/store/{siswa_id}', [InputNilaiRaportController::class, 'store'])
+                ->name('input_nilai_raport.store');
+            Route::get('input-nilai-raport/{siswa_id}/edit', [InputNilaiRaportController::class, 'edit'])
+                ->name('input_nilai_raport.edit');
+            Route::post('input-nilai-raport/{siswa_id}/update', [InputNilaiRaportController::class, 'update'])
+                ->name('input_nilai_raport.update');
+
+            // delete raport for a siswa/semester/tahun
+            Route::post('input-nilai-raport/{siswa_id}/delete', [InputNilaiRaportController::class, 'destroy'])
+                ->name('input_nilai_raport.delete');
+
+            // Form Ekstra / Kehadiran / Info
+            Route::get('/rapor/ekstra/{siswa_id}', [RaporController::class, 'formEkstra'])
+                ->name('rapor.ekstra.form');
+            Route::post('/rapor/ekstra/{siswa_id}', [RaporController::class, 'simpanEkstra'])
+                ->name('rapor.ekstra.simpan');
+            Route::get('/rapor/kehadiran/{siswa_id}', [RaporController::class, 'formKehadiran'])
+                ->name('rapor.kehadiran.form');
+            Route::post('/rapor/kehadiran/{siswa_id}', [RaporController::class, 'simpanKehadiran'])
+                ->name('rapor.kehadiran.simpan');
+            Route::get('/rapor/info/{siswa_id}', [RaporController::class, 'formInfo'])
+                ->name('rapor.info.form');
+            Route::post('/rapor/info/{siswa_id}', [RaporController::class, 'simpanInfo'])
+                ->name('rapor.info.simpan');
+        });
+
+    /*
+    |--------------------------------------------------------------------------
+    | KAPROG
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('kaprog')
+        ->name('kaprog.')
+        ->middleware('role:kaprog')
+        ->group(function () {
 
             // Dashboard (Kaprog)
             Route::get('/dashboard', [KaprogController::class, 'dashboard'])
@@ -348,21 +378,24 @@ Route::middleware('web')->group(function () {
             Route::get('/raport/siswa/{siswaId}/{semester}/{tahun}', [KaprogController::class, 'raportShow'])->name('raport.show');
         });
 
-        // Raport list for kaprog (simple view)
-        // Removed duplicate
+    // Raport list for kaprog (simple view)
+    // Removed duplicate
 
-        // Alternate index route (some views reference kaprog.raport.index)
-        Route::get('/raport', [KaprogController::class, 'raportSiswa'])->name('raport.index');
+    // Alternate index route (some views reference kaprog.raport.index)
+    Route::get('/raport', [KaprogController::class, 'raportSiswa'])->name('raport.index');
 
-        Route::get('/siswa/{id}/detail', [KaprogDashboardController::class, 'detail'])
-            ->name('siswa.detail');
+    Route::get('/siswa/{id}/detail', [KaprogDashboardController::class, 'detail'])
+        ->name('siswa.detail');
 
-        /*
-        |--------------------------------------------------------------------------
-        | ROUTE TU
-        |--------------------------------------------------------------------------
-        */
-        Route::prefix('tu')->name('tu.')->group(function () {
+    /*
+    |--------------------------------------------------------------------------
+    | TU
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('tu')
+        ->name('tu.')
+        ->middleware('role:tu')
+        ->group(function () {
             // Dashboard
             Route::get('/dashboard', [TUController::class, 'dashboard'])->name('dashboard');
 
@@ -384,11 +417,6 @@ Route::middleware('web')->group(function () {
             Route::get('/siswa/{id}/edit', [TUController::class, 'siswaEdit'])->name('siswa.edit');
             Route::put('/siswa/{id}', [TUController::class, 'siswaUpdate'])->name('siswa.update');
             Route::delete('/siswa/{id}', [TUController::class, 'siswaDestroy'])->name('siswa.destroy');
-
-            // Route untuk guru (TU management)
-            Route::get('/guru', [TUController::class, 'guruIndex'])->name('guru.index');
-            Route::get('/guru/create', [TUController::class, 'guruCreate'])->name('guru.create');
-            Route::post('/guru', [TUController::class, 'guruStore'])->name('guru.store');
 
             // Route untuk kelas
             Route::get('/kelas', [TUController::class, 'kelas'])->name('kelas.index');
@@ -439,16 +467,17 @@ Route::middleware('web')->group(function () {
 
             Route::get('/alumni', [AlumniController::class, 'index'])->name('alumni.index');
             Route::get('/alumni/{id}', [AlumniController::class, 'show'])->name('alumni.show');
-            
-            // (cleaned duplicate kelulusan routes)
         });
 
-        /*
-        |--------------------------------------------------------------------------
-        | ROUTE KURIKULUM
-        |--------------------------------------------------------------------------
-        */
-        Route::prefix('kurikulum')->name('kurikulum.')->group(function () {
+    /*
+    |--------------------------------------------------------------------------
+    | KURIKULUM
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('kurikulum')
+        ->name('kurikulum.')
+        ->middleware('role:kurikulum')
+        ->group(function () {
 
             // PPDB (Kurikulum) - allow Kurikulum users to manage PPDB
             Route::get('/ppdb', [PpdbController::class, 'index'])->name('ppdb.index');
@@ -595,5 +624,4 @@ Route::middleware('web')->group(function () {
             Route::get('/alumni/{id}', [AlumniController::class, 'show'])
                 ->name('alumni.show');
         });
-    });
 });

@@ -43,6 +43,7 @@ class LoginController extends Controller
             // Redirect sesuai role
            return match ($user->role) {
     'siswa'        => redirect()->route('siswa.dashboard'),
+    'guru'         => redirect()->route('guru.dashboard'),
     'walikelas'    => redirect()->route('walikelas.dashboard'),
     'kaprog'       => redirect()->route('kaprog.dashboard'),
     'tu'           => redirect()->route('tu.dashboard'),

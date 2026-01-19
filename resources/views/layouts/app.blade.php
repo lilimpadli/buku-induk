@@ -263,6 +263,18 @@
                                     </a>
                                 @endif
 
+                                {{-- ROLE: GURU --}}
+                                @if(Auth::user()->role == 'guru')
+                                    <a href="{{ route('guru.dashboard') }}" class="nav-link {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Dashboard">
+                                        <i class="fas fa-tachometer-alt"></i> <span class="label ms-2">Dashboard</span>
+                                    </a>
+
+                                  
+                                    <a href="{{ route('guru.profile') }}" class="nav-link {{ request()->routeIs('guru.profile*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Diri">
+                                        <i class="fas fa-user"></i> <span class="label ms-2">Data Diri</span>
+                                    </a>
+                                @endif
+
                                 {{-- ROLE: WALI KELAS --}}
                                 @if(Auth::user()->role == 'walikelas')
                                     <a href="{{ route('walikelas.dashboard') }}" class="nav-link {{ request()->routeIs('walikelas.dashboard') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Dashboard">
