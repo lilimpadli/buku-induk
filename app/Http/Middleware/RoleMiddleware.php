@@ -14,10 +14,26 @@ class RoleMiddleware
             return redirect()->route('login');
         }
 
-        $userRole = Auth::user()->role;
+        $user = Auth::user();
+        $userRole = $user->role;
 
         if (!in_array($userRole, $roles)) {
             abort(403, 'Anda tidak punya akses.');
+        }
+
+        // Validasi role-specific records di database
+        // Role guru harus punya record di tabel gurus
+        if (in_array('guru', $roles) && $userRole === 'guru') {
+            if (!$user->guru) {
+                abort(403, 'Anda bukan guru.');
+            }
+        }
+
+        // Role walikelas harus punya record di tabel gurus dengan status wali kelas
+        if (in_array('walikelas', $roles) && $userRole === 'walikelas') {
+            if (!$user->guru) {
+                abort(403, 'Anda bukan wali kelas.');
+            }
         }
 
         return $next($request);

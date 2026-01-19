@@ -178,6 +178,9 @@ class RaporController extends Controller
     */
     public function cetakRapor($siswa_id, $semester, $tahun)
     {
+        // normalize tahun parameter: allow links that use '-' instead of '/' (e.g. 2025-2026)
+        $tahun = str_replace('-', '/', $tahun);
+
         $siswa = DataSiswa::findOrFail($siswa_id);
 
         $nilai = NilaiRaport::with('mapel')
@@ -195,7 +198,13 @@ class RaporController extends Controller
         $info = RaporInfo::where('siswa_id', $siswa_id)->where('semester', $semester)->first();
 
         $pdf = Pdf::loadView('rapor.cetak', compact('siswa', 'nilai', 'ekstra', 'kehadiran', 'info', 'semester', 'tahun'));
-        return $pdf->stream('Raport - ' . $siswa->nama_lengkap . ' - ' . $semester . ' - ' . $tahun . '.pdf');
+
+        // Sanitize filename for HTTP header: replace backslash and slash with '-'
+        $safeName = str_replace(['\\', '/'], '-', $siswa->nama_lengkap);
+        $safeTahun = str_replace(['\\', '/'], '-', $tahun);
+        $filename = 'Raport - ' . $safeName . ' - ' . $semester . ' - ' . $safeTahun . '.pdf';
+
+        return $pdf->stream($filename);
     }
 
 

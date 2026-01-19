@@ -255,17 +255,106 @@
         margin-bottom: 0;
     }
 
+    /* Modal Styles */
+    .modal-content {
+        border-radius: 12px;
+        border: none;
+    }
+
+    .modal-header {
+        border-radius: 12px 12px 0 0;
+    }
+
+    .modal-footer {
+        border-radius: 0 0 12px 12px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #1E293B;
+        margin-bottom: 8px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border-color: #E2E8F0;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(47, 83, 255, 0.1);
+    }
+
+    .btn-outline-success:hover, .btn-outline-info:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
 </style>
 
 <div class="container mt-4">
     <h3>Input Nilai Raport</h3>
     <p>Pilih siswa untuk menginput nilai raport</p>
 
-    <form method="GET" class="mb-3 d-flex gap-2" action="">
-        <input type="text" name="q" value="{{ request('q', $search ?? '') }}" class="form-control" placeholder="Cari nama / NIS / NISN">
-        <button class="btn btn-primary" type="submit">Cari</button>
-        <a href="{{ route('walikelas.input_nilai_raport.index') }}" class="btn btn-outline-secondary">Reset</a>
-    </form>
+    <!-- Alert Messages -->
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <strong>Terjadi Kesalahan!</strong>
+            <ul class="mb-0 mt-2">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if(session('warning'))
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ session('warning') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-times-circle me-2"></i>
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <!-- Search & Action Bar -->
+    <div class="mb-4">
+        <div class="row g-2 mb-3">
+            <div class="col-lg-6">
+                <form method="GET" class="d-flex gap-2" action="">
+                    <input type="text" name="q" value="{{ request('q', $search ?? '') }}" class="form-control" placeholder="Cari nama / NIS / NISN">
+                    <button class="btn btn-primary" type="submit">Cari</button>
+                    <a href="{{ route('walikelas.input_nilai_raport.index') }}" class="btn btn-outline-secondary">Reset</a>
+                </form>
+            </div>
+            <div class="col-lg-6 d-flex gap-2 justify-content-lg-end">
+                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#downloadTemplateModal">
+                    <i class="fas fa-download"></i> Download Template
+                </button>
+                <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#importLegerModal">
+                    <i class="fas fa-upload"></i> Import Leger
+                </button>
+            </div>
+        </div>
+    </div>
 
     <div class="card shadow">
         @if($siswas->count() > 0)
@@ -302,6 +391,119 @@
                 <p>Belum ada siswa yang terdaftar di kelas Anda.</p>
             </div>
         @endif
+    </div>
+</div>
+
+<!-- Modal Download Template -->
+<div class="modal fade" id="downloadTemplateModal" tabindex="-1" aria-labelledby="downloadTemplateLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="modal-title" id="downloadTemplateLabel">
+                    <i class="fas fa-download text-success me-2"></i>Download Template Leger
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Panduan:</strong> Download template untuk rombel tertentu, isi data nilai siswa, kemudian import kembali.
+                </div>
+                <form id="downloadTemplateForm" method="POST" action="{{ route('walikelas.input_nilai_raport.download_template') }}">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="templateRombel" class="form-label">Pilih Rombel</label>
+                        <select name="rombel_id" id="templateRombel" class="form-select" required>
+                            <option value="">-- Pilih Rombel --</option>
+                            @forelse($siswas as $rombelName => $siswaList)
+                                @php
+                                    $rombelObj = $siswaList->first()->rombel;
+                                @endphp
+                                <option value="{{ $rombelObj->id }}">{{ $rombelName }} ({{ $siswaList->count() }} siswa)</option>
+                            @empty
+                                <option value="" disabled>Tidak ada rombel</option>
+                            @endforelse
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="templateSemester" class="form-label">Semester</label>
+                        <select name="semester" id="templateSemester" class="form-select">
+                            <option value="1">Semester 1</option>
+                            <option value="2" selected>Semester 2</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="templateTahunAjaran" class="form-label">Tahun Ajaran</label>
+                        <input type="text" name="tahun_ajaran" id="templateTahunAjaran" class="form-control" placeholder="Cth: 2024/2025" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" form="downloadTemplateForm" class="btn btn-success">
+                    <i class="fas fa-download me-2"></i>Download
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Import Leger -->
+<div class="modal fade" id="importLegerModal" tabindex="-1" aria-labelledby="importLegerLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="modal-title" id="importLegerLabel">
+                    <i class="fas fa-upload text-info me-2"></i>Import Data Leger
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Panduan:</strong> Upload file Excel yang sudah diisi dengan data nilai siswa.
+                </div>
+                <form id="importLegerForm" method="POST" action="{{ route('walikelas.input_nilai_raport.import') }}" enctype="multipart/form-data">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="importRombel" class="form-label">Pilih Rombel</label>
+                        <select name="rombel_id" id="importRombel" class="form-select" required>
+                            <option value="">-- Pilih Rombel --</option>
+                            @forelse($siswas as $rombelName => $siswaList)
+                                @php
+                                    $rombelObj = $siswaList->first()->rombel;
+                                @endphp
+                                <option value="{{ $rombelObj->id }}">{{ $rombelName }}</option>
+                            @empty
+                                <option value="" disabled>Tidak ada rombel</option>
+                            @endforelse
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="importSemester" class="form-label">Semester</label>
+                        <select name="semester" id="importSemester" class="form-select">
+                            <option value="1">Semester 1</option>
+                            <option value="2" selected>Semester 2</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="importTahunAjaran" class="form-label">Tahun Ajaran</label>
+                        <input type="text" name="tahun_ajaran" id="importTahunAjaran" class="form-control" placeholder="Cth: 2024/2025" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="excelFile" class="form-label">File Excel</label>
+                        <input type="file" name="file" id="excelFile" class="form-control" accept=".xlsx,.xls,.csv" required>
+                        <small class="form-text text-muted">Format: .xlsx, .xls, atau .csv</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" form="importLegerForm" class="btn btn-info">
+                    <i class="fas fa-upload me-2"></i>Import
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

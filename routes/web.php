@@ -284,6 +284,8 @@ Route::middleware(['auth'])->group(function () {
             // Nilai Raport
             Route::get('/nilai-raport', [NilaiRaportController::class, 'index'])
                 ->name('nilai_raport.index');
+            Route::get('/nilai-raport/export-excel', [NilaiRaportController::class, 'exportExcel'])
+                ->name('nilai_raport.export_excel');
             Route::get('/nilai-raport/list/{id}', [NilaiRaportController::class, 'list'])
                 ->name('nilai_raport.list');
             Route::get('/nilai-raport/{siswa_id}/{semester}/{tahun}/pdf', [NilaiRaportController::class, 'exportPdf'])
@@ -317,6 +319,12 @@ Route::middleware(['auth'])->group(function () {
             // delete raport for a siswa/semester/tahun
             Route::post('input-nilai-raport/{siswa_id}/delete', [InputNilaiRaportController::class, 'destroy'])
                 ->name('input_nilai_raport.delete');
+
+            // Download template and import leger
+            Route::post('/input-nilai-raport/download-template', [InputNilaiRaportController::class, 'downloadTemplate'])
+                ->name('input_nilai_raport.download_template');
+            Route::post('/input-nilai-raport/import', [InputNilaiRaportController::class, 'import'])
+                ->name('input_nilai_raport.import');
 
             // Form Ekstra / Kehadiran / Info
             Route::get('/rapor/ekstra/{siswa_id}', [RaporController::class, 'formEkstra'])

@@ -56,10 +56,16 @@ class User extends Authenticatable
 
     
 
-    public function rombels()
-    {
-        return $this->belongsToMany(Rombel::class, 'gurus', 'user_id', 'rombel_id');
-    }
+public function guru()
+{
+    return $this->hasOne(Guru::class, 'user_id');
+}
+
+public function rombels()
+{
+    return $this->belongsToMany(Rombel::class, 'gurus', 'user_id', 'rombel_id');
+}
+
 public function waliKelas()
 {
     return $this->hasMany(WaliKelas::class, 'user_id');

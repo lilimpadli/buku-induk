@@ -214,7 +214,14 @@
         </div>
         <div>
             <a href="{{ route('walikelas.siswa.index') }}" class="btn btn-outline-secondary">Kembali</a>
-          
+            @if(auth()->check())
+                @php $role = auth()->user()->role; @endphp
+                @if($role == 'walikelas')
+                    <a href="{{ route('walikelas.siswa.exportPDF', $s->id) }}" class="btn btn-danger" target="_blank">Export PDF</a>
+                @elseif($role == 'guru')
+                    <a href="{{ route('guru.siswa.exportPDF', $s->id) }}" class="btn btn-danger" target="_blank">Export PDF</a>
+                @endif
+            @endif
         </div>
     </div>
 

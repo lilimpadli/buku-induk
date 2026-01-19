@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\QueryException;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class KurikulumSiswaController extends Controller
 {
@@ -23,6 +24,12 @@ class KurikulumSiswaController extends Controller
         $tingkat = $request->get('tingkat', '');
         $search = $request->get('search', '');
         $filterRombel = $request->get('rombel', '');
+        // per-page selector (limit to safe values)
+        $allowedPerPage = [10, 25, 50, 100];
+        $perPage = (int) $request->get('per_page', 50);
+        if (! in_array($perPage, $allowedPerPage)) {
+            $perPage = 50;
+        }
 
         // Query dasar dengan relasi
         $query = DataSiswa::with(['user', 'ayah', 'ibu', 'wali', 'rombel.kelas.jurusan']);
@@ -68,7 +75,7 @@ class KurikulumSiswaController extends Controller
             }
         }
 
-        return view('kurikulum.siswa.index', compact('siswas', 'tingkat', 'search', 'filterRombel', 'allRombels'));
+        return view('kurikulum.siswa.index', compact('siswas', 'tingkat', 'search', 'filterRombel', 'allRombels', 'perPage'));
     }
 
     public function create()
@@ -243,7 +250,7 @@ class KurikulumSiswaController extends Controller
     /**
      * Import siswa from Excel and create associated User accounts with default password 12345678
      */
-   public function import(Request $request)
+    public function import(Request $request)
 {
     $request->validate([
         'file' => 'required|file|mimes:xlsx,xls,csv'
@@ -252,11 +259,18 @@ class KurikulumSiswaController extends Controller
     $path = $request->file('file');
 
     $sheets = Excel::toArray([], $path);
-    if (empty($sheets) || !isset($sheets[0])) {
+    if (empty($sheets) || !is_array($sheets)) {
         return back()->with('error', 'File kosong atau format tidak dikenali.');
     }
 
-    $rows = $sheets[0];
+    // pick the first sheet that has at least 2 rows (header + data)
+    $rows = null;
+    foreach ($sheets as $sheet) {
+        if (is_array($sheet) && count($sheet) > 1) { $rows = $sheet; break; }
+    }
+    if (!is_array($rows) || count($rows) < 2) {
+        return back()->with('error', 'Tidak ada data pada file. Pastikan baris header ada dan data berada di sheet pertama yang berisi data.');
+    }
     if (count($rows) < 2) {
         return back()->with('error', 'Tidak ada data pada file. Pastikan baris header ada.');
     }
@@ -278,7 +292,10 @@ class KurikulumSiswaController extends Controller
             $map['nisn'] = $i;
         }
 
-        // KITA TIDAK PERLU MEMETAKAN 'nis' LAGI KARENA AKAN MENGGUNAKAN 'nomor_induk'
+        // map plain 'nis' header if present (some templates use 'nis')
+        if (str_contains($lower, 'nis') && !str_contains($lower, 'nisn')) {
+            $map['nis'] = $i;
+        }
 
         if (str_contains($lower, 'rombel_id') || str_contains($lower, 'id_rombel') || str_contains($lower, 'id rombel')) {
             $map['rombel_id'] = $i;
@@ -298,6 +315,10 @@ class KurikulumSiswaController extends Controller
 
         if (str_contains($lower, 'email')) {
             $map['email'] = $i;
+        }
+
+        if (str_contains($lower, 'tanggal') || str_contains($lower, 'tanggal_lahir') || str_contains($lower, 'ttl')) {
+            $map['tanggal_lahir'] = $i;
         }
     }
 
@@ -320,7 +341,13 @@ class KurikulumSiswaController extends Controller
         // --- PERUBAHAN UTAMA DIMULAI DI SINI ---
 
         // 1. Ambil nilai nomor_induk dari Excel. Ini akan kita gunakan untuk NIS juga.
-        $nomorInduk = isset($map['nomor_induk']) ? trim((string)($row[$map['nomor_induk']] ?? '')) : null;
+            // Prefer nomor_induk mapping; fallback to nis column if provided
+            $nomorInduk = null;
+            if (isset($map['nomor_induk'])) {
+                $nomorInduk = trim((string)($row[$map['nomor_induk']] ?? ''));
+            } elseif (isset($map['nis'])) {
+                $nomorInduk = trim((string)($row[$map['nis']] ?? ''));
+            }
 
         // 2. Ambil nilai-nilai lainnya
         $nama = isset($map['nama_lengkap']) ? trim((string)($row[$map['nama_lengkap']] ?? '')) : null;
@@ -343,8 +370,54 @@ class KurikulumSiswaController extends Controller
         
         $nisn = isset($map['nisn']) ? trim((string)($row[$map['nisn']] ?? '')) : null;
         $email = isset($map['email']) ? trim((string)($row[$map['email']] ?? '')) : null;
+        $tanggal_lahir = null;
+        if (isset($map['tanggal_lahir'])) {
+            $raw = trim((string)($row[$map['tanggal_lahir']] ?? ''));
+            if ($raw !== '') {
+                try {
+                    // Try to parse common date formats
+                    $tanggal_lahir = Carbon::parse($raw)->format('Y-m-d');
+                } catch (\Throwable $ex) {
+                    // if parse fails, leave null and log warning
+                    $errors[] = "Baris " . ($r+1) . ": tanggal_lahir tidak dikenali ('{$raw}'), akan disimpan kosong.";
+                    $tanggal_lahir = null;
+                }
+            }
+        }
         $namaRombel = isset($map['nama_rombel']) ? trim((string)($row[$map['nama_rombel']] ?? '')) : null;
         $rombelIdFromSheet = isset($map['rombel_id']) ? trim((string)($row[$map['rombel_id']] ?? '')) : null;
+
+        // Resolve rombel id early so existing siswa can be updated with rombel
+        $rombelId = null;
+        if (!empty($rombelIdFromSheet)) {
+            if (is_numeric($rombelIdFromSheet)) {
+                $rombelModel = Rombel::find((int)$rombelIdFromSheet);
+                if ($rombelModel) {
+                    $rombelId = $rombelModel->id;
+                } else {
+                    $errors[] = "Baris " . ($r+1) . ": rombel_id '{$rombelIdFromSheet}' tidak ditemukan.";
+                }
+            } else {
+                // if non-numeric, we'll try name matching below
+            }
+        }
+
+        if (empty($rombelId) && !empty($namaRombel)) {
+            $normalize = function ($s) {
+                $s = strtolower(trim((string)$s));
+                $s = preg_replace('/\s+/u', ' ', $s);
+                $s = str_replace([".", ","], '', $s);
+                return $s;
+            };
+
+            $needle = $normalize($namaRombel);
+            $rombel = Rombel::all()->first(function ($r) use ($needle, $normalize) {
+                $hay = $normalize($r->nama);
+                return ($needle !== '' && (strpos($hay, $needle) !== false || strpos($needle, $hay) !== false));
+            });
+
+            if ($rombel) $rombelId = $rombel->id;
+        }
 
         // Debug: Lihat nilai yang diambil dari baris pertama untuk memastikan
         if ($r == 1) {
@@ -357,44 +430,108 @@ class KurikulumSiswaController extends Controller
             continue;
         }
 
-        // Cari user yang sudah ada berdasarkan nomor_induk atau email
-        $existingUser = null;
-        if ($nomorInduk) {
-            $existingUser = User::where('nomor_induk', $nomorInduk)->first();
+        // First, try to find an existing DataSiswa by nis or nisn to avoid duplicates
+        $existingSiswa = null;
+        if (!empty($nomorInduk)) {
+            $existingSiswa = DataSiswa::where('nis', $nomorInduk)->first();
         }
-        if (!$existingUser && $email) {
-            $existingUser = User::where('email', $email)->first();
+        if (!$existingSiswa && !empty($nisn)) {
+            $existingSiswa = DataSiswa::where('nisn', $nisn)->first();
         }
 
-        try {
-            if ($existingUser) {
-                if ($existingUser->role !== 'siswa') {
-                    $errors[] = "Baris " . ($r+1) . ": user ada tapi bukan role siswa (nomor_induk={$nomorInduk}).";
-                    $skipped++;
-                    continue;
-                }
-                $user = $existingUser;
-            } else {
-                // Buat email default jika kosong
-                if (empty($email)) {
-                    $email = $nomorInduk ? "{$nomorInduk}@example.local" : strtolower(str_replace(' ', '.', strtok($nama, ' '))) . '@example.local';
+        // If an existing siswa row is found, reuse/update it and ensure a linked user exists
+        if ($existingSiswa) {
+            try {
+                $siswaModel = $existingSiswa;
+
+                // Ensure user exists for this siswa; if not, try match by nomor_induk/email and create if needed
+                $user = $siswaModel->user;
+                if (!$user) {
+                    $user = null;
+                    if ($nomorInduk) {
+                        $user = User::where('nomor_induk', $nomorInduk)->first();
+                    }
+                    if (!$user && $email) {
+                        $user = User::where('email', $email)->first();
+                    }
+
+                    if (!$user) {
+                        $emailToUse = empty($email) ? ($nomorInduk ? "{$nomorInduk}@example.local" : strtolower(str_replace(' ', '.', strtok($nama, ' '))) . '@example.local') : $email;
+                        $user = User::create([
+                            'name' => $nama,
+                            'nomor_induk' => $nomorInduk ?: null,
+                            'email' => $emailToUse,
+                            'password' => Hash::make('12345678'),
+                            'role' => 'siswa',
+                        ]);
+                    }
+
+                    // link user to siswa if not already
+                    if ($user && $siswaModel->user_id !== $user->id) {
+                        $siswaModel->user_id = $user->id;
+                    }
                 }
 
-                $user = User::create([
-                    'name' => $nama,
-                    'nomor_induk' => $nomorInduk ?: null,
-                    'email' => $email,
-                    'password' => Hash::make('12345678'),
-                    'role' => 'siswa',
+                // Update siswa fields
+                $siswaModel->fill([
+                    'nama_lengkap' => $nama,
+                    'nis' => $nomorInduk ?: $siswaModel->nis,
+                    'nisn' => $nisn ?: $siswaModel->nisn,
+                    'jenis_kelamin' => $jenis ?: $siswaModel->jenis_kelamin,
+                    'rombel_id' => $rombelId ?? $siswaModel->rombel_id,
+                    'tanggal_lahir' => $tanggal_lahir ?: $siswaModel->tanggal_lahir,
                 ]);
-            }
-        } catch (\Throwable $e) {
-            $errors[] = "Baris " . ($r+1) . ": gagal membuat/mengambil user ({$e->getMessage()}).";
-            $skipped++;
-            continue;
-        }
+                $siswaModel->save();
 
-        $rombelId = null;
+            } catch (\Throwable $e) {
+                $errors[] = "Baris " . ($r+1) . ": gagal memperbarui siswa ({$e->getMessage()}).";
+                $skipped++;
+                continue;
+            }
+
+            // not counted as created
+            $rombelId = $siswaModel->rombel_id ?? null;
+        } else {
+            // No existing siswa; find or create user, then create/upsert siswa using nis/nisn as key
+
+            // Cari user yang sudah ada berdasarkan nomor_induk atau email
+            $existingUser = null;
+            if ($nomorInduk) {
+                $existingUser = User::where('nomor_induk', $nomorInduk)->first();
+            }
+            if (!$existingUser && $email) {
+                $existingUser = User::where('email', $email)->first();
+            }
+
+            try {
+                if ($existingUser) {
+                    if ($existingUser->role !== 'siswa') {
+                        $errors[] = "Baris " . ($r+1) . ": user ada tapi bukan role siswa (nomor_induk={$nomorInduk}).";
+                        $skipped++;
+                        continue;
+                    }
+                    $user = $existingUser;
+                } else {
+                    // Buat email default jika kosong
+                    if (empty($email)) {
+                        $email = $nomorInduk ? "{$nomorInduk}@example.local" : strtolower(str_replace(' ', '.', strtok($nama, ' '))) . '@example.local';
+                    }
+
+                    $user = User::create([
+                        'name' => $nama,
+                        'nomor_induk' => $nomorInduk ?: null,
+                        'email' => $email,
+                        'password' => Hash::make('12345678'),
+                        'role' => 'siswa',
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                $errors[] = "Baris " . ($r+1) . ": gagal membuat/mengambil user ({$e->getMessage()}).";
+                $skipped++;
+                continue;
+            }
+
+            $rombelId = null;
 
         // Cari rombel berdasarkan id atau nama
         if (!empty($rombelIdFromSheet)) {
@@ -469,4 +606,7 @@ class KurikulumSiswaController extends Controller
 
     return redirect()->route('kurikulum.siswa.index')->with('success', $msg);
 }
+
+}
+
 }

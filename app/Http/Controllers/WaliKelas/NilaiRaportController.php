@@ -12,9 +12,11 @@ use App\Models\KenaikanKelas;
 use App\Models\MataPelajaran;
 use App\Models\Rombel;
 use App\Models\Jurusan;
+use App\Exports\NilaiRaportExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
 
 class NilaiRaportController extends Controller
 {
@@ -63,12 +65,71 @@ class NilaiRaportController extends Controller
             $siswas = $query->get()->groupBy(function($siswa) {
                 return $siswa->rombel ? $siswa->rombel->nama : 'Tidak ada rombel';
             });
+
+            // Get available tahun ajaran and semester for the modal
+            $tahunAjaranList = NilaiRaport::whereIn('siswa_id', $query->pluck('id'))
+                ->distinct()
+                ->orderBy('tahun_ajaran', 'desc')
+                ->pluck('tahun_ajaran')
+                ->toArray();
+
+            $semesterList = NilaiRaport::whereIn('siswa_id', $query->pluck('id'))
+                ->distinct()
+                ->orderBy('semester', 'asc')
+                ->pluck('semester')
+                ->toArray();
         } else {
             // jika tidak ada penugasan, kembalikan kosong supaya wali tidak melihat seluruh siswa
             $siswas = collect();
+            $tahunAjaranList = [];
+            $semesterList = [];
         }
 
-        return view('walikelas.nilai_raport.index', compact('siswas', 'search'));
+        return view('walikelas.nilai_raport.index', compact('siswas', 'search', 'tahunAjaranList', 'semesterList'));
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $user = Auth::user();
+        $search = $request->query('q');
+        $semester = $request->query('semester');
+        $tahunAjaran = $request->query('tahun_ajaran');
+
+        // Validasi semester dan tahun ajaran
+        if (!$semester || !$tahunAjaran) {
+            return back()->with('error', 'Semester dan Tahun Ajaran harus dipilih.');
+        }
+
+        // ambil daftar rombel yang dia pegang sebagai wali kelas (sama seperti di index)
+        $rombelsIds = [];
+        if ($user) {
+            $assigns = $user->waliKelas()->get();
+            foreach ($assigns as $a) {
+                if (isset($a->rombel_id) && $a->rombel_id) {
+                    $rombelsIds[] = $a->rombel_id;
+                    continue;
+                }
+
+                if (isset($a->kelas_id) && $a->kelas_id) {
+                    $r = Rombel::where('kelas_id', $a->kelas_id)->pluck('id')->toArray();
+                    $rombelsIds = array_merge($rombelsIds, $r);
+                    continue;
+                }
+            }
+
+            $rombelsIds = array_values(array_unique(array_filter($rombelsIds)));
+        }
+
+        if (empty($rombelsIds)) {
+            return back()->with('error', 'Tidak ada kelas yang ditugaskan untuk Anda.');
+        }
+
+        $filename = 'Ledger_Nilai_Raport_' . $semester . '_' . str_replace('/', '-', $tahunAjaran) . '_' . date('Y-m-d_H-i-s') . '.xlsx';
+
+        return Excel::download(
+            new NilaiRaportExport($rombelsIds, $search, $semester, $tahunAjaran),
+            $filename
+        );
     }
 
     public function exportPdf($siswa_id, $semester, $tahun)

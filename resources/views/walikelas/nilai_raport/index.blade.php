@@ -284,6 +284,9 @@
         <input type="text" name="q" value="{{ request('q', $search ?? '') }}" class="form-control" placeholder="Cari nama / NIS / NISN">
         <button class="btn btn-primary" type="submit">Cari</button>
         <a href="{{ route('walikelas.nilai_raport.index') }}" class="btn btn-outline-secondary">Reset</a>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalExportExcel">
+            <i class="fas fa-download me-1"></i> Export Excel
+        </button>
     </form>
 
     <div class="card shadow">
@@ -330,6 +333,53 @@
                 <p>Belum ada siswa yang terdaftar di kelas Anda.</p>
             </div>
         @endif
+    </div>
+</div>
+
+<!-- Modal Export Excel -->
+<div class="modal fade" id="modalExportExcel" tabindex="-1" aria-labelledby="modalExportExcelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalExportExcelLabel">
+                    <i class="fas fa-download me-2"></i> Export Ledger Nilai Raport
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="GET" action="{{ route('walikelas.nilai_raport.export_excel') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="exportSemester" class="form-label">Semester <span class="text-danger">*</span></label>
+                        <select class="form-select" id="exportSemester" name="semester" required>
+                            <option value="">-- Pilih Semester --</option>
+                            @forelse($semesterList ?? [] as $semester)
+                                <option value="{{ $semester }}">Semester {{ $semester }}</option>
+                            @empty
+                                <option value="">Tidak ada data semester</option>
+                            @endforelse
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="exportTahun" class="form-label">Tahun Ajaran <span class="text-danger">*</span></label>
+                        <select class="form-select" id="exportTahun" name="tahun_ajaran" required>
+                            <option value="">-- Pilih Tahun Ajaran --</option>
+                            @forelse($tahunAjaranList ?? [] as $tahun)
+                                <option value="{{ $tahun }}">{{ $tahun }}</option>
+                            @empty
+                                <option value="">Tidak ada data tahun ajaran</option>
+                            @endforelse
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-download me-1"></i> Export Excel
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 @endsection

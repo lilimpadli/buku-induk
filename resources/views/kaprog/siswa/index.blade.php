@@ -209,6 +209,49 @@
         animation: fadeIn 0.5s ease-out;
     }
 
+    /* Pagination Styling - TAMBAHAN INI */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    
+    .pagination .page-link {
+        position: relative;
+        display: block;
+        color: var(--primary-color);
+        text-decoration: none;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        padding: 0.375rem 0.75rem;
+        margin: 0 2px;
+        border-radius: 0.25rem;
+        transition: all 0.3s ease;
+    }
+    
+    .pagination .page-link:hover {
+        z-index: 2;
+        color: #fff;
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .pagination .page-item.active .page-link {
+        z-index: 3;
+        color: #fff;
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        pointer-events: none;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         h3.mb-3 {
@@ -281,6 +324,7 @@
                 </div>
             </form>
         </div>
+        @endif
     </div>
 
     @php
@@ -346,4 +390,15 @@
     </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Pastikan select per_page berfungsi
+    const perPageSelect = document.querySelector('select[name="per_page"]');
+    if (perPageSelect) {
+        perPageSelect.addEventListener('change', function() {
+            this.form.submit();
+        });
+    }
+});
+</script>
 @endsection

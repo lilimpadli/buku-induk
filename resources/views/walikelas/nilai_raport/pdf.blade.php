@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <title>Rapor Peserta Didik</title>
     <style>
+        /* Ensure correct page size and margins for PDF output */
+        @page { size: A4; margin: 20mm; }
+
         body {
             font-family: Arial, sans-serif;
             font-size: 12px;
@@ -49,6 +52,14 @@
 
         .page-break {
             page-break-before: always;
+            page-break-after: always;
+            display: block;
+            clear: both;
+        }
+
+        /* Avoid breaking table rows across pages */
+        table, tr, td, th {
+            page-break-inside: avoid;
         }
     </style>
 </head>

@@ -12,8 +12,13 @@ use App\Models\RaporInfo;
 use App\Models\KenaikanKelas;
 use App\Models\Rombel;
 use App\Models\Jurusan;
+use App\Exports\NilaiRaportTemplate;
+use App\Exports\LegerTemplate;
+use App\Imports\NilaiRaportImport;
+use App\Imports\LegerImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class InputNilaiRaportController extends Controller
 {
@@ -527,5 +532,85 @@ class InputNilaiRaportController extends Controller
 
         return redirect()->route('walikelas.input_nilai_raport.index')
             ->with('success', 'Data raport berhasil dihapus untuk semester ' . $semester . ' tahun ' . $tahun);
+    }
+
+    /**
+     * Download template leger untuk rombel tertentu
+     */
+    public function downloadTemplate(Request $request)
+    {
+        $request->validate([
+            'rombel_id' => 'required|exists:rombels,id',
+            'semester' => 'required|in:1,2',
+            'tahun_ajaran' => 'required|string',
+        ]);
+
+        $user = Auth::user();
+        $rombelId = $request->rombel_id;
+
+        // Verify user memiliki akses ke rombel ini
+        $rombel = Rombel::findOrFail($rombelId);
+        $assigns = $user->waliKelas()->pluck('rombel_id')->toArray();
+        
+        if (!in_array($rombelId, $assigns)) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses ke rombel ini');
+        }
+
+        $semester = $request->semester;
+        $tahunAjaran = $request->tahun_ajaran;
+
+        // Sanitize filename - remove "/" and "\" characters
+        $rombelName = str_replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], '-', $rombel->nama);
+        $tahunAjaranClean = str_replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], '-', $tahunAjaran);
+
+        $export = new LegerTemplate($rombelId, $semester, $tahunAjaran);
+        $filename = "Leger_{$rombelName}_Sem{$semester}_{$tahunAjaranClean}.xlsx";
+
+        return Excel::download($export, $filename);
+    }
+
+    /**
+     * Import data leger dari file Excel
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'rombel_id' => 'required|exists:rombels,id',
+            'semester' => 'required|in:1,2',
+            'tahun_ajaran' => 'required|string',
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        $user = Auth::user();
+        $rombelId = $request->rombel_id;
+
+        // Verify user memiliki akses ke rombel ini
+        $rombel = Rombel::findOrFail($rombelId);
+        $assigns = $user->waliKelas()->pluck('rombel_id')->toArray();
+        
+        if (!in_array($rombelId, $assigns)) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses ke rombel ini');
+        }
+
+        try {
+            $semester = $request->semester;
+            $tahunAjaran = $request->tahun_ajaran;
+
+            $import = new LegerImport($rombelId, $semester, $tahunAjaran);
+            Excel::import($import, $request->file('file'));
+
+            if ($import->hasErrors()) {
+                $errorMsg = 'Import berhasil namun ada beberapa warning: ' . implode(', ', $import->getErrors());
+                return redirect()->route('walikelas.input_nilai_raport.index')
+                    ->with('warning', $errorMsg);
+            }
+
+            return redirect()->route('walikelas.input_nilai_raport.index')
+                ->with('success', 'Data leger berhasil diimport untuk rombel ' . $rombel->nama);
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
+        }
     }
 }
