@@ -73,6 +73,9 @@
         .sidebar .nav-link.active{ background: var(--accent); color:#fff; font-weight:600; }
 
         .user-mini { 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align:center; 
             padding:12px 6px; 
             border-bottom: 1px solid rgba(47,83,255,0.1);

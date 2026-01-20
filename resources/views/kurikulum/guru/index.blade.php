@@ -2,6 +2,22 @@
 
 @section('title', 'Daftar Guru')
 
+@push('styles')
+<style>
+/* Hapus sidebar kosong */
+aside:empty,
+.sidebar:empty,
+.app-sidebar:empty {
+    display: none !important;
+}
+
+/* Tarik konten ke kiri */
+main {
+    margin-left: 0 !important;
+}
+</style>
+@endpush
+
 @section('content')
 <style>
     /* ===================== STYLE DAFTAR GURU ===================== */
