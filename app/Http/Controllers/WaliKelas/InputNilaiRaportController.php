@@ -187,6 +187,42 @@ class InputNilaiRaportController extends Controller
             'nilai'         => 'required|array'
         ]);
 
+        // Validasi setiap nilai harus diisi (nilai_akhir dan deskripsi wajib)
+        foreach ($req->nilai as $mapel_id => $row) {
+            if (empty($row['nilai_akhir'])) {
+                return back()->withInput()->withErrors([
+                    'nilai' => 'Semua nilai mata pelajaran harus diisi. Mata pelajaran ID: ' . $mapel_id . ' masih kosong.'
+                ]);
+            }
+            if (empty($row['deskripsi'])) {
+                return back()->withInput()->withErrors([
+                    'nilai' => 'Capaian Kompetensi untuk semua mata pelajaran harus diisi. Mata pelajaran ID: ' . $mapel_id . ' masih kosong.'
+                ]);
+            }
+        }
+
+        // Validasi ekstrakurikuler minimal 1 harus diisi
+        $ekstraCount = 0;
+        if ($req->has('ekstra')) {
+            foreach ($req->ekstra as $item) {
+                if (!empty($item['nama_ekstra'])) {
+                    $ekstraCount++;
+                }
+            }
+        }
+        if ($ekstraCount == 0) {
+            return back()->withInput()->withErrors([
+                'ekstra' => 'Minimal 1 ekstrakurikuler harus diisi.'
+            ]);
+        }
+
+        // Validasi kehadiran harus diisi
+        if (!$req->has('hadir') || empty($req->hadir)) {
+            return back()->withInput()->withErrors([
+                'hadir' => 'Data ketidakhadiran harus diisi (minimal isi 0 untuk semua).'
+            ]);
+        }
+
         $semester = $req->semester;
         $tahun    = $req->tahun_ajaran;
 

@@ -210,7 +210,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('guru.profile.update') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('walikelas.data_diri.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -273,7 +273,7 @@
                         </div>
 
                         <div class="d-flex justify-content-end">
-                            <a href="{{ route('guru.profile') }}" class="btn btn-secondary me-2">Batal</a>
+                            <a href="{{ route('walikelas.data_diri.profile') }}" class="btn btn-secondary me-2">Batal</a>
                             <button class="btn btn-primary" type="submit">Simpan</button>
                         </div>
                     </form>

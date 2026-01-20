@@ -8,10 +8,10 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Detail Jurusan: {{ $jurusan->nama }}</h5>
             <div>
-                <a href="{{ route('kurikulum.ppdb.jurusan.pendaftar', $jurusan->id) }}" class="btn btn-sm btn-success me-2">
+                <a href="{{ route('tu.ppdb.jurusan.pendaftar', $jurusan->id) }}" class="btn btn-sm btn-success me-2">
                     <i class="fas fa-list"></i> Lihat Isinya
                 </a>
-                <a href="{{ route('kurikulum.ppdb.index') }}" class="btn btn-sm btn-outline-secondary">
+                <a href="{{ route('tu.ppdb.index') }}" class="btn btn-sm btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i> Kembali ke Daftar Jurusan
                 </a>
             </div>
@@ -42,7 +42,7 @@
                                             <small class="text-muted">{{ $sesi->ppdb_count ?? 0 }} pendaftar</small>
                                         </div>
                                         <div class="mt-2">
-                                            <a href="{{ route('kurikulum.ppdb.jurusan.sesi.pendaftar', ['jurusanId' => $jurusan->id, 'sesiId' => $sesi->id]) }}" class="btn btn-sm btn-outline-primary">
+                                            <a href="{{ route('tu.ppdb.jurusan.sesi.pendaftar', ['jurusanId' => $jurusan->id, 'sesiId' => $sesi->id]) }}" class="btn btn-sm btn-outline-primary">
                                                 Lihat Semua Pendaftar Tahap {{ $i + 1 }}
                                             </a>
                                         </div>
@@ -102,7 +102,7 @@
                                     @foreach($sesi->jalurs as $jalur)
                                         <div class="col-md-6 mb-3">
                                             @if(($jalur->ppdb_count ?? 0) > 0)
-                                                <a href="{{ route('kurikulum.ppdb.jurusan.jalur.pendaftar', [$jurusan->id, $jalur->id]) }}" class="text-decoration-none">
+                                                <a href="{{ route('tu.ppdb.jurusan.jalur.pendaftar', [$jurusan->id, $jalur->id]) }}" class="text-decoration-none">
                                                     <div class="card border-info h-100">
                                                         <div class="card-body">
                                                             <h6 class="card-title">{{ $jalur->nama_jalur }}</h6>

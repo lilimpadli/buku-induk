@@ -305,7 +305,7 @@ class TUController extends Controller
         $data = $request->validate([
             'nama_lengkap' => 'required|string|max:255',
             'nis' => 'nullable|string|max:30|unique:data_siswa,nis',
-            'nisn' => 'nullable|string|max:30',
+            'nisn' => 'nullable|string|max:30|unique:data_siswa,nisn',
             'jenis_kelamin' => 'nullable|in:L,P,Laki-laki,Perempuan',
             'tempat_lahir' => 'nullable|string|max:100',
             'tanggal_lahir' => 'nullable|date',

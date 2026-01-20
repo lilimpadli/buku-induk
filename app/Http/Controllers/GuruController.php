@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class GuruController extends Controller
 {
@@ -47,16 +48,17 @@ class GuruController extends Controller
 
         $guru = Guru::where('user_id', $user->id)->first();
 
-        if (! $guru) {
+        $redirectRoute = 'walikelas.data_diri.profile';
+        if (!$guru) {
             return redirect()
-                ->route('guru.profile')
+                ->route($redirectRoute)
                 ->with('error', 'Data guru tidak ditemukan.');
         }
 
         // ================= VALIDASI DATA =================
         $validated = $request->validate([
             'nama'           => 'required|string|max:255',
-            'nip'            => 'nullable|string|max:50',
+            'nip'            => ['nullable', 'string', 'max:50', Rule::unique('gurus', 'nip')->ignore($guru->id)],
             'email'          => 'nullable|email|max:255',
             'tempat_lahir'   => 'nullable|string|max:255',
             'tanggal_lahir'  => 'nullable|date',
@@ -100,7 +102,7 @@ class GuruController extends Controller
         $user->save();
 
         return redirect()
-            ->route('guru.profile')
+            ->route($redirectRoute)
             ->with('success', 'Profil berhasil diperbarui.');
     }
 }

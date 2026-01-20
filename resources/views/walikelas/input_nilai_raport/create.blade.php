@@ -226,7 +226,7 @@
 
     <h3 class="mb-4">Input Rapor — {{ $siswa->nama_lengkap }}</h3>
 
-    <form action="{{ route('walikelas.input_nilai_raport.store', $siswa->id) }}" method="POST">
+    <form action="{{ route('walikelas.input_nilai_raport.store', $siswa->id) }}" method="POST" id="formRapor">
         @csrf
 
         {{-- ================== SEMESTER & TAHUN ================== --}}
@@ -254,8 +254,8 @@
                 <tr>
                     <th width="5%">No</th>
                     <th>Mata Pelajaran</th>
-                    <th width="10%">Nilai Akhir</th>
-                    <th>Capaian Kompetensi</th>
+                    <th width="10%">Nilai Akhir <span class="text-danger">*</span></th>
+                    <th>Capaian Kompetensi <span class="text-danger">*</span></th>
                 </tr>
             </thead>
             <tbody>
@@ -265,11 +265,11 @@
                     <td>{{ $m->nama }}</td>
                     <td>
                         <input type="number" name="nilai[{{ $m->id }}][nilai_akhir]"
-                               min="0" max="100" class="form-control">
+                               min="0" max="100" class="form-control nilai-required" required>
                     </td>
                     <td>
                         <textarea name="nilai[{{ $m->id }}][deskripsi]"
-                                  rows="2" class="form-control"></textarea>
+                                  rows="2" class="form-control deskripsi-required" required></textarea>
                     </td>
                 </tr>
                 @endforeach
@@ -284,8 +284,8 @@
                 <tr>
                     <th width="5%">No</th>
                     <th>Mata Pelajaran</th>
-                    <th width="10%">Nilai Akhir</th>
-                    <th>Capaian Kompetensi</th>
+                    <th width="10%">Nilai Akhir <span class="text-danger">*</span></th>
+                    <th>Capaian Kompetensi <span class="text-danger">*</span></th>
                 </tr>
             </thead>
             <tbody>
@@ -295,11 +295,11 @@
                     <td>{{ $m->nama }}</td>
                     <td>
                         <input type="number" name="nilai[{{ $m->id }}][nilai_akhir]"
-                               min="0" max="100" class="form-control">
+                               min="0" max="100" class="form-control nilai-required" required>
                     </td>
                     <td>
                         <textarea name="nilai[{{ $m->id }}][deskripsi]"
-                                  rows="2" class="form-control"></textarea>
+                                  rows="2" class="form-control deskripsi-required" required></textarea>
                     </td>
                 </tr>
                 @endforeach
@@ -307,13 +307,13 @@
         </table>
 
         {{-- ================== EKSTRA ================== --}}
-        <h5 class="mt-4 text-success">C. Catatan Ekstrakurikuler</h5>
+        <h5 class="mt-4 text-success">C. Catatan Ekstrakurikuler <span class="text-danger">*</span></h5>
 
         <table class="table table-bordered">
             <thead class="text-center">
                 <tr>
                     <th width="5%">No</th>
-                    <th>Nama Ekstrakurikuler</th>
+                    <th>Nama Ekstrakurikuler <span class="text-danger">*</span></th>
                     <th width="10%">Predikat</th>
                     <th>Keterangan</th>
                 </tr>
@@ -325,7 +325,7 @@
 
                     {{-- nama ekstra --}}
                     <td>
-                        <input type="text" class="form-control"
+                        <input type="text" class="form-control ekstra-required"
                                name="ekstra[{{ $i }}][nama_ekstra]"
                                placeholder="Contoh: Pramuka">
                     </td>
@@ -351,20 +351,20 @@
         </table>
 
         {{-- ================== KEHADIRAN ================== --}}
-        <h5 class="mt-4 text-warning">D. Ketidakhadiran</h5>
+        <h5 class="mt-4 text-warning">D. Ketidakhadiran <span class="text-danger">*</span></h5>
 
         <div class="row">
             <div class="col-md-3">
-                <label>Sakit</label>
-                <input type="number" class="form-control" name="hadir[sakit]" min="0">
+                <label>Sakit <span class="text-danger">*</span></label>
+                <input type="number" class="form-control hadir-required" name="hadir[sakit]" min="0" required>
             </div>
             <div class="col-md-3">
-                <label>Izin</label>
-                <input type="number" class="form-control" name="hadir[izin]" min="0">
+                <label>Izin <span class="text-danger">*</span></label>
+                <input type="number" class="form-control hadir-required" name="hadir[izin]" min="0" required>
             </div>
             <div class="col-md-3">
-                <label>Tanpa Keterangan</label>
-                <input type="number" class="form-control" name="hadir[alpa]" min="0">
+                <label>Tanpa Keterangan <span class="text-danger">*</span></label>
+                <input type="number" class="form-control hadir-required" name="hadir[alpa]" min="0" required>
             </div>
         </div>
 
@@ -412,7 +412,7 @@
             </div>
         </div>
 
-        <button class="btn btn-success mt-4">Simpan Semua Data</button>
+        <button class="btn btn-success mt-4" type="submit" id="btnSimpan">Simpan Semua Data</button>
 
     </form>
 
@@ -424,6 +424,10 @@
         document.addEventListener('DOMContentLoaded', function () {
             const semesterEl = document.getElementById('semesterSelect');
             const kenaikanSection = document.getElementById('kenaikan-section');
+            const formRapor = document.getElementById('formRapor');
+            const btnSimpan = document.getElementById('btnSimpan');
+
+            // Toggle kenaikan section berdasarkan semester
             const updateVisibility = () => {
                 if (!semesterEl || !kenaikanSection) return;
                 const val = (semesterEl.value || '').toString().toLowerCase();
@@ -435,6 +439,154 @@
             };
             semesterEl?.addEventListener('change', updateVisibility);
             updateVisibility();
+
+            // Validasi semua table harus diisi sebelum submit
+            formRapor?.addEventListener('submit', function(e) {
+                let allFilled = true;
+                let firstEmpty = null;
+                let errorMsg = '';
+
+                // Validasi nilai (semua mata pelajaran)
+                const nilaiInputs = document.querySelectorAll('input.nilai-required');
+                nilaiInputs.forEach((input) => {
+                    if (!input.value || input.value.trim() === '') {
+                        allFilled = false;
+                        input.classList.add('is-invalid');
+                        input.style.borderColor = '#dc3545';
+                        if (!firstEmpty) {
+                            firstEmpty = input;
+                            errorMsg = '❌ NILAI MATA PELAJARAN HARUS DIISI!';
+                        }
+                    } else {
+                        input.classList.remove('is-invalid');
+                        input.style.borderColor = '';
+                    }
+                });
+
+                // Validasi deskripsi (Capaian Kompetensi)
+                const deskripsiInputs = document.querySelectorAll('textarea.deskripsi-required');
+                deskripsiInputs.forEach((textarea) => {
+                    if (!textarea.value || textarea.value.trim() === '') {
+                        allFilled = false;
+                        textarea.classList.add('is-invalid');
+                        textarea.style.borderColor = '#dc3545';
+                        if (!firstEmpty) {
+                            firstEmpty = textarea;
+                            errorMsg = '❌ CAPAIAN KOMPETENSI HARUS DIISI!';
+                        }
+                    } else {
+                        textarea.classList.remove('is-invalid');
+                        textarea.style.borderColor = '';
+                    }
+                });
+
+                // Validasi minimal 1 ekstrakurikuler harus diisi
+                const ekstraInputs = document.querySelectorAll('input.ekstra-required');
+                let ekstraCount = 0;
+                ekstraInputs.forEach((input) => {
+                    if (input.value && input.value.trim() !== '') {
+                        ekstraCount++;
+                    }
+                });
+                if (ekstraCount === 0) {
+                    allFilled = false;
+                    if (!firstEmpty) {
+                        firstEmpty = ekstraInputs[0];
+                        errorMsg = '❌ MINIMAL 1 EKSTRAKURIKULER HARUS DIISI!';
+                    }
+                }
+
+                // Validasi kehadiran harus diisi
+                const hadir_inputs = document.querySelectorAll('input.hadir-required');
+                hadir_inputs.forEach((input) => {
+                    if (input.value === '' || input.value === null) {
+                        allFilled = false;
+                        input.classList.add('is-invalid');
+                        input.style.borderColor = '#dc3545';
+                        if (!firstEmpty) {
+                            firstEmpty = input;
+                            errorMsg = '❌ DATA KETIDAKHADIRAN HARUS DIISI!';
+                        }
+                    } else {
+                        input.classList.remove('is-invalid');
+                        input.style.borderColor = '';
+                    }
+                });
+
+                if (!allFilled) {
+                    e.preventDefault();
+                    alert('⚠️ SEMUA TABLE WAJIB DIISI!\n\n' + errorMsg + '\n\nMohon lengkapi semua data sebelum menyimpan.');
+                    if (firstEmpty) {
+                        firstEmpty.focus();
+                        firstEmpty.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    return false;
+                }
+            });
+
+            // Visual feedback saat user mengetik
+            document.querySelectorAll('input.nilai-required').forEach((input) => {
+                input.addEventListener('input', function() {
+                    if (this.value && this.value.trim() !== '') {
+                        this.classList.remove('is-invalid');
+                        this.style.borderColor = '';
+                        this.style.borderColor = '#28a745';
+                    }
+                });
+                input.addEventListener('blur', function() {
+                    if (!this.value || this.value.trim() === '') {
+                        this.classList.add('is-invalid');
+                        this.style.borderColor = '#dc3545';
+                    }
+                });
+            });
+
+            // Visual feedback untuk deskripsi (Capaian Kompetensi)
+            document.querySelectorAll('textarea.deskripsi-required').forEach((textarea) => {
+                textarea.addEventListener('input', function() {
+                    if (this.value && this.value.trim() !== '') {
+                        this.classList.remove('is-invalid');
+                        this.style.borderColor = '';
+                        this.style.borderColor = '#28a745';
+                    }
+                });
+                textarea.addEventListener('blur', function() {
+                    if (!this.value || this.value.trim() === '') {
+                        this.classList.add('is-invalid');
+                        this.style.borderColor = '#dc3545';
+                    }
+                });
+            });
+
+            // Visual feedback untuk ekstrakurikuler
+            document.querySelectorAll('input.ekstra-required').forEach((input) => {
+                input.addEventListener('input', function() {
+                    if (this.value && this.value.trim() !== '') {
+                        this.style.borderColor = '#28a745';
+                    }
+                });
+                input.addEventListener('blur', function() {
+                    if (!this.value || this.value.trim() === '') {
+                        this.style.borderColor = '';
+                    }
+                });
+            });
+
+            // Visual feedback untuk kehadiran
+            document.querySelectorAll('input.hadir-required').forEach((input) => {
+                input.addEventListener('change', function() {
+                    if (this.value !== '' && this.value !== null) {
+                        this.classList.remove('is-invalid');
+                        this.style.borderColor = '#28a745';
+                    }
+                });
+                input.addEventListener('blur', function() {
+                    if (this.value === '' || this.value === null) {
+                        this.classList.add('is-invalid');
+                        this.style.borderColor = '#dc3545';
+                    }
+                });
+            });
         });
     </script>
 @endpush

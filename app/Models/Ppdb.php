@@ -31,6 +31,25 @@ class Ppdb extends Model
         'status'
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            // Jika status diset menjadi 'diterima' dan tanggal_diterima kosong, isi dengan hari ini
+            if ($model->status === 'diterima' && empty($model->tanggal_diterima)) {
+                $model->tanggal_diterima = now()->toDateString();
+            }
+        });
+
+        static::updating(function ($model) {
+            // Jika status diubah menjadi 'diterima' dan tanggal_diterima kosong, isi dengan hari ini
+            if ($model->status === 'diterima' && empty($model->tanggal_diterima) && $model->isDirty('status')) {
+                $model->tanggal_diterima = now()->toDateString();
+            }
+        });
+    }
+
     public function jalur()
     {
         return $this->belongsTo(JalurPpdb::class);

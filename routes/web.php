@@ -234,10 +234,10 @@ Route::middleware(['auth'])->group(function () {
                 ->name('dashboard');
 
             // Profile Management - Use GuruProfileController
-            Route::prefix('profile')->name('profile')->group(function () {
-                Route::get('/', [\App\Http\Controllers\Guru\GuruProfileController::class, 'show'])->name('');
-                Route::get('/edit', [\App\Http\Controllers\Guru\GuruProfileController::class, 'edit'])->name('.edit');
-                Route::put('/', [\App\Http\Controllers\Guru\GuruProfileController::class, 'update'])->name('.update');
+            Route::prefix('profile')->name('profile.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Guru\GuruProfileController::class, 'show'])->name('index');
+                Route::get('/edit', [\App\Http\Controllers\Guru\GuruProfileController::class, 'edit'])->name('edit');
+                Route::put('/', [\App\Http\Controllers\Guru\GuruProfileController::class, 'update'])->name('update');
             });
 
             // Kelas Management
@@ -270,6 +270,12 @@ Route::middleware(['auth'])->group(function () {
 
             Route::get('/profile', [App\Http\Controllers\GuruController::class, 'show'])
                 ->name('data_diri.profile');
+
+            Route::get('/profile/edit', [App\Http\Controllers\GuruController::class, 'edit'])
+                ->name('data_diri.edit');
+
+            Route::put('/profile', [App\Http\Controllers\GuruController::class, 'update'])
+                ->name('data_diri.update');
 
             Route::get('/siswa', [WaliKelasSiswaController::class, 'index'])
                 ->name('siswa.index');
@@ -447,16 +453,15 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/laporan-nilai', [TUController::class, 'laporanNilai'])->name('laporan.nilai');
 
             // PPDB (TU) - tampilkan pendaftar dan assign ke rombel
-            Route::get('/ppdb', [PpdbController::class, 'tuIndex'])->name('ppdb.index');
-            Route::get('/ppdb/jurusan/{id}', [PpdbController::class, 'showJurusan'])->name('ppdb.jurusan.show');
-            Route::get('/ppdb/jurusan/{id}/pendaftar', [PpdbController::class, 'showPendaftarJurusan'])->name('ppdb.jurusan.pendaftar');
-            Route::get('/ppdb/jurusan/{jurusanId}/sesi/{sesiId}', [PpdbController::class, 'showPendaftarSesi'])->name('ppdb.jurusan.sesi.pendaftar');
-            Route::get('/ppdb/sesi/{sesiId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarSesiJalur'])->name('ppdb.sesi.jalur.pendaftar');
-            Route::get('/ppdb/jurusan/{jurusanId}/sesi/{sesiId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarJurusanSesiJalur'])->name('ppdb.jurusan.sesi.jalur.pendaftar');
-            Route::get('/ppdb/jurusan/{jurusanId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarJalur'])->name('ppdb.jurusan.jalur.pendaftar');
-            Route::get('/ppdb/sesi/{sesiId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarSesiJalur'])->name('ppdb.sesi.jalur.pendaftar');
-            Route::get('/ppdb/{id}/assign', [PpdbController::class, 'showAssignForm'])->name('ppdb.assign.form');
-            Route::post('/ppdb/{id}/assign', [PpdbController::class, 'assign'])->name('ppdb.assign');
+            Route::prefix('ppdb')->name('ppdb.')->group(function () {
+                Route::get('/', [PpdbController::class, 'tuIndex'])->name('index');
+                Route::get('/jurusan/{id}', [PpdbController::class, 'showJurusan'])->name('jurusan.show');
+                Route::get('/jurusan/{id}/pendaftar', [PpdbController::class, 'showPendaftarJurusan'])->name('jurusan.pendaftar');
+                Route::get('/jurusan/{jurusanId}/sesi/{sesiId}', [PpdbController::class, 'showPendaftarSesi'])->name('jurusan.sesi.pendaftar');
+                Route::get('/jurusan/{jurusanId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarJalur'])->name('jurusan.jalur.pendaftar');
+                Route::get('/{id}/assign', [PpdbController::class, 'showAssignForm'])->name('assign.form');
+                Route::post('/{id}/assign', [PpdbController::class, 'assign'])->name('assign');
+            });
 
             // Nilai Raport (TU) - mimic walikelas routes for TU role
             Route::get('/nilai-raport', [TUController::class, 'nilaiRaportIndex'] ?? [TUController::class, 'nilaiRaportIndex'])->name('nilai_raport.index');

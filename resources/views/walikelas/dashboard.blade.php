@@ -346,10 +346,6 @@
                     </div>
                     <div class="mt-3 small text-muted">Jumlah siswa aktif di rombel Anda</div>
                     <div class="mt-2">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-arrow-up text-success me-1"></i>
-                            <span class="text-success small">12% dari bulan lalu</span>
-                        </div>
                     </div>
                 </div>
             </div>

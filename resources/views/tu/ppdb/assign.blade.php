@@ -194,16 +194,6 @@
                             <small class="text-muted">Jika dikosongkan, sistem akan generate NIS otomatis</small>
                         </div>
 
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="createAccount" checked>
-                                <label class="form-check-label" for="createAccount">
-                                    Buat akun login untuk siswa
-                                </label>
-                            </div>
-                            <small class="text-muted">Username dan password awal = NIS</small>
-                        </div>
-
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary" {{ $rombels->isEmpty() ? 'disabled' : '' }}>
                                 <i class="fas fa-save"></i> Simpan & Buat NIS

@@ -203,7 +203,7 @@ class PpdbController extends Controller
             return view('kurikulum.ppdb.jurusan.show', compact('jurusan', 'sesis', 'jalurs'));
         }
 
-        return view('tu.ppdb.jurusan.show', compact('jurusan', 'sesis', 'jalurs'));
+        return view('tu.ppdb.jurusan.show', compact('jurusan', 'sesis', 'jalurs', 'tahapSessions'));
     }
 
     // =========================
@@ -411,6 +411,7 @@ class PpdbController extends Controller
         try {
             Ppdb::create(array_merge($validated, $filePaths, [
                 'status' => 'diterima',
+                'tanggal_diterima' => now()->toDateString(),
             ]));
 
             return redirect()
@@ -479,6 +480,17 @@ class PpdbController extends Controller
             $max = DataSiswa::whereNotNull('nis')->max(DB::raw('CAST(nis AS UNSIGNED)'));
             $next = ($max ? intval($max) + 1 : intval(date('Y')) * 1000 + 1);
             $nis = str_pad($next, 6, '0', STR_PAD_LEFT);
+            
+            // Double-check NIS is unique
+            while (DataSiswa::where('nis', $nis)->exists()) {
+                $next++;
+                $nis = str_pad($next, 6, '0', STR_PAD_LEFT);
+            }
+        }
+        
+        // Validate NISN is unique if provided
+        if ($entry->nisn && DataSiswa::where('nisn', $entry->nisn)->exists()) {
+            return back()->withErrors(['nisn' => 'NISN ' . $entry->nisn . ' sudah terdaftar di sistem.'])->withInput();
         }
 
         // Create parent records
@@ -544,7 +556,8 @@ class PpdbController extends Controller
             $entry->update([
                 'rombel_id' => $rombel->id,
                 'kelas_id'  => $rombel->kelas_id,
-                'status'    => 'aktif'
+                'status'    => 'aktif',
+                'tanggal_diterima' => $entry->tanggal_diterima ?? now()->toDateString(),
             ]);
 
             DB::commit();

@@ -209,7 +209,7 @@
                     <p class="text-muted small">{{ $guru->email ?? '' }}</p>
 
                     <div class="mt-3">
-                        <a href="{{ route('guru.profile.edit') }}" class="btn btn-primary btn-sm">Edit Profil</a>
+                        <a href="{{ route('walikelas.data_diri.edit') }}" class="btn btn-primary btn-sm">Edit Profil</a>
                     </div>
                 </div>
             </div>
