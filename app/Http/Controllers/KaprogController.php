@@ -304,9 +304,10 @@ class KaprogController extends Controller
             $guru->update($data);
         }
 
-        // sinkron ke users.name dan email
+        // sinkron ke users.name, email, dan nomor_induk (untuk login dengan NIP baru)
         $user->name = $request->input('nama', $user->name);
         if ($request->filled('email')) $user->email = $request->input('email');
+        if ($request->filled('nip')) $user->nomor_induk = $request->input('nip');
 
         if ($request->hasFile('photo')) {
             $file = $request->file('photo');

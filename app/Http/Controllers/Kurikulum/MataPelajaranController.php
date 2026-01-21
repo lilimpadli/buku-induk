@@ -60,6 +60,27 @@ class MataPelajaranController extends Controller
             'jurusan_id' => 'nullable|exists:jurusans,id'
         ]);
 
+        // Validasi urutan tidak boleh sama di 1 tingkat
+        if ($request->filled('urutan') && $request->filled('tingkat')) {
+            $urutan = $request->input('urutan');
+            $tingkats = array_map('intval', (array) $request->input('tingkat'));
+            
+            foreach ($tingkats as $t) {
+                $exists = \App\Models\MataPelajaranTingkat::whereHas('mataPelajaran', function($q) use ($urutan, $data) {
+                    $q->where('urutan', $urutan);
+                    if ($data['jurusan_id']) {
+                        $q->where('jurusan_id', $data['jurusan_id']);
+                    }
+                })->where('tingkat', $t)->exists();
+                
+                if ($exists) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->with('error', "Urutan $urutan sudah digunakan di kelas $t. Gunakan urutan yang berbeda.");
+                }
+            }
+        }
+
         $mapel = MataPelajaran::create($data);
 
         // sync tingkat
@@ -96,6 +117,28 @@ class MataPelajaranController extends Controller
             'urutan' => 'nullable|integer',
             'jurusan_id' => 'nullable|exists:jurusans,id'
         ]);
+
+        // Validasi urutan tidak boleh sama di 1 tingkat (exclude mapel saat ini)
+        if ($request->filled('urutan') && $request->filled('tingkat')) {
+            $urutan = $request->input('urutan');
+            $tingkats = array_map('intval', (array) $request->input('tingkat'));
+            
+            foreach ($tingkats as $t) {
+                $exists = \App\Models\MataPelajaranTingkat::whereHas('mataPelajaran', function($q) use ($urutan, $data, $id) {
+                    $q->where('urutan', $urutan)
+                      ->where('id', '!=', $id);
+                    if ($data['jurusan_id']) {
+                        $q->where('jurusan_id', $data['jurusan_id']);
+                    }
+                })->where('tingkat', $t)->exists();
+                
+                if ($exists) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->with('error', "Urutan $urutan sudah digunakan di kelas $t. Gunakan urutan yang berbeda.");
+                }
+            }
+        }
 
         $mapel->update($data);
 

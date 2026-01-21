@@ -349,9 +349,6 @@
                                     <!-- MENU BARU -->
                                     <hr class="my-2">
                                     <div class="nav-subtitle">MANAJEMEN LULUSAN</div>
-                                    <a href="{{ route('tu.kelulusan.index') }}" class="nav-link {{ request()->routeIs('tu.kelulusan*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Kelulusan">
-                                        <i class="fas fa-graduation-cap"></i> <span class="label ms-2">Data Kelulusan</span>
-                                    </a>
 
                                     <a href="{{ route('tu.alumni.index') }}" class="nav-link {{ request()->routeIs('tu.alumni*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Alumni">
                                         <i class="fas fa-user-friends"></i> <span class="label ms-2">Data Alumni</span>
@@ -402,9 +399,6 @@
                                         <i class="fas fa-graduation-cap"></i> <span class="label ms-2">Data Kelulusan</span>
                                     </a>
 
-                                    <a href="{{ route('kurikulum.alumni.index') }}" class="nav-link {{ request()->routeIs('kurikulum.alumni*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Alumni">
-                                        <i class="fas fa-user-friends"></i> <span class="label ms-2">Data Alumni</span>
-                                    </a>
                                 @endif
 
                             </nav>

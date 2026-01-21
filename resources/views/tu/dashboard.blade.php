@@ -80,30 +80,6 @@
         </div>
     </div>
 
-    <!-- Menu Navigasi -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow">
-                <div class="card-body">
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="{{ route('tu.kelas.index') }}" class="btn btn-primary">
-                            <i class="fas fa-school me-2"></i> Kelola Kelas
-                        </a>
-                        <a href="{{ route('tu.wali-kelas') }}" class="btn btn-success">
-                            <i class="fas fa-chalkboard-teacher me-2"></i> Kelola Wali Kelas
-                        </a>
-                        <a href="{{ route('tu.siswa.index') }}" class="btn btn-info">
-                            <i class="fas fa-users me-2"></i> Kelola Siswa
-                        </a>
-                        <a href="{{ route('tu.laporan.nilai') }}" class="btn btn-warning">
-                            <i class="fas fa-chart-line me-2"></i> Laporan Nilai
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="row">
         <!-- Siswa Baru -->
         <div class="col-md-6 mb-4">

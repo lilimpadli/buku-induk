@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Manajemen Data Siswa - Buku Induk')
+@section('title', 'Daftar Siswa')
 
 @section('content')
 <style>
@@ -306,6 +306,7 @@
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+    @endif
 
     <div class="card shadow">
         @if($siswas->count() > 0)

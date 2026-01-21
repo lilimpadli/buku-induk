@@ -50,8 +50,14 @@ class NilaiRaportController extends Controller
         }
 
         if (!empty($rombelsIds)) {
+            // Exclude students who have been promoted or graduated
+            $excludedIds = KenaikanKelas::whereIn('status', ['lulus', 'naik'])->pluck('siswa_id')->unique()->filter()->toArray();
+
             $query = DataSiswa::with('rombel')
                 ->whereIn('rombel_id', $rombelsIds)
+                ->when(!empty($excludedIds), function($q) use ($excludedIds) {
+                    return $q->whereNotIn('id', $excludedIds);
+                })
                 ->when($search, function($q) use ($search) {
                     $like = '%' . $search . '%';
                     return $q->where(function($qq) use ($like) {

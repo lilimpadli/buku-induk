@@ -48,6 +48,9 @@ class WaliKelasSiswaController extends Controller
             $rombelsIds = array_merge($rombelsIds, $rombelFromKelas);
         }
 
+        // Pastikan tidak ada duplikasi di array rombelsIds
+        $rombelsIds = array_values(array_unique($rombelsIds));
+
         if (!empty($rombelsIds)) {
             // exclude students who have been promoted or graduated
             $excludedIds = KenaikanKelas::whereIn('status', ['lulus', 'naik'])->pluck('siswa_id')->unique()->filter()->toArray();
@@ -68,6 +71,7 @@ class WaliKelasSiswaController extends Controller
                 ->when(in_array($jenisKelamin, ['L', 'P']), function($q) use ($jenisKelamin) {
                     return $q->where('jenis_kelamin', $jenisKelamin);
                 })
+                ->distinct()
                 ->orderBy('nama_lengkap');
             // Ambil semua hasil tanpa pagination sesuai permintaan
             $siswa = $query->get();

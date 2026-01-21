@@ -85,6 +85,11 @@ class GuruController extends Controller
             $user->email = $validated['email'];
         }
 
+        // Sinkron nomor_induk (untuk login dengan NIP baru)
+        if (!empty($validated['nip'])) {
+            $user->nomor_induk = $validated['nip'];
+        }
+
         // ================= UPLOAD FOTO =================
         if ($request->hasFile('photo')) {
 

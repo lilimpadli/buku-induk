@@ -210,20 +210,38 @@
 </style>
 
 <div class="container">
-    <h3>Detail Guru: {{ $guru->nama }}</h3>
+    <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+        <!-- Foto Guru -->
+        <div style="flex-shrink: 0;">
+            @if($guru->user && $guru->user->photo)
+                <img src="{{ asset('storage/' . $guru->user->photo) }}" 
+                     alt="Foto {{ $guru->nama }}" 
+                     style="width: 150px; height: 150px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            @else
+                <div style="width: 150px; height: 150px; border-radius: 12px; background: linear-gradient(135deg, #2F53FF, #6366F1); display: flex; align-items: center; justify-content: center; color: white; font-size: 60px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    {{ strtoupper(substr($guru->nama, 0, 1)) }}
+                </div>
+            @endif
+        </div>
 
-    <p>
-        <strong>Email:</strong> {{ $guru->email }} <br>
-        <strong>NIP:</strong> {{ $guru->nip }} <br>
+        <!-- Info Guru -->
+        <div style="flex: 1;">
+            <h3 style="margin-top: 0;">Detail Guru: {{ $guru->nama }}</h3>
 
-        @if(optional($guru->user)->role)
-            <strong>Role:</strong> {{ $guru->user->role }} <br>
-        @endif
+            <p>
+                <strong>Email:</strong> {{ $guru->email }} <br>
+                <strong>NIP:</strong> {{ $guru->nip }} <br>
 
-        @if(optional($guru->user)->name)
-            <strong>Login Name:</strong> {{ $guru->user->name }}
-        @endif
-    </p>
+                @if(optional($guru->user)->role)
+                    <strong>Role:</strong> {{ $guru->user->role }} <br>
+                @endif
+
+                @if(optional($guru->user)->name)
+                    <strong>Login Name:</strong> {{ $guru->user->name }}
+                @endif
+            </p>
+        </div>
+    </div>
 
     <hr>
 

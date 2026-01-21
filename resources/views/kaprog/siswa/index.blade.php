@@ -324,7 +324,6 @@
                 </div>
             </form>
         </div>
-        @endif
     </div>
 
     @php

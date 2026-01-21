@@ -479,7 +479,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/kelulusan/rombel/{rombelId}/{tahun}', [KelulusanController::class, 'showRombel'])->name('kelulusan.rombel.show');
 
             Route::get('/alumni', [AlumniController::class, 'index'])->name('alumni.index');
-            Route::get('/alumni/{id}', [AlumniController::class, 'show'])->name('alumni.show');
+            Route::get('/alumni/{tahun}/{jurusanId}', [AlumniController::class, 'byJurusan'])->name('alumni.by-jurusan');
+            Route::get('/alumni/{id}', [AlumniController::class, 'show'])->where('id', '[0-9]+')->name('alumni.show');
         });
 
     /*
@@ -631,10 +632,5 @@ Route::middleware(['auth'])->group(function () {
                 ->name('kelulusan.index');
             Route::get('/kelulusan/rombel/{rombelId}/{tahun}', [KelulusanController::class, 'showRombel'])
                 ->name('kelulusan.rombel.show');
-
-            Route::get('/alumni', [AlumniController::class, 'index'])
-                ->name('alumni.index');
-            Route::get('/alumni/{id}', [AlumniController::class, 'show'])
-                ->name('alumni.show');
         });
 });

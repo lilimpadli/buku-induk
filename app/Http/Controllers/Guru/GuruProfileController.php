@@ -77,6 +77,7 @@ class GuruProfileController extends Controller
         $userData = [
             'name' => $validated['nama'],
             'email' => $validated['email'],
+            'nomor_induk' => $validated['nip'], // Sinkron NIP untuk login
         ];
 
         if (!empty($validated['password'])) {
