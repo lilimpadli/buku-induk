@@ -34,4 +34,25 @@ class Siswa extends Model
     {
         return $this->hasMany(NilaiRaport::class, 'siswa_id');
     }
+
+    public function mutasis()
+    {
+        return $this->hasMany(MutasiSiswa::class, 'siswa_id');
+    }
+
+    /**
+     * Get mutasi terakhir dari siswa
+     */
+    public function mutasiTerakhir()
+    {
+        return $this->hasOne(MutasiSiswa::class, 'siswa_id')->latestOfMany();
+    }
+
+    /**
+     * Get rombel dari siswa
+     */
+    public function rombel()
+    {
+        return $this->belongsTo(Rombel::class, 'rombel_id');
+    }
 }

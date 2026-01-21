@@ -257,7 +257,7 @@ class NilaiRaportController extends Controller
 
         $raports = NilaiRaport::select('semester', 'tahun_ajaran')
             ->where('siswa_id', $id)
-            ->groupBy('semester', 'tahun_ajaran')
+            ->distinct()
             ->orderBy('tahun_ajaran', 'desc')
             ->orderBy('semester', 'asc')
             ->get();
@@ -480,13 +480,26 @@ class NilaiRaportController extends Controller
         $jurusans = Jurusan::orderBy('nama')->get();
         $rombels = Rombel::with('kelas')->orderBy('nama')->get();
 
+        // Ambil rombel saat lapor dibuat (dari nilai raport pertama)
+        $rombelSaatLapor = null;
+        $firstNilai = NilaiRaport::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+        
+        if ($firstNilai && $firstNilai->rombel_id) {
+            $rombelSaatLapor = Rombel::with('kelas')->find($firstNilai->rombel_id);
+        } elseif ($siswa->rombel) {
+            $rombelSaatLapor = $siswa->rombel;
+        }
+
         // jika siswa punya rombel -> tentukan jurusan dan tingkat tujuan (naik kelas)
         $rombelsFiltered = collect();
         $currentJurusanId = null;
         $targetTingkat = null;
 
-        if ($siswa->rombel && $siswa->rombel->kelas) {
-            $currentKelas = $siswa->rombel->kelas;
+        if ($rombelSaatLapor && $rombelSaatLapor->kelas) {
+            $currentKelas = $rombelSaatLapor->kelas;
             $currentJurusanId = $currentKelas->jurusan_id;
             $currentTingkat = (string) $currentKelas->tingkat;
 
@@ -531,7 +544,8 @@ class NilaiRaportController extends Controller
             'jurusans',
             'rombelsFiltered',
             'currentJurusanId',
-            'targetTingkat'
+            'targetTingkat',
+            'rombelSaatLapor'
         ));
     }
 

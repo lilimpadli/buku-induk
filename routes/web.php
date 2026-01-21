@@ -47,6 +47,8 @@ use App\Http\Controllers\KaprogGuruController;
 use App\Http\Controllers\TUController;
 use App\Http\Controllers\TU\KelulusanController;
 use App\Http\Controllers\TU\AlumniController;
+use App\Http\Controllers\TU\MutasiController;
+use App\Http\Controllers\TU\BukuIndukController;
 
 // KAPROG
 use App\Http\Controllers\Kaprog\KaprogDashboardController;
@@ -473,6 +475,16 @@ Route::middleware(['auth'])->group(function () {
 
             // Cetak rapor (TU)
             Route::get('/rapor/{siswa_id}/{semester}/{tahun}/cetak', [RaporController::class, 'cetakRapor'])->name('rapor.cetak');
+
+            // Mutasi Siswa (TU)
+            Route::get('/mutasi/laporan', [MutasiController::class, 'laporan'])->name('mutasi.laporan');
+            Route::resource('/mutasi', MutasiController::class)->names('mutasi');
+
+            // Buku Induk (TU)
+            Route::get('/buku-induk', [BukuIndukController::class, 'index'])->name('buku-induk.index');
+            Route::get('/buku-induk/{siswa}', [BukuIndukController::class, 'show'])->name('buku-induk.show');
+            Route::get('/buku-induk/{siswa}/cetak', [BukuIndukController::class, 'cetak'])->name('buku-induk.cetak');
+            Route::get('/buku-induk/{siswa}/export', [BukuIndukController::class, 'export'])->name('buku-induk.export');
 
             // Kelulusan & Alumni (TU)
             Route::get('/kelulusan', [KelulusanController::class, 'index'])->name('kelulusan.index');

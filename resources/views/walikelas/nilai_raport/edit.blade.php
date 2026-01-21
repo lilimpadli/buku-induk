@@ -284,7 +284,13 @@
                         <th width="30%">Nama Peserta Didik</th>
                         <td>{{ $siswa->nama_lengkap }}</td>
                         <th width="30%">Kelas</th>
-                        <td>{{ $siswa->rombel->nama ?? '-' }}</td>
+                        <td>
+                            @if(isset($rombelSaatLapor) && $rombelSaatLapor)
+                                {{ $rombelSaatLapor->nama }}
+                            @else
+                                {{ $siswa->rombel->nama ?? '-' }}
+                            @endif
+                        </td>
                     </tr>
                     <tr>
                         <th>NISN</th>

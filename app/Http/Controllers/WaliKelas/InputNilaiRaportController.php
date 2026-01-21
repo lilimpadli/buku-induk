@@ -10,6 +10,7 @@ use App\Models\EkstrakurikulerSiswa;
 use App\Models\Kehadiran;
 use App\Models\RaporInfo;
 use App\Models\KenaikanKelas;
+use App\Models\MutasiSiswa;
 use App\Models\Rombel;
 use App\Models\Jurusan;
 use App\Exports\NilaiRaportTemplate;
@@ -369,8 +370,8 @@ class InputNilaiRaportController extends Controller
                     ]
                 );
 
-                // Apply actual move only when not Ganjil and status indicates promotion
-                    if (strtolower($semester) !== 'ganjil' && $status === 'Naik Kelas') {
+                // Apply actual move only when not Ganjil and status indicates promotion/lulus
+                    if (strtolower($semester) !== 'ganjil' && in_array($status, ['Naik Kelas', 'Lulus'])) {
                         // prefer submitted target, fallback to saved kenaikan record
                         $target = $req->kenaikan['rombel_tujuan_id'] ?? ($kenaikan->rombel_tujuan_id ?? null);
                         if ($target) {
@@ -380,6 +381,23 @@ class InputNilaiRaportController extends Controller
                                 $s->save();
                             }
                         }
+
+                        // Buat/update record mutasi dengan status sesuai kenaikan
+                        $mutasiStatus = $status === 'Lulus' ? 'lulus' : 'naik_kelas';
+                        $keterangan = $status === 'Lulus' 
+                            ? 'Lulus dari rapor ' . $tahun . ' semester ' . $semester
+                            : 'Naik kelas dari rapor ' . $tahun . ' semester ' . $semester;
+
+                        MutasiSiswa::updateOrCreate(
+                            [
+                                'siswa_id' => $siswa_id,
+                                'status' => $mutasiStatus
+                            ],
+                            [
+                                'tanggal_mutasi' => now()->format('Y-m-d'),
+                                'keterangan' => $keterangan,
+                            ]
+                        );
                     }
             }
         }
@@ -395,7 +413,7 @@ class InputNilaiRaportController extends Controller
 
         $raports = NilaiRaport::select('semester','tahun_ajaran')
             ->where('siswa_id', $id)
-            ->groupBy('semester','tahun_ajaran')
+            ->distinct()
             ->orderBy('tahun_ajaran','desc')
             ->orderBy('semester','desc')
             ->get();
@@ -635,14 +653,28 @@ class InputNilaiRaportController extends Controller
             $import = new LegerImport($rombelId, $semester, $tahunAjaran);
             Excel::import($import, $request->file('file'));
 
-            if ($import->hasErrors()) {
-                $errorMsg = 'Import berhasil namun ada beberapa warning: ' . implode(', ', $import->getErrors());
+            // Ambil data laporan import
+            $errors = $import->getErrors();
+            $successCount = $import->getSuccessCount();
+
+            if (count($errors) > 0) {
+                // Ada error - tampilkan warning dengan detail error
+                $errorDisplay = array_slice($errors, 0, 5); // Tampilkan max 5 error
+                $errorMsg = "Import selesai dengan " . count($errors) . " warning. Siswa berhasil diproses: {$successCount}. Error: " . implode(' | ', $errorDisplay);
+                if (count($errors) > 5) {
+                    $errorMsg .= " ... dan " . (count($errors) - 5) . " error lainnya";
+                }
                 return redirect()->route('walikelas.input_nilai_raport.index')
                     ->with('warning', $errorMsg);
             }
 
-            return redirect()->route('walikelas.input_nilai_raport.index')
-                ->with('success', 'Data leger berhasil diimport untuk rombel ' . $rombel->nama);
+            if ($successCount > 0) {
+                return redirect()->route('walikelas.input_nilai_raport.index')
+                    ->with('success', "Import berhasil! {$successCount} siswa telah diproses untuk rombel " . $rombel->nama);
+            } else {
+                return redirect()->route('walikelas.input_nilai_raport.index')
+                    ->with('warning', 'Import selesai tetapi tidak ada data siswa yang berhasil diproses. Cek format file atau NIS/NISN siswa.');
+            }
 
         } catch (\Exception $e) {
             return redirect()->back()

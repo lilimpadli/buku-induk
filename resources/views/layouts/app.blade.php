@@ -346,7 +346,18 @@
                                         <i class="fas fa-plus-circle"></i> <span class="label ms-2">Data Guru</span>
                                     </a>
 
-                                    <!-- MENU BARU -->
+                                    <!-- MENU MUTASI SISWA -->
+                                    <hr class="my-2">
+                                    <div class="nav-subtitle">buku induk</div>
+                                    <a href="{{ route('tu.buku-induk.index') }}" class="nav-link {{ request()->routeIs('tu.buku-induk*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Buku Induk">
+                                        <i class="fas fa-book"></i> <span class="label ms-2">Buku Induk</span>
+                                    </a>
+
+                                    <a href="{{ route('tu.mutasi.index') }}" class="nav-link {{ request()->routeIs('tu.mutasi*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Mutasi Siswa">
+                                        <i class="fas fa-exchange-alt"></i> <span class="label ms-2">Mutasi Siswa</span>
+                                    </a>
+
+                                    <!-- MENU KELULUSAN -->
                                     <hr class="my-2">
                                     <div class="nav-subtitle">MANAJEMEN LULUSAN</div>
 
