@@ -5,6 +5,7 @@ namespace App\Http\Controllers\TU;
 use App\Http\Controllers\Controller;
 use App\Models\Siswa;
 use App\Models\Rombel;
+use App\Models\MataPelajaran;
 use Illuminate\Http\Request;
 
 class BukuIndukController extends Controller
@@ -47,6 +48,7 @@ class BukuIndukController extends Controller
     {
         $siswa->load([
             'user', 
+            'rombel.kelas.jurusan',
             'mutasis',
             'nilaiRaports' => function($query) {
                 $query->with('mapel')
@@ -68,6 +70,7 @@ class BukuIndukController extends Controller
     {
         $siswa->load([
             'user', 
+            'rombel.kelas.jurusan',
             'mutasis', 
             'mutasiTerakhir',
             'nilaiRaports' => function($query) {
@@ -90,6 +93,7 @@ class BukuIndukController extends Controller
     {
         $siswa->load([
             'user', 
+            'rombel.kelas.jurusan',
             'mutasis', 
             'mutasiTerakhir',
             'nilaiRaports' => function($query) {
@@ -105,6 +109,185 @@ class BukuIndukController extends Controller
     }
 
     /**
+     * Get tahun ajaran list based on student's class level
+     */
+    private function getTahunAjaranList(Siswa $siswa)
+    {
+        // Get current year and month
+        $currentMonth = date('n');
+        $currentYear = date('Y');
+        
+        // Determine tahun ajaran saat ini
+        // Jika bulan < 7 (sebelum Juli), tahun ajaran adalah tahun lalu
+        $tahunAjaranSekarang = $currentMonth < 7 ? $currentYear - 1 : $currentYear;
+        
+        // Get student's class level (tingkat)
+        $tingkat = $siswa->rombel && $siswa->rombel->kelas ? 
+                   intval($siswa->rombel->kelas->tingkat) : 10;
+        
+        // Get tahun masuk from nilaiRaports or estimate
+        $tahunMasuk = null;
+        if ($siswa->nilaiRaports->count() > 0) {
+            $tahunMasukStr = $siswa->nilaiRaports->first()->tahun_ajaran;
+            $tahunMasuk = intval(explode('/', $tahunMasukStr)[0]);
+        }
+        
+        // If no nilai found, estimate from current tahun ajaran and tingkat
+        // Kelas 10 masuk tahun ini, Kelas 11 masuk tahun lalu, Kelas 12 2 tahun lalu
+        if (!$tahunMasuk) {
+            $tahunMasuk = $tahunAjaranSekarang - ($tingkat - 10);
+        }
+        
+        // Generate tahun ajaran list for 3 years (Kelas 10, 11, 12)
+        $tahunAjaranList = [];
+        for ($i = 0; $i < 3; $i++) {
+            $startYear = $tahunMasuk + $i;
+            $endYear = $startYear + 1;
+            $tahunAjaranList[] = "{$startYear}/{$endYear}";
+        }
+        
+        return $tahunAjaranList;
+    }
+
+    /**
+     * Get mata pelajaran by jurusan and kelompok
+     */
+    private function getMataPelajaranByJurusan(Siswa $siswa)
+    {
+        $mapelByKelompok = [];
+        
+        // First priority: Get from jurusan if siswa has one
+        if ($siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan) {
+            $jurusanId = $siswa->rombel->kelas->jurusan->id;
+            
+            // Get all mata pelajaran for this specific jurusan
+            $mapels = MataPelajaran::where('jurusan_id', $jurusanId)
+                                   ->orderBy('kelompok')
+                                   ->orderBy('urutan')
+                                   ->get();
+            
+            if ($mapels->count() > 0) {
+                foreach ($mapels as $mapel) {
+                    $kelompok = $mapel->kelompok;
+                    $mapelNama = trim($mapel->nama);
+                    
+                    if (!isset($mapelByKelompok[$kelompok])) {
+                        $mapelByKelompok[$kelompok] = [];
+                    }
+                    
+                    // Check if this mapel name already exists in this kelompok
+                    $exists = false;
+                    foreach ($mapelByKelompok[$kelompok] as $existing) {
+                        if (trim($existing['nama']) === $mapelNama) {
+                            $exists = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!$exists) {
+                        $mapelByKelompok[$kelompok][] = [
+                            'nama' => $mapelNama,
+                            'urutan' => $mapel->urutan,
+                        ];
+                    }
+                }
+            }
+        }
+        
+        // Second priority: If no mapel from jurusan, get from nilai raport
+        if (empty($mapelByKelompok) && $siswa->nilaiRaports->count() > 0) {
+            foreach ($siswa->nilaiRaports as $nilai) {
+                $kelompok = trim($nilai->mapel->kelompok ?? 'Lainnya');
+                $mapelNama = trim($nilai->mapel->nama ?? 'Tidak Diketahui');
+                $mapelUrutan = $nilai->mapel->urutan ?? 999;
+                
+                if (!isset($mapelByKelompok[$kelompok])) {
+                    $mapelByKelompok[$kelompok] = [];
+                }
+                
+                // Check if already added
+                $exists = false;
+                foreach ($mapelByKelompok[$kelompok] as $existing) {
+                    if (trim($existing['nama']) === $mapelNama) {
+                        $exists = true;
+                        break;
+                    }
+                }
+                
+                if (!$exists) {
+                    $mapelByKelompok[$kelompok][] = [
+                        'nama' => $mapelNama,
+                        'urutan' => $mapelUrutan,
+                    ];
+                }
+            }
+        }
+        
+        // Third priority: If still empty and no jurusan, use first jurusan as fallback placeholder
+        if (empty($mapelByKelompok) && !($siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan)) {
+            $firstJurusan = \App\Models\Jurusan::first();
+            if ($firstJurusan) {
+                $mapels = MataPelajaran::where('jurusan_id', $firstJurusan->id)
+                                       ->orderBy('kelompok')
+                                       ->orderBy('urutan')
+                                       ->get();
+                
+                if ($mapels->count() > 0) {
+                    foreach ($mapels as $mapel) {
+                        $kelompok = $mapel->kelompok;
+                        $mapelNama = trim($mapel->nama);
+                        
+                        if (!isset($mapelByKelompok[$kelompok])) {
+                            $mapelByKelompok[$kelompok] = [];
+                        }
+                        
+                        // Check if this mapel name already exists
+                        $exists = false;
+                        foreach ($mapelByKelompok[$kelompok] as $existing) {
+                            if (trim($existing['nama']) === $mapelNama) {
+                                $exists = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!$exists) {
+                            $mapelByKelompok[$kelompok][] = [
+                                'nama' => $mapelNama,
+                                'urutan' => $mapel->urutan,
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Sort each kelompok by urutan and nama
+        foreach ($mapelByKelompok as &$mapels) {
+            usort($mapels, function ($a, $b) {
+                if ($a['urutan'] == $b['urutan']) {
+                    return strcmp($a['nama'], $b['nama']);
+                }
+                return $a['urutan'] - $b['urutan'];
+            });
+        }
+        
+        // Sort kelompok
+        $sortedKelompok = [];
+        foreach (['A', 'B'] as $k) {
+            if (isset($mapelByKelompok[$k])) {
+                $sortedKelompok[$k] = $mapelByKelompok[$k];
+            }
+        }
+        foreach ($mapelByKelompok as $k => $v) {
+            if (!isset($sortedKelompok[$k])) {
+                $sortedKelompok[$k] = $v;
+            }
+        }
+        
+        return $sortedKelompok;
+    }
+
+    /**
      * Group nilai raport by kelompok mata pelajaran
      */
     private function groupNilaiByKelompok(Siswa $siswa)
@@ -113,56 +296,74 @@ class BukuIndukController extends Controller
         $tahunAjaranList = [];
         $semesterMap = ['Ganjil' => 1, 'Genap' => 2, 1 => 1, 2 => 2];
         
-        foreach ($siswa->nilaiRaports as $nilai) {
-            $kelompok = trim($nilai->mapel->kelompok ?? 'Lainnya');
-            $mapelNama = trim($nilai->mapel->nama ?? 'Tidak Diketahui');
-            $mapelUrutan = $nilai->mapel->urutan ?? 999;
-            
-            // Initialize kelompok if not exists
+        // Get tahun ajaran list
+        $tahunAjaranList = $this->getTahunAjaranList($siswa);
+        
+        // Get mata pelajaran from database
+        $mapelByKelompok = $this->getMataPelajaranByJurusan($siswa);
+        
+        // Initialize structure with mata pelajaran from database
+        foreach ($mapelByKelompok as $kelompok => $mapels) {
             if (!isset($nilaiByKelompok[$kelompok])) {
                 $nilaiByKelompok[$kelompok] = [];
             }
             
-            // Initialize mata pelajaran by NAMA (to consolidate same names)
-            if (!isset($nilaiByKelompok[$kelompok][$mapelNama])) {
-                $nilaiByKelompok[$kelompok][$mapelNama] = [
-                    'nama' => $mapelNama,
-                    'urutan' => $mapelUrutan,
-                    'nilai' => []
-                ];
-            }
-            
-            // Ambil tahun ajaran dan semester dari database
-            $tahunAjaran = $nilai->tahun_ajaran;
-            $semester = $semesterMap[$nilai->semester] ?? $nilai->semester;
-            
-            // Track all unique tahun ajaran
-            if (!in_array($tahunAjaran, $tahunAjaranList)) {
-                $tahunAjaranList[] = $tahunAjaran;
-            }
-            
-            // Store nilai by tahun ajaran and semester
-            if (!isset($nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran])) {
-                $nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran] = [];
-            }
-            
-            // Ambil nilai_akhir dari database (gunakan yang pertama jika ada duplikat)
-            if (!isset($nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran][$semester])) {
-                $nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran][$semester] = $nilai->nilai_akhir;
+            foreach ($mapels as $mapel) {
+                $mapelNama = $mapel['nama'];
+                if (!isset($nilaiByKelompok[$kelompok][$mapelNama])) {
+                    $nilaiByKelompok[$kelompok][$mapelNama] = [
+                        'nama' => $mapelNama,
+                        'urutan' => $mapel['urutan'],
+                        'nilai' => []
+                    ];
+                    
+                    // Initialize all tahun ajaran with empty values
+                    foreach ($tahunAjaranList as $tahunAjaran) {
+                        $nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran] = [
+                            1 => null,
+                            2 => null
+                        ];
+                    }
+                }
             }
         }
         
-        // Sort tahun ajaran
-        sort($tahunAjaranList);
+        // Fill in actual nilai from database
+        foreach ($siswa->nilaiRaports as $nilai) {
+            $kelompok = trim($nilai->mapel->kelompok ?? 'Lainnya');
+            $mapelNama = trim($nilai->mapel->nama ?? 'Tidak Diketahui');
+            $tahunAjaran = $nilai->tahun_ajaran;
+            $semester = $semesterMap[$nilai->semester] ?? $nilai->semester;
+            
+            // Initialize if not exists
+            if (!isset($nilaiByKelompok[$kelompok])) {
+                $nilaiByKelompok[$kelompok] = [];
+            }
+            if (!isset($nilaiByKelompok[$kelompok][$mapelNama])) {
+                $nilaiByKelompok[$kelompok][$mapelNama] = [
+                    'nama' => $mapelNama,
+                    'urutan' => $nilai->mapel->urutan ?? 999,
+                    'nilai' => []
+                ];
+            }
+            if (!isset($nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran])) {
+                $nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran] = [
+                    1 => null,
+                    2 => null
+                ];
+            }
+            
+            // Store nilai
+            $nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran][$semester] = $nilai->nilai_akhir;
+        }
         
-        // Sort kelompok: A dulu, B kedua, lainnya dibelakang
+        // Sort kelompok: A dulu, B kedua
         $sortedKelompok = [];
         foreach (['A', 'B'] as $k) {
             if (isset($nilaiByKelompok[$k])) {
                 $sortedKelompok[$k] = $nilaiByKelompok[$k];
             }
         }
-        // Add any remaining kelompok
         foreach ($nilaiByKelompok as $k => $v) {
             if (!isset($sortedKelompok[$k])) {
                 $sortedKelompok[$k] = $v;

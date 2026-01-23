@@ -13,85 +13,98 @@
         body {
             font-family: 'Times New Roman', Times, serif;
             background-color: #fff;
-            padding: 20px;
+            padding: 10px;
             color: #000;
-            line-height: 1.5;
+            line-height: 1.3;
         }
         .container {
             max-width: 210mm;
             margin: 0 auto;
             background-color: white;
-            padding: 40px;
+            padding: 15px;
+            height: 297mm;
+            overflow: hidden;
         }
         .buku-induk-header {
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #333;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #333;
         }
         .buku-induk-header h1 {
-            font-size: 16px;
-            margin-bottom: 5px;
+            font-size: 13px;
+            margin-bottom: 2px;
             font-weight: bold;
         }
         .buku-induk-header h2 {
-            font-size: 14px;
+            font-size: 11px;
             font-weight: normal;
         }
         .buku-induk-header p {
-            font-size: 11px;
-            margin: 3px 0;
+            font-size: 9px;
+            margin: 2px 0;
         }
         .buku-induk-section {
-            margin-bottom: 25px;
+            margin-bottom: 4px;
         }
         .buku-induk-section h5 {
             font-weight: bold;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
+            margin-bottom: 2px;
+            padding-bottom: 2px;
             border-bottom: 1px solid #ddd;
-            font-size: 12px;
+            font-size: 8px;
+        }
+        .buku-induk-section p {
+            margin: 1px 0;
+            font-size: 7px;
+            line-height: 1.2;
         }
         .info-row {
             display: flex;
-            margin-bottom: 8px;
-            font-size: 11px;
+            margin-bottom: 1px;
+            font-size: 7px;
         }
         .info-col {
             flex: 1;
+        }
+        .info-col p {
+            margin: 0;
+            font-size: 7px;
+            line-height: 1.1;
         }
         .info-label {
             font-weight: bold;
         }
         .buku-induk-photo {
-            width: 120px;
-            height: 150px;
+            width: 80px;
+            height: 100px;
             border: 1px solid #ddd;
             object-fit: cover;
         }
         .student-info-container {
             display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 6px;
         }
         .student-info {
             flex: 1;
         }
         .student-photo {
             text-align: center;
+            flex-shrink: 0;
         }
         .photo-label {
-            font-size: 10px;
-            margin-top: 5px;
+            font-size: 7px;
+            margin-top: 1px;
         }
         .buku-induk-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10px;
+            font-size: 7px;
         }
         .buku-induk-table th, .buku-induk-table td {
             border: 1px solid #000;
-            padding: 4px;
+            padding: 1px;
             text-align: center;
         }
         .buku-induk-table th {
@@ -108,17 +121,22 @@
         .signature-section {
             display: flex;
             justify-content: space-around;
-            margin-top: 40px;
-            font-size: 10px;
+            margin-top: 8px;
+            font-size: 7px;
         }
         .signature-box {
             text-align: center;
-            width: 130px;
+            width: 80px;
+        }
+        .signature-box p {
+            margin: 0;
+            font-size: 7px;
+            line-height: 1.1;
         }
         .signature-line {
             border-bottom: 1px solid #000;
-            height: 30px;
-            margin-bottom: 5px;
+            height: 12px;
+            margin-bottom: 1px;
         }
         @media print {
             body {
@@ -209,7 +227,11 @@
                         <p><span class="info-label">Alasan Pindah:</span> {{ $siswa->mutasiTerakhir->alasan_pindah ?? '-' }}</p>
                         <p><span class="info-label">Sekolah Tujuan:</span> {{ $siswa->mutasiTerakhir->tujuan_pindah ?? '-' }}</p>
                     @else
-                        <p><em>Tidak ada data mutasi</em></p>
+                        <p><span class="info-label">Status:</span> Aktif</p>
+                        <p><span class="info-label">Tanggal Mutasi:</span> -</p>
+                        <p><span class="info-label">Keterangan:</span> -</p>
+                        <p><span class="info-label">Alasan Pindah:</span> -</p>
+                        <p><span class="info-label">Sekolah Tujuan:</span> -</p>
                     @endif
                 </div>
             </div>
@@ -231,32 +253,32 @@
         <div class="buku-induk-section">
             <h5>E. HASIL PRESTASI PEMBELAJARAN</h5>
             <div class="table-responsive">
-                @if(count($siswa->nilaiRaports) > 0)
-                    <table class="buku-induk-table">
-                        <thead>
-                            <tr>
-                                <th rowspan="3" style="vertical-align: middle; width: 25%;">MATA PELAJARAN</th>
-                                @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
-                                    <th colspan="2" class="text-center">{{ $tahunAjaran }}</th>
-                                @endforeach
-                            </tr>
-                            <tr>
-                                @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
-                                    <th style="width: 35px;">1</th>
-                                    <th style="width: 35px;">2</th>
-                                @endforeach
-                            </tr>
-                            <tr>
-                                @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
-                                    <th>NILAI</th>
-                                    <th>NILAI</th>
-                                @endforeach
-                            </tr>
-                        </thead>
-                        <tbody>
+                <table class="buku-induk-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="3" style="vertical-align: middle; width: 30%; font-size: 7px;">MATA PELAJARAN</th>
+                            @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                <th colspan="2" class="text-center" style="font-size: 6px;">{{ $tahunAjaran }}</th>
+                            @endforeach
+                        </tr>
+                        <tr>
+                            @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                <th style="width: 20px; font-size: 6px;">1</th>
+                                <th style="width: 20px; font-size: 6px;">2</th>
+                            @endforeach
+                        </tr>
+                        <tr>
+                            @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                <th style="font-size: 6px;">NILAI</th>
+                                <th style="font-size: 6px;">NILAI</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(count($nilaiByKelompok['byKelompok']) > 0)
                             @foreach($nilaiByKelompok['byKelompok'] as $kelompok => $mapelGroup)
                                 <tr style="background-color: #f0f0f0; font-weight: bold;">
-                                    <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}">
+                                    <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}" style="font-size: 7px; padding: 1px;">
                                         @if($kelompok === 'A')
                                             A. KELOMPOK MATA PELAJARAN UMUM
                                         @elseif($kelompok === 'B')
@@ -268,19 +290,38 @@
                                 </tr>
                                 @foreach($mapelGroup as $mapelNama => $mapelData)
                                     <tr>
-                                        <td>{{ $mapelData['nama'] }}</td>
+                                        <td style="font-size: 7px; text-align: left; padding: 1px;">{{ $mapelData['nama'] }}</td>
                                         @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
-                                            <td class="text-center">{{ $mapelData['nilai'][$tahunAjaran][1] ?? '-' }}</td>
-                                            <td class="text-center">{{ $mapelData['nilai'][$tahunAjaran][2] ?? '-' }}</td>
+                                            <td class="text-center" style="font-size: 7px;">{{ $mapelData['nilai'][$tahunAjaran][1] ?? '-' }}</td>
+                                            <td class="text-center" style="font-size: 7px;">{{ $mapelData['nilai'][$tahunAjaran][2] ?? '-' }}</td>
                                         @endforeach
                                     </tr>
                                 @endforeach
                             @endforeach
-                        </tbody>
-                    </table>
-                @else
-                    <p><em>Tidak ada data nilai raport untuk siswa ini</em></p>
-                @endif
+                        @else
+                            <tr style="background-color: #f0f0f0; font-weight: bold;">
+                                <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}" style="font-size: 7px;">A. KELOMPOK MATA PELAJARAN UMUM</td>
+                            </tr>
+                            <tr>
+                                <td style="font-size: 7px;">-</td>
+                                @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                    <td class="text-center" style="font-size: 7px;">-</td>
+                                    <td class="text-center" style="font-size: 7px;">-</td>
+                                @endforeach
+                            </tr>
+                            <tr style="background-color: #f0f0f0; font-weight: bold;">
+                                <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}" style="font-size: 7px;">B. KELOMPOK MATA PELAJARAN KEAHLIAN</td>
+                            </tr>
+                            <tr>
+                                <td style="font-size: 7px;">-</td>
+                                @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                    <td class="text-center" style="font-size: 7px;">-</td>
+                                    <td class="text-center" style="font-size: 7px;">-</td>
+                                @endforeach
+                            </tr>
+                        @endif
+                    </tbody>
+                </table>
             </div>
         </div>
 

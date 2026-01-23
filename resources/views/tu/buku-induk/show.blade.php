@@ -153,23 +153,32 @@
                     <!-- Status Mutasi -->
                     <div class="buku-induk-section">
                         <h5>D. STATUS MUTASI</h5>
-                        @if($siswa->mutasiTerakhir)
-                            <div class="row">
-                                <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-md-6">
+                                @if($siswa->mutasiTerakhir)
                                     <p><strong>Status:</strong> <span class="badge bg-{{ $siswa->mutasiTerakhir->status_color }}">{{ $siswa->mutasiTerakhir->status_label }}</span></p>
                                     <p><strong>Tanggal Mutasi:</strong> {{ $siswa->mutasiTerakhir->tanggal_mutasi ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_mutasi)->format('d F Y') : '-' }}</p>
                                     <p><strong>Keterangan:</strong> {{ $siswa->mutasiTerakhir->keterangan ?? '-' }}</p>
-                                </div>
-                                <div class="col-md-6">
+                                @else
+                                    <p><strong>Status:</strong> <span class="badge bg-success">Aktif</span></p>
+                                    <p><strong>Tanggal Mutasi:</strong> -</p>
+                                    <p><strong>Keterangan:</strong> -</p>
+                                @endif
+                            </div>
+                            <div class="col-md-6">
+                                @if($siswa->mutasiTerakhir)
                                     <p><strong>Alasan Pindah:</strong> {{ $siswa->mutasiTerakhir->alasan_pindah ?? '-' }}</p>
                                     <p><strong>Sekolah Tujuan:</strong> {{ $siswa->mutasiTerakhir->tujuan_pindah ?? '-' }}</p>
                                     <p><strong>No. SK Keluar:</strong> {{ $siswa->mutasiTerakhir->no_sk_keluar ?? '-' }}</p>
                                     <p><strong>Tanggal SK Keluar:</strong> {{ $siswa->mutasiTerakhir->tanggal_sk_keluar ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_sk_keluar)->format('d F Y') : '-' }}</p>
-                                </div>
+                                @else
+                                    <p><strong>Alasan Pindah:</strong> -</p>
+                                    <p><strong>Sekolah Tujuan:</strong> -</p>
+                                    <p><strong>No. SK Keluar:</strong> -</p>
+                                    <p><strong>Tanggal SK Keluar:</strong> -</p>
+                                @endif
                             </div>
-                        @else
-                            <p class="text-muted"><em>Tidak ada data mutasi</em></p>
-                        @endif
+                        </div>
                     </div>
                 </div>
 
@@ -191,29 +200,29 @@
             <div class="buku-induk-section">
                 <h5>E. HASIL PRESTASI PEMBELAJARAN</h5>
                 <div class="table-responsive">
-                    @if(count($siswa->nilaiRaports) > 0)
-                        <table class="table table-sm table-bordered buku-induk-table" style="font-size: 11px;">
-                            <thead>
-                                <tr>
-                                    <th rowspan="3" style="vertical-align: middle; width: 30%;">MATA PELAJARAN</th>
-                                    @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
-                                        <th colspan="2" class="text-center">{{ $tahunAjaran }}</th>
-                                    @endforeach
-                                </tr>
-                                <tr>
-                                    @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
-                                        <th class="text-center" style="width: 50px;">1</th>
-                                        <th class="text-center" style="width: 50px;">2</th>
-                                    @endforeach
-                                </tr>
-                                <tr>
-                                    @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
-                                        <th class="text-center">NILAI</th>
-                                        <th class="text-center">NILAI</th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody>
+                    <table class="table table-sm table-bordered buku-induk-table" style="font-size: 11px;">
+                        <thead>
+                            <tr>
+                                <th rowspan="3" style="vertical-align: middle; width: 30%;">MATA PELAJARAN</th>
+                                @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                    <th colspan="2" class="text-center">{{ $tahunAjaran }}</th>
+                                @endforeach
+                            </tr>
+                            <tr>
+                                @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                    <th class="text-center" style="width: 50px;">1</th>
+                                    <th class="text-center" style="width: 50px;">2</th>
+                                @endforeach
+                            </tr>
+                            <tr>
+                                @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                    <th class="text-center">NILAI</th>
+                                    <th class="text-center">NILAI</th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if(count($nilaiByKelompok['byKelompok']) > 0)
                                 @foreach($nilaiByKelompok['byKelompok'] as $kelompok => $mapelGroup)
                                     <tr style="background-color: #f0f0f0; font-weight: bold;">
                                         <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}">
@@ -236,11 +245,30 @@
                                         </tr>
                                     @endforeach
                                 @endforeach
-                            </tbody>
-                        </table>
-                    @else
-                        <p class="text-muted"><em>Tidak ada data nilai raport untuk siswa ini</em></p>
-                    @endif
+                            @else
+                                <tr style="background-color: #f0f0f0; font-weight: bold;">
+                                    <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}">A. KELOMPOK MATA PELAJARAN UMUM</td>
+                                </tr>
+                                <tr>
+                                    <td>-</td>
+                                    @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                        <td class="text-center">-</td>
+                                        <td class="text-center">-</td>
+                                    @endforeach
+                                </tr>
+                                <tr style="background-color: #f0f0f0; font-weight: bold;">
+                                    <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}">B. KELOMPOK MATA PELAJARAN KEAHLIAN</td>
+                                </tr>
+                                <tr>
+                                    <td>-</td>
+                                    @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                        <td class="text-center">-</td>
+                                        <td class="text-center">-</td>
+                                    @endforeach
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
