@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Guru;
 use App\Models\Jurusan;
 use App\Models\User;
+use App\Imports\GuruImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class GuruController extends Controller
 {
@@ -261,5 +263,43 @@ class GuruController extends Controller
         return redirect()
             ->route('kurikulum.guru.manage.index')
             ->with('success', 'Guru berhasil dihapus');
+    }
+
+    public function importForm()
+    {
+        return view('kurikulum.guru.import');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv'
+        ]);
+
+        try {
+            $import = new GuruImport();
+            Excel::import($import, $request->file('file'));
+
+            $successCount = $import->getSuccessCount();
+            $errors = $import->getErrors();
+
+            if ($successCount > 0) {
+                $message = "Berhasil import $successCount guru";
+                if (count($errors) > 0) {
+                    $message .= " dengan " . count($errors) . " error";
+                    return redirect()->route('kurikulum.guru.index')
+                        ->with('success', $message)
+                        ->with('errors', $errors);
+                }
+                return redirect()->route('kurikulum.guru.index')
+                    ->with('success', $message);
+            } else {
+                return redirect()->route('kurikulum.guru.importForm')
+                    ->with('error', 'Tidak ada data guru yang berhasil diimport. ' . implode(', ', $errors));
+            }
+        } catch (\Exception $e) {
+            return redirect()->route('kurikulum.guru.importForm')
+                ->with('error', 'Error: ' . $e->getMessage());
+        }
     }
 }

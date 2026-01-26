@@ -224,7 +224,12 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="mb-3">Daftar Guru</h3>
-        <a href="{{ route('kurikulum.guru.manage.create') }}" class="btn btn-primary">Tambah Guru</a>
+        <div>
+            <a href="{{ route('kurikulum.guru.importForm') }}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-file-import"></i> Import Excel
+            </a>
+            <a href="{{ route('kurikulum.guru.manage.create') }}" class="btn btn-primary">Tambah Guru</a>
+        </div>
     </div>
 
     <!-- FILTER CARD -->

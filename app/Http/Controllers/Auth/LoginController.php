@@ -30,34 +30,38 @@ class LoginController extends Controller
             'password.required' => 'Password wajib diisi'
         ]);
 
-        $credentials = [
-            'nomor_induk' => $request->nomor_induk,
-            'password'    => $request->password,
-        ];
+        // Cari user berdasarkan nomor_induk (case-insensitive)
+        $user = \App\Models\User::whereRaw('LOWER(nomor_induk) = ?', [strtolower($request->nomor_induk)])
+            ->first();
 
-        // Login
-        if (Auth::attempt($credentials)) {
-
-            $user = Auth::user();
-
-            // Redirect sesuai role
-           return match ($user->role) {
-    'siswa'        => redirect()->route('siswa.dashboard'),
-    'guru'         => redirect()->route('guru.dashboard'),
-    'walikelas'    => redirect()->route('walikelas.dashboard'),
-    'kaprog'       => redirect()->route('kaprog.dashboard'),
-    'tu'           => redirect()->route('tu.dashboard'),
-    'kurikulum'    => redirect()->route('kurikulum.dashboard'),
-    'calon_siswa'  => redirect()->route('calon.dashboard'),
-    default        => redirect()->route('dashboard'),
-};
-
+        // Validasi user dan password
+        if ($user && \Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
+            // Login successful
+            Auth::login($user, $request->boolean('remember'));
+            return $this->redirectByRole($user);
         }
 
         // Jika gagal login
         return back()->withErrors([
             'nomor_induk' => 'Nomor induk atau password salah!'
-        ]);
+        ])->onlyInput('nomor_induk');
+    }
+
+    /**
+     * Redirect based on role
+     */
+    private function redirectByRole($user)
+    {
+        return match ($user->role) {
+            'siswa'        => redirect()->route('siswa.dashboard'),
+            'guru'         => redirect()->route('guru.dashboard'),
+            'walikelas'    => redirect()->route('walikelas.dashboard'),
+            'kaprog'       => redirect()->route('kaprog.dashboard'),
+            'tu'           => redirect()->route('tu.dashboard'),
+            'kurikulum'    => redirect()->route('kurikulum.dashboard'),
+            'calon_siswa'  => redirect()->route('calon.dashboard'),
+            default        => redirect()->route('dashboard'),
+        };
     }
 
     /**

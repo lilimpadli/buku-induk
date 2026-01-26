@@ -273,7 +273,7 @@
                                     </a>
 
                                   
-                                    <a href="{{ route('guru.profile') }}" class="nav-link {{ request()->routeIs('guru.profile*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Diri">
+                                    <a href="{{ route('guru.profile.index') }}" class="nav-link {{ request()->routeIs('guru.profile.*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Diri">
                                         <i class="fas fa-user"></i> <span class="label ms-2">Data Diri</span>
                                     </a>
                                 @endif

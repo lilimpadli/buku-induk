@@ -519,6 +519,12 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/guru', [App\Http\Controllers\Kurikulum\GuruController::class, 'index'])
                 ->name('guru.index');
 
+            // Guru import
+            Route::get('/guru/import', [App\Http\Controllers\Kurikulum\GuruController::class, 'importForm'])
+                ->name('guru.importForm');
+            Route::post('/guru/import', [App\Http\Controllers\Kurikulum\GuruController::class, 'import'])
+                ->name('guru.import');
+
             // Backwards-compatible "manage" routes used by views/controllers
             Route::prefix('guru/manage')->name('guru.manage.')->group(function () {
                 Route::get('/', [App\Http\Controllers\Kurikulum\GuruController::class, 'index'])->name('index');
