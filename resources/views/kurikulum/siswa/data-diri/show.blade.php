@@ -13,7 +13,7 @@
             <a href="{{ route('tu.siswa.edit', $siswa->id) }}" class="btn btn-warning me-2">
                 <i class="fas fa-edit"></i> Edit
             </a>
-            <a href="{{ route('tu.siswa.raport', $siswa->id) }}" class="btn btn-primary">
+            <a href="{{ route('kurikulum.rapor.show', $siswa->id) }}" class="btn btn-primary">
                 <i class="fas fa-file-alt"></i> Raport
             </a>
         </div>

@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers\TU;
+namespace App\Http\Controllers\Kurikulum;
 
 use App\Http\Controllers\Controller;
 use App\Models\KenaikanKelas;
@@ -88,7 +88,7 @@ class AlumniController extends Controller
             ];
         }
 
-        return view('tu.alumni.index', compact('allJurusanCards', 'tahunAjaranList', 'tahunSearch'));
+        return view('kurikulum.alumni.index', compact('allJurusanCards', 'tahunAjaranList', 'tahunSearch'));
     }
 
     public function byJurusan($tahun, $jurusanId)
@@ -113,13 +113,6 @@ class AlumniController extends Controller
             ])
             ->orderBy('tahun_ajaran', 'desc')
             ->get();
-        
-        // DEBUG
-        \Log::debug('ByJurusan Debug', [
-            'tahun' => $tahun,
-            'jurusanId' => $jurusanId,
-            'kelulusan_count' => $kelulusan->count(),
-        ]);
 
         // Filter berdasarkan jurusan
         $alumni = [];
@@ -131,13 +124,6 @@ class AlumniController extends Controller
             $kelas = $rombel?->kelas;
             $jurusan = $kelas?->jurusan;
             
-            \Log::debug('Alumni item', [
-                'siswa_id' => $siswa->id ?? 'N/A',
-                'jurusan_id' => $jurusan->id ?? 'N/A',
-                'kelas_id' => $kelas?->id ?? 'N/A',
-                'rombel_id' => $rombel?->id ?? 'N/A',
-            ]);
-            
             if ($jurusan && (int) $jurusan->id === $jurusanId) {
                 $namaJurusan = $jurusan->nama;
                 $alumni[] = [
@@ -148,12 +134,12 @@ class AlumniController extends Controller
             }
         }
 
-        return view('tu.alumni.by-jurusan', compact('alumni', 'tahun', 'jurusanId', 'namaJurusan'));
+        return view('kurikulum.alumni.by-jurusan', compact('alumni', 'tahun', 'jurusanId', 'namaJurusan'));
     }
 
     public function show($id)
     {
         $siswa = DataSiswa::with(['rombel', 'ayah', 'ibu', 'wali'])->findOrFail($id);
-        return view('tu.alumni.show', compact('siswa'));
+        return view('kurikulum.alumni.show', compact('siswa'));
     }
 }

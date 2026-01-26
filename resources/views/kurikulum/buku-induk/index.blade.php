@@ -246,7 +246,7 @@
         <h1 class="h3 mb-0">
             <i class="fas fa-book text-primary"></i> Daftar Buku Induk Siswa
         </h1>
-        <a href="{{ route('tu.siswa.index') }}" class="btn btn-secondary">
+        <a href="{{ route('kurikulum.siswa.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left me-1"></i> Kembali
         </a>
     </div>
@@ -338,11 +338,11 @@
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm" role="group">
-                                    <a href="{{ route('tu.buku-induk.show', $siswa) }}" class="btn btn-outline-primary" 
+                                    <a href="{{ route('kurikulum.buku-induk.show', $siswa) }}" class="btn btn-outline-primary" 
                                         data-bs-toggle="tooltip" title="Lihat Buku Induk">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('tu.buku-induk.cetak', $siswa) }}" target="_blank" class="btn btn-outline-success" 
+                                    <a href="{{ route('kurikulum.buku-induk.cetak', $siswa) }}" target="_blank" class="btn btn-outline-success" 
                                         data-bs-toggle="tooltip" title="Cetak">
                                         <i class="fas fa-print"></i>
                                     </a>

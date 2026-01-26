@@ -106,13 +106,13 @@
             <!-- Tombol Aksi -->
             <div class="card">
                 <div class="card-body">
-                    <a href="{{ route('tu.mutasi.edit', $mutasi) }}" class="btn btn-warning">
+                    <a href="{{ route('kurikulum.mutasi.edit', $mutasi) }}" class="btn btn-warning">
                         <i class="fas fa-edit"></i> Edit Data
                     </a>
-                    <a href="{{ route('tu.mutasi.index') }}" class="btn btn-secondary">
+                    <a href="{{ route('kurikulum.mutasi.index') }}" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Kembali ke Daftar
                     </a>
-                    <form action="{{ route('tu.mutasi.destroy', $mutasi) }}" method="POST" style="display: inline;"
+                    <form action="{{ route('kurikulum.mutasi.destroy', $mutasi) }}" method="POST" style="display: inline;"
                         onsubmit="return confirm('Yakin ingin menghapus data mutasi ini?');">
                         @csrf
                         @method('DELETE')

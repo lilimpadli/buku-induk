@@ -403,11 +403,22 @@
                                         <i class="fas fa-book"></i> <span class="label ms-2">Manajemen Mata Pelajaran</span>
                                     </a>
 
-                                    <!-- MENU BARU -->
+                                    <!-- MENU BUKU INDUK -->
+                                    <hr class="my-2">
+                                    <div class="nav-subtitle">BUKU INDUK</div>
+                                    <a href="{{ route('kurikulum.buku-induk.index') }}" class="nav-link {{ request()->routeIs('kurikulum.buku-induk*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Buku Induk">
+                                        <i class="fas fa-book"></i> <span class="label ms-2">Buku Induk</span>
+                                    </a>
+
+                                    <a href="{{ route('kurikulum.mutasi.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mutasi*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Mutasi Siswa">
+                                        <i class="fas fa-exchange-alt"></i> <span class="label ms-2">Mutasi Siswa</span>
+                                    </a>
+
+                                    <!-- MENU KELULUSAN -->
                                     <hr class="my-2">
                                     <div class="nav-subtitle">MANAJEMEN LULUSAN</div>
-                                    <a href="{{ route('kurikulum.kelulusan.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kelulusan*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Kelulusan">
-                                        <i class="fas fa-graduation-cap"></i> <span class="label ms-2">Data Kelulusan</span>
+                                    <a href="{{ route('kurikulum.alumni.index') }}" class="nav-link {{ request()->routeIs('kurikulum.alumni*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Alumni">
+                                        <i class="fas fa-user-friends"></i> <span class="label ms-2">Data Alumni</span>
                                     </a>
 
                                 @endif

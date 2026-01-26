@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\TU;
+namespace App\Http\Controllers\Kurikulum;
 
 use App\Http\Controllers\Controller;
 use App\Models\Siswa;
@@ -43,7 +43,7 @@ class BukuIndukController extends Controller
         // Get all jurusans for filter dropdown
         $jurusans = Jurusan::orderBy('nama')->get();
 
-        return view('tu.buku-induk.index', compact('siswas', 'jurusans'));
+        return view('kurikulum.buku-induk.index', compact('siswas', 'jurusans'));
     }
 
     /**
@@ -55,6 +55,7 @@ class BukuIndukController extends Controller
             'user', 
             'rombel.kelas.jurusan',
             'mutasis',
+            'mutasiTerakhir',
             'nilaiRaports' => function($query) {
                 $query->with('mapel')
                       ->orderBy('tahun_ajaran')
@@ -65,7 +66,7 @@ class BukuIndukController extends Controller
         // Group nilai by kelompok and nama mata pelajaran
         $nilaiByKelompok = $this->groupNilaiByKelompok($siswa);
         
-        return view('tu.buku-induk.show', compact('siswa', 'nilaiByKelompok'));
+        return view('kurikulum.buku-induk.show', compact('siswa', 'nilaiByKelompok'));
     }
 
     /**
@@ -88,7 +89,7 @@ class BukuIndukController extends Controller
         // Group nilai by kelompok and nama mata pelajaran
         $nilaiByKelompok = $this->groupNilaiByKelompok($siswa);
         
-        return view('tu.buku-induk.cetak', compact('siswa', 'nilaiByKelompok'));
+        return view('kurikulum.buku-induk.cetak', compact('siswa', 'nilaiByKelompok'));
     }
 
     /**
@@ -265,6 +266,12 @@ class BukuIndukController extends Controller
                 }
             }
         }
+
+        // Fourth priority: If still absolutely empty, create placeholder groups
+        if (empty($mapelByKelompok)) {
+            $mapelByKelompok['A'] = [];
+            $mapelByKelompok['B'] = [];
+        }
         
         // Sort each kelompok by urutan and nama
         foreach ($mapelByKelompok as &$mapels) {
@@ -306,6 +313,22 @@ class BukuIndukController extends Controller
         
         // Get mata pelajaran from database
         $mapelByKelompok = $this->getMataPelajaranByJurusan($siswa);
+        
+        // Ensure we always have at least A and B groups
+        if (empty($mapelByKelompok)) {
+            $mapelByKelompok = [
+                'A' => [],
+                'B' => []
+            ];
+        } else {
+            // Add missing groups
+            if (!isset($mapelByKelompok['A'])) {
+                $mapelByKelompok['A'] = [];
+            }
+            if (!isset($mapelByKelompok['B'])) {
+                $mapelByKelompok['B'] = [];
+            }
+        }
         
         // Initialize structure with mata pelajaran from database
         foreach ($mapelByKelompok as $kelompok => $mapels) {
@@ -377,12 +400,14 @@ class BukuIndukController extends Controller
         
         // Sort mata pelajaran dalam setiap kelompok berdasarkan urutan
         foreach ($sortedKelompok as &$mapelGroup) {
-            uasort($mapelGroup, function ($a, $b) {
-                if ($a['urutan'] == $b['urutan']) {
-                    return strcmp($a['nama'], $b['nama']);
-                }
-                return $a['urutan'] - $b['urutan'];
-            });
+            if (is_array($mapelGroup) && count($mapelGroup) > 0) {
+                uasort($mapelGroup, function ($a, $b) {
+                    if ($a['urutan'] == $b['urutan']) {
+                        return strcmp($a['nama'], $b['nama']);
+                    }
+                    return $a['urutan'] - $b['urutan'];
+                });
+            }
         }
         
         return [

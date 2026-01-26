@@ -375,11 +375,17 @@
             <div class="row mt-2">
             <div class="col-md-3">
                 <label>Status</label>
-                <select class="form-control" name="kenaikan[status]">
+                <select class="form-control" name="kenaikan[status]" id="statusSelect">
                     <option value="Naik Kelas">Naik Kelas</option>
                     <option value="Tidak Naik">Tidak Naik</option>
-                    <option value="Lulus">Lulus</option>
+                    <option value="Lulus" @php echo (isset($siswa) && isset($siswa->rombel) && isset($siswa->rombel->kelas) && $siswa->rombel->kelas->tingkat == 12) ? '' : 'disabled'; @endphp>Lulus</option>
                 </select>
+                @php
+                    $currentTingkat = (isset($siswa) && isset($siswa->rombel) && isset($siswa->rombel->kelas)) ? $siswa->rombel->kelas->tingkat : null;
+                @endphp
+                @if($currentTingkat != 12)
+                    <small class="text-muted">* Lulus hanya tersedia untuk Kelas 12</small>
+                @endif
             </div>
 
             <div class="col-md-3">
@@ -394,7 +400,7 @@
                 </select>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4" id="rombelTujuanGroup">
                 <label>Rombel Tujuan</label>
                 <select name="kenaikan[rombel_tujuan_id]" class="form-control" id="rombelSelect">
                     <option value="">-- Pilih Rombel --</option>
@@ -424,6 +430,8 @@
         document.addEventListener('DOMContentLoaded', function () {
             const semesterEl = document.getElementById('semesterSelect');
             const kenaikanSection = document.getElementById('kenaikan-section');
+            const statusSelect = document.getElementById('statusSelect');
+            const rombelTujuanGroup = document.getElementById('rombelTujuanGroup');
             const formRapor = document.getElementById('formRapor');
             const btnSimpan = document.getElementById('btnSimpan');
 
@@ -439,6 +447,21 @@
             };
             semesterEl?.addEventListener('change', updateVisibility);
             updateVisibility();
+
+            // Toggle rombel selection berdasarkan status
+            const updateRombelVisibility = () => {
+                if (!statusSelect || !rombelTujuanGroup) return;
+                const status = statusSelect.value;
+                if (status === 'Lulus') {
+                    rombelTujuanGroup.style.display = 'none';
+                    // Clear rombel selection jika Lulus dipilih
+                    document.getElementById('rombelSelect').value = '';
+                } else {
+                    rombelTujuanGroup.style.display = '';
+                }
+            };
+            statusSelect?.addEventListener('change', updateRombelVisibility);
+            updateRombelVisibility();
 
             // Validasi semua table harus diisi sebelum submit
             formRapor?.addEventListener('submit', function(e) {

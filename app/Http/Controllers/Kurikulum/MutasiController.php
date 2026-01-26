@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\TU;
+namespace App\Http\Controllers\Kurikulum;
 
 use App\Http\Controllers\Controller;
 use App\Models\MutasiSiswa;
@@ -41,7 +41,7 @@ class MutasiController extends Controller
             'naik_kelas' => 'Naik Kelas',
         ];
 
-        return view('tu.mutasi.index', compact('mutasis', 'statuses'));
+        return view('kurikulum.mutasi.index', compact('mutasis', 'statuses'));
     }
 
     /**
@@ -63,7 +63,7 @@ class MutasiController extends Controller
             'lulus' => 'Lulus',
         ];
 
-        return view('tu.mutasi.create', compact('siswas', 'statuses'));
+        return view('kurikulum.mutasi.create', compact('siswas', 'statuses'));
     }
 
     /**
@@ -84,7 +84,7 @@ class MutasiController extends Controller
 
         MutasiSiswa::create($validated);
 
-        return redirect()->route('tu.mutasi.index')
+        return redirect()->route('kurikulum.mutasi.index')
             ->with('success', 'Data mutasi siswa berhasil ditambahkan!');
     }
 
@@ -94,7 +94,7 @@ class MutasiController extends Controller
     public function show(MutasiSiswa $mutasi)
     {
         $mutasi->load('siswa');
-        return view('tu.mutasi.show', compact('mutasi'));
+        return view('kurikulum.mutasi.show', compact('mutasi'));
     }
 
     /**
@@ -111,7 +111,7 @@ class MutasiController extends Controller
             'lulus' => 'Lulus',
         ];
 
-        return view('tu.mutasi.edit', compact('mutasi', 'siswas', 'statuses'));
+        return view('kurikulum.mutasi.edit', compact('mutasi', 'siswas', 'statuses'));
     }
 
     /**
@@ -132,7 +132,7 @@ class MutasiController extends Controller
 
         $mutasi->update($validated);
 
-        return redirect()->route('tu.mutasi.index')
+        return redirect()->route('kurikulum.mutasi.index')
             ->with('success', 'Data mutasi siswa berhasil diperbarui!');
     }
 
@@ -143,7 +143,7 @@ class MutasiController extends Controller
     {
         $mutasi->delete();
 
-        return redirect()->route('tu.mutasi.index')
+        return redirect()->route('kurikulum.mutasi.index')
             ->with('success', 'Data mutasi siswa berhasil dihapus!');
     }
 
@@ -175,6 +175,6 @@ class MutasiController extends Controller
             'lulus' => 'Lulus',
         ];
 
-        return view('tu.mutasi.laporan', compact('mutasis', 'statuses'));
+        return view('kurikulum.mutasi.laporan', compact('mutasis', 'statuses'));
     }
 }

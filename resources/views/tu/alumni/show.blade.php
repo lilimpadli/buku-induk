@@ -72,7 +72,15 @@
                         </h6>
                         <div class="row mb-3">
                             <div class="col-md-12">
-                                <p class="mb-1"><strong>Rombel Terakhir:</strong></p>
+                                <p class="mb-1"><strong>Status Kelulusan:</strong></p>
+                                <p class="text-secondary">
+                                    <span class="badge bg-success">LULUS</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <p class="mb-1"><strong></strong>Rombel Terakhir:</strong></p>
                                 <p class="text-secondary">{{ optional($siswa->rombel)->nama ?? '-' }}</p>
                             </div>
                         </div>
