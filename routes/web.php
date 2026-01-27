@@ -48,6 +48,7 @@ use App\Http\Controllers\TUController;
 use App\Http\Controllers\TU\KelulusanController;
 use App\Http\Controllers\TU\AlumniController;
 use App\Http\Controllers\TU\MutasiController;
+use App\Http\Controllers\TU\DataPribadiController;
 use App\Http\Controllers\TU\BukuIndukController;
 
 // KAPROG
@@ -415,6 +416,11 @@ Route::middleware(['auth'])->group(function () {
             // Dashboard
             Route::get('/dashboard', [TUController::class, 'dashboard'])->name('dashboard');
 
+            // Data Pribadi Guru/TU
+            Route::get('/data-pribadi', [DataPribadiController::class, 'index'])->name('data-pribadi.index');
+            Route::get('/data-pribadi/edit', [DataPribadiController::class, 'edit'])->name('data-pribadi.edit');
+            Route::put('/data-pribadi', [DataPribadiController::class, 'update'])->name('data-pribadi.update');
+
             // Route untuk guru (TU management)
             Route::get('/guru', [TUController::class, 'guruIndex'])->name('guru.index');
             Route::get('/guru/create', [TUController::class, 'guruCreate'])->name('guru.create');
@@ -491,6 +497,11 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/kelulusan/rombel/{rombelId}/{tahun}', [KelulusanController::class, 'showRombel'])->name('kelulusan.rombel.show');
 
             Route::get('/alumni', [AlumniController::class, 'index'])->name('alumni.index');
+            Route::get('/alumni/{siswa_id}/buku-induk/cetak', [AlumniController::class, 'bukuIndukCetak'])->name('alumni.buku-induk.cetak');
+            Route::get('/alumni/{siswa_id}/buku-induk', [AlumniController::class, 'bukuInduk'])->name('alumni.buku-induk.show');
+            Route::get('/alumni/{siswa_id}/raport/{semester}/{tahun}/cetak', [AlumniController::class, 'raporCetak'])->name('alumni.raport.cetak');
+            Route::get('/alumni/{siswa_id}/raport/{semester}/{tahun}', [AlumniController::class, 'raporShow'])->name('alumni.raport.show');
+            Route::get('/alumni/{siswa_id}/raport', [AlumniController::class, 'raporList'])->name('alumni.raport.list');
             Route::get('/alumni/{tahun}/{jurusanId}', [AlumniController::class, 'byJurusan'])->name('alumni.by-jurusan');
             Route::get('/alumni/{id}', [AlumniController::class, 'show'])->where('id', '[0-9]+')->name('alumni.show');
         });
@@ -514,6 +525,14 @@ Route::middleware(['auth'])->group(function () {
 
             Route::get('/dashboard', [KurikulumDashboardController::class, 'index'])
                 ->name('dashboard');
+
+            // Data Pribadi (Kurikulum)
+            Route::get('/data-pribadi', [App\Http\Controllers\Kurikulum\DataPribadiController::class, 'index'])
+                ->name('data-pribadi.index');
+            Route::get('/data-pribadi/edit', [App\Http\Controllers\Kurikulum\DataPribadiController::class, 'edit'])
+                ->name('data-pribadi.edit');
+            Route::put('/data-pribadi', [App\Http\Controllers\Kurikulum\DataPribadiController::class, 'update'])
+                ->name('data-pribadi.update');
 
             // Guru management (Kurikulum)
             Route::get('/guru', [App\Http\Controllers\Kurikulum\GuruController::class, 'index'])
@@ -567,7 +586,20 @@ Route::middleware(['auth'])->group(function () {
 
             // Alumni (Kurikulum)
             Route::get('/alumni', [App\Http\Controllers\Kurikulum\AlumniController::class, 'index'])->name('alumni.index');
+            
+            // Buku Induk Alumni (lebih spesifik, harus di atas)
+            Route::get('/alumni/{siswa_id}/buku-induk/cetak', [App\Http\Controllers\Kurikulum\AlumniController::class, 'bukuIndukCetak'])->name('alumni.buku-induk.cetak');
+            Route::get('/alumni/{siswa_id}/buku-induk', [App\Http\Controllers\Kurikulum\AlumniController::class, 'bukuInduk'])->name('alumni.buku-induk.show');
+            
+            // Raport Alumni (lebih spesifik, harus di atas)
+            Route::get('/alumni/{siswa_id}/raport/{semester}/{tahun}/cetak', [App\Http\Controllers\Kurikulum\AlumniController::class, 'raporCetak'])->name('alumni.raport.cetak');
+            Route::get('/alumni/{siswa_id}/raport/{semester}/{tahun}', [App\Http\Controllers\Kurikulum\AlumniController::class, 'raporShow'])->name('alumni.raport.show');
+            Route::get('/alumni/{siswa_id}/raport', [App\Http\Controllers\Kurikulum\AlumniController::class, 'raporList'])->name('alumni.raport.list');
+            
+            // Alumni by Jurusan
             Route::get('/alumni/{tahun}/{jurusanId}', [App\Http\Controllers\Kurikulum\AlumniController::class, 'byJurusan'])->name('alumni.by-jurusan');
+            
+            // Alumni Show (paling umum, harus di bawah)
             Route::get('/alumni/{id}', [App\Http\Controllers\Kurikulum\AlumniController::class, 'show'])->where('id', '[0-9]+')->name('alumni.show');
 
             Route::get('/siswa', [KurikulumSiswaController::class, 'index'])
@@ -665,4 +697,18 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/kelulusan/rombel/{rombelId}/{tahun}', [KelulusanController::class, 'showRombel'])
                 ->name('kelulusan.rombel.show');
         });
+
+    // Debug route untuk cek nilai dan mata pelajaran
+    if (config('app.debug')) {
+        Route::get('/debug/nilai-raport', function() {
+            $nilaiCount = \App\Models\NilaiRaport::count();
+            $siswaCount = \App\Models\DataSiswa::count();
+            $mapelCount = \App\Models\MataPelajaran::count();
+            
+            $nilaiSample = \App\Models\NilaiRaport::with('mapel')->limit(5)->get();
+            $mapelWithoutKelompok = \App\Models\MataPelajaran::whereNull('kelompok')->orWhere('kelompok', '')->count();
+            
+            return view('debug.nilai-raport', compact('nilaiCount', 'siswaCount', 'mapelCount', 'nilaiSample', 'mapelWithoutKelompok'));
+        });
+    }
 });

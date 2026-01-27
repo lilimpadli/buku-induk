@@ -330,6 +330,10 @@
                                         <i class="fas fa-gauge"></i> <span class="label ms-2">Dashboard</span>
                                     </a>
 
+                                    <a href="{{ route('tu.data-pribadi.index') }}" class="nav-link {{ request()->routeIs('tu.data-pribadi*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Pribadi">
+                                        <i class="fas fa-id-card"></i> <span class="label ms-2">Data Pribadi</span>
+                                    </a>
+
                                     <a class="nav-link {{ request()->routeIs('tu.siswa*') ? 'active' : '' }}" href="{{ route('tu.siswa.index') }}" data-bs-toggle="tooltip" title="Data Siswa">
                                         <i class="fas fa-users"></i> <span class="label ms-2">Data Siswa</span>
                                     </a>
@@ -370,6 +374,10 @@
                                 @if(Auth::user()->role == 'kurikulum')
                                     <a href="{{ route('kurikulum.dashboard') }}" class="nav-link {{ request()->routeIs('kurikulum.dashboard') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Dashboard">
                                         <i class="fas fa-gauge"></i> <span class="label ms-2">Dashboard</span>
+                                    </a>
+
+                                    <a href="{{ route('kurikulum.data-pribadi.index') }}" class="nav-link {{ request()->routeIs('kurikulum.data-pribadi*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Pribadi">
+                                        <i class="fas fa-id-card"></i> <span class="label ms-2">Data Pribadi</span>
                                     </a>
 
                                     <a href="{{ route('kurikulum.kelas.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kelas*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Kelas">

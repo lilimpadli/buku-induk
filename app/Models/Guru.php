@@ -22,6 +22,7 @@ class Guru extends Model
         'jurusan_id',
         'kelas_id',
         'user_id',
+        'rombel_id',
     ];
 
     public function user()

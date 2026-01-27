@@ -2,6 +2,24 @@
 
 @section('title', 'Tambah Mutasi Siswa')
 
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container--default .select2-selection--single {
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+        height: auto;
+        padding: 0.375rem 0.75rem;
+    }
+    
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="container-fluid">
     <div class="row mb-4">
@@ -154,6 +172,7 @@
 </div>
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     function updateStatusFields() {
         const status = document.getElementById('status').value;
@@ -175,6 +194,13 @@
 
     // Jalankan saat halaman dimuat jika ada nilai yang dipilih
     document.addEventListener('DOMContentLoaded', function() {
+        // Inisialisasi Select2 untuk field siswa
+        $('#siswa_id').select2({
+            placeholder: '-- Pilih atau Ketik Nama Siswa --',
+            allowClear: true,
+            width: '100%'
+        });
+
         updateStatusFields();
         
         // Inisialisasi form validation

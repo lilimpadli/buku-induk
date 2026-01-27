@@ -93,4 +93,12 @@ class DataSiswa extends Model
     {
         return $this->belongsTo(Rombel::class);
     }
+
+    /* ================================
+     |  RELASI KENAIKAN KELAS
+     ================================= */
+    public function kenaikanKelas()
+    {
+        return $this->hasMany(KenaikanKelas::class, 'siswa_id');
+    }
 }

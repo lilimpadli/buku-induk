@@ -37,32 +37,45 @@ class KurikulumRaportController extends Controller
     {
         $siswa = DataSiswa::findOrFail($id);
 
-        $nilaiRaports = NilaiRaport::with('mapel')
+        // Konversi format tahun dari 2024-2025 ke 2024/2025
+        $tahun_ajaran = str_replace('-', '/', $tahun);
+
+        // Eager load mapel dengan relasi lainnya untuk menghindari N+1 query
+        $nilaiRaports = NilaiRaport::with(['mapel', 'siswa'])
             ->where('siswa_id', $id)
             ->where('semester', $semester)
-            ->where('tahun_ajaran', $tahun)
+            ->where('tahun_ajaran', $tahun_ajaran)
             ->orderBy('mata_pelajaran_id')
             ->get();
+        
+        // Debug: Log jika tidak ada nilai yang ditemukan
+        if ($nilaiRaports->isEmpty()) {
+            \Log::warning('No NilaiRaport found', [
+                'siswa_id' => $id,
+                'semester' => $semester,
+                'tahun_ajaran' => $tahun_ajaran
+            ]);
+        }
 
         $ekstra = EkstrakurikulerSiswa::where('siswa_id', $id)
             ->where('semester', $semester)
-            ->where('tahun_ajaran', $tahun)
+            ->where('tahun_ajaran', $tahun_ajaran)
             ->get();
 
         $kehadiran = Kehadiran::where('siswa_id', $id)
             ->where('semester', $semester)
-            ->where('tahun_ajaran', $tahun)
+            ->where('tahun_ajaran', $tahun_ajaran)
             ->first();
 
         $info = RaporInfo::where('siswa_id', $id)
             ->where('semester', $semester)
-            ->where('tahun_ajaran', $tahun)
+            ->where('tahun_ajaran', $tahun_ajaran)
             ->first();
 
         $kenaikan = KenaikanKelas::with('rombelTujuan')
             ->where('siswa_id', $id)
             ->where('semester', $semester)
-            ->where('tahun_ajaran', $tahun)
+            ->where('tahun_ajaran', $tahun_ajaran)
             ->first();
 
         return view('kurikulum.rapor.detail', compact(
