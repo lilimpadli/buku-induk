@@ -247,7 +247,7 @@ class AlumniController extends Controller
         $nilaiRaports = \App\Models\NilaiRaport::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
-            ->with(['mapel', 'kelas.jurusan'])
+            ->with(['mapel', 'kelas.jurusan', 'rombel'])
             ->get();
         
         // Ambil ekstrakurikuler

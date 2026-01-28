@@ -543,6 +543,9 @@ Route::middleware(['auth'])->group(function () {
                 ->name('guru.importForm');
             Route::post('/guru/import', [App\Http\Controllers\Kurikulum\GuruController::class, 'import'])
                 ->name('guru.import');
+            // Guru export (Excel)
+            Route::get('/guru/export', [App\Http\Controllers\Kurikulum\GuruController::class, 'exportExcel'])
+                ->name('guru.export');
 
             // Backwards-compatible "manage" routes used by views/controllers
             Route::prefix('guru/manage')->name('guru.manage.')->group(function () {

@@ -255,7 +255,7 @@
             <th width="30%">Nama Peserta Didik</th>
             <td>{{ strtoupper($siswa->nama_lengkap) }}</td>
             <th width="30%">Kelas</th>
-            <td>{{ $kelasHistory ? 'Kelas ' . $kelasHistory->tingkat . ' ' . $kelasHistory->jurusan->nama : '-' }}</td>
+            <td>{{ $nilaiRaports->first()?->rombel?->nama ?? ($kelasHistory ? 'Kelas ' . $kelasHistory->tingkat . ' ' . $kelasHistory->jurusan->nama : '-') }}</td>
         </tr>
         <tr>
             <th>NISN</th>

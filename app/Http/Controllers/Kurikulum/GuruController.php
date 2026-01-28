@@ -8,6 +8,7 @@ use App\Models\Guru;
 use App\Models\Jurusan;
 use App\Models\User;
 use App\Imports\GuruImport;
+use App\Exports\GuruExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class GuruController extends Controller
@@ -16,8 +17,15 @@ class GuruController extends Controller
    {
        $search = $request->query('search', '');
        $jurusan_id = $request->query('jurusan', '');
+       $role = $request->query('role', '');
 
        $allJurusans = Jurusan::orderBy('nama')->get();
+       
+       // Get all unique roles (guru, walikelas, kaprog) from users table
+       $allRoles = User::distinct('role')
+           ->whereIn('role', ['guru', 'walikelas', 'kaprog'])
+           ->pluck('role')
+           ->sort();
 
        $query = Guru::with(['rombels.kelas.jurusan', 'user'])
            ->orderBy('nama');
@@ -34,9 +42,15 @@ class GuruController extends Controller
            $query->where('jurusan_id', $jurusan_id);
        }
 
+       if (!empty($role)) {
+           $query->whereHas('user', function($q) use ($role) {
+               $q->where('role', $role);
+           });
+       }
+
        $gurus = $query->paginate(15)->withQueryString();
 
-       return view('kurikulum.guru.index', compact('gurus', 'allJurusans', 'jurusan_id', 'search'));
+       return view('kurikulum.guru.index', compact('gurus', 'allJurusans', 'jurusan_id', 'search', 'allRoles', 'role'));
    }
 
 
@@ -301,5 +315,13 @@ class GuruController extends Controller
             return redirect()->route('kurikulum.guru.importForm')
                 ->with('error', 'Error: ' . $e->getMessage());
         }
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $search = $request->query('search', '');
+        $jurusan_id = $request->query('jurusan', '');
+
+        return Excel::download(new GuruExport($search, $jurusan_id), 'gurus.xlsx');
     }
 }

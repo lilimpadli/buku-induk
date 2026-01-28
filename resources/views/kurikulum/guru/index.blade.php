@@ -225,6 +225,9 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="mb-3">Daftar Guru</h3>
         <div>
+            <a href="{{ route('kurikulum.guru.export', request()->only(['search','jurusan'])) }}" class="btn btn-outline-primary me-2">
+                <i class="fas fa-file-export"></i> Export Excel
+            </a>
             <a href="{{ route('kurikulum.guru.importForm') }}" class="btn btn-outline-secondary me-2">
                 <i class="fas fa-file-import"></i> Import Excel
             </a>
@@ -237,7 +240,7 @@
         <div class="card-body" style="background-color: #F8FAFC;">
             <form method="GET" action="{{ route('kurikulum.guru.index') }}" class="row g-3 align-items-end">
                 <!-- Search -->
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Cari Guru</label>
                     <div class="input-group">
                         <span class="input-group-text" style="background:white;border:1px solid #E2E8F0;"><i class="bi bi-search"></i></span>
@@ -246,7 +249,7 @@
                 </div>
 
                 <!-- Filter Jurusan -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Jurusan</label>
                     <select name="jurusan" class="form-select" style="border:1px solid #E2E8F0;">
                         <option value="">-- Semua Jurusan --</option>
@@ -258,8 +261,21 @@
                     </select>
                 </div>
 
+                <!-- Filter Role -->
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Role</label>
+                    <select name="role" class="form-select" style="border:1px solid #E2E8F0;">
+                        <option value="">-- Semua Role --</option>
+                        @foreach(($allRoles ?? collect()) as $r)
+                            <option value="{{ $r }}" {{ (isset($role) && $role == $r) ? 'selected' : '' }}>
+                                {{ ucfirst(str_replace('_', ' ', $r)) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <!-- Buttons -->
-                <div class="col-md-3 d-flex gap-2">
+                <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-search"></i> Cari
                     </button>
@@ -286,7 +302,12 @@
                             </div>
                             <div class="teacher-details">
                                 <strong>{{ $g->nama }}</strong>
-                             
+                                <small>{{ $g->nip }}</small>
+                                @if($g->user?->role)
+                                    <small style="color: #2F53FF; font-weight: 500;">
+                                        Role: {{ ucfirst(str_replace('_', ' ', $g->user->role)) }}
+                                    </small>
+                                @endif
                                 
                                 @if($g->rombels && $g->rombels->count())
                                     <div class="teacher-classes">
