@@ -209,48 +209,7 @@
         animation: fadeIn 0.5s ease-out;
     }
 
-    /* Pagination Styling - TAMBAHAN INI */
-    .pagination {
-        display: flex;
-        justify-content: center;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-    }
-    
-    .pagination .page-link {
-        position: relative;
-        display: block;
-        color: var(--primary-color);
-        text-decoration: none;
-        background-color: #fff;
-        border: 1px solid #dee2e6;
-        padding: 0.375rem 0.75rem;
-        margin: 0 2px;
-        border-radius: 0.25rem;
-        transition: all 0.3s ease;
-    }
-    
-    .pagination .page-link:hover {
-        z-index: 2;
-        color: #fff;
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-    }
-    
-    .pagination .page-item.active .page-link {
-        z-index: 3;
-        color: #fff;
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-    }
-    
-    .pagination .page-item.disabled .page-link {
-        color: #6c757d;
-        pointer-events: none;
-        background-color: #fff;
-        border-color: #dee2e6;
-    }
+
 
     /* Responsive */
     @media (max-width: 768px) {
@@ -272,12 +231,29 @@
             margin-left: 0;
             align-self: flex-start;
         }
+
+        .pagination {
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .pagination .page-link {
+            padding: 6px 10px;
+            min-width: 36px;
+            height: 36px;
+            font-size: 12px;
+        }
     }
 </style>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="mb-3">Daftar Siswa - Kaprog</h3>
+        @if(isset($jurusanId) && $jurusanId)
+        <a href="{{ route('kaprog.export.angkatan', $jurusanId) }}" class="btn btn-success">
+            <i class="fas fa-file-excel me-2"></i> Export Per Angkatan
+        </a>
+        @endif
     </div>
 
     <div class="mb-3">
@@ -327,9 +303,35 @@
     </div>
 
     @php
-        $siswas = collect();
-        foreach(['X','XI','XII'] as $t) {
-            $siswas = $siswas->merge($studentsByTingkat[$t] ?? collect());
+        // Merge paginated results from all tingkats
+        $currentTingkat = request()->query('tingkat', '');
+        
+        if ($currentTingkat && $currentTingkat !== 'all' && isset($studentsByTingkat[$currentTingkat])) {
+            $siswas = $studentsByTingkat[$currentTingkat];
+        } else {
+            // Combine all tingkats (take first 15)
+            $allSiswas = collect();
+            foreach(['X','XI','XII'] as $t) {
+                if ($studentsByTingkat[$t] instanceof \Illuminate\Pagination\Paginator || 
+                    $studentsByTingkat[$t] instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                    $allSiswas = $allSiswas->merge($studentsByTingkat[$t]->items());
+                } else {
+                    $allSiswas = $allSiswas->merge($studentsByTingkat[$t] ?? collect());
+                }
+            }
+            // Create a paginator for the merged collection
+            $perPage = 15;
+            $page = \Illuminate\Pagination\Paginator::resolveCurrentPage();
+            $siswas = new \Illuminate\Pagination\LengthAwarePaginator(
+                $allSiswas->forPage($page, $perPage)->values(),
+                $allSiswas->count(),
+                $perPage,
+                $page,
+                [
+                    'path' => request()->url(),
+                    'query' => request()->query(),
+                ]
+            );
         }
     @endphp
 
@@ -379,6 +381,12 @@
                     </a>
                 @endforeach
             </div>
+            
+            @if($siswas instanceof \Illuminate\Pagination\Paginator || $siswas instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                <div class="card-body" style="border-top: 1px solid #E2E8F0; text-align: center;">
+                    {{ $siswas->links('pagination::bootstrap-5') }}
+                </div>
+            @endif
         @else
             <div class="empty-state">
                 <i class="fas fa-user-graduate"></i>

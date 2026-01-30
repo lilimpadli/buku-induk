@@ -458,45 +458,11 @@
                     
                     <hr class="my-4">
                     
-                    <div class="announcement-section">
-                        <h6 class="mb-3 d-flex align-items-center">
-                            <i class="fas fa-bullhorn me-2 text-warning"></i> Pengumuman
-                        </h6>
-                        <div class="alert alert-warning" role="alert">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <small>Deadline input nilai raport semester genap: 30 Juni 2023</small>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
             
-            <!-- Summary Card -->
-            <div class="card summary-card fade-in" style="animation-delay: 0.7s;">
-                <div class="card-body">
-                    <h6 class="mb-4 d-flex align-items-center">
-                        <i class="fas fa-chart-pie me-2 text-primary"></i> Ringkasan Rombel
-                    </h6>
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div class="summary-item">
-                            <div class="summary-number">{{ number_format($total ?? 0) }}</div>
-                            <div class="small text-muted">Total siswa</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-number text-primary">{{ $male ?? 0 }}</div>
-                            <div class="small text-muted"><i class="fas fa-male"></i> Laki-laki</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-number text-danger">{{ $female ?? 0 }}</div>
-                            <div class="small text-muted"><i class="fas fa-female"></i> Perempuan</div>
-                        </div>
-                    </div>
-                    
-                    <div class="progress" style="height: 8px;">
-                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ $malePct ?? 50 }}%"></div>
-                        <div class="progress-bar bg-danger" role="progressbar" style="width: {{ $femalePct ?? 50 }}%"></div>
-                    </div>
-                </div>
-            </div>
+            
         </div>
     </div>
 </div>

@@ -244,7 +244,13 @@
                 <h5 class="mb-0">{{ $rombel->nama }}</h5>
                 <small class="text-muted">Kelas: {{ $rombel->kelas->tingkat ?? '-' }} - Jurusan: {{ $rombel->kelas->jurusan->nama ?? '-' }}</small>
             </div>
-            <a href="{{ route('kaprog.kelas.index') }}" class="btn btn-secondary btn-sm">Kembali</a>
+            <div>
+                <a href="{{ route('kaprog.export.rombel', $rombel->id) }}" class="btn btn-success btn-sm me-2" title="Export siswa rombel ini">
+                    <i class="fas fa-file-excel me-1"></i> Export Rombel
+                </a>
+                
+                <a href="{{ route('kaprog.kelas.index') }}" class="btn btn-secondary btn-sm">Kembali</a>
+            </div>
         </div>
     </div>
 

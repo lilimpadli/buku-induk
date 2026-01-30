@@ -17,6 +17,12 @@ use App\Models\NilaiRaport;
 use App\Models\EkstrakurikulerSiswa;
 use App\Models\Kehadiran;
 use App\Models\RaporInfo;
+use App\Models\KenaikanKelas;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\KaprogSiswaByRombelExport;
+use App\Exports\KaprogSiswaByJurusanExport;
+use App\Exports\KaprogSiswaByAngkatanExport;
 
 class KaprogController extends Controller
 {
@@ -169,7 +175,7 @@ class KaprogController extends Controller
                 });
             }
 
-            $byTingkat[$t] = $q->orderBy('nama_lengkap')->get();
+            $byTingkat[$t] = $q->orderBy('nama_lengkap')->paginate(15);
         }
 
         return view('kaprog.siswa.index', [
@@ -177,7 +183,8 @@ class KaprogController extends Controller
             'search' => $search,
             'filterTingkat' => $filterTingkat,
             'filterRombel' => $filterRombel,
-            'allRombels' => $allRombels
+            'allRombels' => $allRombels,
+            'jurusanId' => $jurusanId
         ]);
     }
 
@@ -326,5 +333,158 @@ class KaprogController extends Controller
         $user->save();
 
         return redirect()->route('kaprog.datapribadi.index')->with('success', 'Data diri berhasil diperbarui.');
+    }
+
+    // Cetak raport PDF untuk kaprog
+    public function cetakRaport($siswaId, $semester, $tahun)
+    {
+        // Normalize tahun parameter
+        $tahun = str_replace('-', '/', $tahun);
+
+        $siswa = DataSiswa::findOrFail($siswaId);
+
+        // Cek akses
+        $user = Auth::user();
+        $guru = Guru::where('user_id', $user->id)->first();
+        if ($guru && $guru->jurusan_id && (!$siswa->rombel || $siswa->rombel->kelas->jurusan_id != $guru->jurusan_id)) {
+            abort(403);
+        }
+
+        // Validasi semester
+        if (!in_array($semester, ['Ganjil', 'Genap'])) {
+            return redirect()->back()->with('error', 'Semester tidak valid');
+        }
+
+        // Get nilai raport
+        $nilaiRaports = NilaiRaport::with('mapel')
+            ->where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->orderBy('mata_pelajaran_id')
+            ->get();
+
+        if ($nilaiRaports->isEmpty()) {
+            return redirect()->back()->with('error', 'Data raport tidak ditemukan');
+        }
+
+        // Get ekstra, kehadiran, info, kenaikan
+        $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->get();
+
+        $kehadiran = Kehadiran::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        $info = RaporInfo::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        $kenaikan = KenaikanKelas::with('rombelTujuan')
+            ->where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        // Load PDF view
+        $pdf = Pdf::loadView('kaprog.siswa.pdf', compact(
+            'siswa',
+            'semester',
+            'tahun',
+            'nilaiRaports',
+            'ekstra',
+            'kehadiran',
+            'info',
+            'kenaikan'
+        ))->setPaper('A4', 'portrait');
+
+        // Sanitize filename
+        $safeName = str_replace(['\\', '/'], '-', $siswa->nama_lengkap);
+        $safeTahun = str_replace(['\\', '/'], '-', $tahun);
+        $filename = 'Raport - ' . $safeName . ' - ' . $semester . ' - ' . $safeTahun . '.pdf';
+
+        return $pdf->stream($filename);
+    }
+
+    // Export siswa per rombel ke Excel
+    public function exportSiswaByRombel($rombelId)
+    {
+        $rombel = Rombel::with('kelas.jurusan')->findOrFail($rombelId);
+
+        // Cek akses
+        $user = Auth::user();
+        $guru = Guru::where('user_id', $user->id)->first();
+        if ($guru && $guru->jurusan_id && $rombel->kelas->jurusan_id != $guru->jurusan_id) {
+            abort(403);
+        }
+
+        $filename = 'Data Siswa - Rombel ' . $rombel->nama . '.xlsx';
+
+        return Excel::download(
+            new KaprogSiswaByRombelExport($rombelId, $rombel->nama),
+            $filename
+        );
+    }
+
+    // Export siswa per jurusan ke Excel
+    public function exportSiswaByJurusan($jurusanId)
+    {
+        $jurusan = Jurusan::findOrFail($jurusanId);
+
+        // Cek akses
+        $user = Auth::user();
+        $guru = Guru::where('user_id', $user->id)->first();
+        if ($guru && $guru->jurusan_id && $guru->jurusan_id != $jurusanId) {
+            abort(403);
+        }
+
+        $filename = 'Data Siswa - Jurusan ' . $jurusan->nama . '.xlsx';
+
+        return Excel::download(
+            new KaprogSiswaByJurusanExport($jurusanId, $jurusan->nama),
+            $filename
+        );
+    }
+
+    // Export semua siswa per angkatan (multiple sheets)
+    public function exportSiswaByAngkatan($jurusanId)
+    {
+        $jurusan = Jurusan::findOrFail($jurusanId);
+
+        // Cek akses
+        $user = Auth::user();
+        $guru = Guru::where('user_id', $user->id)->first();
+        if ($guru && $guru->jurusan_id && $guru->jurusan_id != $jurusanId) {
+            abort(403);
+        }
+
+        $filename = 'Data Siswa Per Angkatan - ' . $jurusan->nama . '.xlsx';
+
+        return Excel::download(
+            new KaprogSiswaByAngkatanExport($jurusanId, $jurusan->nama),
+            $filename
+        );
+    }
+
+    // Export data diri siswa ke PDF
+    public function exportDataDiri($siswaId)
+    {
+        $siswa = DataSiswa::with(['rombel.kelas.jurusan', 'ayah', 'ibu', 'wali'])->findOrFail($siswaId);
+
+        // Cek akses
+        $user = Auth::user();
+        $guru = Guru::where('user_id', $user->id)->first();
+        if ($guru && $guru->jurusan_id && (!$siswa->rombel || $siswa->rombel->kelas->jurusan_id != $guru->jurusan_id)) {
+            abort(403);
+        }
+
+        $pdf = Pdf::loadView('kaprog.siswa.cetak', compact('siswa'))->setPaper('A4', 'portrait');
+
+        $filename = 'Data Diri - ' . str_replace(['\\', '/'], '-', $siswa->nama_lengkap) . '.pdf';
+
+        return $pdf->stream($filename);
     }
 }

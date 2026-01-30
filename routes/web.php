@@ -283,6 +283,10 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/siswa', [WaliKelasSiswaController::class, 'index'])
                 ->name('siswa.index');
 
+            // Export data siswa (Excel)
+            Route::get('/siswa/export-excel', [WaliKelasSiswaController::class, 'exportExcel'])
+                ->name('siswa.exportExcel');
+
             Route::get('/siswa/{id}', [WaliKelasSiswaController::class, 'show'])
                 ->name('siswa.show');
 
@@ -390,9 +394,15 @@ Route::middleware(['auth'])->group(function () {
             // Daftar siswa (kaprog)
             Route::get('/siswa', [KaprogController::class, 'siswaIndex'])->name('siswa.index');
             Route::get('/siswa/{id}', [KaprogController::class, 'show'])->name('siswa.show');
+            Route::get('/siswa/{id}/export-data-diri', [KaprogController::class, 'exportDataDiri'])->name('siswa.export-data-diri');
             // Raport siswa untuk kaprog
             Route::get('/raport/siswa', [KaprogController::class, 'raportSiswa'])->name('raport.siswa');
             Route::get('/raport/siswa/{siswaId}/{semester}/{tahun}', [KaprogController::class, 'raportShow'])->name('raport.show');
+            Route::get('/raport/siswa/{siswaId}/{semester}/{tahun}/cetak', [KaprogController::class, 'cetakRaport'])->name('raport.cetak');
+            // Export siswa per rombel dan jurusan
+            Route::get('/export/rombel/{rombelId}', [KaprogController::class, 'exportSiswaByRombel'])->name('export.rombel');
+            Route::get('/export/jurusan/{jurusanId}', [KaprogController::class, 'exportSiswaByJurusan'])->name('export.jurusan');
+            Route::get('/export/angkatan/{jurusanId}', [KaprogController::class, 'exportSiswaByAngkatan'])->name('export.angkatan');
         });
 
     // Raport list for kaprog (simple view)

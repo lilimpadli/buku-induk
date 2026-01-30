@@ -228,6 +228,7 @@
         </select>
         <button class="btn btn-primary" type="submit">Filter</button>
         <a href="{{ route('walikelas.siswa.index') }}" class="btn btn-outline-secondary">Reset</a>
+        <a href="{{ route('walikelas.siswa.exportExcel') }}" class="btn btn-success">Export Excel</a>
     </form>
 
     <div class="card shadow">

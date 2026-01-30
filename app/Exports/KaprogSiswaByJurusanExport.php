@@ -9,15 +9,15 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 
-class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSize, WithEvents
+class KaprogSiswaByJurusanExport implements FromCollection, WithHeadings, ShouldAutoSize, WithEvents
 {
-    protected $rombelsIds;
-    protected $kelasName;
+    protected $jurusanId;
+    protected $jurusanName;
 
-    public function __construct(array $rombelsIds = [], $kelasName = 'X RPL 2')
+    public function __construct($jurusanId, $jurusanName = 'All')
     {
-        $this->rombelsIds = $rombelsIds;
-        $this->kelasName = $kelasName;
+        $this->jurusanId = $jurusanId;
+        $this->jurusanName = $jurusanName;
     }
 
     /**
@@ -25,13 +25,12 @@ class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSi
      */
     public function collection()
     {
-        $query = DataSiswa::query()->with('rombel');
-
-        if (!empty($this->rombelsIds)) {
-            $query->whereIn('rombel_id', $this->rombelsIds);
-        }
-
-        $students = $query->orderBy('nama_lengkap')->get();
+        $students = DataSiswa::with('rombel.kelas.jurusan')
+            ->whereHas('rombel.kelas', function ($q) {
+                $q->where('jurusan_id', $this->jurusanId);
+            })
+            ->orderBy('nama_lengkap')
+            ->get();
         
         $rows = $students->map(function ($s, $k) {
             $tempatTanggalLahir = '';
@@ -41,14 +40,20 @@ class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSi
             } elseif ($s->tempat_lahir) {
                 $tempatTanggalLahir = $s->tempat_lahir;
             } elseif ($s->tanggal_lahir) {
-                $tempatTanggalLahir = \Carbon\Carbon::parse($s->tanggal_lahir)->format('d-m-Y');
+                $tanggal = \Carbon\Carbon::parse($s->tanggal_lahir)->format('d-m-Y');
+                $tempatTanggalLahir = $tanggal;
             }
+
+            $kelas = optional(optional($s->rombel)->kelas)->tingkat ?? '-';
+            $rombel = optional($s->rombel)->nama ?? '-';
 
             return [
                 'No' => $k + 1,
                 'NIS' => $s->nis ?? '',
                 'NISN' => $s->nisn,
                 'Nama' => $s->nama_lengkap,
+                'Kelas' => $kelas,
+                'Rombel' => $rombel,
                 'JK' => $s->jenis_kelamin,
                 'TTL' => $tempatTanggalLahir,
             ];
@@ -60,6 +65,8 @@ class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSi
             'NIS' => '',
             'NISN' => '',
             'Nama' => 'JUMLAH',
+            'Kelas' => '',
+            'Rombel' => '',
             'JK' => '',
             'TTL' => $students->count(),
         ]);
@@ -70,7 +77,7 @@ class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSi
     public function headings(): array
     {
         return [
-            'No', 'NIS', 'NISN', 'Nama', 'JK', 'Tempat Lahir, Tanggal Lahir'
+            'No', 'NIS', 'NISN', 'Nama', 'Kelas', 'Rombel', 'JK', 'Tempat Lahir, Tanggal Lahir'
         ];
     }
 
@@ -87,25 +94,23 @@ class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSi
                 $sheet->insertNewRowBefore(1, 1);
                 
                 // Add title
-                $sheet->mergeCells('A1:F1');
-                $sheet->setCellValue('A1', 'DATA SISWA KELAS ' . $this->kelasName);
+                $sheet->mergeCells('A1:H1');
+                $sheet->setCellValue('A1', 'DATA SISWA JURUSAN ' . $this->jurusanName);
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(12);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle('A1')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
                 $sheet->getRowDimension(1)->setRowHeight(25);
                 
                 // Apply styling to headers (now at row 2)
-                $sheet->getStyle('A2:F2')->getFont()->setBold(true);
-                $sheet->getStyle('A2:F2')->getFill()
+                $sheet->getStyle('A2:H2')->getFont()->setBold(true);
+                $sheet->getStyle('A2:H2')->getFill()
                     ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                    ->getStartColor()->setARGB('FFDDDDDD');
+                    ->setStartColor(new \PhpOffice\PhpSpreadsheet\Style\Color('DDDDDD'));
                 
-                // Style the total row
+                // Add borders to all cells with data
                 $highestRow = $sheet->getHighestRow();
-                $sheet->getStyle('A' . $highestRow . ':F' . $highestRow)->getFont()->setBold(true);
-                
-                // Add borders to the table (from headers to last row)
-                $sheet->getStyle('A2:F' . $highestRow)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                $highestColumn = $sheet->getHighestColumn();
+                $sheet->getStyle('A2:' . $highestColumn . $highestRow)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
             },
         ];
     }

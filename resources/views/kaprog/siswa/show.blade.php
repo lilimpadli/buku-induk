@@ -351,6 +351,9 @@
             </div>
             <div class="d-flex gap-2">
                 <a href="{{ route('kaprog.raport.siswa') }}?siswa_id={{ $siswa->id }}" class="btn btn-primary btn-sm">Lihat Raport</a>
+                <a href="{{ route('kaprog.siswa.export-data-diri', $siswa->id) }}" class="btn btn-success btn-sm" target="_blank">
+                    <i class="fas fa-file-pdf me-1"></i> Export Data Diri
+                </a>
                 <a href="{{ route('kaprog.siswa.index') }}" class="btn btn-secondary btn-sm">Kembali</a>
             </div>
         </div>

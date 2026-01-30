@@ -4,28 +4,29 @@
     <meta charset="utf-8">
     <title>Raport Siswa</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 12px; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .title { font-size: 16px; font-weight: bold; margin-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        table, th, td { border: 1px solid black; padding: 5px; }
+        body { font-family: Arial, sans-serif; font-size: 11px; margin: 10px; }
+        .header { text-align: center; margin-bottom: 15px; }
+        .title { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 10px; page-break-inside: avoid; }
+        table, th, td { border: 1px solid black; padding: 3px; }
         th { background-color: #f2f2f2; text-align: center; }
-        .section-title { font-weight: bold; margin-top: 15px; margin-bottom: 5px; }
-        .signature { margin-top: 50px; text-align: center; }
+        .section-title { font-weight: bold; margin-top: 8px; margin-bottom: 3px; font-size: 11px; }
+        .signature { margin-top: 20px; text-align: center; page-break-before: always; }
+        tbody tr { height: 18px; }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="title">RAPOR PESERTA DIDIK</div>
-        <div>SMK NEGERI 1 X</div>
+        <div style="font-size: 10px;">SMK NEGERI 1 X</div>
     </div>
 
-    <table>
+    <table style="margin-bottom: 15px;">
         <tr>
-            <th width="25%">Nama Peserta Didik</th>
-            <td width="25%">{{ strtoupper($siswa->nama_lengkap) }}</td>
-            <th width="25%">Kelas</th>
-            <td width="25%">{{ $siswa->rombel->nama ?? '-' }}</td>
+            <th width="20%">Nama Peserta Didik</th>
+            <td width="30%">{{ strtoupper($siswa->nama_lengkap) }}</td>
+            <th width="20%">Kelas</th>
+            <td width="30%">{{ $siswa->rombel->nama ?? '-' }}</td>
         </tr>
         <tr>
             <th>NISN</th>
@@ -47,8 +48,8 @@
             <tr>
                 <th width="5%">No</th>
                 <th width="40%">Mata Pelajaran</th>
-                <th width="15%">Nilai Akhir</th>
-                <th width="40%">Capaian Kompetensi</th>
+                <th width="12%">Nilai</th>
+                <th width="43%">Capaian Kompetensi</th>
             </tr>
         </thead>
         <tbody>
@@ -56,7 +57,7 @@
                 <tr>
                     <td>{{ $n->mapel->urutan }}</td>
                     <td>{{ $n->mapel->nama }}</td>
-                    <td>{{ $n->nilai_akhir }}</td>
+                    <td style="text-align: center;">{{ $n->nilai_akhir }}</td>
                     <td>{{ $n->deskripsi }}</td>
                 </tr>
             @endforeach
@@ -69,8 +70,8 @@
             <tr>
                 <th width="5%">No</th>
                 <th width="40%">Mata Pelajaran</th>
-                <th width="15%">Nilai Akhir</th>
-                <th width="40%">Capaian Kompetensi</th>
+                <th width="12%">Nilai</th>
+                <th width="43%">Capaian Kompetensi</th>
             </tr>
         </thead>
         <tbody>
@@ -78,7 +79,7 @@
                 <tr>
                     <td>{{ $n->mapel->urutan }}</td>
                     <td>{{ $n->mapel->nama }}</td>
-                    <td>{{ $n->nilai_akhir }}</td>
+                    <td style="text-align: center;">{{ $n->nilai_akhir }}</td>
                     <td>{{ $n->deskripsi }}</td>
                 </tr>
             @endforeach
@@ -90,9 +91,9 @@
         <thead>
             <tr>
                 <th width="5%">No</th>
-                <th width="30%">Nama Ekstrakurikuler</th>
-                <th width="15%">Predikat</th>
-                <th width="50%">Keterangan</th>
+                <th width="35%">Ekstrakurikuler</th>
+                <th width="12%">Predikat</th>
+                <th width="48%">Keterangan</th>
             </tr>
         </thead>
         <tbody>
@@ -100,7 +101,7 @@
                 <tr>
                     <td>{{ $i + 1 }}</td>
                     <td>{{ $e->nama_ekstra }}</td>
-                    <td>{{ $e->predikat ?? '-' }}</td>
+                    <td style="text-align: center;">{{ $e->predikat ?? '-' }}</td>
                     <td>{{ $e->keterangan ?? '-' }}</td>
                 </tr>
             @empty
@@ -112,9 +113,9 @@
     </table>
 
     <div class="section-title">D. Ketidakhadiran</div>
-    <table style="width: 50%">
+    <table style="width: 40%; margin-bottom: 20px;">
         <tr>
-            <th width="30%">Sakit</th>
+            <th width="40%">Sakit</th>
             <td>{{ $kehadiran->sakit ?? 0 }} hari</td>
         </tr>
         <tr>
@@ -128,18 +129,18 @@
     </table>
 
     <div class="signature">
-        <div style="display: flex; justify-content: space-between;">
+        <div style="display: flex; justify-content: space-between; font-size: 10px;">
             <div style="width: 45%; text-align: center;">
-                <p>Wali Kelas</p>
-                <br><br><br>
-                <b>{{ $info->wali_kelas ?? '-' }}</b><br>
-                NIP. {{ $info->nip_wali ?? '-' }}
+                <p style="margin: 5px 0;">Wali Kelas</p>
+                <br><br>
+                <b style="font-size: 9px;">{{ $info->wali_kelas ?? '-' }}</b><br>
+                <span style="font-size: 9px;">NIP. {{ $info->nip_wali ?? '-' }}</span>
             </div>
             <div style="width: 45%; text-align: center;">
-                <p>Kepala Sekolah</p>
-                <br><br><br>
-                <b>{{ $info->kepala_sekolah ?? '-' }}</b><br>
-                NIP. {{ $info->nip_kepsek ?? '-' }}
+                <p style="margin: 5px 0;">Kepala Sekolah</p>
+                <br><br>
+                <b style="font-size: 9px;">{{ $info->kepala_sekolah ?? '-' }}</b><br>
+                <span style="font-size: 9px;">NIP. {{ $info->nip_kepsek ?? '-' }}</span>
             </div>
         </div>
     </div>

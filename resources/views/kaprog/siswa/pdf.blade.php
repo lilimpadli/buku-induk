@@ -155,7 +155,7 @@
     @foreach($ekstra as $i => $e)
     <tr>
         <td align="center">{{ $i+1 }}</td>
-        <td>{{ $e->nama_ekstra }}</td>
+        <td>{{ $e->nama_ekstra ?? '-' }}</td>
         <td>{{ $e->keterangan ?? '-' }}</td>
     </tr>
     @endforeach

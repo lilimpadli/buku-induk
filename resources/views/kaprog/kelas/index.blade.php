@@ -206,7 +206,10 @@
                             </div>
 
                             <div class="text-end">
-                                <a href="{{ route('kaprog.kelas.show', $r->id) }}" class="btn btn-sm btn-primary rounded-pill">Detail</a>
+                                <a href="{{ route('kaprog.kelas.show', $r->id) }}" class="btn btn-sm btn-primary rounded-pill me-2">Detail</a>
+                                <a href="{{ route('kaprog.export.rombel', $r->id) }}" class="btn btn-sm btn-success rounded-pill" title="Export Excel">
+                                    <i class="fas fa-download"></i>
+                                </a>
                             </div>
                         </div>
                     </div>

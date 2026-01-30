@@ -193,9 +193,14 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4>Raport Siswa: {{ $siswa->nama_lengkap }}</h4>
-        <a href="{{ route('kaprog.raport.siswa', ['siswa_id' => $siswa->id]) }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Kembali
-        </a>
+        <div>
+            <a href="{{ route('kaprog.raport.siswa', ['siswa_id' => $siswa->id]) }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
+            <a href="{{ route('kaprog.raport.cetak', ['siswaId' => $siswa->id, 'semester' => $semester, 'tahun' => str_replace('/', '-', $tahun)]) }}" class="btn btn-primary" target="_blank">
+                <i class="fas fa-file-pdf"></i> Cetak PDF
+            </a>
+        </div>
     </div>
 
     <p class="text-muted">Semester {{ $semester }} - Tahun Ajaran {{ $tahun }}</p>
@@ -287,7 +292,7 @@
             @forelse($ekstra as $i => $e)
                 <tr>
                     <td class="text-center">{{ $i + 1 }}</td>
-                    <td>{{ $e->kegiatan }}</td>
+                    <td>{{ $e->nama_ekstra }}</td>
                     <td class="text-center">{{ $e->nilai ?? '-' }}</td>
                     <td>{{ $e->keterangan ?? '-' }}</td>
                 </tr>

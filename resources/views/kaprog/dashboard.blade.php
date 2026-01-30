@@ -4,396 +4,444 @@
 
 @section('content')
 <style>
-    /* ===================== STYLE DASHBOARD KAPROG ===================== */
-    
+    /* ===================== DASHBOARD STYLES ===================== */
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --info-color: #3B82F6;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #13B497 0%, #59D4A4 100%);
+        --danger-gradient: linear-gradient(135deg, #F093FB 0%, #F5576C 100%);
+        --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        --dark-gradient: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --card-hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        --text-primary: #2d3748;
+        --text-secondary: #718096;
+        --bg-light: #f7fafc;
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
-        background-color: var(--light-bg);
+        background-color: var(--bg-light);
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: var(--text-primary);
     }
 
-    h5.fw-bold {
-        font-size: 24px;
-        color: #1E293B;
+    /* Header Styles */
+    .dashboard-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 2rem 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+        box-shadow: var(--card-shadow);
         position: relative;
-        padding-left: 15px;
-        margin-bottom: 8px !important;
+        overflow: hidden;
     }
 
-    h5.fw-bold::before {
+    .dashboard-header::before {
         content: "";
         position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 4px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 2px;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(100px, -100px);
+    }
+
+    .dashboard-header h2 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .dashboard-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        position: relative;
+        z-index: 1;
     }
 
     /* Card Styles */
-    .card {
-        border-radius: 16px;
+    .stat-card {
+        border-radius: var(--border-radius);
         border: none;
         box-shadow: var(--card-shadow);
+        transition: var(--transition);
         overflow: hidden;
-        transition: all 0.3s ease;
-        margin-bottom: 1.5rem;
+        position: relative;
+        height: 100%;
     }
 
-    .card:hover {
-        box-shadow: var(--hover-shadow);
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-hover-shadow);
     }
 
-    .card.border-0 {
-        border: none !important;
+    .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: var(--primary-gradient);
     }
 
-    .card.shadow-sm {
-        box-shadow: var(--card-shadow);
+    .stat-card.success::before {
+        background: var(--success-gradient);
     }
 
-    .card-body {
-        padding: 1.5rem;
+    .stat-card.danger::before {
+        background: var(--danger-gradient);
     }
 
-    .card-body.text-center.py-4 {
-        padding: 1.5rem !important;
+    .stat-card.info::before {
+        background: var(--info-gradient);
     }
 
-    /* Stats Cards */
-    h2.fw-bold {
-        font-size: 2.2rem;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 0 !important;
+    .stat-card.warning::before {
+        background: var(--warning-gradient);
     }
 
-    /* Form Styles */
-    .form-control {
-        border-radius: 8px;
-        border: 1px solid #E2E8F0;
-        padding: 10px 12px;
-        font-size: 14px;
-        transition: all 0.2s ease;
+    .stat-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        transition: var(--transition);
     }
 
-    .form-control:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(47, 83, 255, 0.1);
+    .stat-card:hover .stat-icon {
+        transform: scale(1.1);
     }
 
-    .input-group .btn {
-        border-radius: 0 8px 8px 0;
+    .stat-icon.primary {
+        background: var(--primary-gradient);
+    }
+
+    .stat-icon.success {
+        background: var(--success-gradient);
+    }
+
+    .stat-icon.danger {
+        background: var(--danger-gradient);
+    }
+
+    .stat-icon.info {
+        background: var(--info-gradient);
+    }
+
+    .stat-icon.warning {
+        background: var(--warning-gradient);
     }
 
     /* Button Styles */
-    .btn {
-        border-radius: 8px;
+    .btn-gradient {
+        background: var(--primary-gradient);
+        border: none;
+        color: white;
         font-weight: 600;
-        padding: 0.5rem 1.2rem;
-        transition: all 0.2s ease;
+        padding: 0.6rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
     }
 
-    .btn:hover {
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        color: white;
+    }
+
+    .btn-outline-gradient {
+        background: transparent;
+        border: 2px solid;
+        border-image: var(--primary-gradient) 1;
+        color: #667eea;
+        font-weight: 600;
+        padding: 0.6rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+    }
+
+    .btn-outline-gradient:hover {
+        background: var(--primary-gradient);
+        color: white;
         transform: translateY(-2px);
     }
 
-    .btn-primary {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
+    /* List Group Styles */
+    .student-list {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     }
 
-    .btn-primary:hover {
-        background-color: var(--secondary-color);
-        border-color: var(--secondary-color);
+    .student-item {
+        border: none;
+        border-radius: 12px !important;
+        margin-bottom: 12px;
+        padding: 16px;
+        transition: var(--transition);
+        background-color: white;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
     }
 
-    .btn-outline-secondary {
-        color: #64748B;
-        border-color: #E2E8F0;
-    }
-
-    .btn-outline-secondary:hover {
-        background-color: #F1F5F9;
-        border-color: #CBD5E1;
-    }
-
-    .btn-link {
-        text-decoration: none;
-        font-weight: 600;
-    }
-
-    .btn-link.text-primary {
-        color: var(--primary-color);
+    .student-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
 
     /* Table Styles */
+    .table-container {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        background: white;
+    }
+
     .table {
         margin-bottom: 0;
     }
 
-    .table-hover > tbody > tr:hover {
-        background-color: rgba(47, 83, 255, 0.03);
+    .table-hover tbody tr:hover {
+        background-color: rgba(102, 126, 234, 0.05);
     }
 
     .table thead th {
-        border-bottom: 2px solid #E2E8F0;
-        color: #475569;
+        background-color: #f7fafc;
+        border-bottom: 2px solid #e2e8f0;
+        color: var(--text-primary);
         font-weight: 600;
-        font-size: 14px;
-        padding: 12px 15px;
+        padding: 12px 16px;
     }
 
-    .table td, .table th {
-        border-color: #E2E8F0;
-        padding: 12px 15px;
-    }
-
-    /* Chart Container */
-    .chart-container {
-        position: relative;
-        height: 300px;
-        width: 100%;
-    }
-
-    /* Modal Styles */
-    .modal-content {
-        border-radius: 16px;
-        border: none;
-    }
-
-    .modal-header {
-        border-bottom: 1px solid #E2E8F0;
-        padding: 1.5rem;
-    }
-
-    .modal-body {
-        padding: 1.5rem;
-    }
-
-    .img-fluid.rounded {
-        border-radius: 12px;
-        border: 3px solid white;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Text Styles */
-    .text-muted {
-        color: #64748B !important;
-    }
-
-    small.text-muted {
-        font-size: 13px;
+    .table td {
+        padding: 12px 16px;
+        border-color: #e2e8f0;
     }
 
     /* Animations */
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
+        from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
-    .card {
-        animation: fadeIn 0.5s ease-out;
+    .fade-in {
+        animation: fadeIn 0.6s ease-out;
     }
 
     /* Responsive */
     @media (max-width: 768px) {
-        h5.fw-bold {
+        .dashboard-header {
+            padding: 1.5rem 1rem;
+        }
+        
+        .dashboard-header h2 {
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon {
+            width: 56px;
+            height: 56px;
             font-size: 20px;
-        }
-        
-        .card-body {
-            padding: 1.25rem;
-        }
-        
-        .btn {
-            padding: 0.4rem 1rem;
-            font-size: 14px;
-        }
-        
-        .form-control {
-            padding: 8px 10px;
-        }
-        
-        .table thead th,
-        .table td, .table th {
-            padding: 8px 10px;
-            font-size: 13px;
-        }
-        
-        .chart-container {
-            height: 250px;
         }
     }
 </style>
 
-<div class="d-flex justify-content-between align-items-start mb-3">
-    <div>
-        <h5 class="fw-bold mb-2">Dashboard Program Keahlian</h5>
-        <p class="mb-1">Selamat Datang, <strong>{{ Auth::user()->name }}</strong></p>
-        <p class="text-muted small mb-0">{{ $jurusan ? 'Program Keahlian: ' . $jurusan->nama : 'Program Keahlian: -' }}</p>
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="dashboard-header fade-in">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h2 class="mb-1">Halo, Program Keahlian 👋</h2>
+                <div class="text-muted">Ringkasan program keahlian dan siswa — cepat, informatif, dan responsif</div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ route('kaprog.siswa.index') }}" class="btn btn-outline-gradient">Kelola Siswa</a>
+                <a href="{{ route('kaprog.guru.index') }}" class="btn btn-gradient">Kelola Guru</a>
+            </div>
+        </div>
     </div>
-    <div class="text-end">
-        <small class="text-muted">Ringkasan per jurusan</small>
-    </div>
-</div>
 
-<div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center py-4">
-                <p class="text-muted small mb-2">Total Siswa</p>
-                <h2 class="fw-bold mb-0" style="font-size: 2.2rem;">{{ $totalSiswa }}</h2>
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-3 col-md-6 fade-in" style="animation-delay: 0.1s;">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon primary me-3">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Total Siswa</div>
+                            <div class="h4 mb-0">{{ $totalSiswa ?? 0 }}</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-   
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center py-4">
-                <p class="text-muted small mb-2">Jumlah Guru</p>
-                <h2 class="fw-bold mb-0" style="font-size: 2.2rem;">{{ $totalGuru }}</h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center py-4">
-                <p class="text-muted small mb-2">Jumlah Rombel</p>
-                <h2 class="fw-bold mb-0" style="font-size: 2.2rem;">{{ $totalRombel ?? 0 }}</h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center py-4">
-                <p class="text-muted small mb-2">Kelas Aktif</p>
-                <h2 class="fw-bold mb-0" style="font-size: 2.2rem;">{{ $totalKelasAktif ?? 3 }}</h2>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Chart Row -->
-<div class="row mb-4">
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <h6 class="fw-bold mb-3">Distribusi Siswa per Kelas</h6>
-                <div class="chart-container">
-                    <canvas id="kelasChart"></canvas>
+        <div class="col-lg-3 col-md-6 fade-in" style="animation-delay: 0.2s;">
+            <div class="card stat-card success h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon success me-3">
+                            <i class="fas fa-chalkboard-user"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Total Guru</div>
+                            <div class="h4 mb-0">{{ $totalGuru ?? 0 }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 fade-in" style="animation-delay: 0.3s;">
+            <div class="card stat-card info h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon info me-3">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Total Rombel</div>
+                            <div class="h4 mb-0">{{ $totalRombel ?? 0 }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 fade-in" style="animation-delay: 0.4s;">
+            <div class="card stat-card warning h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon warning me-3">
+                            <i class="fas fa-venus-mars"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Jenis Kelamin</div>
+                            @php
+                                $laki = $siswas->where('jenis_kelamin', 'L')->count();
+                                $perempuan = $siswas->where('jenis_kelamin', 'P')->count();
+                            @endphp
+                            <div class="h5 mb-0" style="font-size: 1.1rem;">{{ $laki }}L / {{ $perempuan }}P</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <h6 class="fw-bold mb-3">Perbandingan Jurusan</h6>
-                <div class="chart-container">
-                    <canvas id="jurusanChart"></canvas>
+
+    <!-- Main Content -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-8 fade-in" style="animation-delay: 0.5s;">
+            <div class="card shadow-sm" style="border-radius: var(--border-radius); border: none; box-shadow: var(--card-shadow);">
+                <div class="card-body">
+                    <h5 class="mb-4" style="font-weight: 600;">Distribusi Siswa per Angkatan</h5>
+                    <div style="position: relative; height: 300px; width: 100%;">
+                        <canvas id="angkatanChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4">
+            <!-- Quick Actions Card -->
+            <div class="card shadow-sm mb-4 fade-in" style="border-radius: var(--border-radius); border: none; box-shadow: var(--card-shadow); animation-delay: 0.6s;">
+                <div class="card-body">
+                    <h5 class="mb-4" style="font-weight: 600;">Aksi Cepat</h5>
+                    <div class="d-grid gap-2">
+                        <a href="{{ route('kaprog.siswa.index') }}" class="btn btn-outline-primary" style="border-radius: 10px; padding: 0.6rem 1.2rem; font-weight: 600;">
+                            <i class="fas fa-users me-2"></i> Kelola Siswa
+                        </a>
+                        <a href="{{ route('kaprog.guru.index') }}" class="btn btn-gradient" style="border-radius: 10px; padding: 0.6rem 1.2rem;">
+                            <i class="fas fa-chalkboard-user me-2"></i> Kelola Guru
+                        </a>
+                        <a href="{{ route('kaprog.kelas.index') }}" class="btn btn-outline-success" style="border-radius: 10px; padding: 0.6rem 1.2rem; font-weight: 600;">
+                            <i class="fas fa-graduation-cap me-2"></i> Kelola Kelas
+                        </a>
+                        @if($jurusan)
+                        <a href="{{ route('kaprog.export.jurusan', $jurusan->id) }}" class="btn btn-outline-info" style="border-radius: 10px; padding: 0.6rem 1.2rem; font-weight: 600;">
+                            <i class="fas fa-file-excel me-2"></i> Export Jurusan
+                        </a>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student List -->
+    <div class="row g-4">
+        <div class="col-xl-12 fade-in" style="animation-delay: 0.7s;">
+            <div class="card shadow-sm" style="border-radius: var(--border-radius); border: none; box-shadow: var(--card-shadow);">
+                <div class="card-body">
+                    
+                        <div class="row g-2">
+                            <div class="col-md-8">
+                                <input type="text" name="q" value="{{ request('q') }}" class="form-control" placeholder="Cari nama / NIS">
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-gradient w-100" type="submit">
+                                    <i class="fas fa-search me-2"></i>Cari
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    @if(!empty($siswas) && $siswas->count() > 0)
+                        <div class="student-list">
+                            @foreach($siswas->take(10) as $s)
+                                <div class="student-item d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="student-avatar-placeholder" style="background: var(--primary-gradient); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                                            {{ strtoupper(substr($s->nama_lengkap,0,1)) }}
+                                        </div>
+                                        <div>
+                                            <div style="font-weight:600;">{{ $s->nama_lengkap }}</div>
+                                            <div class="small text-muted">NIS: {{ $s->nis ?? '-' }} • {{ $s->kelas ?? '-' }}</div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-gradient lihat-btn" data-id="{{ $s->id }}">Detail</button>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="{{ route('kaprog.siswa.index') }}" class="btn btn-gradient">
+                                <i class="fas fa-list me-2"></i>Lihat Semua Siswa
+                            </a>
+                        </div>
+                    @else
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-user-graduate fa-3x mb-3"></i>
+                            <p>Belum ada siswa untuk ditampilkan.</p>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- SEARCH & FILTERS -->
-<form method="GET" action="{{ route('kaprog.dashboard') }}">
-    <div class="row mb-4 align-items-center">
-        <div class="col-md-6 mb-3 mb-md-0">
-            <div class="input-group">
-                <input type="text" name="q" value="{{ request('q') }}" class="form-control" placeholder="Cari Data Siswa (nama / NIS)">
-                <button class="btn btn-primary" type="submit">
-                    <i class="fa-solid fa-search"></i>
-                </button>
-            </div>
-        </div>
-        <div class="col-md-6 text-end">
-            <input type="hidden" name="kelas" id="kelasInput" value="{{ request('kelas', 'all') }}">
-            <button type="button" class="btn btn-sm {{ request('kelas') == 'all' || !request('kelas') ? 'btn-primary' : 'btn-outline-secondary' }} filter-btn" data-kelas="all">Semua</button>
-            <button type="button" class="btn btn-sm {{ request('kelas') == '10' ? 'btn-primary' : 'btn-outline-secondary' }} filter-btn" data-kelas="10">Kelas 10</button>
-            <button type="button" class="btn btn-sm {{ request('kelas') == '11' ? 'btn-primary' : 'btn-outline-secondary' }} filter-btn" data-kelas="11">Kelas 11</button>
-            <button type="button" class="btn btn-sm {{ request('kelas') == '12' ? 'btn-primary' : 'btn-outline-secondary' }} filter-btn" data-kelas="12">Kelas 12</button>
-        </div>
-    </div>
-</form>
-
-<!-- TABLE -->
-<div class="card border-0 shadow-sm">
-    <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h6 class="fw-bold mb-0">Daftar Siswa</h6>
-            <small class="text-muted">Menampilkan siswa untuk jurusan: {{ $jurusan->nama ?? '-' }}</small>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Nama</th>
-                        <th>NIS</th>
-                        <th>Kelas</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-
-                <tbody id="siswaTable">
-                    @forelse ($siswas as $s)
-                    @php
-                        if (str_starts_with($s->kelas, 'XII')) $kelasNum = 12;
-                        elseif (str_starts_with($s->kelas, 'XI')) $kelasNum = 11;
-                        else $kelasNum = 10;
-                    @endphp
-
-                    <tr data-kelas="{{ $kelasNum }}">
-                        <td>{{ $s->nama_lengkap }}</td>
-                        <td>{{ $s->nis }}</td>
-                        <td>{{ $s->kelas }}</td>
-                        <td>
-                            <button class="btn btn-link text-primary fw-semibold lihat-btn" data-id="{{ $s->id }}">
-                                LIHAT
-                            </button>
-                        </td>
-                    </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="text-center text-muted">Tidak ada siswa untuk jurusan ini.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-@endsection
-
-{{-- ============================ --}}
-{{--      MODAL DETAIL SISWA     --}}
-{{-- ============================ --}}
+<!-- Modal Detail Siswa -->
 <div class="modal fade" id="modalDetailSiswa" tabindex="-1">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Detail Siswa</h5>
+        <div class="modal-content" style="border-radius: var(--border-radius); border: none;">
+            <div class="modal-header" style="border-bottom: 1px solid #e2e8f0;">
+                <h5 class="modal-title" style="font-weight: 600;">Detail Siswa</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-
             <div class="modal-body">
                 <div id="detailContent">Memuat data...</div>
             </div>
@@ -401,10 +449,11 @@
     </div>
 </div>
 
+@endsection
+
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // ROUTE AJAX BENAR
     const detailRoute = "{{ route('kaprog.siswa.detail', ['id' => '__ID__']) }}";
     
     document.querySelectorAll('.lihat-btn').forEach(btn => {
@@ -414,7 +463,6 @@
             modal.show();
             document.getElementById('detailContent').innerHTML = "Memuat data...";
             
-            // Replace ID di route
             let url = detailRoute.replace('__ID__', id);
             
             fetch(url)
@@ -423,18 +471,19 @@
                     document.getElementById('detailContent').innerHTML = `
                         <div class="row">
                             <div class="col-md-4 text-center">
-                                <img src="${data.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(data.nama_lengkap) + '&size=150'}" 
-                                     class="img-fluid rounded mb-3" width="150">
+                                <div style="background: var(--primary-gradient); width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 48px;">
+                                    ${data.nama_lengkap.charAt(0).toUpperCase()}
+                                </div>
+                                <h6 style="font-weight: 600;">${data.nama_lengkap}</h6>
                             </div>
                             <div class="col-md-8">
-                                <table class="table table-bordered">
-                                    <tr><th>Nama</th><td>${data.nama_lengkap}</td></tr>
-                                    <tr><th>NIS</th><td>${data.nis}</td></tr>
-                                    <tr><th>Kelas</th><td>${data.kelas}</td></tr>
-                                    <tr><th>Jenis Kelamin</th><td>${data.jenis_kelamin}</td></tr>
-                                    <tr><th>TTL</th><td>${data.tempat_lahir}, ${data.tanggal_lahir}</td></tr>
-                                    <tr><th>Alamat</th><td>${data.alamat}</td></tr>
-                                    <tr><th>No HP</th><td>${data.no_hp}</td></tr>
+                                <table class="table table-borderless">
+                                    <tr><th style="font-weight: 600; color: var(--text-primary);">NIS</th><td>${data.nis}</td></tr>
+                                    <tr><th style="font-weight: 600; color: var(--text-primary);">Kelas</th><td>${data.kelas}</td></tr>
+                                    <tr><th style="font-weight: 600; color: var(--text-primary);">Jenis Kelamin</th><td>${data.jenis_kelamin}</td></tr>
+                                    <tr><th style="font-weight: 600; color: var(--text-primary);">TTL</th><td>${data.tempat_lahir}, ${data.tanggal_lahir}</td></tr>
+                                    <tr><th style="font-weight: 600; color: var(--text-primary);">Alamat</th><td>${data.alamat}</td></tr>
+                                    <tr><th style="font-weight: 600; color: var(--text-primary);">No HP</th><td>${data.no_hp}</td></tr>
                                 </table>
                             </div>
                         </div>
@@ -443,40 +492,27 @@
         });
     });
 
-    // Filter buttons behavior: set hidden input and submit form
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const val = this.dataset.kelas;
-            // set the input exactly to 'all' / '10' / '11' / '12' so server receives the expected value
-            document.getElementById('kelasInput').value = val;
-            this.closest('form').submit();
-        });
-    });
+    // Chart.js - Distribusi Siswa per Angkatan (Kelas 10, 11, 12)
+    const angkatanCtx = document.getElementById('angkatanChart').getContext('2d');
     
-    // Chart.js - Distribusi Siswa per Kelas
-    const kelasCtx = document.getElementById('kelasChart').getContext('2d');
-    const kelasChart = new Chart(kelasCtx, {
+    const angkatanChart = new Chart(angkatanCtx, {
         type: 'bar',
         data: {
             labels: ['Kelas 10', 'Kelas 11', 'Kelas 12'],
             datasets: [{
                 label: 'Jumlah Siswa',
-                data: [
-                    {{ $siswaKelas10 ?? 0 }},
-                    {{ $siswaKelas11 ?? 0 }},
-                    {{ $siswaKelas12 ?? 0 }}
-                ],
+                data: [{{ $siswaKelas10 ?? 0 }}, {{ $siswaKelas11 ?? 0 }}, {{ $siswaKelas12 ?? 0 }}],
                 backgroundColor: [
-                    'rgba(47, 83, 255, 0.7)',
-                    'rgba(99, 102, 241, 0.7)',
-                    'rgba(16, 185, 129, 0.7)'
+                    'rgba(102, 126, 234, 0.7)',
+                    'rgba(19, 180, 151, 0.7)',
+                    'rgba(79, 172, 254, 0.7)'
                 ],
                 borderColor: [
-                    'rgba(47, 83, 255, 1)',
-                    'rgba(99, 102, 241, 1)',
-                    'rgba(16, 185, 129, 1)'
+                    'rgba(102, 126, 234, 1)',
+                    'rgba(19, 180, 151, 1)',
+                    'rgba(79, 172, 254, 1)'
                 ],
-                borderWidth: 1,
+                borderWidth: 2,
                 borderRadius: 8
             }]
         },
@@ -494,43 +530,6 @@
                     ticks: {
                         precision: 0
                     }
-                }
-            }
-        }
-    });
-    
-    // Chart.js - Perbandingan Jurusan
-    const jurusanCtx = document.getElementById('jurusanChart').getContext('2d');
-    const jurusanChart = new Chart(jurusanCtx, {
-        type: 'doughnut',
-        data: {
-            labels: {!! json_encode($rombelLabels ?? []) !!},
-            datasets: [{
-                data: {!! json_encode($rombelCounts ?? []) !!},
-                backgroundColor: (function(){
-                    // generate a color palette based on number of rombels
-                    const base = ["47,83,255","99,102,241","16,185,129","245,158,11","239,68,68","14,165,233","168,85,247","236,72,153"];
-                    const colors = [];
-                    const n = ({{ json_encode($rombelCounts ?? []) }}).length || 0;
-                    for (let i=0;i<n;i++) colors.push(`rgba(${base[i % base.length]},0.75)`);
-                    return colors;
-                })(),
-                borderColor: (function(){
-                    const base = ["47,83,255","99,102,241","16,185,129","245,158,11","239,68,68","14,165,233","168,85,247","236,72,153"];
-                    const colors = [];
-                    const n = ({{ json_encode($rombelCounts ?? []) }}).length || 0;
-                    for (let i=0;i<n;i++) colors.push(`rgba(${base[i % base.length]},1)`);
-                    return colors;
-                })(),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'right'
                 }
             }
         }

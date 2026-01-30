@@ -9,15 +9,15 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 
-class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSize, WithEvents
+class KaprogSiswaByRombelExport implements FromCollection, WithHeadings, ShouldAutoSize, WithEvents
 {
-    protected $rombelsIds;
-    protected $kelasName;
+    protected $rombelId;
+    protected $rombelName;
 
-    public function __construct(array $rombelsIds = [], $kelasName = 'X RPL 2')
+    public function __construct($rombelId, $rombelName = 'Rombel')
     {
-        $this->rombelsIds = $rombelsIds;
-        $this->kelasName = $kelasName;
+        $this->rombelId = $rombelId;
+        $this->rombelName = $rombelName;
     }
 
     /**
@@ -25,13 +25,10 @@ class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSi
      */
     public function collection()
     {
-        $query = DataSiswa::query()->with('rombel');
-
-        if (!empty($this->rombelsIds)) {
-            $query->whereIn('rombel_id', $this->rombelsIds);
-        }
-
-        $students = $query->orderBy('nama_lengkap')->get();
+        $students = DataSiswa::with('rombel.kelas.jurusan')
+            ->where('rombel_id', $this->rombelId)
+            ->orderBy('nama_lengkap')
+            ->get();
         
         $rows = $students->map(function ($s, $k) {
             $tempatTanggalLahir = '';
@@ -41,7 +38,8 @@ class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSi
             } elseif ($s->tempat_lahir) {
                 $tempatTanggalLahir = $s->tempat_lahir;
             } elseif ($s->tanggal_lahir) {
-                $tempatTanggalLahir = \Carbon\Carbon::parse($s->tanggal_lahir)->format('d-m-Y');
+                $tanggal = \Carbon\Carbon::parse($s->tanggal_lahir)->format('d-m-Y');
+                $tempatTanggalLahir = $tanggal;
             }
 
             return [
@@ -88,7 +86,7 @@ class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSi
                 
                 // Add title
                 $sheet->mergeCells('A1:F1');
-                $sheet->setCellValue('A1', 'DATA SISWA KELAS ' . $this->kelasName);
+                $sheet->setCellValue('A1', 'DATA SISWA ROMBEL ' . $this->rombelName);
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(12);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle('A1')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
@@ -98,14 +96,12 @@ class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSi
                 $sheet->getStyle('A2:F2')->getFont()->setBold(true);
                 $sheet->getStyle('A2:F2')->getFill()
                     ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                    ->getStartColor()->setARGB('FFDDDDDD');
+                    ->setStartColor(new \PhpOffice\PhpSpreadsheet\Style\Color('DDDDDD'));
                 
-                // Style the total row
+                // Add borders to all cells with data
                 $highestRow = $sheet->getHighestRow();
-                $sheet->getStyle('A' . $highestRow . ':F' . $highestRow)->getFont()->setBold(true);
-                
-                // Add borders to the table (from headers to last row)
-                $sheet->getStyle('A2:F' . $highestRow)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                $highestColumn = $sheet->getHighestColumn();
+                $sheet->getStyle('A2:' . $highestColumn . $highestRow)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
             },
         ];
     }
