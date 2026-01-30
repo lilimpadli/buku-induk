@@ -232,17 +232,20 @@
             <div class="card mt-3 shadow-sm">
                 <div class="card-body">
                     <h6 class="card-title">Informasi Singkat</h6>
-                    <p class="mb-1"><strong>Tempat, Tgl Lahir:</strong> {{ $guru->tempat_lahir ?? '-' }}, {{ $guru->tanggal_lahir ? \Carbon\Carbon::parse($guru->tanggal_lahir)->format('d-m-Y') : '-' }}</p>
+                    <p class="mb-1"><strong>Tempat, Tgl Lahir:</strong> 
+                        {{ $guru && $guru->tempat_lahir ? $guru->tempat_lahir : '-' }}, 
+                        {{ $guru && $guru->tanggal_lahir ? \Carbon\Carbon::parse($guru->tanggal_lahir)->format('d-m-Y') : '-' }}
+                    </p>
                     <p class="mb-1"><strong>Jenis Kelamin:</strong> 
-                        @if($guru->jenis_kelamin == 'L')
+                        @if($guru && $guru->jenis_kelamin == 'L')
                             Laki-laki
-                        @elseif($guru->jenis_kelamin == 'P')
+                        @elseif($guru && $guru->jenis_kelamin == 'P')
                             Perempuan
                         @else
                             -
                         @endif
                     </p>
-                    <p class="mb-0"><strong>Alamat:</strong> {{ $guru->alamat ?? '-' }}</p>
+                    <p class="mb-0"><strong>Alamat:</strong> {{ $guru && $guru->alamat ? $guru->alamat : '-' }}</p>
                 </div>
             </div>
         </div>
@@ -254,26 +257,26 @@
                     <div class="row">
                         <div class="col-md-6">
                             <table class="table table-borderless table-sm">
-                                <tr><th>Nama</th><td>{{ $guru->nama ?? '-' }}</td></tr>
-                                <tr><th>NIP</th><td>{{ $guru->nip ?? '-' }}</td></tr>
-                                <tr><th>Email</th><td>{{ $guru->email ?? '-' }}</td></tr>
-                                <tr><th>Telepon</th><td>{{ $guru->telepon ?? '-' }}</td></tr>
+                                <tr><th>Nama</th><td>{{ $guru && $guru->nama ? $guru->nama : '-' }}</td></tr>
+                                <tr><th>NIP</th><td>{{ $guru && $guru->nip ? $guru->nip : '-' }}</td></tr>
+                                <tr><th>Email</th><td>{{ $guru && $guru->email ? $guru->email : '-' }}</td></tr>
+                                <tr><th>Telepon</th><td>{{ $guru && $guru->telepon ? $guru->telepon : '-' }}</td></tr>
                             </table>
                         </div>
                         <div class="col-md-6">
                             <table class="table table-borderless table-sm">
-                                <tr><th>Tempat Lahir</th><td>{{ $guru->tempat_lahir ?? '-' }}</td></tr>
-                                <tr><th>Tanggal Lahir</th><td>{{ $guru->tanggal_lahir ? \Carbon\Carbon::parse($guru->tanggal_lahir)->format('d F Y') : '-' }}</td></tr>
+                                <tr><th>Tempat Lahir</th><td>{{ $guru && $guru->tempat_lahir ? $guru->tempat_lahir : '-' }}</td></tr>
+                                <tr><th>Tanggal Lahir</th><td>{{ $guru && $guru->tanggal_lahir ? \Carbon\Carbon::parse($guru->tanggal_lahir)->format('d F Y') : '-' }}</td></tr>
                                 <tr><th>Jenis Kelamin</th><td>
-                                    @if($guru->jenis_kelamin == 'L')
+                                    @if($guru && $guru->jenis_kelamin == 'L')
                                         Laki-laki
-                                    @elseif($guru->jenis_kelamin == 'P')
+                                    @elseif($guru && $guru->jenis_kelamin == 'P')
                                         Perempuan
                                     @else
                                         -
                                     @endif
                                 </td></tr>
-                                <tr><th>Umur</th><td>{{ $guru->tanggal_lahir ? \Carbon\Carbon::parse($guru->tanggal_lahir)->age . ' tahun' : '-' }}</td></tr>
+                                <tr><th>Umur</th><td>{{ $guru && $guru->tanggal_lahir ? \Carbon\Carbon::parse($guru->tanggal_lahir)->age . ' tahun' : '-' }}</td></tr>
                             </table>
                         </div>
                     </div>
@@ -281,7 +284,7 @@
                     <hr class="my-4">
 
                     <h6 class="card-title">Alamat Lengkap</h6>
-                    <p class="mb-0">{{ $guru->alamat ?? '-' }}</p>
+                    <p class="mb-0">{{ $guru && $guru->alamat ? $guru->alamat : '-' }}</p>
                 </div>
             </div>
         </div>

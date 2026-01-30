@@ -218,7 +218,7 @@
                     </div>
 
                     <h5 class="mb-0">{{ $guru->nama ?? '-' }}</h5>
-                    <p class="text-muted mb-1">NIP: {{ $guru->nip ?? '-' }}</p>
+                    <p class="text-muted mb-1">NIP: {{ $guru->nip ?: ($user->nomor_induk ?? '-') }}</p>
                     <p class="text-muted small">{{ $user->username ?? '-' }}</p>
 
                     <div class="mt-3">
@@ -255,7 +255,7 @@
                         <div class="col-md-6">
                             <table class="table table-borderless table-sm">
                                 <tr><th>Nama</th><td>{{ $guru->nama ?? '-' }}</td></tr>
-                                <tr><th>NIP</th><td>{{ $guru->nip ?? '-' }}</td></tr>
+                                <tr><th>NIP</th><td>{{ $guru->nip ?: ($user->nomor_induk ?? '-') }}</td></tr>
                                 <tr><th>Email</th><td>{{ $guru->email ?? '-' }}</td></tr>
                                 <tr><th>Telepon</th><td>{{ $guru->telepon ?? '-' }}</td></tr>
                             </table>

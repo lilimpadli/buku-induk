@@ -273,7 +273,7 @@
                         </div>
 
                         <div class="d-flex justify-content-end">
-                            <a href="{{ route('guru.profile') }}" class="btn btn-secondary me-2">Batal</a>
+                            <a href="{{ route('guru.profile.index') }}" class="btn btn-secondary me-2">Batal</a>
                             <button class="btn btn-primary" type="submit">Simpan</button>
                         </div>
                     </form>

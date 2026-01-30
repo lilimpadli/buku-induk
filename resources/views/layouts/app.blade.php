@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') - Aplikasi Buku Induk</title>
+    <link rel="icon" href="{{ asset('images/bg.png') }}?v={{ filemtime(public_path('images/bg.png')) }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('images/bg.png') }}?v={{ filemtime(public_path('images/bg.png')) }}">
+    <meta name="theme-color" content="#2F53FF">
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -58,8 +61,13 @@
         }
 
         .brand .logo {
-            width:40px; height:40px; border-radius:8px;
-            background: var(--accent); display:inline-flex; align-items:center; justify-content:center; color:#fff; font-weight:700;
+            width:40px; height:40px; border-radius:50%;
+            background: var(--accent); display:inline-flex; align-items:center; justify-content:center; color:#fff; font-weight:700; overflow:hidden;
+        }
+
+        .brand .logo img.brand-logo-img {
+            width:40px; height:40px; object-fit:cover; display:block; border-radius:50%;
+            border:2px solid rgba(255,255,255,0.9); box-shadow: 0 4px 12px rgba(0,0,0,0.12);
         }
 
         .sidebar-search{ padding:0 6px 10px 6px; }
@@ -223,7 +231,9 @@
                 <div>
                     <div class="sidebar-header">
                         <div class="brand">
-                            <div class="logo">BI</div>
+                            <div class="logo">
+                                <img src="{{ asset('images/biskaone.jpeg') }}?v={{ filemtime(public_path('images/biskaone.jpeg')) }}" alt="BISKAONE" class="brand-logo-img" style="border-radius:50% !important; width:40px; height:40px; object-fit:cover; display:block;" onerror="this.style.display='none'">
+                            </div>
                             <div>
                                 <div class="title" style="font-weight:700;">Buku Induk</div>
                                 <small class="text-muted">Sekolah</small>

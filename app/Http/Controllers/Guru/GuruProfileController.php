@@ -97,6 +97,6 @@ class GuruProfileController extends Controller
             $user->update(['photo' => $photoPath]);
         }
 
-        return redirect()->route('guru.profile')->with('success', 'Profil berhasil diperbarui!');
+        return redirect()->route('guru.profile.index')->with('success', 'Profil berhasil diperbarui!');
     }
 }

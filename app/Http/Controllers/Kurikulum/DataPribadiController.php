@@ -15,6 +15,14 @@ class DataPribadiController extends Controller
         $user = Auth::user();
         $guru = $user->guru;
 
+        // Jika guru belum ada, buat instance baru (agar view tidak perlu cek null)
+        if (!$guru) {
+            $guru = new Guru();
+            $guru->user_id = $user->id;
+            $guru->nama = $user->nama_lengkap ?? $user->name ?? '';
+            $guru->jenis_kelamin = 'L'; // Default value
+        }
+
         return view('kurikulum.data-pribadi.index', compact('user', 'guru'));
     }
 

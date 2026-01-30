@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMK Negeri 1 Kawali - Buku Induk & PPDB 2025</title>
+    <link rel="icon" href="{{ asset('images/bg.png') }}?v={{ filemtime(public_path('images/bg.png')) }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('images/bg.png') }}?v={{ filemtime(public_path('images/bg.png')) }}">
     
     <!-- External CSS Libraries -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -47,7 +49,11 @@
         .logo {
             width: 70px;
             height: 70px;
+            border-radius: 50%;
+            overflow: hidden;
             animation: float 3s ease-in-out infinite;
+            border: 3px solid rgba(255,255,255,0.9);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         @keyframes float {
@@ -533,7 +539,7 @@
     <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23fdd835'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' text-anchor='middle' fill='%230056b3'%3ESMK%3C/text%3E%3C/svg%3E" class="logo" alt="Logo SMKN 1 Kawali">
+                <img src="{{ asset('images/biskaone.jpeg') }}?v={{ filemtime(public_path('images/biskaone.jpeg')) }}" class="logo rounded-circle" alt="BISKAONE" style="border-radius:50% !important; width:70px; height:70px; object-fit:cover; display:block;" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%23fdd835\'/%3E%3Ctext x=\'50\' y=\'65\' font-size=\'50\' font-weight=\'bold\' text-anchor=\'middle\' fill=\'%230056b3\'\%3ESMK%3C/text%3E%3C/svg%3E'">
                 <div>
                     <h5 class="school-name">SMKN 1 KAWALI</h5>
                     <p class="school-location">KAB. CIAMIS</p>

@@ -58,12 +58,14 @@
                             <td>{{ ($m->tingkats ?? collect())->pluck('tingkat')->implode(', ') }}</td>
                             <td>{{ $m->urutan }}</td>
                             <td>
-                                <a href="{{ route('kurikulum.mata-pelajaran.edit', $m->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                                <form action="{{ route('kurikulum.mata-pelajaran.destroy', $m->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Hapus mata pelajaran ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-danger">Hapus</button>
-                                </form>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <a href="{{ route('kurikulum.mata-pelajaran.edit', $m->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                                    <form action="{{ route('kurikulum.mata-pelajaran.destroy', $m->id) }}" method="POST" onsubmit="return confirm('Hapus mata pelajaran ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-sm btn-danger">Hapus</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         @empty
