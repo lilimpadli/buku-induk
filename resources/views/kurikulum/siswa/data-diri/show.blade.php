@@ -10,8 +10,11 @@
             <p class="text-muted mb-4">{{ $siswa->nama_lengkap }}</p>
         </div>
         <div class="ms-3">
-            <a href="{{ route('tu.siswa.edit', $siswa->id) }}" class="btn btn-warning me-2">
+            <a href="{{ route('kurikulum.data-siswa.edit', $siswa->id) }}" class="btn btn-warning me-2">
                 <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{{ route('kurikulum.siswa.cetak', $siswa->id) }}" class="btn btn-success me-2" target="_blank">
+                <i class="fas fa-print"></i> Cetak
             </a>
             <a href="{{ route('kurikulum.rapor.show', $siswa->id) }}" class="btn btn-primary">
                 <i class="fas fa-file-alt"></i> Raport

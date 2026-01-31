@@ -320,11 +320,17 @@
                         </div>
                         
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('tu.kelas.show', $rombel->id) }}" 
-                               class="btn {{ $rombel->id == 5 ? 'btn-light' : 'btn-outline-primary' }} btn-sm">
-                                <i class="fas fa-info-circle me-1"></i> Detail
-                            </a>
-                            
+                            <div class="d-flex gap-2">
+                                <a href="{{ route('tu.kelas.show', $rombel->id) }}" 
+                                   class="btn {{ $rombel->id == 5 ? 'btn-light' : 'btn-outline-primary' }} btn-sm">
+                                    <i class="fas fa-info-circle me-1"></i> Detail
+                                </a>
+
+                                <a href="{{ route('tu.kelas.export', $rombel->id) }}" class="btn btn-success btn-sm">
+                                    <i class="fas fa-file-excel me-1"></i> Export
+                                </a>
+                            </div>
+
                             <div class="dropdown">
                                 <button class="btn {{ $rombel->id == 5 ? 'btn-light' : 'btn-outline-secondary' }} btn-sm dropdown-toggle" type="button" id="dropdownMenuButton{{ $rombel->id }}" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-ellipsis-v"></i>

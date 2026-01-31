@@ -56,13 +56,19 @@
 
 <!-- ================= HALAMAN 1 : NILAI RAPOR ================= -->
 
+<!-- JUDUL -->
+<div style="text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 20px;">
+    RAPOR PESERTA DIDIK<br>
+    <span style="font-size: 11px;">SMK NEGERI 1 X</span>
+</div>
+
 <!-- IDENTITAS SISWA -->
 <table class="no-border">
     <tr>
         <td width="20%">Nama Peserta Didik</td>
         <td width="30%">: <b>{{ strtoupper($siswa->nama_lengkap) }}</b></td>
         <td width="20%">Kelas</td>
-        <td width="30%">: {{ $rombelRaport->nama ?? $siswa->rombel->nama ?? '-' }}</td>
+        <td width="30%">: {{ $rombelRaport->nama ?? '-' }}</td>
     </tr>
     <tr>
         <td>NISN</td>
@@ -79,7 +85,7 @@
 </table>
 
 <!-- MAPEL UMUM -->
-<div class="section-bar">Mata Pelajaran Umum</div>
+<div class="section-bar">A. Kelompok Mata Pelajaran Umum</div>
 <table>
     <tr>
         <th width="5%">No</th>
@@ -98,7 +104,7 @@
 </table>
 
 <!-- MAPEL KEJURUAN -->
-<div class="section-bar">Mata Pelajaran Kejuruan</div>
+<div class="section-bar">B. Kelompok Mata Pelajaran Kejuruan</div>
 <table>
     <tr>
         <th width="5%">No</th>
@@ -145,7 +151,7 @@
 
 
 <!-- KOKURIKULER -->
-<div class="section-bar">Kokurikuler</div>
+<div class="section-bar">C. Kegiatan Ekstrakurikuler</div>
 <table>
     <tr>
         <th width="5%">No</th>
@@ -162,30 +168,36 @@
 </table>
 
 <!-- KETIDAKHADIRAN + CATATAN WALI KELAS -->
-<table style="margin-top:15px;">
+<div class="section-bar">D. Ketidakhadiran</div>
+<table style="margin-top:5px; width: 50%;">
     <tr>
-        <td width="40%" valign="top">
-            <table>
-                <tr><th>Sakit</th><td>{{ $kehadiran->sakit ?? 0 }} Hari</td></tr>
-                <tr><th>Izin</th><td>{{ $kehadiran->izin ?? 0 }} Hari</td></tr>
-                <tr><th>Tanpa Keterangan</th><td>{{ $kehadiran->tanpa_keterangan ?? 0 }} Hari</td></tr>
-            </table>
-        </td>
-        <td width="60%" valign="top">
-            <table>
-                <tr><th>Catatan Wali Kelas</th></tr>
-                <tr>
-                    <td style="height:90px;">{{ $kenaikan->catatan ?? '' }}</td>
-                </tr>
-            </table>
-        </td>
+        <th width="40%">Sakit</th>
+        <td>{{ $kehadiran->sakit ?? 0 }} Hari</td>
+    </tr>
+    <tr>
+        <th>Izin</th>
+        <td>{{ $kehadiran->izin ?? 0 }} Hari</td>
+    </tr>
+    <tr>
+        <th>Tanpa Keterangan</th>
+        <td>{{ $kehadiran->tanpa_keterangan ?? 0 }} Hari</td>
+    </tr>
+</table>
+
+<!-- CATATAN WALI KELAS -->
+<div class="section-bar" style="margin-top:20px;">Catatan Wali Kelas</div>
+<table style="margin-top:5px;">
+    <tr>
+        <td style="height:80px;">{{ $kenaikan->catatan ?? '' }}</td>
     </tr>
 </table>
 
 <!-- TANGGAPAN ORANG TUA -->
-<table style="margin-top:15px;">
-    <tr><th>Tanggapan Orang Tua / Wali Murid</th></tr>
-    <tr><td style="height:70px;"></td></tr>
+<div class="section-bar" style="margin-top:20px;">Tanggapan Orang Tua / Wali Murid</div>
+<table style="margin-top:5px;">
+    <tr>
+        <td style="height:80px;"></td>
+    </tr>
 </table>
 
 <!-- TTD -->

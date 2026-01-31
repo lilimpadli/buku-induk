@@ -13,15 +13,15 @@
         body {
             font-family: 'Times New Roman', Times, serif;
             background-color: #fff;
-            padding: 10px;
+            padding: 0;
             color: #000;
-            line-height: 1.4;
+            line-height: 1.1;
         }
         .container {
             max-width: 210mm;
             margin: 0 auto;
             background-color: white;
-            padding: 15px;
+            padding: 8mm;
             height: 297mm;
             overflow: hidden;
             display: flex;
@@ -29,99 +29,100 @@
         }
         .buku-induk-header {
             text-align: center;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #333;
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+            border-bottom: 2px solid #000;
         }
         .buku-induk-header h1 {
-            font-size: 16px;
+            font-size: 14px;
             margin-bottom: 2px;
             font-weight: bold;
+            text-transform: uppercase;
         }
         .buku-induk-header h2 {
-            font-size: 13px;
+            font-size: 9px;
+            margin-bottom: 2px;
             font-weight: normal;
-        }
-        .buku-induk-header p {
-            font-size: 11px;
-            margin: 2px 0;
         }
 
         /* --- MAIN LAYOUT: TWO COLUMNS --- */
         .main-content-wrapper {
             display: flex;
-            gap: 15px;
-            flex-grow: 1; /* Mengisi sisa ruang tinggi halaman */
+            gap: 8px;
+            flex-grow: 1;
+            overflow: hidden;
         }
+        
         .nilai-column {
-            flex: 3; /* Kolom nilai lebih lebar */
+            flex: 2.2;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
         .data-column {
-            flex: 2; /* Kolom data lebih sempit */
+            flex: 1.8;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
         /* --- END OF MAIN LAYOUT --- */
 
         /* --- Right Column: Student Data (VERTICAL) --- */
         .data-section {
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
         .data-section-title {
             font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 11px;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 2px;
+            margin-bottom: 4px;
+            font-size: 8px;
+            text-decoration: underline;
         }
         .data-row {
             display: flex;
             margin-bottom: 4px;
-            align-items: flex-end; /* Sejajarkan label dengan garis bawah */
+            align-items: flex-end;
         }
         .data-label {
-            width: 130px; /* Lebar label yang konsisten */
-            font-weight: bold;
-            padding-right: 8px;
+            width: 85px;
+            font-weight: normal;
+            padding-right: 4px;
             flex-shrink: 0;
-            font-size: 10px;
+            font-size: 8px;
         }
         .data-value {
             flex: 1;
-            border-bottom: 1px solid #000;
-            min-height: 14px; /* Tinggi garis bawah */
-            font-size: 10px;
-            padding-bottom: 1px; /* Beri jarak ke garis bawah */
+            border-bottom: 0.6px dotted #000;
+            min-height: 12px;
+            font-size: 8px;
+            padding-bottom: 1px;
         }
         
         /* --- Photo & Side Info Table --- */
         .photo-info-container {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
         }
         .photo-box {
-            width: 100px;
-            height: 130px;
+            width: 70px;
+            height: 95px;
             border: 1px solid #000;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 8px;
+            margin: 0 auto 6px;
         }
         .photo-box img {
-            width: 98px;
-            height: 128px;
+            width: 68px;
+            height: 93px;
             object-fit: cover;
         }
         .side-table {
             width: 100%;
-            font-size: 9px;
+            font-size: 6px;
             text-align: left;
         }
         .side-table td {
-            padding: 2px 4px;
+            padding: 1px 2px;
             vertical-align: top;
         }
         .side-table td.label {
@@ -140,83 +141,125 @@
             text-align: center;
             font-weight: 700;
             margin: 0 0 6px;
-            font-size: 13px;
+            font-size: 10px;
         }
         .table-responsive {
-            flex-grow: 1; /* Membuat tabel mengisi sisa ruang vertikal */
-            overflow: hidden; /* Sembunyikan overflow */
+            flex-grow: 1;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
         .buku-induk-table {
             width: 100%;
-            height: 100%; /* Mengisi tinggi container */
             border-collapse: collapse;
-            font-size: 9px;
-            table-layout: fixed; /* Membantu kontrol lebar kolom */
+            font-size: 6px;
+            table-layout: fixed;
+            height: 100%;
         }
         .buku-induk-table th, .buku-induk-table td {
             border: 1px solid #000;
-            padding: 3px;
+            padding: 2px 3px;
             text-align: center;
+            vertical-align: middle;
         }
         .buku-induk-table th {
-            background-color: #f8f9fa;
+            background-color: #f0f0f0;
             font-weight: bold;
+            font-size: 6px;
+            padding: 2px 1px;
         }
-        .buku-induk-table td:first-child {
+        .buku-induk-table tbody td:first-child {
             text-align: left;
             font-weight: normal;
+            font-size: 6px;
+            padding: 2px 4px;
+            line-height: 1.1;
+        }
+        .buku-induk-table tbody td:not(:first-child) {
+            font-size: 5.5px;
         }
         .buku-induk-table th:first-child {
             text-align: center;
         }
         .buku-induk-table tbody tr.group-row td {
-            background-color: #f0f0f0;
+            background-color: #e8e8e8;
             font-weight: bold;
+            text-align: left;
+            font-size: 6px;
         }
 
         /* --- Signature --- */
         .signature-section {
-            margin-top: auto; /* Dorong ke bawah kolom */
-            padding-top: 15px;
+            margin-top: auto;
+            padding-top: 8px;
             display: flex;
-            justify-content: space-around;
-            font-size: 10px;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-size: 6px;
         }
         .signature-box {
             text-align: center;
-            width: 90px;
+            width: 110px;
         }
         .signature-box p {
             margin: 0;
-            font-size: 9px;
-            line-height: 1.3;
+            font-size: 8px;
+            line-height: 1.2;
         }
         .signature-line {
             border-top: 1px solid #000;
-            height: 20px;
-            margin-top: 15px;
+            height: 36px;
+            margin-top: 6px;
+        }
+        .stamp-box {
+            width: 45px;
+            height: 45px;
+            border: 1px solid #000;
+        }
+        .signature-info {
+            margin-top: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .signature-box-small {
+            width: 110px;
+            height: 40px;
+            border: 1px solid #000;
+            margin-bottom: 4px;
         }
 
         @media print {
+            @page { 
+                size: A4 portrait; 
+                margin: 5mm;
+                -webkit-print-color-adjust: exact;
+            }
             body {
-                padding: 5mm;
+                padding: 0;
+                margin: 0;
             }
             .container {
                 box-shadow: none;
-                height: auto;
-                overflow: visible;
+                width: 210mm;
+                height: 297mm;
+                overflow: hidden;
                 page-break-after: always;
+                padding: 5mm;
+                margin: 0;
             }
             .main-content-wrapper {
-                flex-direction: row; /* Pertahankan dua kolom saat print */
+                flex-direction: row;
+                height: calc(100% - 40px);
             }
             .buku-induk-table {
-                font-size: 8pt;
+                font-size: 6pt;
             }
             .data-label, .data-value {
-                font-size: 8pt;
+                font-size: 7pt;
+            }
+            .table-responsive {
+                height: 100%;
             }
         }
     </style>
@@ -227,9 +270,7 @@
         <div class="buku-induk-header">
             <h1>BUKU INDUK SISWA</h1>
             <h2>SMKN 1 KAWALI</h2>
-            <p>TEKNOLOGI INFORMATIKA</p>
-            <p>PENGEMBANGAN PERANGKAT LUNAK DAN GIM</p>
-            <p>KONSENTRASI KEAHLIAN: {{ $siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan ? $siswa->rombel->kelas->jurusan->nama : 'REKAYASA PERANGKAT LUNAK' }}</p>
+            <h2>KONSENTRASI: {{ $siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan ? $siswa->rombel->kelas->jurusan->nama : 'REKAYASA PERANGKAT LUNAK' }}</h2>
         </div>
 
         <div class="main-content-wrapper">
@@ -300,7 +341,7 @@
                             @endif
                             
                             {{-- TAMBAHKAN BANYAK BARIS KOSONG DI SINI --}}
-                            @for ($i = 0; $i < 35; $i++)
+                            @for ($i = 0; $i < 15; $i++)
                                 <tr>
                                     <td>&nbsp;</td>
                                     @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
@@ -322,41 +363,10 @@
                         @if(isset($siswa->user) && isset($siswa->user->photo))
                             <img src="{{ asset('storage/' . $siswa->user->photo) }}" alt="{{ $siswa->nama_lengkap }}" onerror="this.style.display='none'">
                         @else
-                            <span style="font-size: 10px; color: #999;">Photo</span>
+                            <span style="font-size: 8px; color: #999;">Photo</span>
                         @endif
                     </div>
-                    <table class="side-table">
-                        <tr>
-                            <td class="label">NIS / NISN</td>
-                            <td class="sep">:</td>
-                            <td class="value">{{ $siswa->nis }} / {{ $siswa->nisn ?? '-' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Nama Lengkap</td>
-                            <td class="sep">:</td>
-                            <td class="value">{{ $siswa->nama_lengkap }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Jenis Kelamin</td>
-                            <td class="sep">:</td>
-                            <td class="value">{{ $siswa->jenis_kelamin == 'L' ? 'L' : 'P' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Tempat/Tgl.Lahir</td>
-                            <td class="sep">:</td>
-                            <td class="value">{{ $siswa->tempat_lahir ?? '-' }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d M Y') : '-' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Agama</td>
-                            <td class="sep">:</td>
-                            <td class="value">{{ $siswa->agama ?? '-' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Alamat</td>
-                            <td class="sep">:</td>
-                            <td class="value" style="white-space:normal;">{{ $siswa->alamat ?? '-' }}</td>
-                        </tr>
-                    </table>
+                    <!-- side-table removed: keeping underlined form fields only -->
                 </div>
 
                 <!-- Form Data (VERTICAL) - Tanpa Judul A dan B -->
@@ -504,14 +514,12 @@
                 
                 <!-- Signature -->
                 <div class="signature-section">
-                    <div class="signature-box">
-                        <div class="signature-line"></div>
-                        <p>Tanda Tangan</p>
+                    <div class="signature-info">
+                        <div class="signature-box-small"></div>
+                        <p>Mengetahui</p>
+                        <p>Kepala Sekolah</p>
                     </div>
-                    <div class="signature-box">
-                        <div class="signature-line"></div>
-                        <p>Tanda Tangan</p>
-                    </div>
+                    <div class="stamp-box" aria-hidden="true"></div>
                 </div>
             </div>
         </div>

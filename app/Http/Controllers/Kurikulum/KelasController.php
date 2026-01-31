@@ -7,6 +7,8 @@ use App\Models\Guru;
 use App\Models\Rombel;
 use App\Models\Kelas;
 use App\Models\Jurusan;
+use App\Exports\KaprogSiswaByRombelExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 
 class KelasController extends Controller
@@ -140,5 +142,10 @@ class KelasController extends Controller
 
         return redirect()->route('kurikulum.kelas.index')
             ->with('success', 'Data rombel berhasil dihapus.');
+    }
+
+    public function export($id)
+    {
+        return Excel::download(new KaprogSiswaByRombelExport($id), 'rombel-' . $id . '.xlsx');
     }
 }

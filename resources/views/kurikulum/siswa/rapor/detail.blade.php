@@ -236,22 +236,15 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>Review Rapor</h3>
         <div>
-            <a href="{{ route('tu.nilai_raport.list', $siswa->id) }}" class="btn btn-outline-secondary">
+            <a href="{{ route('kurikulum.rapor.show', $siswa->id) }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
-            <a href="{{ route('tu.rapor.cetak', [
-                'siswa_id' => $siswa->id,
-                'semester' => $semester,
-                'tahun' => str_replace('/', '-', $tahun)
+            <a href="{{ route('kurikulum.rapor.cetak', [
+                $siswa->id,
+                $semester,
+                str_replace('/', '-', $tahun)
             ]) }}" class="btn btn-primary" target="_blank">
-                Cetak PDF
-            </a>
-            <a href="{{ route('tu.nilai_raport.edit', [
-                'siswa_id' => $siswa->id,
-                'semester' => $semester,
-                'tahun' => str_replace('/', '-', $tahun)
-            ]) }}" class="btn btn-warning">
-                Edit Rapor
+                <i class="fas fa-print"></i> Cetak PDF
             </a>
         </div>
     </div>
@@ -262,7 +255,7 @@
             <th width="30%">Nama Peserta Didik</th>
             <td>{{ strtoupper($siswa->nama_lengkap) }}</td>
             <th width="30%">Kelas</th>
-            <td>{{ $siswa->rombel->nama ?? '-' }}</td>
+            <td>{{ $rombelRaport->nama ?? '-' }}</td>
         </tr>
         <tr>
             <th>NISN</th>
@@ -362,36 +355,35 @@
                     <td colspan="4" class="text-center text-muted">Tidak ada data</td>
                 </tr>
             @endforelse
-            </tbody>
-        </table>
+        </tbody>
+    </table>
 
-        {{-- Kehadiran --}}
-        <h5 class="fw-bold mt-4">D. Ketidakhadiran</h5>
-        <table class="table table-bordered" style="width: 50%">
-            <tr>
-                <th>Sakit</th>
-                <td>{{ $kehadiran->sakit ?? 0 }} hari</td>
-            </tr>
-            <tr>
-                <th>Izin</th>
-                <td>{{ $kehadiran->izin ?? 0 }} hari</td>
-            </tr>
-            <tr>
-                <th>Tanpa Keterangan</th>
-                <td>{{ $kehadiran->tanpa_keterangan ?? 0 }} hari</td>
-            </tr>
-        </table>
+    {{-- Kehadiran --}}
+    <h5 class="fw-bold mt-4">D. Ketidakhadiran</h5>
+    <table class="table table-bordered" style="width: 50%">
+        <tr>
+            <th>Sakit</th>
+            <td>{{ $kehadiran->sakit ?? 0 }} hari</td>
+        </tr>
+        <tr>
+            <th>Izin</th>
+            <td>{{ $kehadiran->izin ?? 0 }} hari</td>
+        </tr>
+        <tr>
+            <th>Tanpa Keterangan</th>
+            <td>{{ $kehadiran->tanpa_keterangan ?? 0 }} hari</td>
+        </tr>
+    </table>
 
-        {{-- Kenaikan --}}
-        @if(strtolower($semester) !== 'ganjil')
-            <h5 class="fw-bold mt-4">E. Kenaikan Kelas</h5>
-            <p><b>Status:</b> {{ $kenaikan->status ?? 'Belum Ditentukan' }}</p>
-            @if(isset($kenaikan->rombelTujuan))
-                <p><b>Ke Kelas:</b> {{ $kenaikan->rombelTujuan->nama }}</p>
-            @endif
-            <p><b>Catatan:</b> {{ $kenaikan->catatan ?? '-' }}</p>
+    {{-- Kenaikan --}}
+    @if(strtolower($semester) !== 'ganjil')
+        <h5 class="fw-bold mt-4">E. Kenaikan Kelas</h5>
+        <p><b>Status:</b> {{ $kenaikan->status ?? 'Belum Ditentukan' }}</p>
+        @if(isset($kenaikan->rombelTujuan))
+            <p><b>Ke Kelas:</b> {{ $kenaikan->rombelTujuan->nama }}</p>
         @endif
+        <p><b>Catatan:</b> {{ $kenaikan->catatan ?? '-' }}</p>
+    @endif
 
-        
-    </div>
+</div>
 @endsection

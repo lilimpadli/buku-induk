@@ -356,7 +356,7 @@ class KaprogController extends Controller
         }
 
         // Get nilai raport
-        $nilaiRaports = NilaiRaport::with('mapel')
+        $nilaiRaports = NilaiRaport::with(['mapel', 'rombel'])
             ->where('siswa_id', $siswa->id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
@@ -366,6 +366,9 @@ class KaprogController extends Controller
         if ($nilaiRaports->isEmpty()) {
             return redirect()->back()->with('error', 'Data raport tidak ditemukan');
         }
+
+        // Dapatkan rombel dari data raport (sesuai dengan raport yang sedang dicetak)
+        $rombelRaport = $nilaiRaports->first()?->rombel;
 
         // Get ekstra, kehadiran, info, kenaikan
         $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa->id)
@@ -398,7 +401,8 @@ class KaprogController extends Controller
             'ekstra',
             'kehadiran',
             'info',
-            'kenaikan'
+            'kenaikan',
+            'rombelRaport'
         ))->setPaper('A4', 'portrait');
 
         // Sanitize filename

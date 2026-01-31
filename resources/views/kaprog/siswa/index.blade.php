@@ -384,7 +384,7 @@
             
             @if($siswas instanceof \Illuminate\Pagination\Paginator || $siswas instanceof \Illuminate\Pagination\LengthAwarePaginator)
                 <div class="card-body" style="border-top: 1px solid #E2E8F0; text-align: center;">
-                    {{ $siswas->links('pagination::bootstrap-5') }}
+                    {{ $siswas->links('pagination::bootstrap-4') }}
                 </div>
             @endif
         @else

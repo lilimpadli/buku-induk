@@ -584,7 +584,7 @@
                             <i class="fas fa-sign-in-alt me-2"></i>Login Sistem
                         </a>
                         <a href="{{ route("ppdb.index")}}" class="btn btn-custom btn-ppdb">
-                            <i class="fas fa-user-plus me-2"></i> PPDB 2025
+                            <i class="fas fa-user-plus me-2"></i> PPDB
                         </a>
                     </div>
                 </div>

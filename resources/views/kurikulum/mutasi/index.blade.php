@@ -120,7 +120,7 @@
         <!-- Pagination -->
         @if($mutasis->hasPages())
             <div class="card-footer">
-                {{ $mutasis->links() }}
+                {{ $mutasis->links('pagination::bootstrap-4') }}
             </div>
         @endif
     </div>

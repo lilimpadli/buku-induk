@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DataSiswa;
 use App\Models\User;
 use App\Models\NilaiRaport;
+use App\Models\Ppdb;
 use App\Models\Kelas;
 use App\Models\Jurusan;
 use App\Models\MataPelajaran;
@@ -17,6 +18,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\KaprogSiswaByRombelExport;
+use App\Exports\KaprogSiswaByJurusanExport;
+use App\Exports\KaprogSiswaByAngkatanExport;
+use App\Exports\GuruExportMultiSheet;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TUController extends Controller
 {
@@ -71,6 +78,9 @@ class TUController extends Controller
         // Statistik nilai raport
         $totalNilai = NilaiRaport::count();
         $nilaiTerbaru = NilaiRaport::with('siswa')->latest()->take(5)->get();
+
+        // Recent PPDB submissions (for dashboard) - eager load relations
+        $ppdbTerbaru = Ppdb::with(['jalur', 'sesi', 'jurusan'])->latest()->take(5)->get();
         
         return view('tu.dashboard', compact(
             'totalSiswa', 
@@ -84,7 +94,8 @@ class TUController extends Controller
             'waliKelasLimit',
             'kelasLimit',
             'totalNilai',
-            'nilaiTerbaru'
+            'nilaiTerbaru',
+            'ppdbTerbaru'
         ));
     }
     
@@ -119,43 +130,117 @@ class TUController extends Controller
 
         $allRombels = Rombel::with('kelas')->orderBy('nama')->get();
 
+        // List of jurusans for export options
+        $allJurusans = Jurusan::orderBy('nama')->get();
+
         $siswas = $query->paginate(10)->withQueryString();
 
-        return view('tu.siswa.index', compact('siswas', 'search', 'allRombels', 'filterRombel'));
+        return view('tu.siswa.index', compact('siswas', 'search', 'allRombels', 'filterRombel', 'allJurusans'));
+    }
+
+    /**
+     * Export siswa per jurusan (TU)
+     */
+    public function exportSiswaByJurusan($jurusanId)
+    {
+        $jurusan = Jurusan::findOrFail($jurusanId);
+
+        $filename = 'Data Siswa - Jurusan ' . $jurusan->nama . '.xlsx';
+
+        return Excel::download(
+            new KaprogSiswaByJurusanExport($jurusanId, $jurusan->nama),
+            $filename
+        );
+    }
+
+    /**
+     * Export siswa per angkatan (multiple sheets) for a jurusan (TU)
+     */
+    public function exportSiswaByAngkatan($jurusanId)
+    {
+        $jurusan = Jurusan::findOrFail($jurusanId);
+
+        $filename = 'Data Siswa Per Angkatan - ' . $jurusan->nama . '.xlsx';
+
+        return Excel::download(
+            new KaprogSiswaByAngkatanExport($jurusanId, $jurusan->nama),
+            $filename
+        );
     }
 
     /**
      * Daftar guru untuk TU
      */
+    /**
+     * Export siswa per rombel (TU)
+     */
+    public function exportSiswaByRombel($rombelId)
+    {
+        $rombel = Rombel::findOrFail($rombelId);
+        $filename = 'Data Siswa Rombel ' . $rombel->nama . '.xlsx';
+
+        return Excel::download(
+            new KaprogSiswaByRombelExport($rombelId, $rombel->nama),
+            $filename
+        );
+    }
+
+    /**
+     * Export guru dengan 2 sheet: TU dan Staff Lainnya (guru, walikelas, kurikulum, kaprog)
+     */
+    public function exportGuru()
+    {
+        $filename = 'Pengguna_Guru.xlsx';
+        return Excel::download(new GuruExportMultiSheet(), $filename);
+    }
     public function guruIndex()
     {
-        // Fetch a paginated list of all Guru models, with their associated User data
-        // and the rombels they teach (including the rombel's kelas and jurusan).
+        // Fetch all users (tu, guru, walikelas, kurikulum, kaprog) with optional role and search filters
         $search = request('search');
+        $role_filter = request('role');
         $jurusan_id = request('jurusan');
         
-        $gurus = Guru::with(['user', 'rombels.kelas.jurusan'])
-            ->when($search, function($query) use($search) {
-                $query->where(function($q) use($search) {
-                    $q->where('nama', 'like', "%{$search}%")
-                      ->orWhere('nip', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%")
-                      ->orWhereHas('user', function($uq) use($search) {
-                          $uq->where('email', 'like', "%{$search}%");
-                      });
+        $roles = ['tu', 'guru', 'walikelas', 'kurikulum', 'kaprog'];
+        
+        $query = User::query()
+            ->with(['guru' => function($q) {
+                $q->with(['rombels.kelas.jurusan', 'jurusan']);
+            }])
+            ->whereIn('role', $roles);
+        
+        // Role filter
+        if ($role_filter && in_array($role_filter, $roles)) {
+            $query->where('role', $role_filter);
+        }
+        
+        // Search filter
+        if ($search) {
+            $query->where(function($q) use($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('nomor_induk', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhereHas('guru', function($gq) use($search) {
+                      $gq->where('nip', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+        
+        // Jurusan filter (only for guru)
+        if ($jurusan_id) {
+            $query->where(function($q) use($jurusan_id) {
+                $q->whereHas('guru', function($gq) use($jurusan_id) {
+                    $gq->where('jurusan_id', $jurusan_id);
                 });
-            })
-            ->when($jurusan_id, function($query) use($jurusan_id) {
-                $query->where('jurusan_id', $jurusan_id);
-            })
-            // Order by kaprog role first, then by nama
-            ->orderByRaw("FIELD(user_id, (SELECT id FROM users WHERE role = 'kaprog' AND id = user_id)) DESC, nama")
-            ->paginate(10)
-            ->withQueryString();
+            });
+        }
+        
+        $gurus = $query->orderBy('name')->paginate(10)->withQueryString();
 
         $allJurusans = Jurusan::orderBy('nama')->get();
+        $roleOptions = ['tu' => 'TU', 'guru' => 'Guru', 'walikelas' => 'Wali Kelas', 'kurikulum' => 'Kurikulum', 'kaprog' => 'Kaprog'];
 
-        return view('tu.guru.index', compact('gurus', 'search', 'jurusan_id', 'allJurusans'));
+        return view('tu.guru.index', compact('gurus', 'search', 'jurusan_id', 'role_filter', 'allJurusans', 'roleOptions'));
     }
 
     /**
@@ -344,6 +429,21 @@ class TUController extends Controller
     }
 
     /**
+     * Export data diri siswa (TU) to PDF
+     */
+    public function siswaExportPdf($id)
+    {
+        $siswa = DataSiswa::with(['ayah', 'ibu', 'wali', 'rombel'])->findOrFail($id);
+
+        $pdf = Pdf::loadView('tu.siswa.data-diri.pdf', compact('siswa'))
+            ->setPaper('A4', 'portrait');
+
+        $filename = 'Data Diri - ' . ($siswa->nama_lengkap ?? $siswa->nis ?? $siswa->id) . '.pdf';
+
+        return $pdf->stream($filename);
+    }
+
+    /**
      * Halaman raport siswa (TU)
      */
     public function siswaRaport($id)
@@ -359,6 +459,57 @@ class TUController extends Controller
             ->get();
 
         return view('tu.siswa.raport.list', compact('siswa', 'raports'));
+    }
+
+    /**
+     * Cetak raport (TU) — use TU-specific raport PDF view
+     */
+    public function cetakRaport($siswa_id, $semester, $tahun)
+    {
+        // normalize tahun parameter like RaporController
+        $tahun = str_replace('-', '/', $tahun);
+
+        $siswa = DataSiswa::findOrFail($siswa_id);
+
+        $nilaiRaports = NilaiRaport::with('mapel', 'rombel')
+            ->where('siswa_id', $siswa_id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->orderBy(
+                MataPelajaran::select('urutan')
+                    ->whereColumn('mata_pelajarans.id', 'nilai_raports.mata_pelajaran_id')
+            )
+            ->get();
+
+        // Dapatkan rombel dari data raport (sesuai dengan raport yang sedang dicetak)
+        $rombelRaport = $nilaiRaports->first()?->rombel;
+
+        $ekstra = \App\Models\EkstrakurikulerSiswa::where('siswa_id', $siswa_id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->get();
+        $kehadiran = \App\Models\Kehadiran::where('siswa_id', $siswa_id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+        $info = \App\Models\RaporInfo::where('siswa_id', $siswa_id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+        $kenaikan = \App\Models\KenaikanKelas::with('rombelTujuan')
+            ->where('siswa_id', $siswa_id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        $pdf = Pdf::loadView('tu.siswa.raport.pdf', compact('siswa', 'nilaiRaports', 'ekstra', 'kehadiran', 'info', 'semester', 'tahun', 'kenaikan', 'rombelRaport'))
+            ->setPaper('A4', 'portrait');
+
+        $safeName = str_replace(['\\', '/'], '-', $siswa->nama_lengkap);
+        $safeTahun = str_replace(['\\', '/'], '-', $tahun);
+        $filename = 'Raport - ' . $safeName . ' - ' . $semester . ' - ' . $safeTahun . '.pdf';
+
+        return $pdf->stream($filename);
     }
 
     /**

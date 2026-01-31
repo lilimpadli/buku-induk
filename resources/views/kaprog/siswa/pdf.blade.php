@@ -62,7 +62,7 @@
         <td width="20%">Nama Peserta Didik</td>
         <td width="30%">: <b>{{ strtoupper($siswa->nama_lengkap) }}</b></td>
         <td width="20%">Kelas</td>
-        <td width="30%">: {{ $siswa->rombel->nama ?? '-' }}</td>
+        <td width="30%">: {{ $rombelRaport->nama ?? $siswa->rombel->nama ?? '-' }}</td>
     </tr>
     <tr>
         <td>NISN</td>
@@ -131,7 +131,7 @@
     </tr>
     <tr>
         <td>Kelas</td>
-        <td>: {{ $siswa->rombel->nama ?? '-' }}</td>
+        <td>: {{ $rombelRaport->nama ?? $siswa->rombel->nama ?? '-' }}</td>
     </tr>
     <tr>
         <td>Tahun Pelajaran</td>

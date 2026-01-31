@@ -19,7 +19,7 @@
 
     <div class="card shadow-sm border-0 mt-3" style="border-radius: 15px;">
         <div class="card-body">
-            <form action="{{ route('tu.siswa.update', $siswa->id) }}" method="POST">
+            <form action="{{ route('kurikulum.data-siswa.update', $siswa->id) }}" method="POST">
                 @csrf
                 @method('PUT')
 
@@ -175,7 +175,7 @@
 
                 <div class="row mt-3">
                     <div class="col-12 d-flex justify-content-end">
-                        <a href="{{ url('/tu/siswa/' . $siswa->id) }}" class="btn btn-secondary me-2">Batal</a>
+                        <a href="{{ route('kurikulum.data-siswa.show', $siswa->id) }}" class="btn btn-secondary me-2">Batal</a>
                         <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                     </div>
                 </div>

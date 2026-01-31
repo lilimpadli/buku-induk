@@ -11,9 +11,14 @@
             <h2 class="fw-bold mb-1">Detail Rombel</h2>
             <p class="text-muted mb-0">{{ $rombel->nama }}</p>
         </div>
-        <a href="{{ request()->header('referer') ?: route('kurikulum.kelas.index') }}" class="btn btn-outline-secondary">
-            <i class="fa fa-arrow-left me-2"></i> Kembali
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('kurikulum.kelas.export', $rombel->id) }}" class="btn btn-success">
+                <i class="fas fa-file-excel me-2"></i> Export Rombel
+            </a>
+            <a href="{{ request()->header('referer') ?: route('kurikulum.kelas.index') }}" class="btn btn-outline-secondary">
+                <i class="fa fa-arrow-left me-2"></i> Kembali
+            </a>
+        </div>
     </div>
 
     <!-- INFO ROMBEL -->

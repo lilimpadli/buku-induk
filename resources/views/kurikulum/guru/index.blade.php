@@ -352,7 +352,7 @@
             </div>
             
             <div class="d-flex justify-content-center mt-3 p-3">
-                {{ $gurus->links() }}
+                {{ $gurus->links('pagination::bootstrap-4') }}
             </div>
         @else
             <div class="empty-state">

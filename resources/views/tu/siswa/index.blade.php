@@ -217,6 +217,20 @@
         </a>
     </div>
 
+    <div class="mb-3 d-flex align-items-center gap-2">
+        <form id="exportForm" class="d-flex align-items-center gap-2">
+            <select id="exportJurusan" class="form-select form-select-sm" style="width:240px">
+                <option value="">-- Pilih Jurusan untuk Export --</option>
+                @foreach(($allJurusans ?? collect()) as $j)
+                    <option value="{{ $j->id }}">{{ $j->nama }}</option>
+                @endforeach
+            </select>
+
+            
+            <a id="btnExportAngkatan" href="#" class="btn btn-outline-secondary btn-sm">Export Per Angkatan</a>
+        </form>
+    </div>
+
     <div class="mb-3">
         @php $currentTingkat = request()->query('tingkat', ''); @endphp
         <div class="btn-group" role="group">
@@ -259,54 +273,56 @@
         @if($siswas->count() > 0)
             <div class="list-group list-group-flush">
                 @foreach ($siswas as $siswa)
-                    <div class="list-group-item">
-                        <div class="student-info">
-                            <div class="student-avatar">
-                                @if($siswa->foto)
-                                    <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}">
-                                @else
-                                    {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
-                                @endif
-                            </div>
-                            <div class="student-details">
-                                <strong>{{ $siswa->nama_lengkap }}</strong>
-                                <small>NIS: {{ $siswa->nis }} | NISN: {{ $siswa->nisn }} | Jenis Kelamin: {{ $siswa->jenis_kelamin }}</small>
-                            </div>
-                            @php
-                                $rombel = $siswa->rombel ?? null;
-                                $rombelNama = $rombel->nama ?? null;
-                                $tingkatVal = optional($rombel->kelas)->tingkat ?? null;
-                                // Remove any existing tingkat tokens (X, XI, XII) from rombel name to avoid duplication
-                                $rombelWithoutTingkat = $rombelNama ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama) : null;
-                                $rombelWithoutTingkat = $rombelWithoutTingkat ? trim($rombelWithoutTingkat) : null;
-                                // Insert space between letters and trailing digits, e.g. RPL1 -> RPL 1
-                                $formatted = $rombelWithoutTingkat ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat) : null;
-                            @endphp
-                            @if($rombel)
-                                <div class="student-class">
-                                    @if($tingkatVal)
-                                        {{ $tingkatVal }} {{ $formatted }}
+                    <div class="list-group-item d-flex align-items-center justify-content-between">
+                        <a href="{{ route('tu.siswa.detail', $siswa->id) }}" class="text-decoration-none text-reset d-flex align-items-center" style="flex:1">
+                            <div class="student-info">
+                                <div class="student-avatar">
+                                    @if($siswa->foto)
+                                        <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}">
                                     @else
-                                        {{ $formatted }}
+                                        {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
                                     @endif
                                 </div>
-                            @endif
-                            <div class="student-actions">
-                                <div class="btn-group">
-                                    <a href="{{ route('tu.siswa.detail', $siswa->id) }}" class="btn btn-sm btn-info" title="Detail">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ route('tu.siswa.edit', $siswa->id) }}" class="btn btn-sm btn-warning" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('tu.siswa.destroy', $siswa->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data siswa ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                <div class="student-details">
+                                    <strong>{{ $siswa->nama_lengkap }}</strong>
+                                    <small>NIS: {{ $siswa->nis }} | NISN: {{ $siswa->nisn }} | Jenis Kelamin: {{ $siswa->jenis_kelamin }}</small>
                                 </div>
+
+                                @php
+                                    $rombel = $siswa->rombel ?? null;
+                                    $rombelNama = $rombel->nama ?? null;
+                                    $tingkatVal = optional($rombel->kelas)->tingkat ?? null;
+                                    $rombelWithoutTingkat = $rombelNama ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama) : null;
+                                    $rombelWithoutTingkat = $rombelWithoutTingkat ? trim($rombelWithoutTingkat) : null;
+                                    $formatted = $rombelWithoutTingkat ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat) : null;
+                                @endphp
+                                @if($rombel)
+                                    <div class="student-class">
+                                        @if($tingkatVal)
+                                            {{ $tingkatVal }} {{ $formatted }}
+                                        @else
+                                            {{ $formatted }}
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                        </a>
+
+                        <div class="student-actions ms-3">
+                            <div class="btn-group">
+                                <a href="{{ route('tu.siswa.detail', $siswa->id) }}" class="btn btn-sm btn-info" title="Detail">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ route('tu.siswa.edit', $siswa->id) }}" class="btn btn-sm btn-warning" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ route('tu.siswa.destroy', $siswa->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data siswa ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -314,7 +330,7 @@
             </div>
             @if(method_exists($siswas, 'links'))
                 <div class="p-3">
-                    {{ $siswas->links() }}
+                    {{ $siswas->links('pagination::bootstrap-4') }}
                 </div>
             @endif
         @else
@@ -326,4 +342,33 @@
         @endif
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const select = document.getElementById('exportJurusan');
+    const btnJ = document.getElementById('btnExportJurusan');
+    const btnA = document.getElementById('btnExportAngkatan');
+    const baseJurusan = "{{ url('tu/siswa/export/jurusan') }}";
+    const baseAngkatan = "{{ url('tu/siswa/export/angkatan') }}";
+
+    function getId(){ return select ? select.value : null; }
+
+    if(btnJ){
+        btnJ.addEventListener('click', function(e){
+            e.preventDefault();
+            const id = getId();
+            if(!id){ alert('Pilih jurusan terlebih dahulu'); return; }
+            window.location = baseJurusan + '/' + id;
+        });
+    }
+
+    if(btnA){
+        btnA.addEventListener('click', function(e){
+            e.preventDefault();
+            const id = getId();
+            if(!id){ alert('Pilih jurusan terlebih dahulu'); return; }
+            window.location = baseAngkatan + '/' + id;
+        });
+    }
+});
+</script>
 @endsection

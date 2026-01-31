@@ -193,9 +193,18 @@ class RaporController extends Controller
             )
             ->get();
 
-        $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa_id)->get();
-        $kehadiran = Kehadiran::where('siswa_id', $siswa_id)->where('semester', $semester)->first();
-        $info = RaporInfo::where('siswa_id', $siswa_id)->where('semester', $semester)->first();
+        $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa_id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->get();
+        $kehadiran = Kehadiran::where('siswa_id', $siswa_id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+        $info = RaporInfo::where('siswa_id', $siswa_id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
 
         $pdf = Pdf::loadView('rapor.cetak', compact('siswa', 'nilai', 'ekstra', 'kehadiran', 'info', 'semester', 'tahun'));
 

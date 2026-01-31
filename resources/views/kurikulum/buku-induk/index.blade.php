@@ -367,7 +367,7 @@
         <!-- Pagination -->
         @if($siswas->hasPages())
             <div class="p-3">
-                {{ $siswas->links() }}
+                {{ $siswas->links('pagination::bootstrap-4') }}
             </div>
         @endif
     </div>

@@ -224,6 +224,9 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="mb-3">Daftar Guru</h3>
+        <a href="{{ route('tu.guru.export') }}" class="btn btn-success btn-sm">
+            <i class="fas fa-file-excel me-1"></i> Export Guru (2 Halaman)
+        </a>
     </div>
 
     <!-- FILTER CARD -->
@@ -231,7 +234,7 @@
         <div class="card-body" style="background-color: #F8FAFC;">
             <form method="GET" action="{{ route('tu.guru.index') }}" class="row g-3 align-items-end">
                 <!-- Search -->
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Cari Guru</label>
                     <div class="input-group">
                         <span class="input-group-text" style="background:white;border:1px solid #E2E8F0;"><i class="bi bi-search"></i></span>
@@ -239,8 +242,21 @@
                     </div>
                 </div>
 
+                <!-- Filter Role -->
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Role</label>
+                    <select name="role" class="form-select" style="border:1px solid #E2E8F0;">
+                        <option value="">-- Semua Role --</option>
+                        @foreach($roleOptions as $key => $label)
+                            <option value="{{ $key }}" {{ (isset($role_filter) && $role_filter == $key) ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <!-- Filter Jurusan -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Jurusan</label>
                     <select name="jurusan" class="form-select" style="border:1px solid #E2E8F0;">
                         <option value="">-- Semua Jurusan --</option>
@@ -253,7 +269,7 @@
                 </div>
 
                 <!-- Buttons -->
-                <div class="col-md-3 d-flex gap-2">
+                <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-search"></i> Cari
                     </button>
@@ -268,24 +284,23 @@
     <div class="card shadow">
         @if($gurus->count() > 0)
             <div class="list-group list-group-flush">
-                @forelse($gurus as $g)
+                @forelse($gurus as $u)
                     <div class="list-group-item">
                         <div class="teacher-info">
                             <div class="teacher-avatar">
-                                @if($g->foto)
-                                    <img src="{{ asset('storage/' . $g->foto) }}" alt="{{ $g->nama }}">
+                                @if($u->photo)
+                                    <img src="{{ asset('storage/' . $u->photo) }}" alt="{{ $u->name }}">
                                 @else
-                                    {{ strtoupper(substr($g->nama, 0, 1)) }}
+                                    {{ strtoupper(substr($u->name, 0, 1)) }}
                                 @endif
                             </div>
                             <div class="teacher-details">
-                                <strong>{{ $g->nama }}</strong>
-                             
+                                <strong>{{ $u->name }}</strong>
+                                <small>{{ ucfirst($u->role) }} • {{ $u->nomor_induk ?? $u->email }}</small>
                                 
-                                @if($g->rombels && $g->rombels->count())
+                                @if($u->guru && $u->guru->rombels && $u->guru->rombels->count())
                                     <div class="teacher-classes">
-                                       
-                                        @foreach($g->rombels as $r)
+                                        @foreach($u->guru->rombels as $r)
                                             @php
                                                 $kelas = $r->kelas;
                                             @endphp
@@ -297,23 +312,25 @@
                                 @endif
                             </div>
                             <div class="teacher-actions">
-                                <a href="{{ route('tu.guru.show', $g->id) }}" class="btn btn-sm btn-primary" title="Detail">
-                                    <i class="fas fa-eye"></i> Detail
-                                </a>
+                                @if($u->guru)
+                                    <a href="{{ route('tu.guru.show', $u->guru->id) }}" class="btn btn-sm btn-primary" title="Detail">
+                                        <i class="fas fa-eye"></i> Detail
+                                    </a>
+                                @endif
                             </div>
                         </div>
                     </div>
                 @empty
                     <div class="empty-state">
                         <i class="fas fa-chalkboard-teacher"></i>
-                        <h5>Belum ada guru</h5>
-                        <p>Belum ada data guru yang tersedia.</p>
+                        <h5>Belum ada pengguna</h5>
+                        <p>Belum ada data pengguna yang tersedia.</p>
                     </div>
                 @endforelse
             </div>
             
             <div class="d-flex justify-content-center mt-3 p-3">
-                {{ $gurus->links() }}
+                {{ $gurus->links('pagination::bootstrap-4') }}
             </div>
         @else
             <div class="empty-state">

@@ -183,24 +183,45 @@ class KurikulumSiswaController extends Controller
     public function edit($id)
     {
         $siswa = DataSiswa::findOrFail($id);
-        $users = User::where('role', 'siswa')->get();
+        return view('kurikulum.siswa.edit', compact('siswa'));
+    }
+
+    public function editDataDiri($id)
+    {
+        $siswa = DataSiswa::with(['ayah', 'ibu', 'wali'])->findOrFail($id);
         $rombels = Rombel::all();
         $kelas = Kelas::with('jurusan')->get();
-        $jurusans = Jurusan::all();
 
-        return view('kurikulum.siswa.edit', compact('siswa','users','rombels','kelas','jurusans'));
+        return view('kurikulum.siswa.data-diri.edit', compact('siswa','rombels','kelas'));
     }
 
     public function update(Request $request, $id)
     {
         $siswa = DataSiswa::findOrFail($id);
+
+        // Check if this is a password update (only password fields provided)
+        if ($request->filled('password') || $request->filled('password_confirmation')) {
+            $request->validate([
+                'password' => 'nullable|string|min:6|confirmed',
+            ]);
+
+            if ($request->filled('password')) {
+                $user = $siswa->user;
+                if ($user) {
+                    $user->update(['password' => Hash::make($request->password)]);
+                    return redirect()->route('kurikulum.siswa.index')->with('success', 'Password siswa berhasil diubah.');
+                }
+            }
+            return back()->with('error', 'User tidak ditemukan');
+        }
+
+        // Otherwise, this is a data-diri update
         $data = $request->validate([
-            'user_id' => 'nullable|exists:users,id',
             'nama_lengkap' => 'required|string|max:255',
             'nis' => 'nullable|string',
             'nisn' => 'nullable|string',
-            'tempat_lahir' => 'required|string',
-            'tanggal_lahir' => 'required|date',
+            'tempat_lahir' => 'nullable|string',
+            'tanggal_lahir' => 'nullable|date',
             'jenis_kelamin' => 'nullable|string',
             'agama' => 'nullable|string',
             'alamat' => 'nullable|string',
@@ -209,21 +230,62 @@ class KurikulumSiswaController extends Controller
             'tanggal_diterima' => 'nullable|date',
             'rombel_id' => 'nullable|exists:rombels,id',
             'email' => 'nullable|email',
+            // Parent data
+            'ayah_nama' => 'nullable|string|max:255',
+            'ayah_pekerjaan' => 'nullable|string|max:255',
+            'ayah_telepon' => 'nullable|string|max:50',
+            'ayah_alamat' => 'nullable|string|max:1000',
+            'ibu_nama' => 'nullable|string|max:255',
+            'ibu_pekerjaan' => 'nullable|string|max:255',
+            'ibu_telepon' => 'nullable|string|max:50',
+            'ibu_alamat' => 'nullable|string|max:1000',
+            'wali_nama' => 'nullable|string|max:255',
+            'wali_pekerjaan' => 'nullable|string|max:255',
+            'wali_telepon' => 'nullable|string|max:50',
+            'wali_alamat' => 'nullable|string|max:1000',
         ]);
 
-        if (empty($data['user_id'])) {
-            // keep existing associated user
-            $data['user_id'] = $siswa->user_id;
-            $user = User::find($data['user_id']);
-        } else {
-            $user = User::find($data['user_id']);
-        }
+        // Update siswa data
+        $siswa->update([
+            'nama_lengkap' => $data['nama_lengkap'],
+            'nis' => $data['nis'],
+            'nisn' => $data['nisn'],
+            'tempat_lahir' => $data['tempat_lahir'],
+            'tanggal_lahir' => $data['tanggal_lahir'],
+            'jenis_kelamin' => $data['jenis_kelamin'],
+            'agama' => $data['agama'],
+            'alamat' => $data['alamat'],
+            'no_hp' => $data['no_hp'],
+            'kelas' => $data['kelas'],
+            'tanggal_diterima' => $data['tanggal_diterima'],
+            'rombel_id' => $data['rombel_id'],
+        ]);
 
-        $data['nis'] = $request->input('nis') ?? $user->nomor_induk ?? $siswa->nis;
+        // Update or create Ayah
+        $siswa->ayah()->updateOrCreate(['siswa_id' => $siswa->id], [
+            'nama' => $data['ayah_nama'],
+            'pekerjaan' => $data['ayah_pekerjaan'],
+            'telepon' => $data['ayah_telepon'],
+            'alamat' => $data['ayah_alamat'],
+        ]);
 
-        $siswa->update($data);
+        // Update or create Ibu
+        $siswa->ibu()->updateOrCreate(['siswa_id' => $siswa->id], [
+            'nama' => $data['ibu_nama'],
+            'pekerjaan' => $data['ibu_pekerjaan'],
+            'telepon' => $data['ibu_telepon'],
+            'alamat' => $data['ibu_alamat'],
+        ]);
 
-        return redirect()->route('kurikulum.siswa.index')->with('success', 'Data siswa diperbarui.');
+        // Update or create Wali
+        $siswa->wali()->updateOrCreate(['siswa_id' => $siswa->id], [
+            'nama' => $data['wali_nama'],
+            'pekerjaan' => $data['wali_pekerjaan'],
+            'telepon' => $data['wali_telepon'],
+            'alamat' => $data['wali_alamat'],
+        ]);
+
+        return redirect()->route('kurikulum.data-siswa.show', $siswa->id)->with('success', 'Data siswa berhasil diperbarui.');
     }
 
     public function destroy($id)
@@ -248,365 +310,98 @@ class KurikulumSiswaController extends Controller
     }
 
     /**
-     * Import siswa from Excel and create associated User accounts with default password 12345678
+     * Import siswa from Excel
      */
     public function import(Request $request)
-{
-    $request->validate([
-        'file' => 'required|file|mimes:xlsx,xls,csv'
-    ]);
-
-    $path = $request->file('file');
-
-    $sheets = Excel::toArray([], $path);
-    if (empty($sheets) || !is_array($sheets)) {
-        return back()->with('error', 'File kosong atau format tidak dikenali.');
-    }
-
-    // pick the first sheet that has at least 2 rows (header + data)
-    $rows = null;
-    foreach ($sheets as $sheet) {
-        if (is_array($sheet) && count($sheet) > 1) { $rows = $sheet; break; }
-    }
-    if (!is_array($rows) || count($rows) < 2) {
-        return back()->with('error', 'Tidak ada data pada file. Pastikan baris header ada dan data berada di sheet pertama yang berisi data.');
-    }
-    if (count($rows) < 2) {
-        return back()->with('error', 'Tidak ada data pada file. Pastikan baris header ada.');
-    }
-
-    $header = array_map(function ($h) {
-        return (string)Str::of($h)->lower()->trim();
-    }, $rows[0]);
-
-    $map = [];
-    foreach ($header as $i => $h) {
-        $lower = $h;
-
-        // Kita hanya butuh memetakan kolom-kolom penting saja
-        if (str_contains($lower, 'nomor') || str_contains($lower, 'nomor_induk') || str_contains($lower, 'nomor induk')) {
-            $map['nomor_induk'] = $i;
-        }
-
-        if (str_contains($lower, 'nisn')) {
-            $map['nisn'] = $i;
-        }
-
-        // map plain 'nis' header if present (some templates use 'nis')
-        if (str_contains($lower, 'nis') && !str_contains($lower, 'nisn')) {
-            $map['nis'] = $i;
-        }
-
-        if (str_contains($lower, 'rombel_id') || str_contains($lower, 'id_rombel') || str_contains($lower, 'id rombel')) {
-            $map['rombel_id'] = $i;
-        }
-
-        if (str_contains($lower, 'nama_rombel') || str_contains($lower, 'rombel')) {
-            $map['nama_rombel'] = $i;
-        }
-
-        if (str_contains($lower, 'nama') && !str_contains($lower, 'rombel')) {
-            $map['nama_lengkap'] = $i;
-        }
-
-        if (str_contains($lower, 'jenis') && str_contains($lower, 'kelamin')) {
-            $map['jenis_kelamin'] = $i;
-        }
-
-        if (str_contains($lower, 'email')) {
-            $map['email'] = $i;
-        }
-
-        if (str_contains($lower, 'tanggal') || str_contains($lower, 'tanggal_lahir') || str_contains($lower, 'ttl')) {
-            $map['tanggal_lahir'] = $i;
-        }
-    }
-
-    // Debug: Lihat pemetaan kolom yang berhasil
-    \Log::info('Pemetaan Kolom: ' . json_encode($map));
-
-    $created = 0;
-    $updated = 0;
-    $skipped = 0;
-    $errors = [];
-
-    for ($r = 1; $r < count($rows); $r++) {
-        $row = $rows[$r];
-        $allEmpty = true;
-        foreach ($row as $cell) {
-            if (trim((string)$cell) !== '') { $allEmpty = false; break; }
-        }
-        if ($allEmpty) continue;
-
-        // --- PERUBAHAN UTAMA DIMULAI DI SINI ---
-
-        // 1. Ambil nilai nomor_induk dari Excel. Ini akan kita gunakan untuk NIS juga.
-            // Prefer nomor_induk mapping; fallback to nis column if provided
-            $nomorInduk = null;
-            if (isset($map['nomor_induk'])) {
-                $nomorInduk = trim((string)($row[$map['nomor_induk']] ?? ''));
-            } elseif (isset($map['nis'])) {
-                $nomorInduk = trim((string)($row[$map['nis']] ?? ''));
-            }
-
-        // 2. Ambil nilai-nilai lainnya
-        $nama = isset($map['nama_lengkap']) ? trim((string)($row[$map['nama_lengkap']] ?? '')) : null;
-        $jenis = isset($map['jenis_kelamin']) ? trim((string)($row[$map['jenis_kelamin']] ?? '')) : null;
-        
-        // Normalisasi jenis kelamin
-        if ($jenis !== null) {
-            $jnorm = strtolower($jenis);
-            $jnorm = str_replace([' ', '\t', '\n', "-"], '', $jnorm);
-            if (in_array($jnorm, ['l','lk','laki','lakilaki','laki-laki','lk-lk'])) {
-                $jenis = 'L';
-            } elseif (in_array($jnorm, ['p','pr','per','perempuan','perempuant'])) {
-                $jenis = 'P';
-            } elseif ($jnorm === '') {
-                $jenis = '';
-            } else {
-                $errors[] = "Baris " . ($r+1) . ": nilai jenis_kelamin tidak dikenali ('{$jenis}').";
-            }
-        }
-        
-        $nisn = isset($map['nisn']) ? trim((string)($row[$map['nisn']] ?? '')) : null;
-        $email = isset($map['email']) ? trim((string)($row[$map['email']] ?? '')) : null;
-        $tanggal_lahir = null;
-        if (isset($map['tanggal_lahir'])) {
-            $raw = trim((string)($row[$map['tanggal_lahir']] ?? ''));
-            if ($raw !== '') {
-                try {
-                    // Try to parse common date formats
-                    $tanggal_lahir = Carbon::parse($raw)->format('Y-m-d');
-                } catch (\Throwable $ex) {
-                    // if parse fails, leave null and log warning
-                    $errors[] = "Baris " . ($r+1) . ": tanggal_lahir tidak dikenali ('{$raw}'), akan disimpan kosong.";
-                    $tanggal_lahir = null;
-                }
-            }
-        }
-        $namaRombel = isset($map['nama_rombel']) ? trim((string)($row[$map['nama_rombel']] ?? '')) : null;
-        $rombelIdFromSheet = isset($map['rombel_id']) ? trim((string)($row[$map['rombel_id']] ?? '')) : null;
-
-        // Resolve rombel id early so existing siswa can be updated with rombel
-        $rombelId = null;
-        if (!empty($rombelIdFromSheet)) {
-            if (is_numeric($rombelIdFromSheet)) {
-                $rombelModel = Rombel::find((int)$rombelIdFromSheet);
-                if ($rombelModel) {
-                    $rombelId = $rombelModel->id;
-                } else {
-                    $errors[] = "Baris " . ($r+1) . ": rombel_id '{$rombelIdFromSheet}' tidak ditemukan.";
-                }
-            } else {
-                // if non-numeric, we'll try name matching below
-            }
-        }
-
-        if (empty($rombelId) && !empty($namaRombel)) {
-            $normalize = function ($s) {
-                $s = strtolower(trim((string)$s));
-                $s = preg_replace('/\s+/u', ' ', $s);
-                $s = str_replace([".", ","], '', $s);
-                return $s;
-            };
-
-            $needle = $normalize($namaRombel);
-            $rombel = Rombel::all()->first(function ($r) use ($needle, $normalize) {
-                $hay = $normalize($r->nama);
-                return ($needle !== '' && (strpos($hay, $needle) !== false || strpos($needle, $hay) !== false));
-            });
-
-            if ($rombel) $rombelId = $rombel->id;
-        }
-
-        // Debug: Lihat nilai yang diambil dari baris pertama untuk memastikan
-        if ($r == 1) {
-            \Log::info("Contoh Baris 1: Nomor Induk={$nomorInduk}, Nama={$nama}, Jenis={$jenis}");
-        }
-
-        if (empty($nama)) {
-            $errors[] = "Baris " . ($r+1) . ": nama kosong, dilewati.";
-            $skipped++;
-            continue;
-        }
-
-        // First, try to find an existing DataSiswa by nis or nisn to avoid duplicates
-        $existingSiswa = null;
-        if (!empty($nomorInduk)) {
-            $existingSiswa = DataSiswa::where('nis', $nomorInduk)->first();
-        }
-        if (!$existingSiswa && !empty($nisn)) {
-            $existingSiswa = DataSiswa::where('nisn', $nisn)->first();
-        }
-
-        // If an existing siswa row is found, reuse/update it and ensure a linked user exists
-        if ($existingSiswa) {
-            try {
-                $siswaModel = $existingSiswa;
-
-                // Ensure user exists for this siswa; if not, try match by nomor_induk/email and create if needed
-                $user = $siswaModel->user;
-                if (!$user) {
-                    $user = null;
-                    if ($nomorInduk) {
-                        $user = User::where('nomor_induk', $nomorInduk)->first();
-                    }
-                    if (!$user && $email) {
-                        $user = User::where('email', $email)->first();
-                    }
-
-                    if (!$user) {
-                        $emailToUse = empty($email) ? ($nomorInduk ? "{$nomorInduk}@example.local" : strtolower(str_replace(' ', '.', strtok($nama, ' '))) . '@example.local') : $email;
-                        $user = User::create([
-                            'name' => $nama,
-                            'nomor_induk' => $nomorInduk ?: null,
-                            'email' => $emailToUse,
-                            'password' => Hash::make('12345678'),
-                            'role' => 'siswa',
-                        ]);
-                    }
-
-                    // link user to siswa if not already
-                    if ($user && $siswaModel->user_id !== $user->id) {
-                        $siswaModel->user_id = $user->id;
-                    }
-                }
-
-                // Update siswa fields
-                $siswaModel->fill([
-                    'nama_lengkap' => $nama,
-                    'nis' => $nomorInduk ?: $siswaModel->nis,
-                    'nisn' => $nisn ?: $siswaModel->nisn,
-                    'jenis_kelamin' => $jenis ?: $siswaModel->jenis_kelamin,
-                    'rombel_id' => $rombelId ?? $siswaModel->rombel_id,
-                    'tanggal_lahir' => $tanggal_lahir ?: $siswaModel->tanggal_lahir,
-                ]);
-                $siswaModel->save();
-
-            } catch (\Throwable $e) {
-                $errors[] = "Baris " . ($r+1) . ": gagal memperbarui siswa ({$e->getMessage()}).";
-                $skipped++;
-                continue;
-            }
-
-            // not counted as created
-            $rombelId = $siswaModel->rombel_id ?? null;
-        } else {
-            // No existing siswa; find or create user, then create/upsert siswa using nis/nisn as key
-
-            // Cari user yang sudah ada berdasarkan nomor_induk atau email
-            $existingUser = null;
-            if ($nomorInduk) {
-                $existingUser = User::where('nomor_induk', $nomorInduk)->first();
-            }
-            if (!$existingUser && $email) {
-                $existingUser = User::where('email', $email)->first();
-            }
-
-            try {
-                if ($existingUser) {
-                    if ($existingUser->role !== 'siswa') {
-                        $errors[] = "Baris " . ($r+1) . ": user ada tapi bukan role siswa (nomor_induk={$nomorInduk}).";
-                        $skipped++;
-                        continue;
-                    }
-                    $user = $existingUser;
-                } else {
-                    // Buat email default jika kosong
-                    if (empty($email)) {
-                        $email = $nomorInduk ? "{$nomorInduk}@example.local" : strtolower(str_replace(' ', '.', strtok($nama, ' '))) . '@example.local';
-                    }
-
-                    $user = User::create([
-                        'name' => $nama,
-                        'nomor_induk' => $nomorInduk ?: null,
-                        'email' => $email,
-                        'password' => Hash::make('12345678'),
-                        'role' => 'siswa',
-                    ]);
-                }
-            } catch (\Throwable $e) {
-                $errors[] = "Baris " . ($r+1) . ": gagal membuat/mengambil user ({$e->getMessage()}).";
-                $skipped++;
-                continue;
-            }
-
-            $rombelId = null;
-
-        // Cari rombel berdasarkan id atau nama
-        if (!empty($rombelIdFromSheet)) {
-            if (is_numeric($rombelIdFromSheet)) {
-                $rombelModel = Rombel::find((int)$rombelIdFromSheet);
-                if ($rombelModel) {
-                    $rombelId = $rombelModel->id;
-                } else {
-                    $errors[] = "Baris " . ($r+1) . ": rombel_id '{$rombelIdFromSheet}' tidak ditemukan.";
-                }
-            } else {
-                $errors[] = "Baris " . ($r+1) . ": nilai rombel_id tidak numerik ('{$rombelIdFromSheet}'), mencoba pencocokan nama.";
-            }
-        }
-
-        if (empty($rombelId) && !empty($namaRombel)) {
-            $normalize = function ($s) {
-                $s = strtolower(trim((string)$s));
-                $s = preg_replace('/\s+/u', ' ', $s);
-                $s = str_replace([".", ","], '', $s);
-                return $s;
-            };
-
-            $needle = $normalize($namaRombel);
-            $rombel = Rombel::all()->first(function ($r) use ($needle, $normalize) {
-                $hay = $normalize($r->nama);
-                return ($needle !== '' && (strpos($hay, $needle) !== false || strpos($needle, $hay) !== false));
-            });
-
-            if ($rombel) $rombelId = $rombel->id;
-        }
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv'
+        ]);
 
         try {
-            // Cegah duplikat: jika DataSiswa sudah ada untuk user ini atau nis yang sama,
-            // lakukan update alih-alih membuat record baru.
-            $existingData = null;
-            if ($user && $user->id) {
-                $existingData = DataSiswa::where('user_id', $user->id)->first();
+            $path = $request->file('file');
+            $sheets = Excel::toArray(new class {}, $path);
+            
+            if (empty($sheets) || !is_array($sheets)) {
+                return back()->with('error', 'File kosong atau format tidak dikenali.');
             }
 
-            if (!$existingData && !empty($nomorInduk)) {
-                $existingData = DataSiswa::where('nis', $nomorInduk)->first();
+            // Get first sheet with data
+            $rows = null;
+            foreach ($sheets as $sheet) {
+                if (is_array($sheet) && count($sheet) > 1) {
+                    $rows = $sheet;
+                    break;
+                }
             }
 
-            $payload = [
-                'user_id' => $user->id,
-                'nama_lengkap' => $nama,
-                'nis' => $nomorInduk,
-                'nisn' => $nisn,
-                'jenis_kelamin' => $jenis,
-                'rombel_id' => $rombelId,
-            ];
-
-            if ($existingData) {
-                $existingData->update($payload);
-                $updated++;
-            } else {
-                DataSiswa::create($payload);
-                $created++;
+            if (!is_array($rows) || count($rows) < 2) {
+                return back()->with('error', 'Tidak ada data pada file.');
             }
+
+            $created = 0;
+            $updated = 0;
+
+            // Process rows starting from row 1 (skip header)
+            for ($r = 1; $r < count($rows); $r++) {
+                $row = $rows[$r];
+                
+                // Skip empty rows
+                $allEmpty = true;
+                foreach ($row as $cell) {
+                    if (trim((string)$cell) !== '') {
+                        $allEmpty = false;
+                        break;
+                    }
+                }
+                if ($allEmpty) continue;
+
+                // Extract data (basic mapping)
+                $nama = trim((string)($row[0] ?? ''));
+                $nis = trim((string)($row[1] ?? ''));
+                $nisn = trim((string)($row[2] ?? ''));
+
+                if (empty($nama)) continue;
+
+                // Find or create siswa
+                $siswa = DataSiswa::where('nis', $nis)->first();
+                if ($siswa) {
+                    $siswa->update([
+                        'nama_lengkap' => $nama,
+                        'nisn' => $nisn ?: $siswa->nisn,
+                    ]);
+                    $updated++;
+                } else {
+                    DataSiswa::create([
+                        'nama_lengkap' => $nama,
+                        'nis' => $nis,
+                        'nisn' => $nisn,
+                        'jenis_kelamin' => 'Laki-laki',
+                    ]);
+                    $created++;
+                }
+            }
+
+            return redirect()->route('kurikulum.siswa.index')
+                ->with('success', "Import selesai. Dibuat: {$created}. Diperbarui: {$updated}.");
+
         } catch (\Throwable $e) {
-            $errors[] = "Baris " . ($r+1) . ": gagal menyimpan siswa ({$e->getMessage()}).";
-            $skipped++;
-            continue;
+            return back()->with('error', 'Gagal mengimport file: ' . $e->getMessage());
         }
     }
 
-    $msg = "Import selesai. Dibuat: {$created}. Diperbarui: {$updated}. Dilewati: {$skipped}.";
-    if (!empty($errors)) {
-        $msg .= ' Beberapa peringatan: ' . implode(' | ', array_slice($errors,0,10));
+    /**
+     * Cetak data siswa (PDF)
+     */
+    public function cetak($id)
+    {
+        $siswa = DataSiswa::with(['ayah', 'ibu', 'wali', 'rombel'])->findOrFail($id);
+        
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('kurikulum.siswa.data-diri.pdf', compact('siswa'))
+            ->setPaper('A4', 'portrait');
+        
+        $filename = 'Data Diri - ' . ($siswa->nama_lengkap ?? $siswa->nis ?? $siswa->id) . '.pdf';
+        
+        return $pdf->stream($filename);
     }
-
-    return redirect()->route('kurikulum.siswa.index')->with('success', $msg);
-}
-
-}
-
 }

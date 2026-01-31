@@ -433,6 +433,7 @@ Route::middleware(['auth'])->group(function () {
 
             // Route untuk guru (TU management)
             Route::get('/guru', [TUController::class, 'guruIndex'])->name('guru.index');
+            Route::get('/guru/export', [TUController::class, 'exportGuru'])->name('guru.export');
             Route::get('/guru/create', [TUController::class, 'guruCreate'])->name('guru.create');
             Route::post('/guru', [TUController::class, 'guruStore'])->name('guru.store');
             Route::get('/guru/{id}', [TUController::class, 'guruShow'])->name('guru.show');
@@ -442,6 +443,9 @@ Route::middleware(['auth'])->group(function () {
 
             // Route untuk siswa
             Route::get('/siswa', [TUController::class, 'siswa'])->name('siswa.index');
+            Route::get('/siswa/export/jurusan/{jurusanId}', [TUController::class, 'exportSiswaByJurusan'])->name('siswa.export.jurusan');
+            Route::get('/siswa/export/angkatan/{jurusanId}', [TUController::class, 'exportSiswaByAngkatan'])->name('siswa.export.angkatan');
+            Route::get('/siswa/{id}/export-pdf', [TUController::class, 'siswaExportPdf'])->name('siswa.exportPDF');
             Route::get('/siswa/create', [TUController::class, 'siswaCreate'])->name('siswa.create');
             Route::post('/siswa', [TUController::class, 'siswaStore'])->name('siswa.store');
             Route::get('/siswa/{id}', [TUController::class, 'siswaDetail'])->name('siswa.detail');
@@ -454,6 +458,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/kelas', [TUController::class, 'kelas'])->name('kelas.index');
             Route::get('/kelas/create', [TUController::class, 'kelasCreate'])->name('kelas.create');
             Route::post('/kelas', [TUController::class, 'kelasStore'])->name('kelas.store');
+            // Export siswa per rombel (TU) - mirror Kaprog export
+            Route::get('/kelas/{id}/export', [TUController::class, 'exportSiswaByRombel'])->name('kelas.export');
             Route::get('/kelas/{id}', [TUController::class, 'kelasDetail'])->name('kelas.show');
             Route::get('/kelas/{id}/edit', [TUController::class, 'kelasEdit'])->name('kelas.edit');
             Route::put('/kelas/{id}', [TUController::class, 'kelasUpdate'])->name('kelas.update');
@@ -489,8 +495,8 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/nilai-raport/update', [TUController::class, 'nilaiRaportUpdate'])->name('nilai_raport.update');
             Route::delete('/nilai-raport/delete', [TUController::class, 'nilaiRaportDestroy'])->name('nilai_raport.destroy');
 
-            // Cetak rapor (TU)
-            Route::get('/rapor/{siswa_id}/{semester}/{tahun}/cetak', [RaporController::class, 'cetakRapor'])->name('rapor.cetak');
+            // Cetak rapor (TU) — use TU controller so it renders TU-specific PDF
+            Route::get('/rapor/{siswa_id}/{semester}/{tahun}/cetak', [TUController::class, 'cetakRaport'])->name('rapor.cetak');
 
             // Mutasi Siswa (TU)
             Route::get('/mutasi/laporan', [MutasiController::class, 'laporan'])->name('mutasi.laporan');
@@ -634,7 +640,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/siswa/{id}', [KurikulumSiswaController::class, 'show'])
                 ->name('data-siswa.show');
 
-            Route::get('/siswa/{id}/edit', [KurikulumSiswaController::class, 'edit'])
+            Route::get('/siswa/{id}/edit', [KurikulumSiswaController::class, 'editDataDiri'])
                 ->name('data-siswa.edit');
 
             Route::put('/siswa/{id}', [KurikulumSiswaController::class, 'update'])
@@ -642,6 +648,12 @@ Route::middleware(['auth'])->group(function () {
 
             Route::delete('/siswa/{id}', [KurikulumSiswaController::class, 'destroy'])
                 ->name('data-siswa.destroy');
+
+            Route::get('/siswa/{id}/edit-password', [KurikulumSiswaController::class, 'edit'])
+                ->name('siswa.edit');
+
+            Route::get('/siswa/{id}/cetak', [KurikulumSiswaController::class, 'cetak'])
+                ->name('siswa.cetak');
 
             // KELAS
             Route::get('/kelas/create', [KelasController::class, 'create'])
@@ -665,6 +677,12 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/rapor/{id}/{semester}/{tahun}', [App\Http\Controllers\Kurikulum\KurikulumRaportController::class, 'detail'])
                 ->name('rapor.detail');
 
+            Route::get('/rapor/{id}/{semester}/{tahun}/cetak', [App\Http\Controllers\Kurikulum\KurikulumRaportController::class, 'exportPdf'])
+                ->name('rapor.cetak');
+
+            Route::get('/rapor/{id}/{semester}/{tahun}/show', [App\Http\Controllers\Kurikulum\KurikulumRaportController::class, 'show_html'])
+                ->name('rapor.show_html');
+
             Route::get('/kurikulum/manajemen-kelas', [KelasController::class, 'index'])
                 ->name('kurikulum.kelas.index');
 
@@ -681,6 +699,9 @@ Route::middleware(['auth'])->group(function () {
 
             Route::put('/manajemen-kelas/{id}', [KelasController::class, 'update'])
                 ->name('kelas.update');
+
+            Route::get('/manajemen-kelas/{id}/export', [KelasController::class, 'export'])
+                ->name('kelas.export');
 
             // JURUSAN
             Route::get('/jurusan', [JurusanController::class, 'index'])

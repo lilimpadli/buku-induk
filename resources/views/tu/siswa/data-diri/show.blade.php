@@ -13,6 +13,9 @@
             <a href="{{ route('tu.siswa.edit', $siswa->id) }}" class="btn btn-warning me-2">
                 <i class="fas fa-edit"></i> Edit
             </a>
+            <a href="{{ route('tu.siswa.exportPDF', $siswa->id) }}" class="btn btn-success me-2">
+                <i class="fas fa-file-pdf"></i> Export
+            </a>
             <a href="{{ route('tu.siswa.raport', $siswa->id) }}" class="btn btn-primary">
                 <i class="fas fa-file-alt"></i> Raport
             </a>

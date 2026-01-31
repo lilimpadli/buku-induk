@@ -4,8 +4,6 @@
 
 @section('content')
 <style>
-    /* ===================== STYLE RIWAYAT RAPOR ===================== */
-    
     :root {
         --primary-color: #2F53FF;
         --secondary-color: #6366F1;
@@ -48,7 +46,6 @@
         margin-bottom: 25px;
     }
 
-    /* Card Styles */
     .card {
         border-radius: 16px;
         border: none;
@@ -61,7 +58,6 @@
         box-shadow: var(--hover-shadow);
     }
 
-    /* List Group Styles */
     .list-group {
         border-radius: 16px;
     }
@@ -111,7 +107,6 @@
         color: var(--primary-color);
     }
 
-    /* Report Info */
     .report-info {
         display: flex;
         align-items: center;
@@ -157,7 +152,6 @@
         display: block;
     }
 
-    /* Badge Styles */
     .badge {
         padding: 8px 12px;
         font-size: 12px;
@@ -172,7 +166,6 @@
         box-shadow: 0 4px 8px rgba(47, 83, 255, 0.3);
     }
 
-    /* Empty State */
     .empty-state {
         text-align: center;
         padding: 60px 20px;
@@ -190,7 +183,6 @@
         margin-bottom: 10px;
     }
 
-    /* Animations */
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
@@ -200,7 +192,6 @@
         animation: fadeIn 0.5s ease-out;
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
         h3 {
             font-size: 24px;
@@ -229,17 +220,16 @@
 </style>
 
 <div class="container mt-4">
-
     <h3>Riwayat Rapor — {{ $siswa->nama_lengkap }}</h3>
     <p class="text-muted">Pilih raport berdasarkan semester dan tahun ajaran</p>
 
     <div class="card shadow">
         @forelse ($raports as $r)
             <div class="list-group list-group-flush">
-                <a href="{{ route('tu.nilai_raport.show', [
-                        'siswa_id' => $siswa->id,
-                        'semester' => $r->semester,
-                        'tahun' => $r->tahun_ajaran
+                <a href="{{ route('kurikulum.rapor.detail', [
+                        $siswa->id,
+                        $r->semester,
+                        str_replace('/', '-', $r->tahun_ajaran)
                     ]) }}"
                    class="list-group-item list-group-item-action d-flex justify-content-between">
 
@@ -258,15 +248,12 @@
                 </a>
             </div>
         @empty
-
             <div class="empty-state">
                 <i class="fas fa-file-alt"></i>
                 <h5>Belum ada raport</h5>
                 <p>Belum ada raport tersimpan untuk siswa ini.</p>
             </div>
-
         @endforelse
-
     </div>
 </div>
 @endsection

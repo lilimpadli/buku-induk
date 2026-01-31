@@ -352,8 +352,11 @@
                                 <a href="{{ route('kurikulum.data-siswa.show', $siswa->id) }}" class="btn btn-sm btn-info" title="Detail">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="{{ route('kurikulum.data-siswa.edit', $siswa->id) }}" class="btn btn-sm btn-warning" title="Edit">
+                                <a href="{{ route('kurikulum.data-siswa.edit', $siswa->id) }}" class="btn btn-sm btn-warning" title="Edit Data Diri">
                                     <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{{ route('kurikulum.siswa.edit', $siswa->id) }}" class="btn btn-sm btn-secondary" title="Ubah Password">
+                                    <i class="fas fa-key"></i>
                                 </a>
                                 <form action="{{ route('kurikulum.data-siswa.destroy', $siswa->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data siswa ini?')">
                                     @csrf
@@ -369,7 +372,7 @@
             </div>
             
             <div class="d-flex justify-content-center mt-3 p-3">
-                {{ $siswas->links() }}
+                {{ $siswas->links('pagination::bootstrap-4') }}
             </div>
         @else
             <div class="empty-state">

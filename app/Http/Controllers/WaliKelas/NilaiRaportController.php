@@ -149,12 +149,15 @@ class NilaiRaportController extends Controller
 
         $siswa = DataSiswa::findOrFail($siswa_id);
 
-        $nilaiRaports = NilaiRaport::with('mapel')
+        $nilaiRaports = NilaiRaport::with(['mapel', 'rombel'])
             ->where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->orderBy('mata_pelajaran_id')
             ->get();
+
+        // Dapatkan rombel dari data raport (sesuai dengan raport yang sedang dicetak)
+        $rombelRaport = $nilaiRaports->first()?->rombel;
 
         // default: all mapel by kelompok, but prefer filtering by siswa rombel->kelas->tingkat
         $kelompokA = MataPelajaran::where('kelompok', 'A')->orderBy('urutan');
@@ -241,7 +244,7 @@ class NilaiRaportController extends Controller
             ->first();
 
         $pdf = Pdf::loadView('walikelas.nilai_raport.pdf', compact(
-            'siswa', 'semester', 'tahun', 'nilaiRaports', 'kelompokA', 'kelompokB', 'nilaiMap', 'ekstra', 'kehadiran', 'info', 'kenaikan'
+            'siswa', 'semester', 'tahun', 'nilaiRaports', 'kelompokA', 'kelompokB', 'nilaiMap', 'ekstra', 'kehadiran', 'info', 'kenaikan', 'rombelRaport'
         ))->setPaper('A4', 'portrait');
 
         $safeNama = str_replace(['/', '\\'], '-', $siswa->nama_lengkap);

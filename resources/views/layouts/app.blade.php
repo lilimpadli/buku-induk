@@ -399,13 +399,16 @@
                                     </a>
 
                                     <!-- Dropdown Menu untuk PPDB -->
+                                    @php
+                                        $ppdbActive = request()->is('kurikulum/ppdb*') || request()->routeIs('kurikulum.ppdb.*');
+                                    @endphp
                                     <div class="dropdown">
-                                        <a class="nav-link dropdown-toggle {{ request()->is('kurikulum/ppdb*') ? 'active' : '' }}" href="#" id="ppdbDropdownKurikulum" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <a class="nav-link dropdown-toggle {{ $ppdbActive ? 'active' : '' }}" href="#" id="ppdbDropdownKurikulum" role="button" data-bs-toggle="dropdown" aria-expanded="{{ $ppdbActive ? 'true' : 'false' }}">
                                             <i class="fas fa-users"></i> <span class="label ms-2">PPDB</span>
                                         </a>
-                                        <ul class="dropdown-menu" aria-labelledby="ppdbDropdownKurikulum">
-                                            <li><a class="dropdown-item" href="{{ route('kurikulum.ppdb.index') }}"><i class="fas fa-list"></i> Data PPDB</a></li>
-                                            <li><a class="dropdown-item" href="{{ route('kurikulum.ppdb.timeline') }}"><i class="fas fa-clock"></i> Timeline PPDB</a></li>
+                                        <ul class="dropdown-menu {{ $ppdbActive ? 'show' : '' }}" aria-labelledby="ppdbDropdownKurikulum">
+                                            <li><a class="dropdown-item {{ request()->routeIs('kurikulum.ppdb.index') ? 'active' : '' }}" href="{{ route('kurikulum.ppdb.index') }}"><i class="fas fa-list"></i> Data PPDB</a></li>
+                                            <li><a class="dropdown-item {{ request()->routeIs('kurikulum.ppdb.timeline') ? 'active' : '' }}" href="{{ route('kurikulum.ppdb.timeline') }}"><i class="fas fa-clock"></i> Timeline PPDB</a></li>
                                         </ul>
                                     </div>
 

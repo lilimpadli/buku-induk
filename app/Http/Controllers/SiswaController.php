@@ -495,7 +495,7 @@ class SiswaController extends Controller
                 ->with('error', 'Semester tidak valid');
         }
 
-        $nilaiRaports = NilaiRaport::with('mapel')
+        $nilaiRaports = NilaiRaport::with(['mapel', 'rombel'])
             ->where('siswa_id', $siswa->id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
@@ -507,6 +507,9 @@ class SiswaController extends Controller
             return redirect()->route('siswa.raport')
                 ->with('error', 'Data raport untuk semester ' . $semester . ' tahun ajaran ' . $tahun . ' tidak ditemukan');
         }
+
+        // Dapatkan rombel dari data raport (sesuai dengan raport yang sedang dicetak)
+        $rombelRaport = $nilaiRaports->first()?->rombel;
 
         $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa->id)
             ->where('semester', $semester)
@@ -536,7 +539,8 @@ class SiswaController extends Controller
             'ekstra',
             'kehadiran',
             'info',
-            'kenaikan'
+            'kenaikan',
+            'rombelRaport'
         ))->setPaper('A4', 'portrait');
 
         // filename for Content-Disposition must not contain '/' or '\\', sanitize it

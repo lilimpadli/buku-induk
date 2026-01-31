@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Akun Siswa')
+@section('title', 'Ubah Password Siswa')
 
 @section('content')
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>Edit Akun Siswa</h3>
+        <h3>Ubah Password Siswa</h3>
         <a href="{{ route('kurikulum.siswa.index') }}" class="btn btn-secondary">Kembali</a>
     </div>
 
@@ -19,16 +19,36 @@
         </div>
     @endif
 
-    <div class="card shadow">
+    <div class="card shadow" style="border-radius: 15px;">
         <div class="card-body">
+            <h5 class="mb-4">{{ $siswa->nama_lengkap }}</h5>
+
             <form method="POST" action="{{ route('kurikulum.data-siswa.update', $siswa->id) }}">
                 @csrf
                 @method('PUT')
 
-                @include('kurikulum.siswa._form')
+                <div class="mb-3">
+                    <label class="form-label">NIS / Nomor Induk</label>
+                    <input type="text" class="form-control" value="{{ $siswa->nis }}" readonly>
+                </div>
+
+                <hr>
+
+                <h6 class="mb-3">Ubah Password</h6>
+
+                <div class="mb-3">
+                    <label class="form-label" for="password">Password Baru</label>
+                    <input type="password" name="password" id="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah" value="{{ old('password') }}">
+                    <small class="text-muted">Minimal 6 karakter</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="password_confirmation">Konfirmasi Password</label>
+                    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="Ulangi password baru">
+                </div>
 
                 <div class="mt-4 d-flex justify-content-end">
-                    <a href="{{ route('tu.siswa.index') }}" class="btn btn-secondary me-2">Batal</a>
+                    <a href="{{ route('kurikulum.siswa.index') }}" class="btn btn-secondary me-2">Batal</a>
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save me-1"></i> Simpan Perubahan
                     </button>
@@ -37,45 +57,5 @@
         </div>
     </div>
 </div>
-
-<script>
-    // reuse same dependent selects script from create
-    document.addEventListener('DOMContentLoaded', function () {
-        const jurusanSelect = document.querySelector('select[name="jurusan_id"]');
-        const kelasSelect = document.getElementById('kelasSelect');
-        const rombelSelect = document.getElementById('rombelSelect');
-
-        function filterKelas() {
-            const jurusanId = jurusanSelect ? jurusanSelect.value : '';
-            Array.from(kelasSelect.options).forEach(opt => {
-                if (!opt.value) return;
-                const match = !jurusanId || opt.dataset.jurusan == jurusanId;
-                opt.style.display = match ? '' : 'none';
-            });
-            if (kelasSelect.selectedOptions.length && kelasSelect.selectedOptions[0].style.display === 'none') {
-                kelasSelect.value = '';
-            }
-            filterRombel();
-        }
-
-        function filterRombel() {
-            const kelasId = kelasSelect ? kelasSelect.value : '';
-            Array.from(rombelSelect.options).forEach(opt => {
-                if (!opt.value) return;
-                const dataKelas = opt.dataset.kelas || '';
-                const match = !kelasId || dataKelas == kelasId;
-                opt.style.display = match ? '' : 'none';
-            });
-            if (rombelSelect.selectedOptions.length && rombelSelect.selectedOptions[0].style.display === 'none') {
-                rombelSelect.value = '';
-            }
-        }
-
-        if (jurusanSelect) jurusanSelect.addEventListener('change', filterKelas);
-        if (kelasSelect) kelasSelect.addEventListener('change', filterRombel);
-
-        filterKelas();
-    });
-</script>
 
 @endsection
