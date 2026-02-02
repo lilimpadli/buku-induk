@@ -17,8 +17,9 @@ class WaliKelasSiswaController extends Controller
 {
     // List siswa
    public function index(Request $request)
-{
+    {
     $user = Auth::user();
+    /** @var \App\Models\User $user */
     $search = $request->query('q');
     $jenisKelamin = $request->query('jenis_kelamin');
 
@@ -131,6 +132,7 @@ class WaliKelasSiswaController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
 
         // ambil daftar rombel yang dia pegang sebagai wali kelas
         $rombelsIds = [];
@@ -212,6 +214,7 @@ class WaliKelasSiswaController extends Controller
     public function exportExcel(Request $request)
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $rombelsIds = [];
         if ($user) {
             $rombelsIds = $user->waliKelas()

@@ -26,6 +26,7 @@ class InputNilaiRaportController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $search = $request->query('q');
 
         // ambil daftar rombel yang dia pegang sebagai wali kelas
@@ -86,6 +87,7 @@ class InputNilaiRaportController extends Controller
         $kelompokB = MataPelajaran::where('kelompok', 'B')->orderBy('urutan');
 
         // jika siswa memiliki rombel->kelas, filter mapel berdasarkan tingkat angkatan
+        $currentJurusanId = null;
         if ($siswa->rombel && $siswa->rombel->kelas) {
             $currentKelas = $siswa->rombel->kelas;
             $currentTingkat = (string) $currentKelas->tingkat;
@@ -459,6 +461,7 @@ class InputNilaiRaportController extends Controller
         $kelompokA = MataPelajaran::where('kelompok','A')->orderBy('urutan');
         $kelompokB = MataPelajaran::where('kelompok','B')->orderBy('urutan');
 
+        $currentJurusanId = null;
         if ($siswa->rombel && $siswa->rombel->kelas) {
             $currentKelas = $siswa->rombel->kelas;
             $currentTingkat = (string) $currentKelas->tingkat;
@@ -601,6 +604,7 @@ class InputNilaiRaportController extends Controller
         ]);
 
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $rombelId = $request->rombel_id;
 
         // Verify user memiliki akses ke rombel ini
@@ -637,6 +641,7 @@ class InputNilaiRaportController extends Controller
         ]);
 
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $rombelId = $request->rombel_id;
 
         // Verify user memiliki akses ke rombel ini

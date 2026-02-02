@@ -270,8 +270,9 @@
                         </p>
 
                         @php
+                            $jurusan = $jurusan ?? null;
                             $rombelList = $g->rombels
-                                ->filter(fn ($r) => optional($r->kelas)->jurusan_id == $jurusan->id);
+                                ->filter(fn ($r) => optional($r->kelas)->jurusan_id == optional($jurusan)->id);
                         @endphp
 
                         <ul class="mb-3">

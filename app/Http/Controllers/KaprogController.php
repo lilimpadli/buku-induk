@@ -272,7 +272,7 @@ class KaprogController extends Controller
             ->where('tahun_ajaran', $tahun)
             ->first();
 
-        $kenaikan = \App\Models\KenaikanKelas::with('rombelTujuan')->where('siswa_id', $siswa->id)
+        $kenaikan = KenaikanKelas::with('rombelTujuan')->where('siswa_id', $siswa->id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->first();
@@ -300,6 +300,7 @@ class KaprogController extends Controller
     public function updateDataDiri(Request $request)
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $guru = Guru::where('user_id', $user->id)->first();
 
         $data = $request->validate([

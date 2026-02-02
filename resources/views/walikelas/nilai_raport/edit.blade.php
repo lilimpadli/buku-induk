@@ -489,45 +489,7 @@
             </div>
         </div>
 
-        <!-- Info Rapor -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>Informasi Rapor</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <label>Wali Kelas</label>
-                        <input type="text" name="info[wali_kelas]" class="form-control"
-                            value="{{ $info->wali_kelas ?? '' }}">
-                    </div>
-                    <div class="col-md-6">
-                        <label>NIP Wali Kelas</label>
-                        <input type="text" name="info[nip_wali]" class="form-control"
-                            value="{{ $info->nip_wali ?? '' }}">
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label>Kepala Sekolah</label>
-                        <input type="text" name="info[kepsek]" class="form-control"
-                            value="{{ $info->kepala_sekolah ?? '' }}">
-                    </div>
-                    <div class="col-md-6">
-                        <label>NIP Kepala Sekolah</label>
-                        <input type="text" name="info[nip_kepsek]" class="form-control"
-                            value="{{ $info->nip_kepsek ?? '' }}">
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label>Tanggal Rapor</label>
-                        <input type="date" name="info[tanggal_rapor]" class="form-control"
-                            value="{{ $info->tanggal_rapor ?? date('Y-m-d') }}">
-                    </div>
-                </div>
-            </div>
-        </div>
+        
 
         <div class="text-end">
             <button type="submit" class="btn btn-primary">

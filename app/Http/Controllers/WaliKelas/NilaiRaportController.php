@@ -23,6 +23,7 @@ class NilaiRaportController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $search = $request->query('q');
 
         // ambil daftar rombel yang dia pegang sebagai wali kelas
@@ -98,6 +99,7 @@ class NilaiRaportController extends Controller
     public function exportExcel(Request $request)
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $search = $request->query('q');
         $semester = $request->query('semester');
         $tahunAjaran = $request->query('tahun_ajaran');
