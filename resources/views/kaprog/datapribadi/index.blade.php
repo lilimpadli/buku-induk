@@ -23,7 +23,14 @@
     }
 
     .container {
-        max-width: 900px;
+        max-width: 1200px;
+    }
+
+    /* Responsive Container */
+    .report-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 1rem;
     }
 
     /* Card Styles */
@@ -33,6 +40,7 @@
         box-shadow: var(--card-shadow);
         overflow: hidden;
         transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
     }
 
     .card:hover {
@@ -40,14 +48,14 @@
     }
 
     .card-body {
-        padding: 2rem;
+        padding: 1.5rem;
     }
 
     .card-title {
-        font-size: 22px;
+        font-size: 18px;
         color: #1E293B;
         font-weight: 600;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
         position: relative;
         padding-left: 15px;
     }
@@ -64,61 +72,28 @@
         border-radius: 2px;
     }
 
-    /* Form Styles */
-    .form-label {
-        color: #475569;
-        font-weight: 600;
-        margin-bottom: 8px;
-        font-size: 14px;
+    /* Profile Image */
+    .rounded-circle {
+        border: 4px solid white;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
     }
 
-    .form-control, .form-select {
-        border-radius: 8px;
-        border: 1px solid #E2E8F0;
-        padding: 12px 15px;
-        font-size: 14px;
-        transition: all 0.2s ease;
+    .rounded-circle:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
     }
 
-    .form-control:focus, .form-select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(47, 83, 255, 0.1);
-    }
-
-    textarea.form-control {
-        min-height: 100px;
-        resize: vertical;
-    }
-
-    /* Alert Styles */
-    .alert {
-        border-radius: 8px;
-        border: none;
-        font-size: 14px;
-        margin-bottom: 1.5rem;
-        padding: 12px 15px;
-    }
-
-    .alert-success {
-        background-color: rgba(16, 185, 129, 0.1);
-        color: var(--success-color);
-    }
-
-    .alert-danger {
-        background-color: rgba(239, 68, 68, 0.1);
-        color: var(--danger-color);
-    }
-
-    .alert ul {
-        margin-bottom: 0;
-        padding-left: 20px;
+    /* Profile Placeholder */
+    .bg-secondary {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
     }
 
     /* Buttons */
     .btn {
         border-radius: 8px;
         font-weight: 600;
-        padding: 0.6rem 1.5rem;
+        padding: 0.5rem 1.2rem;
         transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
@@ -138,20 +113,57 @@
         border-color: var(--secondary-color);
     }
 
-    .btn-secondary {
-        background-color: #64748B;
-        border-color: #64748B;
+    /* Alert Styles */
+    .alert {
+        border-radius: 8px;
+        border: none;
+        font-size: 14px;
+        margin-bottom: 1rem;
     }
 
-    .btn-secondary:hover {
-        background-color: #475569;
-        border-color: #475569;
+    .alert-success {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+    }
+
+    .alert-danger {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+    }
+
+    /* Table Styles */
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table-borderless th,
+    .table-borderless td {
+        border: none;
+        padding: 0.5rem 0;
+    }
+
+    .table-borderless th {
+        color: #64748B;
+        font-weight: 600;
+        font-size: 14px;
+        width: 40%;
+    }
+
+    .table-borderless td {
+        color: #334155;
+        font-size: 14px;
     }
 
     /* Text Styles */
+    h5.mb-0 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1E293B;
+        margin-bottom: 0.5rem !important;
+    }
+
     .text-muted {
         color: #64748B !important;
-        font-size: 13px;
     }
 
     /* Animations */
@@ -167,111 +179,167 @@
     /* Responsive */
     @media (max-width: 768px) {
         .card-body {
-            padding: 1.5rem;
-        }
-        
-        .card-title {
-            font-size: 20px;
+            padding: 1.25rem;
         }
         
         .btn {
-            padding: 0.5rem 1.2rem;
+            padding: 0.4rem 1rem;
+            font-size: 14px;
+        }
+
+        .report-container {
+            padding: 0 0.5rem;
+        }
+
+        .col-md-4, .col-md-8 {
+            flex: 0 0 100%;
+            max-width: 100%;
+            margin-bottom: 1rem;
+        }
+        
+        .table-borderless th {
+            font-size: 13px;
+            width: 50%;
+        }
+        
+        .table-borderless td {
+            font-size: 13px;
+        }
+        
+        h5.mb-0 {
+            font-size: 16px;
+        }
+        
+        .text-muted {
+            font-size: 12px;
+        }
+        
+        .rounded-circle {
+            width: 100px !important;
+            height: 100px !important;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .report-container {
+            padding: 0 0.5rem;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .card-title {
             font-size: 14px;
         }
         
-        .form-control, .form-select {
-            padding: 10px 12px;
+        .btn {
+            padding: 0.3rem 0.8rem;
+            font-size: 12px;
+            width: 100%;
+        }
+        
+        .table-borderless th {
+            font-size: 12px;
+            width: 40%;
+        }
+        
+        .table-borderless td {
+            font-size: 12px;
+        }
+        
+        .row {
+            gap: 1rem;
+        }
+        
+        h5.mb-0 {
+            font-size: 14px;
+        }
+        
+        .rounded-circle {
+            width: 80px !important;
+            height: 80px !important;
+            font-size: 24px !important;
+        }
+        
+        .mt-3 {
+            margin-top: 1rem !important;
+        }
+        
+        .card {
+            margin-bottom: 1rem !important;
         }
     }
 </style>
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
+<div class="container-fluid mt-4">
+    <div class="report-container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm text-center">
                 <div class="card-body">
-                    <h5 class="card-title mb-3">Edit Data Diri</h5>
-
                     @if(session('success'))
                         <div class="alert alert-success">{{ session('success') }}</div>
                     @endif
-                    @if($errors->any())
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
+
+                    @if(session('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
                     @endif
+                    <div class="mb-3">
+                        @if(isset($user) && $user->photo)
+                            <img src="{{ asset('storage/' . $user->photo) }}" alt="Foto" class="rounded-circle" style="width:120px;height:120px;object-fit:cover;">
+                        @else
+                            <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center" style="width:120px;height:120px;color:white;font-size:28px;font-weight:700;">
+                                {{ $guru && $guru->nama ? strtoupper(substr($guru->nama,0,1)) : 'K' }}
+                            </div>
+                        @endif
+                    </div>
 
-                    <form action="{{ route('kaprog.datapribadi.update') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
+                    <h5 class="mb-0">{{ $guru->nama ?? '-' }}</h5>
+                    <p class="text-muted mb-1">NIP: {{ $guru->nip ?? '-' }}</p>
+                    <p class="text-muted small">{{ $guru->email ?? '' }}</p>
 
-                        <div class="mb-3">
-                            <label class="form-label">Nama</label>
-                            <input type="text" name="nama" class="form-control" value="{{ old('nama', $guru->nama ?? $user->name ?? '') }}" required>
+                    <div class="mt-3">
+                        <a href="{{ route('kaprog.datapribadi.edit') }}" class="btn btn-primary btn-sm">Edit Profil</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">Informasi Singkat</h6>
+                    <p class="mb-1"><strong>Tempat, Tgl Lahir:</strong> {{ $guru->tempat_lahir ?? '-' }}, {{ $guru->tanggal_lahir ?? '-' }}</p>
+                    <p class="mb-1"><strong>Jenis Kelamin:</strong> {{ $guru->jenis_kelamin ?? '-' }}</p>
+                    <p class="mb-0"><strong>Alamat:</strong> {{ $guru->alamat ?? '-' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Detail Profil</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless table-sm">
+                                <tr><th>Nama</th><td>{{ $guru->nama ?? '-' }}</td></tr>
+                                <tr><th>NIP</th><td>{{ $guru->nip ?? '-' }}</td></tr>
+                                <tr><th>Email</th><td>{{ $guru->email ?? '-' }}</td></tr>
+                                <tr><th>Tempat Lahir</th><td>{{ $guru->tempat_lahir ?? '-' }}</td></tr>
+                            </table>
                         </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">NIP</label>
-                            <input type="text" name="nip" class="form-control" value="{{ old('nip', $guru->nip ?? '') }}">
+                        <div class="col-md-6">
+                            <table class="table table-borderless table-sm">
+                                <tr><th>Tanggal Lahir</th><td>{{ $guru->tanggal_lahir ?? '-' }}</td></tr>
+                                <tr><th>Jenis Kelamin</th><td>{{ $guru->jenis_kelamin ?? '-' }}</td></tr>
+                                <tr><th>Alamat</th><td>{{ $guru->alamat ?? '-' }}</td></tr>
+                            </table>
                         </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" value="{{ old('email', $user->email ?? '') }}">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Tempat Lahir</label>
-                            <input type="text" name="tempat_lahir" class="form-control" value="{{ old('tempat_lahir', $guru->tempat_lahir ?? '') }}">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Tanggal Lahir</label>
-                            <input type="date" name="tanggal_lahir" class="form-control" value="{{ old('tanggal_lahir', $guru->tanggal_lahir ?? '') }}">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Jenis Kelamin</label>
-                            <input type="text" name="jenis_kelamin" class="form-control" value="{{ old('jenis_kelamin', $guru->jenis_kelamin ?? '') }}">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Alamat</label>
-                            <textarea name="alamat" class="form-control">{{ old('alamat', $guru->alamat ?? '') }}</textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Foto Profil (opsional)</label>
-                            <input type="file" name="photo" accept="image/*" class="form-control">
-                            @if(isset($user) && $user->photo)
-                                <small class="text-muted">Foto saat ini: <a href="{{ asset('storage/' . $user->photo) }}" target="_blank">Lihat</a></small>
-                            @endif
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Password Baru (opsional)</label>
-                            <input type="password" name="password" class="form-control" autocomplete="new-password" placeholder="Kosongkan jika tidak ingin mengubah password">
-                            <small class="text-muted">Biarkan kosong jika tidak ingin mengubah password. Minimal 8 karakter.</small>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Konfirmasi Password</label>
-                            <input type="password" name="password_confirmation" class="form-control" autocomplete="new-password" placeholder="Konfirmasi password baru">
-                        </div>
-
-                        <div class="d-flex justify-content-end">
-                            <a href="{{ route('kaprog.dashboard') }}" class="btn btn-secondary me-2">Batal</a>
-                            <button class="btn btn-primary" type="submit">Simpan</button>
-                        </div>
-                    </form>
-
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 @endsection

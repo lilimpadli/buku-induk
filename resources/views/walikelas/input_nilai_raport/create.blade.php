@@ -23,6 +23,13 @@
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
+    /* Responsive Container */
+    .report-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
     h3.mb-4 {
         font-size: 28px;
         color: #1E293B;
@@ -198,31 +205,75 @@
     /* Responsive */
     @media (max-width: 768px) {
         h3.mb-4 {
-            font-size: 24px;
+            font-size: 22px;
+            margin-bottom: 1.5rem !important;
         }
         
         h5.mt-3, h5.mt-4 {
-            font-size: 16px;
+            font-size: 15px;
+            margin-top: 1rem !important;
+            margin-bottom: 0.75rem !important;
         }
         
         .btn {
-            padding: 0.5rem 1.2rem;
-            font-size: 14px;
+            padding: 0.6rem 1rem;
+            font-size: 13px;
+            width: 100%;
+            display: block;
+            text-align: center;
+            white-space: normal;
+            margin: 0.5rem 0 !important;
         }
         
         .form-control, .form-select {
             padding: 8px 10px;
+            font-size: 13px;
         }
         
+        .table {
+            font-size: 12px;
+        }
+
         .table thead th,
         .table tbody td {
             padding: 8px 10px;
-            font-size: 13px;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        .report-container {
+            padding: 0 0.5rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            display: block;
+        }
+
+        .row.mb-4 {
+            margin-bottom: 1rem !important;
+        }
+
+        .col-md-3, .col-md-4, .col-md-6, .col-md-12 {
+            flex: 0 0 100%;
+            max-width: 100%;
+            margin-bottom: 0.75rem;
+        }
+
+        .d-grid.gap-2 {
+            display: flex !important;
+            flex-direction: column;
+            gap: 0.75rem !important;
+        }
+
+        .d-grid.gap-2 .btn {
+            margin: 0 !important;
         }
     }
 </style>
 
-<div class="container mt-4">
+<div class="container-fluid mt-4">
+    <div class="report-container">
 
     <h3 class="mb-4">Input Rapor — {{ $siswa->nama_lengkap }}</h3>
 
@@ -422,6 +473,7 @@
 
     </form>
 
+    </div>
 </div>
 @endsection
 

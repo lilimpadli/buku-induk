@@ -217,19 +217,95 @@
             font-size: 24px;
         }
         
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .mb-3 {
+            overflow-x: auto;
+        }
+        
+        .btn-group {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .btn-group .btn {
+            flex: 1;
+            min-width: 80px;
+            font-size: 12px;
+            padding: 0.3rem 0.75rem;
+        }
+        
+        .card-body form.row {
+            flex-direction: column;
+        }
+        
+        .col-md-6, .col-md-3 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .input-group {
+            width: 100%;
+        }
+        
+        .col-md-3 .btn {
+            width: 100%;
+        }
+        
         .list-group-flush > .list-group-item {
-            padding: 15px;
+            padding: 12px;
+            flex-direction: column;
+            align-items: flex-start !important;
         }
         
         .student-info {
-            flex-direction: column;
-            align-items: flex-start;
+            width: 100%;
+            flex-direction: row;
             gap: 10px;
+        }
+        
+        .student-details {
+            flex: 1;
         }
         
         .student-class {
             margin-left: 0;
+            margin-top: 8px;
             align-self: flex-start;
+        }
+        
+        .student-gender {
+            margin-right: 0;
+            margin-bottom: 8px;
+        }
+        
+        .student-actions {
+            margin-left: 0;
+            margin-top: 10px;
+            width: 100%;
+        }
+        
+        .student-actions .btn-group {
+            width: 100%;
+        }
+        
+        .student-actions .btn-group .btn {
+            flex: 1;
+            font-size: 12px;
+        }
+        
+        .form-control, .form-select {
+            font-size: 14px;
+            padding: 8px 10px;
         }
 
         .pagination {
@@ -241,6 +317,45 @@
             padding: 6px 10px;
             min-width: 36px;
             height: 36px;
+            font-size: 12px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        h3.mb-3 {
+            font-size: 20px;
+            padding-left: 12px;
+        }
+        
+        h3.mb-3::before {
+            width: 4px;
+        }
+        
+        .btn-group {
+            width: 100%;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .btn-group .btn {
+            width: 100%;
+        }
+        
+        .list-group-flush > .list-group-item {
+            padding: 10px;
+        }
+        
+        .student-avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+        }
+        
+        .student-details strong {
+            font-size: 14px;
+        }
+        
+        .student-details small {
             font-size: 12px;
         }
     }

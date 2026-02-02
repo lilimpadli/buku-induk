@@ -206,6 +206,36 @@
         .table tbody td {
             padding: 8px 10px;
         }
+        
+        .container {
+            max-width: 100%;
+            padding: 0 1rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        h3 {
+            font-size: 20px;
+            padding-left: 12px;
+        }
+        
+        h5.mt-3 {
+            font-size: 16px;
+        }
+        
+        .table {
+            font-size: 12px;
+        }
+        
+        .table thead th,
+        .table tbody td {
+            padding: 6px 8px;
+        }
+        
+        .btn {
+            padding: 0.3rem 0.8rem;
+            font-size: 12px;
+        }
     }
 </style>
 

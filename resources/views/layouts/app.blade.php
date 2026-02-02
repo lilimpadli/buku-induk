@@ -23,7 +23,7 @@
     <style>
         /* Layout */
         :root{
-            --sidebar-bg: linear-gradient(180deg,#eef2ff,#f8fafc);
+            --sidebar-bg: #ffffff;
             --accent: #2F53FF;
             --muted: #6b7280;
         }
@@ -33,111 +33,274 @@
             transition: var(--transition, 0.2s) ease;
         }
 
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 12px 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            z-index: 1030;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mobile-header .hamburger {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #1f2937;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .mobile-header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mobile-header .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Sidebar Desktop */
         .sidebar {
             position: fixed;
             top: 0;
             left: 0;
             height: 100vh;
             background: var(--sidebar-bg);
-            padding: 1.25rem 0.75rem;
+            padding: 0;
             border-right: 1px solid rgba(47,83,255,0.06);
-            width: 260px;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            width: 280px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
             z-index: 1000;
             overflow-y: auto;
-            transition: width 0.2s ease;
+            transition: transform 0.3s ease;
         }
 
         .sidebar-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 6px 10px 6px;
-            margin-bottom: 6px;
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            background: white;
+        }
+
+        .sidebar-close {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--accent);
+            cursor: pointer;
+            padding: 4px 8px;
         }
 
         .brand {
-            display:flex; align-items:center; gap:10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .brand .logo {
-            width:40px; height:40px; border-radius:50%;
-            background: var(--accent); display:inline-flex; align-items:center; justify-content:center; color:#fff; font-weight:700; overflow:hidden;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
         }
 
-        .brand .logo img.brand-logo-img {
-            width:40px; height:40px; object-fit:cover; display:block; border-radius:50%;
-            border:2px solid rgba(255,255,255,0.9); box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        .brand .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
-        .sidebar-search{ padding:0 6px 10px 6px; }
-
-        .sidebar .nav-link{
-            color: #0f172a; padding:10px 12px; border-radius:8px; margin-bottom:6px; display:flex; align-items:center; gap:10px;
-        }
-
-        .sidebar .nav-link:hover{ background: rgba(47,83,255,0.08); color: var(--accent); text-decoration:none; }
-
-        .sidebar .nav-link.active{ background: var(--accent); color:#fff; font-weight:600; }
-
-        .user-mini { 
+        .brand-text {
             display: flex;
             flex-direction: column;
+        }
+
+        .brand-text .title {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--accent);
+            line-height: 1.2;
+        }
+
+        .brand-text small {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .sidebar-content {
+            padding: 16px 12px;
+        }
+
+        .user-mini {
+            display: none;
+        }
+
+        .nav-section-title {
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 0.05em;
+            margin-top: 16px;
+            margin-bottom: 4px;
+        }
+
+        .sidebar .nav-link {
+            color: #4b5563;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            display: flex;
             align-items: center;
-            text-align:center; 
-            padding:12px 6px; 
-            border-bottom: 1px solid rgba(47,83,255,0.1);
-            margin-bottom: 15px;
+            gap: 12px;
+            font-size: 15px;
+            transition: all 0.2s ease;
         }
 
-        .user-mini img {
-            border: 3px solid white;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
+        .sidebar .nav-link i {
+            width: 20px;
+            text-align: center;
+            font-size: 18px;
         }
 
-        .user-mini img:hover {
-            transform: scale(1.05);
+        .sidebar .nav-link:hover {
+            background: rgba(47,83,255,0.08);
+            color: var(--accent);
+            text-decoration: none;
         }
 
-        /* collapsed body state */
-        body.sidebar-collapsed .sidebar{ width:64px; }
-        body.sidebar-collapsed .sidebar .nav-link span.label{ display:none; }
-        body.sidebar-collapsed .sidebar .sidebar-header .brand span.title{ display:none; }
-        body.sidebar-collapsed .user-mini div { display:none; }
-        body.sidebar-collapsed .user-mini small { display:none; }
-        body.sidebar-collapsed .user-mini img {
-            width: 40px;
-            height: 40px;
+        .sidebar .nav-link.active {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
         }
 
+        /* Dropdown in sidebar */
+        .sidebar .dropdown-menu {
+            background: #f9fafb;
+            border: none;
+            box-shadow: none;
+            padding: 4px 0;
+            margin-left: 28px;
+            border-radius: 8px;
+        }
+
+        .sidebar .dropdown-item {
+            padding: 10px 16px;
+            font-size: 14px;
+            color: #4b5563;
+            border-radius: 6px;
+            margin: 2px 8px;
+        }
+
+        .sidebar .dropdown-item:hover {
+            background: rgba(47,83,255,0.08);
+            color: var(--accent);
+        }
+
+        .sidebar .dropdown-item.active {
+            background: rgba(47,83,255,0.15);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .sidebar .dropdown-item i {
+            width: 18px;
+            margin-right: 8px;
+        }
+
+        .logout-section {
+            padding: 16px;
+            border-top: 1px solid #f0f0f0;
+            margin-top: auto;
+        }
+
+        /* Main Content */
         main {
             background: #f8f9fa;
             padding: 30px 28px;
-            margin-left: 260px;
+            margin-left: 280px;
             min-height: 100vh;
-            transition: margin-left .2s ease;
+            transition: margin-left .3s ease;
         }
 
-        body.sidebar-collapsed main {
-            margin-left: 64px;
-        }
+        /* Mobile Styles */
+        @media (max-width: 991px) {
+            .mobile-header {
+                display: flex;
+            }
 
-        @media (max-width: 991px){
-            .sidebar{ 
-                position: static; 
-                width:100%; 
-                height: auto;
+            .sidebar {
+                transform: translateX(-100%);
+                width: 80%;
+                max-width: 320px;
+                z-index: 1040;
             }
-            body.sidebar-collapsed .sidebar{ 
-                width:100%; 
-                height: auto;
+
+            .sidebar.show {
+                transform: translateX(0);
             }
+
+            .sidebar-close {
+                display: block;
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 1035;
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+            }
+
             main {
                 margin-left: 0;
+                padding-top: 80px;
+                padding-left: 16px;
+                padding-right: 16px;
             }
         }
-        /* Ensure pagination icons/chevrons keep a normal size */
+
+        /* Desktop - hide mobile elements */
+        @media (min-width: 992px) {
+            .mobile-header {
+                display: none !important;
+            }
+            
+            .sidebar-close {
+                display: none !important;
+            }
+
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+
+        /* Pagination fixes */
         .pagination .page-link svg,
         .pagination .page-link i,
         .pagination svg,
@@ -154,7 +317,6 @@
             vertical-align: -0.125em !important;
         }
 
-        /* Make sure pagination links keep compact padding */
         .pagination .page-link,
         .pagination .page-item a,
         .pagination .page-item button {
@@ -162,7 +324,7 @@
             min-width: 2.2rem !important;
         }
 
-        /* Global safety clamps for icons inside main content to prevent accidental huge icons */
+        /* Icon size controls */
         main svg,
         main i.fas,
         main i.far,
@@ -177,7 +339,6 @@
             font-size: 1rem !important;
         }
 
-        /* Specific override for empty-state icons which in views sometimes set large sizes */
         main .empty-state i,
         .empty-state i {
             font-size: 2rem !important;
@@ -185,286 +346,263 @@
             max-height: 2rem !important;
             display: inline-block !important;
         }
-        
-        /* Perbaikan untuk dropdown menu */
-        .dropdown-menu {
-            border: 1px solid rgba(0,0,0,.1);
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
-        }
-        
-        .dropdown-item {
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-        }
-        
-        .dropdown-item i {
-            width: 20px;
-            margin-right: 8px;
-        }
-        
-        /* Perbaikan untuk tautan aktif */
-        .sidebar .nav-link.active {
-            background: var(--accent);
-            color: #fff;
-        }
-        
-        /* Perbaikan untuk judul submenu */
-        .sidebar .nav-subtitle {
-            padding: 0.5rem 1rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--muted);
-            letter-spacing: 0.05em;
-        }
     </style>
 </head>
 
 <body>
+
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <button class="hamburger" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="user-info">
+            @auth
+                <span class="d-none d-sm-inline">{{ Auth::user()->nama_lengkap ?? Auth::user()->name ?? '' }}</span>
+                @if(isset(Auth::user()->photo) && Auth::user()->photo)
+                    <img src="{{ asset('storage/' . Auth::user()->photo) }}?v={{ time() }}" alt="Profile">
+                @else
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->nama_lengkap ?? Auth::user()->name ?? '') }}&size=80" alt="Profile">
+                @endif
+            @endauth
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <div class="container-fluid">
         <div class="row">
 
             <!-- =============== SIDEBAR =============== -->
             @unless(View::hasSection('noSidebar'))
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar">
-                <div>
-                    <div class="sidebar-header">
-                        <div class="brand">
-                            <div class="logo">
-                                <img src="{{ asset('images/biskaone.jpeg') }}?v={{ filemtime(public_path('images/biskaone.jpeg')) }}" alt="BISKAONE" class="brand-logo-img" style="border-radius:50% !important; width:40px; height:40px; object-fit:cover; display:block;" onerror="this.style.display='none'">
-                            </div>
-                            <div>
-                                <div class="title" style="font-weight:700;">Buku Induk</div>
-                                <small class="text-muted">Sekolah</small>
-                            </div>
+            <nav class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <div class="brand">
+                        <div class="logo">
+                            <img src="{{ asset('images/biskaone.jpeg') }}?v={{ filemtime(public_path('images/biskaone.jpeg')) }}" alt="BISKAONE" onerror="this.style.display='none'">
                         </div>
-                        
+                        <div class="brand-text">
+                            <div class="title">Buku Induk</div>
+                            <small>Sekolah</small>
+                        </div>
                     </div>
+                    <button class="sidebar-close" id="sidebarClose">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
 
-                    <div class="sidebar-search">
-                        <input class="form-control form-control-sm" placeholder="Cari menu..." id="sidebarSearch">
-                    </div>
-
+                <div class="sidebar-content">
                     @auth
-                        <div class="user-mini">
-                            @if(isset(Auth::user()->photo) && Auth::user()->photo)
-                                <img src="{{ asset('storage/' . Auth::user()->photo) }}?v={{ time() }}" class="rounded-circle mb-2" width="80" height="80" style="object-fit:cover;" id="sidebarProfilePhoto">
-                            @else
-                                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->nama_lengkap ?? Auth::user()->name ?? '') }}&size=80" class="rounded-circle mb-2" width="80" height="80" id="sidebarProfilePhoto">
+                        <!-- MENU -->
+                        <nav class="nav flex-column">
+
+                            {{-- ROLE: SISWA --}}
+                            @if(Auth::user()->role == 'siswa')
+                                <a href="{{ route('siswa.dashboard') }}" class="nav-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
+                                    <i class="fas fa-home"></i> <span>Dashboard</span>
+                                </a>
+
+                                <div class="nav-section-title">DATA</div>
+
+                                <a href="{{ route('siswa.dataDiri') }}" class="nav-link {{ request()->routeIs('siswa.dataDiri*') ? 'active' : '' }}">
+                                    <i class="fas fa-user"></i> <span>Data Pribadi Siswa</span>
+                                </a>
+
+                                <a href="{{ route('siswa.raport') }}" class="nav-link {{ request()->routeIs('siswa.raport') ? 'active' : '' }}">
+                                    <i class="fas fa-clipboard"></i> <span>Raport</span>
+                                </a>
                             @endif
-                            <div style="font-weight:600;">{{ Auth::user()->nama_lengkap ?? Auth::user()->name ?? '-' }}</div>
-                            <small class="text-muted">{{ ucfirst(Auth::user()->role) }}</small>
-                        </div>
 
-                        <div class="px-2">
-                            <!-- MENU -->
-                            <nav class="nav flex-column">
+                            {{-- ROLE: GURU --}}
+                            @if(Auth::user()->role == 'guru')
+                                <a href="{{ route('guru.dashboard') }}" class="nav-link {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}">
+                                    <i class="fas fa-home"></i> <span>Dashboard</span>
+                                </a>
 
-                                {{-- ROLE: SISWA --}}
-                                @if(Auth::user()->role == 'siswa')
-                                    <a href="{{ route('siswa.dashboard') }}" class="nav-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Dashboard">
-                                        <i class="fas fa-tachometer-alt"></i> <span class="label ms-2">Dashboard</span>
+                                <div class="nav-section-title">DATA</div>
+
+                                <a href="{{ route('guru.profile.index') }}" class="nav-link {{ request()->routeIs('guru.profile.*') ? 'active' : '' }}">
+                                    <i class="fas fa-user"></i> <span>Data Pribadi Siswa</span>
+                                </a>
+                            @endif
+
+                            {{-- ROLE: WALI KELAS --}}
+                            @if(Auth::user()->role == 'walikelas')
+                                <a href="{{ route('walikelas.dashboard') }}" class="nav-link {{ request()->routeIs('walikelas.dashboard') ? 'active' : '' }}">
+                                    <i class="fas fa-home"></i> <span>Dashboard</span>
+                                </a>
+
+                                <div class="nav-section-title">DATA</div>
+
+                                <a href="{{ route('walikelas.data_diri.profile') }}" class="nav-link {{ request()->routeIs('walikelas.data_diri.profile') ? 'active' : '' }}">
+                                    <i class="fas fa-user"></i> <span>Data Pribadi Siswa</span>
+                                </a>
+
+                                <a href="{{ route('walikelas.siswa.index') }}" class="nav-link {{ request()->routeIs('walikelas.siswa.*') ? 'active' : '' }}">
+                                    <i class="fas fa-calendar-check"></i> <span>Data Siswa</span>
+                                </a>
+
+                                <a href="{{ route('walikelas.input_nilai_raport.index') }}" class="nav-link {{ request()->routeIs('walikelas.input_nilai_raport.index') ? 'active' : '' }}">
+                                    <i class="fas fa-clipboard"></i> <span>Input Nilai Raport</span>
+                                </a>
+
+                                <a href="{{ route('walikelas.nilai_raport.index') }}" class="nav-link {{ request()->routeIs('walikelas.nilai_raport.index') ? 'active' : '' }}">
+                                    <i class="fas fa-file-alt"></i> <span>Lihat Nilai Raport</span>
+                                </a>
+                            @endif
+
+                            {{-- ROLE: KAPROG --}}
+                            @if(Auth::user()->role == 'kaprog')
+                                <a href="{{ route('kaprog.dashboard') }}" class="nav-link {{ request()->routeIs('kaprog.dashboard') ? 'active' : '' }}">
+                                    <i class="fas fa-home"></i> <span>Dashboard</span>
+                                </a>
+
+                                <div class="nav-section-title">DATA</div>
+
+                                <a href="{{ route('kaprog.datapribadi.index') }}" class="nav-link {{ request()->routeIs('kaprog.datapribadi*') ? 'active' : '' }}">
+                                    <i class="fas fa-user"></i> <span>Data Diri</span>
+                                </a>
+
+                                <a href="{{ route('kaprog.siswa.index') }}" class="nav-link {{ request()->routeIs('kaprog.siswa.*') ? 'active' : '' }}">
+                                    <i class="fas fa-users"></i> <span>Data Siswa</span>
+                                </a>
+
+                                <a href="{{ route('kaprog.kelas.index') }}" class="nav-link {{ request()->routeIs('kaprog.kelas.*') ? 'active' : '' }}">
+                                    <i class="fas fa-chalkboard"></i> <span>Data Kelas</span>
+                                </a>
+
+                                <a href="{{ route('kaprog.guru.index') }}" class="nav-link {{ request()->routeIs('kaprog.guru.*') ? 'active' : '' }}">
+                                    <i class="fas fa-user-tie"></i> <span>Guru</span>
+                                </a>
+                            @endif
+
+                            {{-- ROLE: TU --}}
+                            @if(Auth::user()->role == 'tu')
+                                <a href="{{ route('tu.dashboard') }}" class="nav-link {{ request()->routeIs('tu.dashboard') ? 'active' : '' }}">
+                                    <i class="fas fa-home"></i> <span>Dashboard</span>
+                                </a>
+
+                                <div class="nav-section-title">DATA</div>
+
+                                <a href="{{ route('tu.data-pribadi.index') }}" class="nav-link {{ request()->routeIs('tu.data-pribadi*') ? 'active' : '' }}">
+                                    <i class="fas fa-id-card"></i> <span>Data Pribadi</span>
+                                </a>
+
+                                <a href="{{ route('tu.siswa.index') }}" class="nav-link {{ request()->routeIs('tu.siswa*') ? 'active' : '' }}">
+                                    <i class="fas fa-users"></i> <span>Data Siswa</span>
+                                </a>
+
+                                <a href="{{ route('tu.ppdb.index') }}" class="nav-link {{ request()->routeIs('tu.ppdb*') ? 'active' : '' }}">
+                                    <i class="fas fa-user-plus"></i> <span>PPDB</span>
+                                </a>
+
+                                <a href="{{ route('tu.kelas.index') }}" class="nav-link {{ request()->routeIs('tu.kelas*') ? 'active' : '' }}">
+                                    <i class="fas fa-school"></i> <span>Manajemen Kelas</span>
+                                </a>
+
+                                <a href="{{ route('tu.guru.index') }}" class="nav-link {{ request()->routeIs('tu.guru*') ? 'active' : '' }}">
+                                    <i class="fas fa-chalkboard-teacher"></i> <span>Data Guru</span>
+                                </a>
+
+                                <div class="nav-section-title">BUKU INDUK</div>
+
+                                <a href="{{ route('tu.buku-induk.index') }}" class="nav-link {{ request()->routeIs('tu.buku-induk*') ? 'active' : '' }}">
+                                    <i class="fas fa-book"></i> <span>Buku Induk</span>
+                                </a>
+
+                                <a href="{{ route('tu.mutasi.index') }}" class="nav-link {{ request()->routeIs('tu.mutasi*') ? 'active' : '' }}">
+                                    <i class="fas fa-exchange-alt"></i> <span>Mutasi Siswa</span>
+                                </a>
+
+                                <div class="nav-section-title">MANAJEMEN LULUSAN</div>
+
+                                <a href="{{ route('tu.alumni.index') }}" class="nav-link {{ request()->routeIs('tu.alumni*') ? 'active' : '' }}">
+                                    <i class="fas fa-user-graduate"></i> <span>Data Alumni</span>
+                                </a>
+                            @endif
+
+                            {{-- ROLE: KURIKULUM --}}
+                            @if(Auth::user()->role == 'kurikulum')
+                                <a href="{{ route('kurikulum.dashboard') }}" class="nav-link {{ request()->routeIs('kurikulum.dashboard') ? 'active' : '' }}">
+                                    <i class="fas fa-home"></i> <span>Dashboard</span>
+                                </a>
+
+                                <div class="nav-section-title">DATA</div>
+
+                                <a href="{{ route('kurikulum.data-pribadi.index') }}" class="nav-link {{ request()->routeIs('kurikulum.data-pribadi*') ? 'active' : '' }}">
+                                    <i class="fas fa-id-card"></i> <span>Data Pribadi</span>
+                                </a>
+
+                                <a href="{{ route('kurikulum.kelas.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kelas*') ? 'active' : '' }}">
+                                    <i class="fas fa-school"></i> <span>Manajemen Kelas</span>
+                                </a>
+
+                                <a href="{{ route('kurikulum.siswa.index') }}" class="nav-link {{ request()->routeIs('kurikulum.siswa*') ? 'active' : '' }}">
+                                    <i class="fas fa-users"></i> <span>Manajemen Siswa</span>
+                                </a>
+
+                                @php
+                                    $ppdbActive = request()->is('kurikulum/ppdb*') || request()->routeIs('kurikulum.ppdb.*');
+                                @endphp
+                                <div class="dropdown">
+                                    <a class="nav-link dropdown-toggle {{ $ppdbActive ? 'active' : '' }}" href="#" id="ppdbDropdownKurikulum" role="button" data-bs-toggle="dropdown" aria-expanded="{{ $ppdbActive ? 'true' : 'false' }}">
+                                        <i class="fas fa-user-plus"></i> <span>PPDB</span>
                                     </a>
+                                    <ul class="dropdown-menu {{ $ppdbActive ? 'show' : '' }}" aria-labelledby="ppdbDropdownKurikulum">
+                                        <li><a class="dropdown-item {{ request()->routeIs('kurikulum.ppdb.index') ? 'active' : '' }}" href="{{ route('kurikulum.ppdb.index') }}"><i class="fas fa-list"></i> Data PPDB</a></li>
+                                        <li><a class="dropdown-item {{ request()->routeIs('kurikulum.ppdb.timeline') ? 'active' : '' }}" href="{{ route('kurikulum.ppdb.timeline') }}"><i class="fas fa-clock"></i> Timeline PPDB</a></li>
+                                    </ul>
+                                </div>
 
-                                    <a href="{{ route('siswa.dataDiri') }}" class="nav-link {{ request()->routeIs('siswa.dataDiri*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Diri">
-                                        <i class="fas fa-user"></i> <span class="label ms-2">Data Diri</span>
-                                    </a>
+                                <a href="{{ route('kurikulum.jurusan.index') }}" class="nav-link {{ request()->routeIs('kurikulum.jurusan*') ? 'active' : '' }}">
+                                    <i class="fas fa-graduation-cap"></i> <span>Manajemen Jurusan</span>
+                                </a>
 
-                                    <a href="{{ route('siswa.raport') }}" class="nav-link {{ request()->routeIs('siswa.raport') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Lihat Raport">
-                                        <i class="fas fa-file-alt"></i> <span class="label ms-2">Lihat Raport</span>
-                                    </a>
-                                @endif
+                                <a href="{{ route('kurikulum.guru.index') }}" class="nav-link {{ request()->routeIs('kurikulum.guru*') ? 'active' : '' }}">
+                                    <i class="fas fa-chalkboard-teacher"></i> <span>Manajemen Guru</span>
+                                </a>
 
-                                {{-- ROLE: GURU --}}
-                                @if(Auth::user()->role == 'guru')
-                                    <a href="{{ route('guru.dashboard') }}" class="nav-link {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Dashboard">
-                                        <i class="fas fa-tachometer-alt"></i> <span class="label ms-2">Dashboard</span>
-                                    </a>
+                                <a href="{{ route('kurikulum.mata-pelajaran.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mata-pelajaran*') ? 'active' : '' }}">
+                                    <i class="fas fa-book-open"></i> <span>Manajemen Mata Pelajaran</span>
+                                </a>
 
-                                  
-                                    <a href="{{ route('guru.profile.index') }}" class="nav-link {{ request()->routeIs('guru.profile.*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Diri">
-                                        <i class="fas fa-user"></i> <span class="label ms-2">Data Diri</span>
-                                    </a>
-                                @endif
+                                <div class="nav-section-title">BUKU INDUK</div>
 
-                                {{-- ROLE: WALI KELAS --}}
-                                @if(Auth::user()->role == 'walikelas')
-                                    <a href="{{ route('walikelas.dashboard') }}" class="nav-link {{ request()->routeIs('walikelas.dashboard') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Dashboard">
-                                        <i class="fas fa-tachometer-alt"></i> <span class="label ms-2">Dashboard</span>
-                                    </a>
+                                <a href="{{ route('kurikulum.buku-induk.index') }}" class="nav-link {{ request()->routeIs('kurikulum.buku-induk*') ? 'active' : '' }}">
+                                    <i class="fas fa-book"></i> <span>Buku Induk</span>
+                                </a>
 
-                                    <a href="{{ route('walikelas.data_diri.profile') }}" class="nav-link {{ request()->routeIs('walikelas.data_diri.profile') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Diri">
-                                        <i class="fas fa-user"></i> <span class="label ms-2">Data Diri</span>
-                                    </a>
+                                <a href="{{ route('kurikulum.mutasi.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mutasi*') ? 'active' : '' }}">
+                                    <i class="fas fa-exchange-alt"></i> <span>Mutasi Siswa</span>
+                                </a>
 
-                                    <a href="{{ route('walikelas.siswa.index') }}" class="nav-link {{ request()->routeIs('walikelas.siswa.*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Siswa">
-                                        <i class="fas fa-users"></i> <span class="label ms-2">Data Siswa</span>
-                                    </a>
+                                <div class="nav-section-title">MANAJEMEN LULUSAN</div>
 
-                                    <a href="{{ route('walikelas.input_nilai_raport.index') }}" class="nav-link {{ request()->routeIs('walikelas.input_nilai_raport.index') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Input Nilai Raport">
-                                        <i class="fas fa-clipboard-check"></i> <span class="label ms-2">Input Nilai Raport</span>
-                                    </a>
+                                <a href="{{ route('kurikulum.alumni.index') }}" class="nav-link {{ request()->routeIs('kurikulum.alumni*') ? 'active' : '' }}">
+                                    <i class="fas fa-user-graduate"></i> <span>Data Alumni</span>
+                                </a>
+                            @endif
 
-                                    <a href="{{ route('walikelas.nilai_raport.index') }}" class="nav-link {{ request()->routeIs('walikelas.nilai_raport.index') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Lihat Nilai Raport">
-                                        <i class="fas fa-file-lines"></i> <span class="label ms-2">Lihat Nilai Raport</span>
-                                    </a>
-                                @endif
-
-                                {{-- ROLE: KAPROG --}}
-                                @if(Auth::user()->role == 'kaprog')
-                                    <a href="{{ route('kaprog.dashboard') }}" class="nav-link {{ request()->routeIs('kaprog.dashboard') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Dashboard">
-                                        <i class="fas fa-gauge"></i> <span class="label ms-2">Dashboard</span>
-                                    </a>
-
-                                    <a href="{{ route('kaprog.datapribadi.index') }}" class="nav-link {{ request()->routeIs('kaprog.datapribadi*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Diri">
-                                        <i class="fas fa-id-card"></i> <span class="label ms-2">Data Diri</span>
-                                    </a>
-
-                                    <a href="{{ route('kaprog.siswa.index') }}" class="nav-link {{ request()->routeIs('kaprog.siswa.*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Siswa">
-                                        <i class="fas fa-users"></i> <span class="label ms-2">Data Siswa</span>
-                                    </a>
-
-                                    <a href="{{ route('kaprog.kelas.index') }}" class="nav-link {{ request()->routeIs('kaprog.kelas.*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Kelas">
-                                        <i class="fas fa-chalkboard"></i> <span class="label ms-2">Data Kelas</span>
-                                    </a>
-
-                                    <a href="{{ route('kaprog.guru.index') }}" class="nav-link {{ request()->routeIs('kaprog.guru.*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Guru">
-                                        <i class="fas fa-user-tie"></i> <span class="label ms-2">Guru</span>
-                                    </a>
-                                @endif
-
-                                {{-- ROLE: TU --}}
-                                @if(Auth::user()->role == 'tu')
-                                    <a href="{{ route('tu.dashboard') }}" class="nav-link {{ request()->routeIs('tu.dashboard') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Dashboard">
-                                        <i class="fas fa-gauge"></i> <span class="label ms-2">Dashboard</span>
-                                    </a>
-
-                                    <a href="{{ route('tu.data-pribadi.index') }}" class="nav-link {{ request()->routeIs('tu.data-pribadi*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Pribadi">
-                                        <i class="fas fa-id-card"></i> <span class="label ms-2">Data Pribadi</span>
-                                    </a>
-
-                                    <a class="nav-link {{ request()->routeIs('tu.siswa*') ? 'active' : '' }}" href="{{ route('tu.siswa.index') }}" data-bs-toggle="tooltip" title="Data Siswa">
-                                        <i class="fas fa-users"></i> <span class="label ms-2">Data Siswa</span>
-                                    </a>
-
-                                    <a class="nav-link {{ request()->routeIs('tu.ppdb*') ? 'active' : '' }}" href="{{ route('tu.ppdb.index') }}" data-bs-toggle="tooltip" title="PPDB">
-                                        <i class="fas fa-users"></i> <span class="label ms-2">PPDB</span>
-                                    </a>
-
-                                    <a class="nav-link {{ request()->routeIs('tu.kelas*') ? 'active' : '' }}" href="{{ route('tu.kelas.index') }}" data-bs-toggle="tooltip" title="Manajemen Kelas">
-                                        <i class="fas fa-plus-circle"></i> <span class="label ms-2">Manajemen Kelas</span>
-                                    </a>
-
-                                    <a class="nav-link {{ request()->routeIs('tu.guru*') ? 'active' : '' }}" href="{{ route('tu.guru.index') }}" data-bs-toggle="tooltip" title="Data Guru">
-                                        <i class="fas fa-plus-circle"></i> <span class="label ms-2">Data Guru</span>
-                                    </a>
-
-                                    <!-- MENU MUTASI SISWA -->
-                                    <hr class="my-2">
-                                    <div class="nav-subtitle">buku induk</div>
-                                    <a href="{{ route('tu.buku-induk.index') }}" class="nav-link {{ request()->routeIs('tu.buku-induk*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Buku Induk">
-                                        <i class="fas fa-book"></i> <span class="label ms-2">Buku Induk</span>
-                                    </a>
-
-                                    <a href="{{ route('tu.mutasi.index') }}" class="nav-link {{ request()->routeIs('tu.mutasi*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Mutasi Siswa">
-                                        <i class="fas fa-exchange-alt"></i> <span class="label ms-2">Mutasi Siswa</span>
-                                    </a>
-
-                                    <!-- MENU KELULUSAN -->
-                                    <hr class="my-2">
-                                    <div class="nav-subtitle">MANAJEMEN LULUSAN</div>
-
-                                    <a href="{{ route('tu.alumni.index') }}" class="nav-link {{ request()->routeIs('tu.alumni*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Alumni">
-                                        <i class="fas fa-user-friends"></i> <span class="label ms-2">Data Alumni</span>
-                                    </a>
-                                @endif
-
-                                {{-- ROLE: KURIKULUM --}}
-                                @if(Auth::user()->role == 'kurikulum')
-                                    <a href="{{ route('kurikulum.dashboard') }}" class="nav-link {{ request()->routeIs('kurikulum.dashboard') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Dashboard">
-                                        <i class="fas fa-gauge"></i> <span class="label ms-2">Dashboard</span>
-                                    </a>
-
-                                    <a href="{{ route('kurikulum.data-pribadi.index') }}" class="nav-link {{ request()->routeIs('kurikulum.data-pribadi*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Pribadi">
-                                        <i class="fas fa-id-card"></i> <span class="label ms-2">Data Pribadi</span>
-                                    </a>
-
-                                    <a href="{{ route('kurikulum.kelas.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kelas*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Kelas">
-                                        <i class="fas fa-school"></i> <span class="label ms-2">Manajemen Kelas</span>
-                                    </a>
-
-                                    <a href="{{ route('kurikulum.siswa.index') }}" class="nav-link {{ request()->routeIs('kurikulum.siswa*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Siswa">
-                                        <i class="fas fa-users"></i> <span class="label ms-2">Manajemen Siswa</span>
-                                    </a>
-
-                                    <!-- Dropdown Menu untuk PPDB -->
-                                    @php
-                                        $ppdbActive = request()->is('kurikulum/ppdb*') || request()->routeIs('kurikulum.ppdb.*');
-                                    @endphp
-                                    <div class="dropdown">
-                                        <a class="nav-link dropdown-toggle {{ $ppdbActive ? 'active' : '' }}" href="#" id="ppdbDropdownKurikulum" role="button" data-bs-toggle="dropdown" aria-expanded="{{ $ppdbActive ? 'true' : 'false' }}">
-                                            <i class="fas fa-users"></i> <span class="label ms-2">PPDB</span>
-                                        </a>
-                                        <ul class="dropdown-menu {{ $ppdbActive ? 'show' : '' }}" aria-labelledby="ppdbDropdownKurikulum">
-                                            <li><a class="dropdown-item {{ request()->routeIs('kurikulum.ppdb.index') ? 'active' : '' }}" href="{{ route('kurikulum.ppdb.index') }}"><i class="fas fa-list"></i> Data PPDB</a></li>
-                                            <li><a class="dropdown-item {{ request()->routeIs('kurikulum.ppdb.timeline') ? 'active' : '' }}" href="{{ route('kurikulum.ppdb.timeline') }}"><i class="fas fa-clock"></i> Timeline PPDB</a></li>
-                                        </ul>
-                                    </div>
-
-                                    <a href="{{ route('kurikulum.jurusan.index') }}" class="nav-link {{ request()->routeIs('kurikulum.jurusan*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Jurusan">
-                                        <i class="fas fa-school"></i> <span class="label ms-2">Manajemen Jurusan</span>
-                                    </a>
-
-                                    <a href="{{ route('kurikulum.guru.index') }}" class="nav-link {{ request()->routeIs('kurikulum.guru*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Guru">
-                                        <i class="fas fa-user-tie"></i> <span class="label ms-2">Manajemen Guru</span>
-                                    </a>
-
-                                    <a href="{{ route('kurikulum.mata-pelajaran.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mata-pelajaran*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Manajemen Mata Pelajaran">
-                                        <i class="fas fa-book"></i> <span class="label ms-2">Manajemen Mata Pelajaran</span>
-                                    </a>
-
-                                    <!-- MENU BUKU INDUK -->
-                                    <hr class="my-2">
-                                    <div class="nav-subtitle">BUKU INDUK</div>
-                                    <a href="{{ route('kurikulum.buku-induk.index') }}" class="nav-link {{ request()->routeIs('kurikulum.buku-induk*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Buku Induk">
-                                        <i class="fas fa-book"></i> <span class="label ms-2">Buku Induk</span>
-                                    </a>
-
-                                    <a href="{{ route('kurikulum.mutasi.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mutasi*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Mutasi Siswa">
-                                        <i class="fas fa-exchange-alt"></i> <span class="label ms-2">Mutasi Siswa</span>
-                                    </a>
-
-                                    <!-- MENU KELULUSAN -->
-                                    <hr class="my-2">
-                                    <div class="nav-subtitle">MANAJEMEN LULUSAN</div>
-                                    <a href="{{ route('kurikulum.alumni.index') }}" class="nav-link {{ request()->routeIs('kurikulum.alumni*') ? 'active' : '' }}" data-bs-toggle="tooltip" title="Data Alumni">
-                                        <i class="fas fa-user-friends"></i> <span class="label ms-2">Data Alumni</span>
-                                    </a>
-
-                                @endif
-
-                            </nav>
-
-                            <hr>
-
-                            <!-- LOGOUT -->
-                            <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                                @csrf
-                                <button type="submit" class="btn btn-danger btn-sm w-100">
-                                    <i class="fas fa-sign-out-alt me-1"></i> Logout
-                                </button>
-                            </form>
-                        </div>
+                        </nav>
                     @endauth
+                </div>
 
-                   
+                <div class="logout-section">
+                    @auth
+                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="fas fa-sign-out-alt me-2"></i> Logout
+                            </button>
+                        </form>
+                    @endauth
                 </div>
             </nav>
             @endunless
 
             <!-- MAIN CONTENT -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <main>
                 @include('partials._alerts')
                 @yield('content')
             </main>
@@ -474,32 +612,40 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // sidebar toggle
-        document.addEventListener('DOMContentLoaded', function(){
-            const toggle = document.getElementById('sidebarToggle');
-            if (! toggle) return;
-            toggle.addEventListener('click', function(){
-                document.body.classList.toggle('sidebar-collapsed');
-                // rotate icon
-                this.querySelector('i').classList.toggle('fa-angle-right');
-            });
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarClose = document.getElementById('sidebarClose');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-            // simple search filter for nav links
-            const search = document.getElementById('sidebarSearch');
-            if (search) {
-                search.addEventListener('input', function(){
-                    const q = this.value.toLowerCase();
-                    document.querySelectorAll('.sidebar .nav-link').forEach(function(a){
-                        const txt = a.textContent.toLowerCase();
-                        a.style.display = txt.includes(q) ? '' : 'none';
-                    });
+            // Toggle sidebar
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.add('show');
+                    sidebarOverlay.classList.add('show');
+                    document.body.style.overflow = 'hidden';
                 });
             }
-            
-            // Inisialisasi dropdown Bootstrap
-            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'))
+
+            // Close sidebar
+            function closeSidebar() {
+                sidebar.classList.remove('show');
+                sidebarOverlay.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+
+            if (sidebarClose) {
+                sidebarClose.addEventListener('click', closeSidebar);
+            }
+
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', closeSidebar);
+            }
+
+            // Initialize Bootstrap dropdowns
+            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
             var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
-                return new bootstrap.Dropdown(dropdownToggleEl)
+                return new bootstrap.Dropdown(dropdownToggleEl);
             });
         });
     </script>

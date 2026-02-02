@@ -26,12 +26,22 @@
         max-width: 1200px;
     }
 
+    /* Page Header */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
     h3.fw-semibold {
         font-size: 28px;
         color: #1E293B;
         position: relative;
         padding-left: 15px;
-        margin-bottom: 20px;
+        margin: 0;
     }
 
     h3.fw-semibold::before {
@@ -46,6 +56,12 @@
         border-radius: 3px;
     }
 
+    .header-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
     /* Card Styles */
     .card {
         border-radius: 16px;
@@ -53,6 +69,7 @@
         box-shadow: var(--card-shadow);
         overflow: hidden;
         transition: all 0.3s ease;
+        background: white;
     }
 
     .card:hover {
@@ -67,7 +84,7 @@
     h5.border-bottom {
         font-size: 18px;
         color: #1E293B;
-        font-weight: 600;
+        font-weight: 700;
         padding-bottom: 12px;
         margin-bottom: 20px;
         border-bottom: 2px solid #E2E8F0;
@@ -79,7 +96,7 @@
         position: absolute;
         bottom: -2px;
         left: 0;
-        width: 80px;
+        width: 60px;
         height: 2px;
         background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
         border-radius: 1px;
@@ -87,75 +104,116 @@
 
     /* Form Labels */
     .form-label.fw-semibold {
-        color: #475569;
+        color: #64748B;
         font-weight: 600;
         margin-bottom: 6px;
-        font-size: 14px;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .form-control-plaintext {
-        color: #334155;
+        color: #1E293B;
         font-size: 15px;
+        font-weight: 500;
         padding: 10px 0;
         border-bottom: 1px solid #E2E8F0;
         border-radius: 0;
+        word-break: break-word;
     }
 
     /* Buttons */
     .btn {
-        border-radius: 8px;
+        border-radius: 10px;
         font-weight: 600;
-        padding: 0.5rem 1.2rem;
+        padding: 0.6rem 1.3rem;
         transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
+        gap: 0.5rem;
+        border: none;
+        font-size: 14px;
     }
 
     .btn:hover {
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn i {
+        font-size: 14px;
     }
 
     .btn-primary {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     }
 
     .btn-primary:hover {
-        background-color: var(--secondary-color);
-        border-color: var(--secondary-color);
+        background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
     }
 
     .btn-danger {
-        background-color: var(--danger-color);
-        border-color: var(--danger-color);
+        background: linear-gradient(135deg, #EF4444, #DC2626);
+    }
+
+    .btn-danger:hover {
+        background: linear-gradient(135deg, #DC2626, #B91C1C);
     }
 
     /* Empty State */
-    .fa-user-slash {
-        opacity: 0.5;
+    .empty-state {
+        padding: 3rem 1.5rem;
+        text-align: center;
     }
 
-    .text-muted.fw-semibold {
-        color: #64748B !important;
+    .empty-state i {
+        font-size: 4rem;
+        color: #CBD5E1;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state h5 {
+        color: #64748B;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #94A3B8;
+        margin-bottom: 1.5rem;
     }
 
     /* Image Styling */
+    .photo-container {
+        display: inline-block;
+        position: relative;
+    }
+
     .rounded.shadow {
         border-radius: 12px;
         border: 3px solid white;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
         transition: all 0.3s ease;
+        object-fit: cover;
     }
 
     .rounded.shadow:hover {
-        transform: scale(1.03);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        transform: scale(1.05);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
     }
 
     /* Timestamp */
-    small.text-muted {
+    .timestamp-info {
+        background: #F1F5F9;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+    }
+
+    .timestamp-info small {
         font-size: 12px;
-        color: #94A3B8;
+        color: #64748B;
+        font-weight: 500;
     }
 
     /* Animations */
@@ -168,19 +226,225 @@
         animation: fadeIn 0.5s ease-out;
     }
 
-    /* Responsive */
+    /* Data Grid Improvements */
+    .data-row {
+        margin-bottom: 1.5rem;
+    }
+
+    .data-section {
+        margin-top: 2rem;
+    }
+
+    /* ============ MOBILE OPTIMIZATIONS ============ */
     @media (max-width: 768px) {
-        .card-body {
-            padding: 1.5rem;
+        /* Container & Layout */
+        .container {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
         }
-        
+
+        .col-md-10 {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        /* Page Header Mobile */
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
         h3.fw-semibold {
-            font-size: 24px;
+            font-size: 1.15rem;
+            padding-left: 12px;
         }
-        
+
+        h3.fw-semibold::before {
+            width: 4px;
+        }
+
+        .header-actions {
+            width: 100%;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .header-actions .btn {
+            width: 100%;
+            justify-content: center;
+            padding: 0.55rem 0.9rem;
+            font-size: 0.85rem;
+        }
+
+        /* Card Mobile */
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        /* Section Headers Mobile */
+        h5.border-bottom {
+            font-size: 0.9rem;
+            padding-bottom: 8px;
+            margin-bottom: 0.85rem;
+        }
+
+        h5.border-bottom::after {
+            width: 45px;
+        }
+
+        /* Form Fields Mobile */
+        .form-label.fw-semibold {
+            font-size: 0.65rem;
+            margin-bottom: 3px;
+        }
+
+        .form-control-plaintext {
+            font-size: 0.85rem;
+            padding: 6px 0;
+            line-height: 1.4;
+        }
+
+        /* Grid Layout Mobile - PERBAIKAN: Semua kolom jadi full width */
+        .row.g-3 {
+            gap: 0.6rem;
+        }
+
+        .col-md-3, 
+        .col-md-4, 
+        .col-md-6,
+        .col-6 {
+            width: 100% !important;
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        /* Data Sections Mobile */
+        .data-section {
+            margin-top: 1.25rem;
+        }
+
+        .col-12.mt-4 {
+            margin-top: 1.25rem !important;
+        }
+
+        .col-12.mt-2 {
+            margin-top: 0.85rem !important;
+        }
+
+        /* Photo Mobile */
+        .photo-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .rounded.shadow {
+            width: 120px;
+            height: 120px;
+            border-width: 2px;
+        }
+
+        /* Timestamp Mobile */
+        .timestamp-info {
+            padding: 0.5rem 0.65rem;
+            margin-top: 0.85rem;
+        }
+
+        .timestamp-info small {
+            font-size: 0.65rem;
+            line-height: 1.5;
+            display: block;
+        }
+
+        /* Empty State Mobile */
+        .empty-state {
+            padding: 1.75rem 1rem;
+        }
+
+        .empty-state i {
+            font-size: 2.75rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .empty-state h5 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
+            margin-bottom: 1.15rem;
+        }
+
+        .empty-state .btn {
+            width: 100%;
+            padding: 0.65rem 0.9rem;
+        }
+    }
+
+    /* Extra Small Devices */
+    @media (max-width: 400px) {
+        h3.fw-semibold {
+            font-size: 1.25rem;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        h5.border-bottom {
+            font-size: 0.95rem;
+        }
+
+        .form-control-plaintext {
+            font-size: 0.85rem;
+        }
+
         .btn {
-            padding: 0.4rem 1rem;
-            font-size: 14px;
+            font-size: 0.85rem;
+            padding: 0.6rem 0.9rem;
+        }
+
+        .rounded.shadow {
+            width: 120px;
+            height: 120px;
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+        }
+    }
+
+    /* Tablet Optimization */
+    @media (min-width: 769px) and (max-width: 991px) {
+        .card-body {
+            padding: 1.75rem;
+        }
+
+        h3.fw-semibold {
+            font-size: 1.6rem;
+        }
+
+        .header-actions {
+            flex-wrap: nowrap;
+        }
+    }
+
+    /* Desktop Enhancements */
+    @media (min-width: 992px) {
+        .form-control-plaintext:hover {
+            background-color: #F8FAFC;
+        }
+
+        .btn:active {
+            transform: translateY(0);
         }
     }
 </style>
@@ -190,23 +454,29 @@
 
         <!-- Main Content -->
         <div class="col-md-10 mx-auto">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="page-header">
                 <h3 class="fw-semibold">Data Diri Siswa</h3>
 
                 @if ($siswa)
-                    <div>
-                        <a href="{{ route('siswa.dataDiri.edit') }}" class="btn btn-primary me-2">
-                            <i class="fas fa-edit me-1"></i> Edit Data
-                        </a>
-
+                    <div class="header-actions">
                         <a href="{{ route('siswa.dataDiri.exportPDF') }}" class="btn btn-danger" target="_blank">
-                            <i class="bi bi-file-earmark-pdf"></i> Export PDF
+                            <i class="bi bi-file-earmark-pdf"></i> 
+                            <span class="d-none d-sm-inline">Export PDF</span>
+                            <span class="d-inline d-sm-none">PDF</span>
+                        </a>
+                        
+                        <a href="{{ route('siswa.dataDiri.edit') }}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> 
+                            <span class="d-none d-sm-inline">Edit Data</span>
+                            <span class="d-inline d-sm-none">Edit</span>
                         </a>
                     </div>
                 @else
-                    <a href="{{ route('siswa.dataDiri.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus me-1"></i> Tambah Data
-                    </a>
+                    <div class="header-actions">
+                        <a href="{{ route('siswa.dataDiri.create') }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Tambah Data
+                        </a>
+                    </div>
                 @endif
             </div>
 
@@ -225,12 +495,12 @@
                                 <p class="form-control-plaintext">{{ $siswa->nama_lengkap }}</p>
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-md-3 col-6">
                                 <label class="form-label fw-semibold">NIS</label>
                                 <p class="form-control-plaintext">{{ $siswa->nis }}</p>
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-md-3 col-6">
                                 <label class="form-label fw-semibold">NISN</label>
                                 <p class="form-control-plaintext">{{ $siswa->nisn }}</p>
                             </div>
@@ -290,7 +560,7 @@
                             </div>
 
                             <!-- DATA AYAH -->
-                            <div class="col-12 mt-4">
+                            <div class="col-12 mt-4 data-section">
                                 <h5 class="border-bottom pb-2 fw-semibold">Data Ayah</h5>
                             </div>
 
@@ -315,7 +585,7 @@
                             </div>
 
                             <!-- DATA IBU -->
-                            <div class="col-12 mt-4">
+                            <div class="col-12 mt-4 data-section">
                                 <h5 class="border-bottom pb-2 fw-semibold">Data Ibu</h5>
                             </div>
 
@@ -340,7 +610,7 @@
                             </div>
 
                             <!-- DATA WALI -->
-                            <div class="col-12 mt-4">
+                            <div class="col-12 mt-4 data-section">
                                 <h5 class="border-bottom pb-2 fw-semibold">Data Wali (Opsional)</h5>
                             </div>
 
@@ -365,10 +635,12 @@
                             </div>
 
                             <!-- FOTO -->
-                            <div class="col-12 mt-4">
+                            <div class="col-12 mt-4 data-section">
                                 <label class="form-label fw-semibold">Foto Siswa</label><br>
                                 @if ($siswa->foto)
-                                    <img src="{{ asset('storage/' . $siswa->foto) }}" width="150" class="rounded shadow">
+                                    <div class="photo-container">
+                                        <img src="{{ asset('storage/' . $siswa->foto) }}" width="150" height="150" class="rounded shadow" alt="Foto Siswa">
+                                    </div>
                                 @else
                                     <p class="text-muted">Tidak ada foto</p>
                                 @endif
@@ -376,10 +648,12 @@
 
                             <!-- TIMESTAMP -->
                             <div class="col-12 mt-4">
-                                <small class="text-muted">
-                                    Dibuat pada: {{ $siswa->created_at->format('d M Y H:i') }} |
-                                    Diperbarui: {{ $siswa->updated_at->format('d M Y H:i') }}
-                                </small>
+                                <div class="timestamp-info">
+                                    <small>
+                                        <strong>Dibuat:</strong> {{ $siswa->created_at->format('d M Y H:i') }} • 
+                                        <strong>Diperbarui:</strong> {{ $siswa->updated_at->format('d M Y H:i') }}
+                                    </small>
+                                </div>
                             </div>
 
                         </div>
@@ -389,13 +663,15 @@
             @else
                 <!-- DATA KOSONG -->
                 <div class="card shadow-sm">
-                    <div class="card-body text-center py-5">
-                        <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted fw-semibold">Data diri belum diisi</h5>
-                        <p class="text-muted">Silakan lengkapi data diri Anda untuk melanjutkan</p>
-                        <a href="{{ route('siswa.dataDiri.create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus me-1"></i> Isi Data Sekarang
-                        </a>
+                    <div class="card-body">
+                        <div class="empty-state">
+                            <i class="fas fa-user-slash"></i>
+                            <h5>Data diri belum diisi</h5>
+                            <p>Silakan lengkapi data diri Anda untuk melanjutkan</p>
+                            <a href="{{ route('siswa.dataDiri.create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Isi Data Sekarang
+                            </a>
+                        </div>
                     </div>
                 </div>
             @endif

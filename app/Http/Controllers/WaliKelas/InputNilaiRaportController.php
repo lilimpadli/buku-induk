@@ -65,7 +65,8 @@ class InputNilaiRaportController extends Controller
                 })
                 ->orderBy('nama_lengkap');
 
-            $siswas = $query->get()->groupBy(function($siswa) {
+            $queryResults = $query->paginate(15);
+            $siswas = $queryResults->getCollection()->groupBy(function($siswa) {
                 return $siswa->rombel ? $siswa->rombel->nama : 'Tidak ada rombel';
             });
         } else {
@@ -73,7 +74,7 @@ class InputNilaiRaportController extends Controller
             $siswas = collect();
         }
 
-        return view('walikelas.input_nilai_raport.index', compact('siswas', 'search'));
+        return view('walikelas.input_nilai_raport.index', compact('siswas', 'search', 'queryResults'));
     }
 
     public function create($siswa_id)

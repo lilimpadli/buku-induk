@@ -175,9 +175,97 @@
             padding: 1.25rem;
         }
         
+        .card-title {
+            font-size: 16px;
+        }
+        
         .btn {
             padding: 0.4rem 1rem;
+            font-size: 13px;
+        }
+        
+        .table-borderless th {
+            font-size: 13px;
+            width: 50%;
+        }
+        
+        .table-borderless td {
+            font-size: 13px;
+        }
+        
+        .row {
+            flex-direction: column;
+        }
+        
+        .col-md-4, .col-md-8 {
+            flex: 0 0 100%;
+            max-width: 100%;
+            margin-bottom: 1rem;
+        }
+        
+        h5.mb-0 {
+            font-size: 16px;
+        }
+        
+        .text-muted {
+            font-size: 12px;
+        }
+        
+        .rounded-circle {
+            width: 100px !important;
+            height: 100px !important;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .container {
+            padding: 0 0.75rem;
+            max-width: 100%;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .card-title {
             font-size: 14px;
+        }
+        
+        .btn {
+            padding: 0.3rem 0.8rem;
+            font-size: 12px;
+            width: 100%;
+        }
+        
+        .table-borderless th {
+            font-size: 12px;
+            width: 40%;
+        }
+        
+        .table-borderless td {
+            font-size: 12px;
+        }
+        
+        .row {
+            gap: 1rem;
+        }
+        
+        h5.mb-0 {
+            font-size: 14px;
+        }
+        
+        .rounded-circle {
+            width: 80px !important;
+            height: 80px !important;
+            font-size: 24px !important;
+        }
+        
+        .mt-3 {
+            margin-top: 1rem !important;
+        }
+        
+        .card {
+            margin-bottom: 1rem !important;
         }
     }
 </style>

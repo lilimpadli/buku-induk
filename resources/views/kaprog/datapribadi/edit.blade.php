@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Profil Guru')
+@section('title', 'Edit Profil Kaprog')
 
 @section('content')
 <style>
-    /* ===================== STYLE EDIT PROFIL GURU ===================== */
+    /* ===================== STYLE EDIT PROFIL KAPROG ===================== */
     
     :root {
         --primary-color: #2F53FF;
@@ -166,12 +166,20 @@
 
     /* Responsive */
     @media (max-width: 768px) {
+        .container {
+            padding: 0 1rem;
+        }
+        
         .card-body {
             padding: 1.5rem;
         }
         
         .card-title {
             font-size: 20px;
+        }
+        
+        .form-label {
+            font-size: 13px;
         }
         
         .btn {
@@ -192,7 +200,6 @@
         .d-flex.justify-content-end .btn {
             width: 100%;
             margin-right: 0 !important;
-            margin-bottom: 0.5rem;
         }
     }
     
@@ -210,7 +217,8 @@
         }
         
         .form-label {
-            font-size: 13px;
+            font-size: 12px;
+            margin-bottom: 6px;
         }
         
         .form-control, .form-select {
@@ -231,6 +239,16 @@
         .col-md-8 {
             flex: 0 0 100%;
             max-width: 100%;
+            padding: 0;
+        }
+        
+        .alert {
+            font-size: 12px;
+            padding: 10px 12px;
+        }
+        
+        textarea.form-control {
+            min-height: 80px;
         }
     }
 </style>
@@ -260,7 +278,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('guru.profile.update') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('kaprog.datapribadi.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -323,7 +341,7 @@
                         </div>
 
                         <div class="d-flex justify-content-end">
-                            <a href="{{ route('guru.profile.index') }}" class="btn btn-secondary me-2">Batal</a>
+                            <a href="{{ route('kaprog.datapribadi.index') }}" class="btn btn-secondary me-2">Batal</a>
                             <button class="btn btn-primary" type="submit">Simpan</button>
                         </div>
                     </form>

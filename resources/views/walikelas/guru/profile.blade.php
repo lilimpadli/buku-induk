@@ -26,6 +26,13 @@
         max-width: 1200px;
     }
 
+    /* Responsive Container */
+    .report-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
     /* Card Styles */
     .card {
         border-radius: 16px;
@@ -179,10 +186,21 @@
             padding: 0.4rem 1rem;
             font-size: 14px;
         }
+
+        .report-container {
+            padding: 0 0.5rem;
+        }
+
+        .col-md-4, .col-md-8 {
+            flex: 0 0 100%;
+            max-width: 100%;
+            margin-bottom: 1rem;
+        }
     }
 </style>
 
-<div class="container mt-4">
+<div class="container-fluid mt-4">
+    <div class="report-container">
     <div class="row">
         <div class="col-md-4">
             <div class="card shadow-sm text-center">

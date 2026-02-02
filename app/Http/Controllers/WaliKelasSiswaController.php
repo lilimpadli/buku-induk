@@ -73,8 +73,8 @@ class WaliKelasSiswaController extends Controller
                 })
                 ->distinct()
                 ->orderBy('nama_lengkap');
-            // Ambil semua hasil tanpa pagination sesuai permintaan
-            $siswa = $query->get();
+            // Ambil hasil dengan pagination
+            $siswa = $query->paginate(15);
         } else {
             // jika tidak ada penugasan, kembalikan kosong supaya wali tidak melihat seluruh siswa
             $siswa = collect();

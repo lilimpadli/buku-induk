@@ -288,6 +288,14 @@ class KaprogController extends Controller
         return view('kaprog.datapribadi.index', compact('user', 'guru'));
     }
 
+    // Tampilkan form edit data diri kaprog
+    public function editDataDiri()
+    {
+        $user = Auth::user();
+        $guru = Guru::where('user_id', $user->id)->first();
+        return view('kaprog.datapribadi.edit', compact('user', 'guru'));
+    }
+
     // Simpan perubahan data diri kaprog
     public function updateDataDiri(Request $request)
     {

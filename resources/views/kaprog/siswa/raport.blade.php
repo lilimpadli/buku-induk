@@ -167,12 +167,51 @@
         }
         
         .card-body {
-            padding: 1.5rem;
+            padding: 1.25rem;
+        }
+        
+        .form-label {
+            font-size: 13px;
+        }
+        
+        .form-select {
+            font-size: 13px;
+            padding: 8px 10px;
         }
         
         .btn {
             width: 100%;
             justify-content: center;
+            font-size: 14px;
+        }
+        
+        .row.mb-4 {
+            flex-direction: column;
+        }
+        
+        .col-md-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        h4.fw-bold {
+            font-size: 20px;
+            padding-left: 12px;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .info-card {
+            padding: 1rem;
+        }
+        
+        .btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 12px;
         }
     }
 </style>

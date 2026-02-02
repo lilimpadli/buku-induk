@@ -42,6 +42,25 @@
         border-radius: 3px;
     }
 
+    h3.mb-0 {
+        font-size: 28px;
+        color: #1E293B;
+        position: relative;
+        padding-left: 15px;
+    }
+
+    h3.mb-0::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 70%;
+        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+        border-radius: 3px;
+    }
+
     /* Card Styles */
     .card {
         border-radius: 16px;
@@ -194,8 +213,14 @@
 
     /* Responsive */
     @media (max-width: 768px) {
-        h3.mb-3 {
+        h3.mb-0 {
             font-size: 24px;
+        }
+        
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
         }
         
         .list-group-flush > .list-group-item {
@@ -216,8 +241,9 @@
 </style>
 
 <div class="container mt-4">
-
-    <h3 class="mb-3">Daftar Siswa</h3>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0">Daftar Siswa</h3>
+    </div>
 
     <form method="GET" class="mb-3 d-flex gap-2" action="">
         <input type="text" name="q" value="{{ request('q', $search ?? '') }}" class="form-control" placeholder="Cari nama / NISN / No. Induk">
@@ -256,7 +282,6 @@
                     </a>
                 @endforeach
             </div>
-            {{-- menampilkan semua siswa, pagination dinonaktifkan --}}
         @else
             <div class="empty-state">
                 <i class="fas fa-user-graduate"></i>
@@ -265,6 +290,13 @@
             </div>
         @endif
     </div>
+
+    <!-- Pagination Links -->
+    @if($siswa instanceof \Illuminate\Pagination\LengthAwarePaginator && $siswa->hasPages())
+        <div class="p-3">
+            {{ $siswa->appends(request()->query())->links('pagination::bootstrap-4') }}
+        </div>
+    @endif
 
 </div>
 @endsection

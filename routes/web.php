@@ -390,6 +390,7 @@ Route::middleware(['auth'])->group(function () {
 
             // Data diri kaprog
             Route::get('/data-diri', [KaprogController::class, 'dataDiri'])->name('datapribadi.index');
+            Route::get('/data-diri/edit', [KaprogController::class, 'editDataDiri'])->name('datapribadi.edit');
             Route::put('/data-diri', [KaprogController::class, 'updateDataDiri'])->name('datapribadi.update');
             // Daftar siswa (kaprog)
             Route::get('/siswa', [KaprogController::class, 'siswaIndex'])->name('siswa.index');

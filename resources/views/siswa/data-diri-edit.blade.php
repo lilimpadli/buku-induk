@@ -157,6 +157,7 @@
         transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
+        gap: 0.4rem;
     }
 
     .btn:hover {
@@ -226,19 +227,204 @@
         animation: fadeIn 0.5s ease-out;
     }
 
-    /* Responsive */
+    /* Button Actions Container */
+    .button-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    /* ============ MOBILE OPTIMIZATIONS ============ */
     @media (max-width: 768px) {
-        .card-body {
-            padding: 1.5rem;
+        /* Container */
+        .container {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
         }
-        
+
+        /* Title */
         h3.mb-4 {
-            font-size: 24px;
+            font-size: 1.15rem;
+            padding-left: 12px;
+            margin-bottom: 1rem !important;
         }
-        
+
+        h3.mb-4::before {
+            width: 4px;
+        }
+
+        /* Card */
+        .card {
+            border-radius: 12px;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        /* Progress Bar Section */
+        .progress {
+            height: 6px !important;
+        }
+
+        .step-label {
+            font-size: 0.7rem;
+        }
+
+        .step-label i {
+            display: none;
+        }
+
+        /* Form Headers */
+        h5.mb-3 {
+            font-size: 0.95rem;
+            padding-left: 12px;
+            margin-bottom: 1rem !important;
+        }
+
+        h5.mb-3::before {
+            width: 3px;
+        }
+
+        h6.border-bottom {
+            font-size: 0.85rem;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        h6.border-bottom::after {
+            width: 45px;
+        }
+
+        /* Form Elements */
+        .form-label {
+            font-size: 0.75rem;
+            margin-bottom: 5px;
+        }
+
+        .form-control, .form-select {
+            font-size: 0.85rem;
+            padding: 8px 10px;
+        }
+
+        /* Grid Layout - All columns full width on mobile */
+        .row.g-3 {
+            gap: 0.6rem;
+        }
+
+        .col-md-3,
+        .col-md-4,
+        .col-md-6,
+        .col-md-12 {
+            width: 100% !important;
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        /* Buttons */
         .btn {
-            padding: 0.4rem 1rem;
-            font-size: 14px;
+            padding: 0.5rem 0.9rem;
+            font-size: 0.8rem;
+        }
+
+        .button-actions {
+            flex-direction: column;
+            width: 100%;
+            gap: 0.5rem;
+        }
+
+        .button-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Photo Preview */
+        .rounded {
+            width: 80px !important;
+            border-width: 2px;
+        }
+
+        /* Text Size Adjustments */
+        .text-danger.small,
+        .text-muted {
+            font-size: 0.7rem;
+        }
+
+        /* Spacing */
+        .mt-5 {
+            margin-top: 1.5rem !important;
+        }
+
+        .mt-3 {
+            margin-top: 1rem !important;
+        }
+
+        .col-12.mt-3 {
+            margin-top: 1rem !important;
+        }
+    }
+
+    /* Extra Small Devices */
+    @media (max-width: 400px) {
+        h3.mb-4 {
+            font-size: 1.05rem;
+        }
+
+        .card-body {
+            padding: 0.85rem;
+        }
+
+        h5.mb-3 {
+            font-size: 0.9rem;
+        }
+
+        h6.border-bottom {
+            font-size: 0.8rem;
+        }
+
+        .form-label {
+            font-size: 0.7rem;
+        }
+
+        .form-control, .form-select {
+            font-size: 0.8rem;
+            padding: 7px 9px;
+        }
+
+        .btn {
+            font-size: 0.75rem;
+            padding: 0.45rem 0.8rem;
+        }
+
+        .step-label {
+            font-size: 0.65rem;
+        }
+    }
+
+    /* Tablet Optimization */
+    @media (min-width: 769px) and (max-width: 991px) {
+        .card-body {
+            padding: 1.75rem;
+        }
+
+        h3.mb-4 {
+            font-size: 1.5rem;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+        }
+
+        .form-control, .form-select {
+            font-size: 0.9rem;
+        }
+    }
+
+    /* Desktop Enhancements */
+    @media (min-width: 992px) {
+        .btn:active {
+            transform: translateY(0);
         }
     }
 </style>
@@ -466,18 +652,18 @@
                         </div>
 
                         <!-- Tombol -->
-                        <div class="mt-5 d-flex justify-content-end gap-2">
+                        <div class="mt-5 button-actions">
                             <a href="{{ route('siswa.dataDiri') }}" class="btn btn-secondary">
-                                <i class="fas fa-times me-1"></i> Batal
+                                <i class="fas fa-times"></i> <span>Batal</span>
                             </a>
                             <button type="button" class="btn btn-outline-secondary" id="prevBtn" style="display: none;">
-                                <i class="fas fa-arrow-left me-1"></i> Kembali
+                                <i class="fas fa-arrow-left"></i> <span>Kembali</span>
                             </button>
                             <button type="button" class="btn btn-primary" id="nextBtn">
-                                <i class="fas fa-arrow-right me-1"></i> Lanjut
+                                <span>Lanjut</span> <i class="fas fa-arrow-right"></i>
                             </button>
                             <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
-                                <i class="fas fa-save me-1"></i> Simpan Perubahan
+                                <i class="fas fa-save"></i> <span>Simpan Perubahan</span>
                             </button>
                         </div>
 

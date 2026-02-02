@@ -68,7 +68,8 @@ class NilaiRaportController extends Controller
                 })
                 ->orderBy('nama_lengkap');
 
-            $siswas = $query->get()->groupBy(function($siswa) {
+            $queryResults = $query->paginate(15);
+            $siswas = $queryResults->getCollection()->groupBy(function($siswa) {
                 return $siswa->rombel ? $siswa->rombel->nama : 'Tidak ada rombel';
             });
 
@@ -91,7 +92,7 @@ class NilaiRaportController extends Controller
             $semesterList = [];
         }
 
-        return view('walikelas.nilai_raport.index', compact('siswas', 'search', 'tahunAjaranList', 'semesterList'));
+        return view('walikelas.nilai_raport.index', compact('siswas', 'search', 'tahunAjaranList', 'semesterList', 'queryResults'));
     }
 
     public function exportExcel(Request $request)

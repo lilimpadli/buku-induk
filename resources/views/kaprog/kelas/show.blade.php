@@ -234,6 +234,32 @@
         .modal-body .table-sm th {
             width: 40%;
         }
+        
+        .form-control, .form-select {
+            font-size: 13px;
+            padding: 8px 10px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .card-body {
+            padding: 1rem;
+        }
+        
+        h5.mb-0 {
+            font-size: 16px;
+        }
+        
+        .table thead th,
+        .table td, .table th {
+            padding: 6px 8px;
+            font-size: 12px;
+        }
+        
+        .btn {
+            padding: 0.3rem 0.8rem;
+            font-size: 12px;
+        }
     }
 </style>
 

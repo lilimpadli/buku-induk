@@ -164,28 +164,54 @@
 
         .d-flex.justify-content-between {
             flex-direction: column;
-            gap: 15px;
+            align-items: flex-start;
+            gap: 1rem;
         }
 
         .d-flex.justify-content-between div {
             width: 100%;
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
         .btn {
-            flex: 1;
+            width: 100%;
             justify-content: center;
+            font-size: 13px;
+            padding: 0.4rem 0.8rem;
         }
 
         .table-bordered th,
         .table-bordered td {
             padding: 8px 10px;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         h5.fw-bold {
             font-size: 16px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        h4 {
+            font-size: 20px;
+            padding-left: 12px;
+        }
+
+        .table-bordered th,
+        .table-bordered td {
+            padding: 6px 8px;
+            font-size: 11px;
+        }
+
+        .btn {
+            padding: 0.3rem 0.6rem;
+            font-size: 12px;
+        }
+
+        h5.fw-bold {
+            font-size: 14px;
         }
     }
 </style>

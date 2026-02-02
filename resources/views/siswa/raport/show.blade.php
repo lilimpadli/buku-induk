@@ -213,9 +213,30 @@
             font-size: 13px;
         }
     }
+
+    /* Responsive container for raport detail pages */
+    .report-container{max-width:1100px;margin:0 auto;padding:0 1rem;}
+    .table td, .table th{word-wrap:break-word;white-space:normal;}
+    .table-responsive{overflow-x:auto;}
+    /* Desktop: 2x2 layout */
+    .info-table{table-layout:auto;width:100%;}
+    .kehadiran-table{width:50%;}
+    /* Mobile: stack into compact rows */
+    @media (max-width:768px){
+        .report-container{padding:0 0.5rem;}
+        .kehadiran-table{width:100%;}
+        .info-table{display:block; width:100%;}
+        .info-table tr{display:flex;flex-wrap:wrap;margin-bottom:0.5rem;}
+        .info-table th, .info-table td{flex:0 0 50%;padding:0.5rem 0.75rem !important;border:1px solid #e2e8f0;font-size:13px;}
+        .info-table th:nth-child(1) { width:100%; order:1; flex-basis:100%; background-color:#f8fafc; }
+        .info-table td:nth-child(2) { width:100%; order:2; flex-basis:100%; }
+        .info-table th:nth-child(3) { width:100%; order:3; flex-basis:100%; background-color:#f8fafc; }
+        .info-table td:nth-child(4) { width:100%; order:4; flex-basis:100%; }
+    }
 </style>
 
-<div class="container mt-4">
+<div class="container-fluid mt-4">
+    <div class="report-container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>Detail Raport</h3>
         <div>
@@ -232,24 +253,24 @@
     <div class="card shadow mb-4">
         <div class="card-body">
             <h5 class="card-title">Informasi Siswa</h5>
-            <table class="table table-bordered">
+            <table class="table table-bordered info-table">
                 <tr>
-                    <th width="20%">Nama Lengkap</th>
-                    <td width="30%">{{ $siswa->nama_lengkap }}</td>
-                    <th width="20%">NISN</th>
-                    <td width="30%">{{ $siswa->nisn }}</td>
+                    <th width="25%">Nama Lengkap</th>
+                    <td width="25%">{{ $siswa->nama_lengkap }}</td>
+                    <th width="25%">NISN</th>
+                    <td width="25%">{{ $siswa->nisn }}</td>
                 </tr>
                 <tr>
-                    <th>Kelas</th>
-                    <td>{{ $rombelRaport->nama ?? ($siswa->rombel->nama ?? '-') }}</td>
-                    <th>Jurusan</th>
-                    <td>{{ optional($kelasRaport->jurusan)->nama ?? ($siswa->rombel->kelas->jurusan->nama ?? '-') }}</td>
+                    <th width="25%">Kelas</th>
+                    <td width="25%">{{ $rombelRaport->nama ?? ($siswa->rombel->nama ?? '-') }}</td>
+                    <th width="25%">Jurusan</th>
+                    <td width="25%">{{ optional($kelasRaport->jurusan)->nama ?? ($siswa->rombel->kelas->jurusan->nama ?? '-') }}</td>
                 </tr>
                 <tr>
-                    <th>Semester</th>
-                    <td>{{ $semester }}</td>
-                    <th>Tahun Ajaran</th>
-                    <td>{{ $tahun }}</td>
+                    <th width="25%">Semester</th>
+                    <td width="25%">{{ $semester }}</td>
+                    <th width="25%">Tahun Ajaran</th>
+                    <td width="25%">{{ $tahun }}</td>
                 </tr>
             </table>
         </div>
@@ -357,7 +378,7 @@
     <div class="card shadow mb-4">
         <div class="card-body">
             <h5 class="card-title">Ketidakhadiran</h5>
-            <div class="table-responsive" style="width: 50%;">
+            <div class="table-responsive kehadiran-table">
                 <table class="table table-bordered">
                     <tr>
                         <th>Sakit</th>
@@ -390,5 +411,6 @@
         </div>
     @endif
 
+    </div>
 </div>
 @endsection

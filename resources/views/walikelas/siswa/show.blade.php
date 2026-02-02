@@ -22,6 +22,13 @@
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
+    /* Responsive Container */
+    .report-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
     h3.mb-0 {
         font-size: 28px;
         color: #1E293B;
@@ -190,22 +197,60 @@
         }
         
         h3.mb-0 {
-            font-size: 24px;
+            font-size: 22px;
+            margin-bottom: 0.5rem !important;
         }
         
         .btn {
-            padding: 0.4rem 1rem;
-            font-size: 14px;
+            padding: 0.6rem 1rem;
+            font-size: 13px;
+            width: 100%;
+            display: block;
+            text-align: center;
+            white-space: normal;
+            margin: 0.5rem 0 !important;
         }
         
         .table-borderless th,
         .table-borderless td {
-            font-size: 13px;
+            font-size: 12px;
+            padding: 0.4rem 0;
+        }
+
+        .report-container {
+            padding: 0 0.5rem;
+        }
+
+        .d-flex.justify-content-between {
+            display: flex !important;
+            flex-direction: column;
+            align-items: stretch !important;
+            gap: 0.75rem;
+        }
+
+        .d-flex.justify-content-between > div {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .col-lg-4, .col-lg-8 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+
+        .row > .col-lg-4:first-child {
+            margin-bottom: 1rem;
+        }
+
+        .mb-3 {
+            margin-bottom: 1rem !important;
         }
     }
 </style>
 
-<div class="container mt-4">
+<div class="container-fluid mt-4">
+    <div class="report-container">
 
     <div class="d-flex justify-content-between align-items-start mb-3">
         <div>

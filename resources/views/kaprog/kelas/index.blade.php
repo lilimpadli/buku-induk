@@ -160,12 +160,8 @@
 
     /* Responsive */
     @media (max-width: 768px) {
-        .card-body {
-            padding: 1.25rem;
-        }
-        
-        .card-body.d-flex {
-            padding: 1rem;
+        .container {
+            padding: 0 1rem;
         }
         
         h5.mb-0 {
@@ -173,12 +169,40 @@
         }
         
         h6.mb-1, h6.mb-0 {
-            font-size: 15px;
+            font-size: 14px;
+        }
+        
+        .card-body {
+            padding: 1.25rem;
         }
         
         .btn {
-            padding: 0.4rem 1rem;
-            font-size: 14px;
+            padding: 0.4rem 0.8rem;
+            font-size: 13px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .row.g-3 {
+            --bs-gutter-x: 0.75rem;
+            --bs-gutter-y: 0.75rem;
+        }
+        
+        .col-sm-12.col-md-6.col-lg-4 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        
+        .card.shadow-sm {
+            margin-bottom: 1rem;
+        }
+        
+        h5.mb-0 {
+            font-size: 16px;
+        }
+        
+        .card-body {
+            padding: 1rem;
         }
     }
 </style>

@@ -166,12 +166,20 @@
 
     /* Responsive */
     @media (max-width: 768px) {
+        .container {
+            padding: 0 1rem;
+        }
+        
         .card-body {
             padding: 1.5rem;
         }
         
         .card-title {
             font-size: 20px;
+        }
+        
+        .form-label {
+            font-size: 13px;
         }
         
         .btn {
@@ -181,6 +189,66 @@
         
         .form-control, .form-select {
             padding: 10px 12px;
+            font-size: 13px;
+        }
+        
+        .d-flex.justify-content-end {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .d-flex.justify-content-end .btn {
+            width: 100%;
+            margin-right: 0 !important;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .container {
+            padding: 0 0.75rem;
+        }
+        
+        .card-body {
+            padding: 1.25rem;
+        }
+        
+        .card-title {
+            font-size: 18px;
+        }
+        
+        .form-label {
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+        
+        .form-control, .form-select {
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+        
+        .btn {
+            padding: 0.4rem 1rem;
+            font-size: 12px;
+            width: 100%;
+        }
+        
+        .row.justify-content-center {
+            margin: 0;
+        }
+        
+        .col-md-8 {
+            flex: 0 0 100%;
+            max-width: 100%;
+            padding: 0;
+        }
+        
+        .alert {
+            font-size: 12px;
+            padding: 10px 12px;
+        }
+        
+        textarea.form-control {
+            min-height: 80px;
         }
     }
 </style>

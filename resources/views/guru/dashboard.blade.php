@@ -57,6 +57,49 @@
         position: relative;
         z-index: 1;
     }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 1.5rem 1rem;
+        }
+        
+        .dashboard-header h2 {
+            font-size: 20px;
+        }
+        
+        .dashboard-header::before {
+            width: 200px;
+            height: 200px;
+            transform: translate(50px, -50px);
+        }
+        
+        .d-flex.align-items-center.justify-content-between {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .dashboard-header {
+            padding: 1rem 0.75rem;
+        }
+        
+        .dashboard-header h2 {
+            font-size: 18px;
+            margin-bottom: 0.25rem;
+        }
+        
+        .dashboard-header .text-muted {
+            font-size: 13px;
+        }
+        
+        .dashboard-header::before {
+            width: 150px;
+            height: 150px;
+            transform: translate(25px, -25px);
+        }
+    }
 </style>
 
 <div class="container-fluid py-4">

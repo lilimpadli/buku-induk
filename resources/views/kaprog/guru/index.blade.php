@@ -176,17 +176,59 @@
 
     /* Responsive */
     @media (max-width: 768px) {
+        .container {
+            max-width: 100%;
+            padding: 1.5rem 1rem;
+        }
+        
         h3 {
             font-size: 24px;
+        }
+        
+        .d-flex {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .form-control {
+            font-size: 14px;
+            padding: 8px 10px;
+        }
+        
+        .btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 13px;
+        }
+        
+        .col-md-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
         }
         
         .card-body {
             padding: 1.25rem;
         }
         
-        .btn {
-            padding: 0.4rem 1rem;
-            font-size: 14px;
+        .card-title {
+            font-size: 16px;
+        }
+        
+        .card-text {
+            font-size: 13px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        h3 {
+            font-size: 20px;
+        }
+        
+        .card {
+            margin-bottom: 1rem;
+        }
+        
+        .card-body {
+            padding: 1rem;
         }
     }
 </style>

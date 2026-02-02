@@ -26,6 +26,13 @@
         max-width: 1200px;
     }
 
+    /* Responsive Container */
+    .report-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
     h3 {
         font-size: 28px;
         color: #1E293B;

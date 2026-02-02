@@ -42,6 +42,26 @@
         border-radius: 3px;
     }
 
+    h3.mb-0 {
+        font-size: 28px;
+        color: #1E293B;
+        position: relative;
+        padding-left: 15px;
+        margin-bottom: 0 !important;
+    }
+
+    h3.mb-0::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 70%;
+        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+        border-radius: 3px;
+    }
+
     p {
         color: #64748B;
         margin-left: 20px;
@@ -210,7 +230,7 @@
 
     /* Responsive */
     @media (max-width: 768px) {
-        h3 {
+        h3.mb-0 {
             font-size: 24px;
         }
         
@@ -294,8 +314,12 @@
 </style>
 
 <div class="container mt-4">
-    <h3>Input Nilai Raport</h3>
-    <p>Pilih siswa untuk menginput nilai raport</p>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="mb-0">Input Nilai Raport</h3>
+            <p class="text-muted mb-0" style="font-size: 14px; margin-top: 4px;">Pilih siswa untuk menginput nilai raport</p>
+        </div>
+    </div>
 
     <!-- Alert Messages -->
     @if($errors->any())
@@ -392,6 +416,13 @@
             </div>
         @endif
     </div>
+
+    <!-- Pagination Links -->
+    @if(isset($queryResults) && $queryResults instanceof \Illuminate\Pagination\LengthAwarePaginator && $queryResults->hasPages())
+        <div class="p-3">
+            {{ $queryResults->appends(request()->query())->links('pagination::bootstrap-4') }}
+        </div>
+    @endif
 </div>
 
 <!-- Modal Download Template -->

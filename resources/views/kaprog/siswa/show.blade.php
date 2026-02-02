@@ -328,6 +328,7 @@
         .btn {
             padding: 0.4rem 1rem;
             font-size: 14px;
+            width: 100%;
         }
 
         .table thead th,
@@ -338,6 +339,52 @@
 
         .profile-name {
             font-size: 20px;
+        }
+        
+        .nav-tabs .nav-link {
+            padding: 10px 15px;
+            font-size: 13px;
+        }
+        
+        .tab-content {
+            padding: 15px;
+        }
+        
+        .row > div {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .card-body {
+            padding: 1rem;
+        }
+        
+        h5.mb-0 {
+            font-size: 20px;
+        }
+        
+        h6.card-title {
+            font-size: 16px;
+        }
+        
+        .table thead th,
+        .table td, .table th {
+            padding: 6px 8px;
+            font-size: 12px;
+        }
+        
+        .btn {
+            padding: 0.3rem 0.8rem;
+            font-size: 12px;
+        }
+        
+        .nav-tabs .nav-link {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+    }
         }
     }
 </style>

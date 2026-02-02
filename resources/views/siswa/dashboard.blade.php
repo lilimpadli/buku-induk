@@ -59,7 +59,13 @@
     }
 
     .dashboard-header .text-muted {
-        color: rgba(255, 255, 255, 0.8) !important;
+        color: rgba(255, 255, 255, 0.9) !important;
+        position: relative;
+        z-index: 1;
+        font-weight: 500;
+    }
+
+    .dashboard-header .btn-gradient {
         position: relative;
         z-index: 1;
     }
@@ -73,6 +79,7 @@
         overflow: hidden;
         position: relative;
         height: 100%;
+        background: white;
     }
 
     .stat-card:hover {
@@ -113,6 +120,7 @@
         font-size: 24px;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
         transition: var(--transition);
+        flex-shrink: 0;
     }
 
     .stat-card:hover .stat-icon {
@@ -155,8 +163,7 @@
 
     .btn-outline-gradient {
         background: transparent;
-        border: 2px solid;
-        border-image: var(--primary-gradient) 1;
+        border: 2px solid #667eea;
         color: #667eea;
         font-weight: 600;
         padding: 0.6rem 1.2rem;
@@ -167,6 +174,7 @@
     .btn-outline-gradient:hover {
         background: var(--primary-gradient);
         color: white;
+        border-color: transparent;
         transform: translateY(-2px);
     }
 
@@ -177,6 +185,8 @@
         box-shadow: var(--card-shadow);
         overflow: hidden;
         height: 100%;
+        background: white;
+        transition: var(--transition);
     }
 
     .profile-card:hover {
@@ -207,24 +217,6 @@
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     }
 
-    /* Action Button */
-    .action-btn {
-        border-radius: 10px;
-        padding: 0.6rem 1.2rem;
-        margin-bottom: 8px;
-        font-weight: 600;
-        transition: var(--transition);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
-
-    .action-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-
     /* Animations */
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(20px); }
@@ -235,26 +227,358 @@
         animation: fadeIn 0.6s ease-out;
     }
 
-    /* Responsive */
+    /* Parent Contact Card */
+    .parent-contact-card {
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        border: none;
+        background: white;
+        transition: var(--transition);
+    }
+
+    .parent-contact-card:hover {
+        box-shadow: var(--card-hover-shadow);
+        transform: translateY(-3px);
+    }
+
+    .parent-data-card {
+        border-radius: 12px;
+        border: none;
+        background: #f8f9fa;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .parent-data-card h6 {
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* =============== MOBILE OPTIMIZATIONS =============== */
     @media (max-width: 768px) {
+        /* General mobile adjustments */
+        body {
+            font-size: 14px;
+        }
+
+        .container-fluid {
+            padding: 0.75rem !important;
+        }
+
+        /* Mobile Header */
         .dashboard-header {
-            padding: 1.5rem 1rem;
+            padding: 1.25rem;
+            border-radius: 16px;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-header::before {
+            width: 180px;
+            height: 180px;
+            transform: translate(80px, -80px);
         }
         
         .dashboard-header h2 {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
+            margin-bottom: 0.4rem;
+            line-height: 1.3;
+        }
+
+        .dashboard-header .text-muted {
+            font-size: 0.9rem;
+        }
+
+        .dashboard-header .d-flex {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .dashboard-header .btn-gradient {
+            width: 100%;
+            padding: 0.65rem 1rem;
+            font-size: 0.9rem;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Stat Cards Mobile */
+        .stat-card {
+            border-radius: 14px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-card .card-body {
+            padding: 1rem;
         }
         
         .stat-icon {
-            width: 56px;
-            height: 56px;
+            width: 52px;
+            height: 52px;
             font-size: 20px;
+            border-radius: 12px;
+        }
+
+        .stat-card .h5 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0;
+        }
+
+        .stat-card .small {
+            font-size: 0.75rem;
+        }
+
+        .stat-card .text-muted.small {
+            font-size: 0.7rem;
+        }
+
+        /* Profile Card Mobile */
+        .profile-card {
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .profile-card .card-body {
+            padding: 1.5rem 1rem;
         }
         
         .profile-image, .profile-placeholder {
-            width: 120px;
-            height: 120px;
-            font-size: 44px;
+            width: 100px;
+            height: 100px;
+            font-size: 38px;
+            border-width: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .profile-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-card .text-muted {
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Mobile Buttons Grid */
+        .profile-card .row.g-2 {
+            gap: 0.5rem;
+        }
+
+        .profile-card .btn-outline-gradient,
+        .profile-card .btn-outline-danger {
+            padding: 0.65rem 1rem;
+            font-size: 0.85rem;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .profile-card .btn-outline-gradient i,
+        .profile-card .btn-outline-danger i {
+            font-size: 0.85rem;
+        }
+
+        /* Action buttons at bottom */
+        .profile-card .d-flex.gap-3 {
+            flex-direction: column;
+            gap: 0.6rem !important;
+        }
+
+        .profile-card .d-flex.gap-3 .btn {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Parent Contact Card Mobile */
+        .parent-contact-card {
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .parent-contact-card .card-body {
+            padding: 1.25rem;
+        }
+
+        .parent-contact-card h5 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .parent-data-card {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+        }
+
+        .parent-data-card h6 {
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .parent-data-card .table {
+            font-size: 0.8rem;
+            margin-bottom: 0;
+        }
+
+        .parent-data-card .table th {
+            font-weight: 600;
+            color: #4a5568;
+            padding: 0.4rem 0;
+        }
+
+        .parent-data-card .table td {
+            padding: 0.4rem 0;
+            color: #2d3748;
+        }
+
+        .parent-contact-card .btn-gradient {
+            padding: 0.7rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Modal Mobile */
+        .modal-dialog {
+            margin: 0.5rem;
+            max-width: calc(100% - 1rem);
+        }
+
+        .modal-content {
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .modal-body {
+            padding: 1.25rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .modal .form-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+
+        .modal .form-control {
+            font-size: 0.9rem;
+            padding: 0.6rem 0.75rem;
+            border-radius: 8px;
+        }
+
+        .modal .form-text {
+            font-size: 0.75rem;
+            margin-top: 0.3rem;
+        }
+
+        .modal .btn {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+
+        /* Spacing adjustments */
+        .row.g-3 {
+            gap: 0.75rem;
+        }
+
+        .mb-3 {
+            margin-bottom: 0.75rem !important;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem !important;
+        }
+    }
+
+    /* Extra small devices */
+    @media (max-width: 400px) {
+        .dashboard-header h2 {
+            font-size: 1.15rem;
+        }
+
+        .dashboard-header .text-muted {
+            font-size: 0.85rem;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            font-size: 18px;
+        }
+
+        .stat-card .h5 {
+            font-size: 0.95rem;
+        }
+
+        .profile-image, .profile-placeholder {
+            width: 90px;
+            height: 90px;
+            font-size: 34px;
+        }
+
+        .profile-card h3 {
+            font-size: 1.1rem;
+        }
+
+        .btn-gradient, .btn-outline-gradient {
+            font-size: 0.8rem;
+            padding: 0.6rem 0.9rem;
+        }
+    }
+
+    /* Landscape mobile optimization */
+    @media (max-width: 768px) and (orientation: landscape) {
+        .dashboard-header {
+            padding: 1rem;
+        }
+
+        .profile-image, .profile-placeholder {
+            width: 80px;
+            height: 80px;
+            font-size: 32px;
+        }
+
+        .modal-dialog {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+    }
+
+    /* Desktop styles preserved */
+    @media (min-width: 769px) {
+        /* Keep original desktop styles */
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .profile-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .parent-contact-card:hover {
+            transform: translateY(-3px);
         }
     }
 </style>
@@ -285,26 +609,30 @@
                 </div>
             </div>
             <div class="d-flex gap-2">
-                <a href="{{ route('siswa.dataDiri.edit') }}" class="btn btn-gradient">Edit Profil</a>
+                <a href="{{ route('siswa.dataDiri.edit') }}" class="btn btn-gradient">
+                    <i class="fas fa-edit me-1"></i>
+                    <span class="d-none d-sm-inline">Edit Profil</span>
+                    <span class="d-inline d-sm-none">Edit</span>
+                </a>
             </div>
         </div>
     </div>
 
     <!-- Stats Cards -->
-    <div class="row g-4 mb-4">
+    <div class="row g-3 mb-3">
         <div class="col-lg-6 col-md-6 fade-in" style="animation-delay: 0.1s;">
             <div class="card stat-card h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="stat-icon primary me-3">
-                            <i class="fas fa-book"></i>
+                            <i class="fas fa-chalkboard-teacher"></i>
                         </div>
-                        <div>
-                            <div class="text-muted small">Wali Kelas</div>
+                        <div class="flex-grow-1">
+                            <div class="text-muted small mb-1">Wali Kelas</div>
                             <div class="h5 mb-0">{{ $siswa && $siswa->rombel && $siswa->rombel->guru ? $siswa->rombel->guru->nama : 'Belum ditentukan' }}</div>
                         </div>
                     </div>
-                    <div class="mt-3 small text-muted">Guru pengampu kelas Anda</div>
+                    <div class="mt-2 small text-muted">Guru pengampu kelas Anda</div>
                 </div>
             </div>
         </div>
@@ -316,8 +644,8 @@
                         <div class="stat-icon success me-3">
                             <i class="fas fa-check-circle"></i>
                         </div>
-                        <div>
-                            <div class="text-muted small">Status Profil</div>
+                        <div class="flex-grow-1">
+                            <div class="text-muted small mb-1">Status Profil</div>
                             @if(isset($missing) && count($missing) > 0)
                                 <div class="h5 mb-0 text-warning">{{ count($missing) }} Field Kosong</div>
                             @else
@@ -325,7 +653,7 @@
                             @endif
                         </div>
                     </div>
-                    <div class="mt-3 small text-muted">
+                    <div class="mt-2 small text-muted">
                         @if(isset($missing) && count($missing) > 0)
                             Masih ada {{ count($missing) }} field yang perlu diisi
                         @else
@@ -338,122 +666,118 @@
     </div>
 
     <!-- Main Content -->
-    <div class="row g-4">
-        <!-- Profile Card - Left Side (Bigger) -->
+    <div class="row g-3">
+        <!-- Profile Card -->
         <div class="col-xl-8 fade-in" style="animation-delay: 0.5s;">
             <div class="card profile-card h-100">
-                <div class="card-body text-center p-5">
+                <div class="card-body text-center">
                     @if($siswa && $siswa->foto)
-                        <img src="{{ asset('storage/' . $siswa->foto) }}" class="profile-image mb-4" alt="Foto Siswa">
+                        <img src="{{ asset('storage/' . $siswa->foto) }}" class="profile-image mb-3" alt="Foto Siswa">
                     @else
-                        <div class="profile-placeholder bg-gradient mb-4 mx-auto" style="background: var(--primary-gradient);">
+                        <div class="profile-placeholder bg-gradient mb-3 mx-auto" style="background: var(--primary-gradient);">
                             {{ $siswa ? strtoupper(substr($siswa->nama_lengkap,0,1)) : 'S' }}
                         </div>
                     @endif
                     
                     <h3 class="mb-2">{{ $siswa->nama_lengkap ?? 'Belum Lengkap' }}</h3>
-                    <p class="text-muted mb-4">NIS: {{ $siswa->nis ?? '-' }} • NISN: {{ $siswa->nisn ?? '-' }}</p>
+                    <p class="text-muted mb-3">NIS: {{ $siswa->nis ?? '-' }} • NISN: {{ $siswa->nisn ?? '-' }}</p>
                     
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
                             <button type="button" class="btn btn-outline-gradient w-100" data-bs-toggle="modal" data-bs-target="#editNamaModal">
-                                <i class="fas fa-user me-2"></i> Edit Nama
+                                <i class="fas fa-user me-1"></i> Edit Nama
                             </button>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-6">
                             <button type="button" class="btn btn-outline-gradient w-100" data-bs-toggle="modal" data-bs-target="#editEmailModal">
-                                <i class="fas fa-envelope me-2"></i> Edit Email
+                                <i class="fas fa-envelope me-1"></i> Edit Email
                             </button>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-6">
                             <button type="button" class="btn btn-outline-gradient w-100" data-bs-toggle="modal" data-bs-target="#editFotoModal">
-                                <i class="fas fa-camera me-2"></i> Edit Foto
+                                <i class="fas fa-camera me-1"></i> Edit Foto
                             </button>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-6">
                             <button type="button" class="btn btn-outline-gradient w-100" data-bs-toggle="modal" data-bs-target="#editPasswordModal">
-                                <i class="fas fa-key me-2"></i> Ubah Password
+                                <i class="fas fa-key me-1"></i> Password
                             </button>
                         </div>
                         @if($siswa && $siswa->foto)
-                        <div class="col-md-12">
+                        <div class="col-12">
                             <button type="button" class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#confirmDeleteFotoModal">
-                                <i class="fas fa-trash me-2"></i> Hapus Foto
+                                <i class="fas fa-trash me-1"></i> Hapus Foto
                             </button>
                         </div>
                         @endif
                     </div>
                     
                     <div class="d-flex gap-3 justify-content-center">
-                        <a href="{{ route('siswa.dataDiri.exportPDF') }}" class="btn btn-gradient px-4" target="_blank">
-                            <i class="fas fa-download me-2"></i> Unduh Data Diri
+                        <a href="{{ route('siswa.dataDiri.exportPDF') }}" class="btn btn-gradient" target="_blank">
+                            <i class="fas fa-download me-1"></i> Unduh Data
                         </a>
-                        <a href="{{ route('siswa.dataDiri.edit') }}" class="btn btn-outline-gradient px-4">
-                            <i class="fas fa-edit me-2"></i> Lengkapi Profil
+                        <a href="{{ route('siswa.dataDiri.edit') }}" class="btn btn-outline-gradient">
+                            <i class="fas fa-edit me-1"></i> Lengkapi Profil
                         </a>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Parent Contact Card -->
         <div class="col-xl-4">
-            <!-- Kontak Orang Tua - Right Side -->
-            <div class="card shadow-sm mb-4 fade-in" style="animation-delay: 0.6s; border-radius: var(--border-radius);">
+            <div class="card parent-contact-card shadow-sm fade-in" style="animation-delay: 0.6s;">
                 <div class="card-body">
-                    <h5 class="mb-4">Kontak Orang Tua</h5>
+                    <h5 class="mb-3">Kontak Orang Tua</h5>
 
-                    <div class="mb-4">
-                        <div class="card border-0 bg-light mb-3">
-                            <div class="card-body">
-                                <h6 class="text-primary mb-3">
-                                    <i class="fas fa-user-tie me-2"></i>Data Ayah
-                                </h6>
-                                <table class="table table-borderless table-sm mb-0">
-                                    <tbody>
-                                        <tr>
-                                            <th width="40%">Nama</th>
-                                            <td>{{ $siswa->ayah->nama ?? '-' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Telepon</th>
-                                            <td>{{ $siswa->ayah->telepon ?? '-' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Pekerjaan</th>
-                                            <td>{{ $siswa->ayah->pekerjaan ?? '-' }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                    <div class="mb-3">
+                        <div class="parent-data-card">
+                            <h6 class="text-primary">
+                                <i class="fas fa-user-tie"></i>Data Ayah
+                            </h6>
+                            <table class="table table-borderless table-sm mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th width="40%">Nama</th>
+                                        <td>{{ $siswa->ayah->nama ?? '-' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Telepon</th>
+                                        <td>{{ $siswa->ayah->telepon ?? '-' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Pekerjaan</th>
+                                        <td>{{ $siswa->ayah->pekerjaan ?? '-' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                         
-                        <div class="card border-0 bg-light">
-                            <div class="card-body">
-                                <h6 class="text-danger mb-3">
-                                    <i class="fas fa-user me-2"></i>Data Ibu
-                                </h6>
-                                <table class="table table-borderless table-sm mb-0">
-                                    <tbody>
-                                        <tr>
-                                            <th width="40%">Nama</th>
-                                            <td>{{ $siswa->ibu->nama ?? '-' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Telepon</th>
-                                            <td>{{ $siswa->ibu->telepon ?? '-' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Pekerjaan</th>
-                                            <td>{{ $siswa->ibu->pekerjaan ?? '-' }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                        <div class="parent-data-card">
+                            <h6 class="text-danger">
+                                <i class="fas fa-user"></i>Data Ibu
+                            </h6>
+                            <table class="table table-borderless table-sm mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th width="40%">Nama</th>
+                                        <td>{{ $siswa->ibu->nama ?? '-' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Telepon</th>
+                                        <td>{{ $siswa->ibu->telepon ?? '-' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Pekerjaan</th>
+                                        <td>{{ $siswa->ibu->pekerjaan ?? '-' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                     
                     <a href="{{ route('siswa.dataDiri.edit') }}" class="btn btn-gradient w-100">
-                        <i class="fas fa-edit me-2"></i>Edit Kontak Orang Tua
+                        <i class="fas fa-edit me-1"></i>Edit Kontak Orang Tua
                     </a>
                 </div>
             </div>
@@ -480,7 +804,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
             </form>
         </div>
@@ -511,7 +835,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
             </form>
         </div>
@@ -537,7 +861,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Upload Foto</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
                 </div>
             </form>
         </div>
@@ -560,7 +884,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-danger">Hapus Foto</button>
+                    <button type="submit" class="btn btn-danger">Hapus</button>
                 </div>
             </form>
         </div>
@@ -595,7 +919,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Ubah Password</button>
+                    <button type="submit" class="btn btn-primary">Ubah</button>
                 </div>
             </form>
         </div>
