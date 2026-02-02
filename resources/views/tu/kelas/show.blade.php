@@ -42,7 +42,7 @@
         border-radius: 3px;
     }
 
-    .text-muted {
+    .rombel-subtitle {
         color: #64748B !important;
         margin-left: 15px;
     }
@@ -71,19 +71,20 @@
     }
 
     /* Info Card Styles */
-    .info-card .row > div {
+    .info-card .info-item {
         padding: 15px;
         border-radius: 12px;
         background-color: rgba(47, 83, 255, 0.03);
         transition: all 0.3s ease;
+        height: 100%;
     }
 
-    .info-card .row > div:hover {
+    .info-card .info-item:hover {
         background-color: rgba(47, 83, 255, 0.06);
         transform: translateY(-3px);
     }
 
-    .info-card p {
+    .info-card .info-label {
         font-size: 13px;
         font-weight: 600;
         color: #64748B;
@@ -92,10 +93,11 @@
         letter-spacing: 0.5px;
     }
 
-    .info-card h6 {
+    .info-card .info-value {
         font-size: 16px;
         color: #1E293B;
         margin-bottom: 0;
+        font-weight: 600;
     }
 
     /* Button Styles */
@@ -151,11 +153,39 @@
         border-radius: 0 0 16px 16px;
     }
 
+    .student-avatar {
+        flex-shrink: 0;
+    }
+
+    .student-avatar-circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .student-avatar-initial {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
     /* Empty State */
-    .text-center.py-4 {
+    .empty-state {
         color: #64748B;
         font-weight: 500;
         padding: 40px 20px !important;
+    }
+
+    .empty-state i {
+        color: #94a3b8;
     }
 
     /* Animations */
@@ -169,44 +199,190 @@
     }
 
     /* Responsive */
-    @media (max-width: 768px) {
-        h2.fw-bold {
-            font-size: 24px;
-        }
-        
-        .text-muted {
-            margin-left: 0;
-            margin-bottom: 15px;
-        }
-        
-        .d-flex.justify-content-between {
-            flex-direction: column;
-            align-items: flex-start !important;
-        }
-        
-        .btn-outline-secondary {
-            margin-top: 10px;
-            align-self: flex-start;
-        }
-        
-        .info-card .row > div {
-            margin-bottom: 15px;
-        }
-        
+    @media (max-width: 992px) {
         .table thead th,
         .table tbody td {
             padding: 12px 15px;
         }
     }
+
+    @media (max-width: 768px) {
+        h2.fw-bold {
+            font-size: 24px;
+            padding-left: 12px;
+        }
+
+        h2.fw-bold::before {
+            width: 4px;
+        }
+        
+        .rombel-subtitle {
+            margin-left: 12px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-outline-secondary {
+            font-size: 0.875rem;
+            padding: 6px 12px;
+        }
+
+        .card-header {
+            padding: 15px 20px 12px;
+        }
+
+        .card-header h5 {
+            font-size: 1.1rem;
+        }
+
+        .card-body {
+            padding: 15px 20px;
+        }
+        
+        .info-card .info-item {
+            margin-bottom: 12px;
+            padding: 12px;
+        }
+
+        .info-card .info-label {
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .info-card .info-value {
+            font-size: 15px;
+        }
+        
+        .table thead th {
+            font-size: 12px;
+            padding: 10px 12px;
+        }
+
+        .table tbody td {
+            padding: 10px 12px;
+            font-size: 0.875rem;
+        }
+
+        .student-avatar {
+            margin-right: 10px !important;
+        }
+
+        .student-avatar-circle,
+        .student-avatar-initial {
+            width: 32px;
+            height: 32px;
+            font-size: 13px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.5rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        h2.fw-bold {
+            font-size: 20px;
+            padding-left: 10px;
+        }
+
+        .rombel-subtitle {
+            margin-left: 10px;
+            font-size: 0.85rem;
+        }
+
+        .header-section {
+            margin-bottom: 1rem !important;
+        }
+
+        .btn-outline-secondary {
+            width: 100%;
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            padding: 8px 12px;
+        }
+
+        .card-header {
+            padding: 12px 15px 10px;
+        }
+
+        .card-header h5 {
+            font-size: 1rem;
+        }
+
+        .card-body {
+            padding: 12px 15px;
+        }
+
+        .info-card .info-item {
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .info-card .info-label {
+            font-size: 11px;
+        }
+
+        .info-card .info-value {
+            font-size: 14px;
+        }
+
+        /* Mobile: Hide some table columns */
+        .table thead th:nth-child(3),
+        .table tbody td:nth-child(3) {
+            display: none;
+        }
+
+        .table thead th {
+            font-size: 11px;
+            padding: 8px 10px;
+        }
+
+        .table tbody td {
+            padding: 8px 10px;
+            font-size: 0.8rem;
+        }
+
+        .student-avatar {
+            margin-right: 8px !important;
+        }
+
+        .student-avatar-circle,
+        .student-avatar-initial {
+            width: 28px;
+            height: 28px;
+            font-size: 12px;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.4rem;
+        }
+
+        .badge i {
+            display: none;
+        }
+
+        .empty-state {
+            padding: 30px 15px !important;
+        }
+
+        .empty-state i {
+            font-size: 1.5rem !important;
+        }
+
+        .empty-state p {
+            font-size: 0.875rem;
+        }
+    }
 </style>
 
-<div class="container-fluid mt-4">
+<div class="container-fluid px-3 px-md-4 mt-3 mt-md-4">
 
     <!-- JUDUL DAN TOMBOL KEMBALI -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 mb-md-4 header-section">
+        <div class="flex-grow-1">
             <h2 class="fw-bold mb-1">Detail Rombel</h2>
-            <p class="text-muted mb-0">{{ $rombel->nama }}</p>
+            <p class="rombel-subtitle mb-0">{{ $rombel->nama }}</p>
         </div>
         <div class="d-flex gap-2">
             <a href="{{ route('tu.kelas.export', $rombel->id) }}" class="btn btn-success">
@@ -219,20 +395,32 @@
     </div>
 
     <!-- INFO ROMBEL -->
-    <div class="card shadow-sm border-0 mb-4 info-card">
+    <div class="card shadow-sm border-0 mb-3 mb-md-4 info-card">
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-4 mb-3 mb-md-0">
-                    <p class="mb-1"><i class="fas fa-layer-group me-2"></i> Tingkat</p>
-                    <h6 class="fw-bold">{{ $rombel->kelas->tingkat ?? '-' }}</h6>
+            <div class="row g-2 g-md-3">
+                <div class="col-12 col-md-4">
+                    <div class="info-item">
+                        <p class="info-label mb-1">
+                            <i class="fas fa-layer-group me-1 me-md-2"></i> Tingkat
+                        </p>
+                        <h6 class="info-value">{{ $rombel->kelas->tingkat ?? '-' }}</h6>
+                    </div>
                 </div>
-                <div class="col-md-4 mb-3 mb-md-0">
-                    <p class="mb-1"><i class="fas fa-graduation-cap me-2"></i> Jurusan</p>
-                    <h6 class="fw-bold">{{ $rombel->kelas->jurusan->nama ?? '-' }}</h6>
+                <div class="col-12 col-md-4">
+                    <div class="info-item">
+                        <p class="info-label mb-1">
+                            <i class="fas fa-graduation-cap me-1 me-md-2"></i> Jurusan
+                        </p>
+                        <h6 class="info-value">{{ $rombel->kelas->jurusan->nama ?? '-' }}</h6>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <p class="mb-1"><i class="fas fa-user-tie me-2"></i> Wali Kelas</p>
-                    <h6 class="fw-bold">{{ $rombel->guru->nama ?? '-' }}</h6>
+                <div class="col-12 col-md-4">
+                    <div class="info-item">
+                        <p class="info-label mb-1">
+                            <i class="fas fa-user-tie me-1 me-md-2"></i> Wali Kelas
+                        </p>
+                        <h6 class="info-value">{{ $rombel->guru->nama ?? '-' }}</h6>
+                    </div>
                 </div>
             </div>
         </div>
@@ -241,7 +429,11 @@
     <!-- DAFTAR SISWA -->
     <div class="card shadow-sm border-0">
         <div class="card-header">
-            <h5 class="fw-bold mb-0">Daftar Siswa</h5>
+            <h5 class="fw-bold mb-0">
+                <i class="fas fa-users me-2"></i>
+                Daftar Siswa
+                <span class="badge bg-primary ms-2">{{ $rombel->siswa->count() }}</span>
+            </h5>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -260,30 +452,33 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="student-avatar me-3">
+                                        <div class="student-avatar me-2 me-md-3">
                                             @if($siswa->foto)
-                                                <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
+                                                <img src="{{ asset('storage/' . $siswa->foto) }}" 
+                                                     alt="{{ $siswa->nama_lengkap }}" 
+                                                     class="student-avatar-circle">
                                             @else
-                                                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                                                <div class="student-avatar-initial">
                                                     {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
                                                 </div>
                                             @endif
                                         </div>
-                                        {{ $siswa->nama_lengkap }}
+                                        <span class="student-name">{{ $siswa->nama_lengkap }}</span>
                                     </div>
                                 </td>
                                 <td>{{ $siswa->nis }}</td>
                                 <td>
                                     <span class="badge {{ $siswa->jenis_kelamin == 'L' ? 'bg-info' : 'bg-danger' }} bg-opacity-10 text-dark">
                                         <i class="fas fa-{{ $siswa->jenis_kelamin == 'L' ? 'mars' : 'venus' }} me-1"></i>
-                                        {{ $siswa->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}
+                                        <span class="d-none d-sm-inline">{{ $siswa->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</span>
+                                        <span class="d-sm-none">{{ $siswa->jenis_kelamin }}</span>
                                     </span>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center py-4">
-                                    <i class="fas fa-user-graduate fa-2x mb-3 text-muted"></i>
+                                <td colspan="4" class="text-center empty-state">
+                                    <i class="fas fa-user-graduate fa-2x mb-3"></i>
                                     <p class="mb-0">Belum ada siswa di rombel ini.</p>
                                 </td>
                             </tr>

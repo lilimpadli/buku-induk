@@ -17,7 +17,7 @@
     }
 
     h3 {
-        font-size: 28px;
+        font-size: clamp(20px, 5vw, 28px);
         color: #1E293B;
         position: relative;
         padding-left: 15px;
@@ -45,35 +45,40 @@
 
     .info-row {
         display: flex;
+        flex-direction: column;
         padding: 15px;
         background-color: rgba(47, 83, 255, 0.03);
         border-radius: 8px;
         margin-bottom: 10px;
+        gap: 8px;
     }
 
     .info-label {
         font-weight: 600;
         color: #64748B;
-        font-size: 13px;
+        font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        min-width: 150px;
     }
 
     .info-value {
         color: #1E293B;
         font-weight: 500;
+        font-size: 15px;
+        word-wrap: break-word;
     }
 
     .btn-back {
         background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         border: none;
         border-radius: 8px;
-        padding: 10px 24px;
+        padding: 8px 16px;
         font-weight: 600;
         color: white;
         text-decoration: none;
         transition: all 0.3s ease;
+        font-size: 14px;
+        white-space: nowrap;
     }
 
     .btn-back:hover {
@@ -84,20 +89,22 @@
 
     .table {
         margin-bottom: 0;
+        font-size: 14px;
     }
 
     .table thead th {
         font-weight: 600;
         color: #475569;
-        font-size: 14px;
+        font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         border-bottom: 2px solid #E2E8F0;
-        padding: 15px 20px;
+        padding: 12px 15px;
+        white-space: nowrap;
     }
 
     .table tbody td {
-        padding: 15px 20px;
+        padding: 12px 15px;
         vertical-align: middle;
         border-bottom: 1px solid #F1F5F9;
     }
@@ -111,11 +118,139 @@
         padding: 40px 20px;
         color: #64748B;
     }
+
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    /* Mobile Styles */
+    @media (max-width: 576px) {
+        .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .header-section {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .btn-back {
+            width: 100%;
+            text-align: center;
+            padding: 10px 16px;
+        }
+
+        .card-body {
+            padding: 1rem !important;
+        }
+
+        h5 {
+            font-size: 18px;
+        }
+
+        .info-row {
+            padding: 12px;
+        }
+
+        .info-label {
+            font-size: 11px;
+        }
+
+        .info-value {
+            font-size: 14px;
+        }
+
+        .table {
+            font-size: 12px;
+        }
+
+        .table thead th {
+            font-size: 10px;
+            padding: 10px 8px;
+        }
+
+        .table tbody td {
+            padding: 10px 8px;
+        }
+
+        /* Stack table on mobile */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .badge {
+            font-size: 11px;
+        }
+    }
+
+    /* Tablet Styles */
+    @media (min-width: 577px) and (max-width: 991px) {
+        .info-row {
+            flex-direction: row;
+            gap: 15px;
+        }
+
+        .info-label {
+            min-width: 140px;
+            font-size: 13px;
+        }
+
+        .card-body {
+            padding: 1.5rem !important;
+        }
+    }
+
+    /* Desktop Styles */
+    @media (min-width: 992px) {
+        .info-row {
+            flex-direction: row;
+            gap: 20px;
+        }
+
+        .info-label {
+            min-width: 180px;
+            font-size: 13px;
+        }
+
+        .card-body.p-4 {
+            padding: 2rem !important;
+        }
+
+        .btn-back {
+            padding: 10px 24px;
+        }
+    }
+
+    /* Extra large screens */
+    @media (min-width: 1400px) {
+        .container {
+            max-width: 1200px;
+        }
+    }
+
+    /* Print styles */
+    @media print {
+        .btn-back {
+            display: none;
+        }
+
+        .card {
+            box-shadow: none;
+            border: 1px solid #ddd;
+        }
+    }
 </style>
 
 <div class="container mt-4">
     <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="header-section">
         <h3>Detail Guru</h3>
         <a href="{{ route('tu.guru.index') }}" class="btn-back">
             <i class="fa fa-arrow-left me-2"></i> Kembali

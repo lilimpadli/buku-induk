@@ -12,6 +12,7 @@
         --success-color: #10B981;
         --warning-color: #F59E0B;
         --danger-color: #EF4444;
+        --info-color: #3B82F6;
         --light-bg: #F8FAFC;
         --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -45,7 +46,7 @@
     }
 
     .card-title {
-        font-size: 18px;
+        font-size: clamp(16px, 3vw, 18px);
         color: #1E293B;
         font-weight: 600;
         margin-bottom: 1rem;
@@ -67,7 +68,7 @@
 
     /* Heading Styles */
     h5.mb-3 {
-        font-size: 16px;
+        font-size: clamp(14px, 3vw, 16px);
         color: #1E293B;
         font-weight: 600;
         margin-bottom: 1rem !important;
@@ -93,6 +94,7 @@
         overflow: hidden;
         box-shadow: var(--card-shadow);
         transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
     }
 
     .photo-container:hover {
@@ -117,11 +119,23 @@
     }
 
     .photo-placeholder i {
-        font-size: 4rem;
+        font-size: clamp(3rem, 8vw, 4rem);
         opacity: 0.5;
     }
 
+    .photo-placeholder p {
+        font-size: clamp(12px, 3vw, 14px);
+        margin-top: 1rem;
+    }
+
     /* Button Styles */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+
     .btn {
         border-radius: 8px;
         font-weight: 600;
@@ -130,6 +144,8 @@
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
+        font-size: clamp(12px, 2.5vw, 14px);
+        white-space: nowrap;
     }
 
     .btn:hover {
@@ -145,38 +161,62 @@
     .btn-secondary:hover {
         background-color: #475569;
         border-color: #475569;
+        color: white;
+    }
+
+    .btn-primary {
+        background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        border: none;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+        color: white;
+    }
+
+    .btn-info {
+        background-color: var(--info-color);
+        border: none;
+        color: white;
+    }
+
+    .btn-info:hover {
+        background-color: #2563EB;
+        color: white;
     }
 
     /* Row Styles */
-    .row {
-        margin-bottom: 1.5rem;
+    .data-row {
+        margin-bottom: 1rem;
     }
 
-    .col-md-6 p:first-child,
-    .col-md-12 p:first-child {
+    .data-label {
         font-weight: 600;
         color: #64748B;
-        font-size: 13px;
-        margin-bottom: 0.5rem;
+        font-size: clamp(11px, 2.3vw, 13px);
+        margin-bottom: 0.3rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
     }
 
-    .col-md-6 p:last-child,
-    .col-md-12 p:last-child {
+    .data-value {
         color: #334155;
-        font-size: 14px;
+        font-size: clamp(13px, 2.8vw, 15px);
+        word-wrap: break-word;
     }
 
     /* Section Divider */
     hr {
         border: none;
         border-top: 2px solid #E2E8F0;
-        margin: 2rem 0;
+        margin: 1.5rem 0;
     }
 
     /* Badge Styles */
     .badge {
         padding: 8px 12px;
-        font-size: 12px;
+        font-size: clamp(11px, 2.3vw, 12px);
         font-weight: 600;
         border-radius: 20px;
         background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
@@ -196,25 +236,168 @@
         animation: fadeIn 0.5s ease-out;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
+    /* Mobile Styles */
+    @media (max-width: 767px) {
+        .container {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .action-buttons .btn {
+            width: 100%;
+            justify-content: center;
+            padding: 0.6rem 1rem;
+        }
+
+        .data-row {
+            margin-bottom: 0.75rem;
+        }
+
+        .data-label {
+            margin-bottom: 0.2rem;
+        }
+
+        hr {
+            margin: 1rem 0;
+        }
+
+        h5.mb-3 {
+            margin-bottom: 0.75rem !important;
+            padding-left: 12px;
+        }
+
+        h5.mb-3::before {
+            width: 3px;
+        }
+
+        /* Photo at top on mobile */
+        .col-md-4 {
+            order: -1;
+        }
+
+        .photo-container {
+            margin-bottom: 1rem;
+        }
+
+        .photo-container img {
+            height: auto !important;
+            max-height: 300px;
+        }
+
+        .photo-placeholder {
+            min-height: 250px;
+        }
+    }
+
+    /* Tablet Styles */
+    @media (min-width: 768px) and (max-width: 991px) {
+        .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
         .card-body {
             padding: 1.25rem;
         }
-        
-        .btn {
-            padding: 0.4rem 1rem;
-            font-size: 14px;
+
+        .action-buttons .btn {
+            padding: 0.5rem 1rem;
+            font-size: 13px;
         }
 
-        .row {
-            flex-direction: column;
+        .photo-container img {
+            height: 350px !important;
+        }
+    }
+
+    /* Desktop Styles */
+    @media (min-width: 992px) {
+        .container {
+            max-width: 1140px;
+            margin: 0 auto;
+        }
+
+        .card-body {
+            padding: 1.75rem;
+        }
+
+        .photo-container img {
+            height: 400px !important;
+        }
+    }
+
+    /* Large Desktop */
+    @media (min-width: 1200px) {
+        .container {
+            max-width: 1140px;
+        }
+    }
+
+    /* Extra Large Screens */
+    @media (min-width: 1400px) {
+        .container {
+            max-width: 1320px;
+        }
+    }
+
+    /* Landscape on Mobile */
+    @media (max-width: 767px) and (orientation: landscape) {
+        .photo-container {
+            margin-bottom: 0.75rem;
+        }
+
+        .photo-container img {
+            max-height: 250px;
+        }
+
+        .photo-placeholder {
+            min-height: 200px;
+        }
+
+        .card-body {
+            padding: 0.75rem;
+        }
+    }
+
+    /* Print Styles */
+    @media print {
+        body {
+            background-color: white;
+        }
+
+        .action-buttons,
+        .btn {
+            display: none !important;
+        }
+
+        .card {
+            box-shadow: none;
+            border: 1px solid #ddd;
+            page-break-inside: avoid;
+        }
+
+        .photo-container {
+            box-shadow: none;
+            border: 1px solid #ddd;
+        }
+
+        @page {
+            margin: 2cm;
         }
     }
 </style>
 
 <div class="container mt-4">
-    <div class="mb-4 d-flex gap-2">
+    <div class="action-buttons">
         <a href="{{ route('tu.alumni.index') }}" class="btn btn-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>
@@ -227,51 +410,67 @@
     </div>
 
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-8 col-12">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <!-- Data Pribadi -->
                     <h5 class="mb-3">Data Pribadi</h5>
                     <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>NIS:</strong></p>
-                            <p>{{ $siswa->nis }}</p>
+                        <div class="col-md-6 col-12">
+                            <div class="data-row">
+                                <p class="data-label">NIS:</p>
+                                <p class="data-value">{{ $siswa->nis }}</p>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <p><strong>NISN:</strong></p>
-                            <p>{{ $siswa->nisn ?? '-' }}</p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Nama Lengkap:</strong></p>
-                            <p>{{ $siswa->nama_lengkap }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <p><strong>Jenis Kelamin:</strong></p>
-                            <p>{{ $siswa->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</p>
+                        <div class="col-md-6 col-12">
+                            <div class="data-row">
+                                <p class="data-label">NISN:</p>
+                                <p class="data-value">{{ $siswa->nisn ?? '-' }}</p>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Agama:</strong></p>
-                            <p>{{ $siswa->agama ?? '-' }}</p>
+                        <div class="col-md-6 col-12">
+                            <div class="data-row">
+                                <p class="data-label">Nama Lengkap:</p>
+                                <p class="data-value">{{ $siswa->nama_lengkap }}</p>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <p><strong>No. HP:</strong></p>
-                            <p>{{ $siswa->no_hp ?? '-' }}</p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <p><strong>Tempat, Tanggal Lahir:</strong></p>
-                            <p>{{ $siswa->tempat_lahir ?? '-' }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d F Y') : '-' }}</p>
+                        <div class="col-md-6 col-12">
+                            <div class="data-row">
+                                <p class="data-label">Jenis Kelamin:</p>
+                                <p class="data-value">{{ $siswa->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</p>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
-                            <p><strong>Alamat:</strong></p>
-                            <p>{{ $siswa->alamat ?? '-' }}</p>
+                        <div class="col-md-6 col-12">
+                            <div class="data-row">
+                                <p class="data-label">Agama:</p>
+                                <p class="data-value">{{ $siswa->agama ?? '-' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="data-row">
+                                <p class="data-label">No. HP:</p>
+                                <p class="data-value">{{ $siswa->no_hp ?? '-' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-12">
+                            <div class="data-row">
+                                <p class="data-label">Tempat, Tanggal Lahir:</p>
+                                <p class="data-value">{{ $siswa->tempat_lahir ?? '-' }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d F Y') : '-' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-12">
+                            <div class="data-row">
+                                <p class="data-label">Alamat:</p>
+                                <p class="data-value">{{ $siswa->alamat ?? '-' }}</p>
+                            </div>
                         </div>
                     </div>
 
@@ -279,23 +478,31 @@
                     <hr>
                     <h5 class="mb-3">Data Sekolah</h5>
                     <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Status Kelulusan:</strong></p>
-                            <p><span class="badge bg-success">LULUS</span></p>
+                        <div class="col-md-6 col-12">
+                            <div class="data-row">
+                                <p class="data-label">Status Kelulusan:</p>
+                                <p class="data-value"><span class="badge bg-success">LULUS</span></p>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <p><strong>Rombel Terakhir:</strong></p>
-                            <p>{{ optional($siswa->rombel)->nama ?? '-' }}</p>
+                        <div class="col-md-6 col-12">
+                            <div class="data-row">
+                                <p class="data-label">Rombel Terakhir:</p>
+                                <p class="data-value">{{ optional($siswa->rombel)->nama ?? '-' }}</p>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Tingkat Kelas:</strong></p>
-                            <p>{{ optional($siswa->rombel->kelas)->tingkat ?? '-' }}</p>
+                        <div class="col-md-6 col-12">
+                            <div class="data-row">
+                                <p class="data-label">Tingkat Kelas:</p>
+                                <p class="data-value">{{ optional($siswa->rombel->kelas)->tingkat ?? '-' }}</p>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <p><strong>Jurusan:</strong></p>
-                            <p>{{ optional($siswa->rombel->kelas->jurusan)->nama ?? '-' }}</p>
+                        <div class="col-md-6 col-12">
+                            <div class="data-row">
+                                <p class="data-label">Jurusan:</p>
+                                <p class="data-value">{{ optional($siswa->rombel->kelas->jurusan)->nama ?? '-' }}</p>
+                            </div>
                         </div>
                     </div>
 
@@ -306,57 +513,75 @@
 
                         @if($siswa->ayah)
                             <div class="row">
-                                <div class="col-md-12">
-                                    <p><strong>Ayah:</strong></p>
-                                    <p>{{ $siswa->ayah->nama }}</p>
+                                <div class="col-md-12 col-12">
+                                    <div class="data-row">
+                                        <p class="data-label">Ayah:</p>
+                                        <p class="data-value">{{ $siswa->ayah->nama }}</p>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6">
-                                    <p><strong>Pekerjaan Ayah:</strong></p>
-                                    <p>{{ $siswa->ayah->pekerjaan ?? '-' }}</p>
+                                <div class="col-md-6 col-12">
+                                    <div class="data-row">
+                                        <p class="data-label">Pekerjaan Ayah:</p>
+                                        <p class="data-value">{{ $siswa->ayah->pekerjaan ?? '-' }}</p>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <p><strong>Telepon Ayah:</strong></p>
-                                    <p>{{ $siswa->ayah->telepon ?? '-' }}</p>
+                                <div class="col-md-6 col-12">
+                                    <div class="data-row">
+                                        <p class="data-label">Telepon Ayah:</p>
+                                        <p class="data-value">{{ $siswa->ayah->telepon ?? '-' }}</p>
+                                    </div>
                                 </div>
                             </div>
                         @endif
 
                         @if($siswa->ibu)
                             <div class="row">
-                                <div class="col-md-12">
-                                    <p><strong>Ibu:</strong></p>
-                                    <p>{{ $siswa->ibu->nama }}</p>
+                                <div class="col-md-12 col-12">
+                                    <div class="data-row">
+                                        <p class="data-label">Ibu:</p>
+                                        <p class="data-value">{{ $siswa->ibu->nama }}</p>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6">
-                                    <p><strong>Pekerjaan Ibu:</strong></p>
-                                    <p>{{ $siswa->ibu->pekerjaan ?? '-' }}</p>
+                                <div class="col-md-6 col-12">
+                                    <div class="data-row">
+                                        <p class="data-label">Pekerjaan Ibu:</p>
+                                        <p class="data-value">{{ $siswa->ibu->pekerjaan ?? '-' }}</p>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <p><strong>Telepon Ibu:</strong></p>
-                                    <p>{{ $siswa->ibu->telepon ?? '-' }}</p>
+                                <div class="col-md-6 col-12">
+                                    <div class="data-row">
+                                        <p class="data-label">Telepon Ibu:</p>
+                                        <p class="data-value">{{ $siswa->ibu->telepon ?? '-' }}</p>
+                                    </div>
                                 </div>
                             </div>
                         @endif
 
                         @if($siswa->wali)
                             <div class="row">
-                                <div class="col-md-12">
-                                    <p><strong>Wali:</strong></p>
-                                    <p>{{ $siswa->wali->nama }}</p>
+                                <div class="col-md-12 col-12">
+                                    <div class="data-row">
+                                        <p class="data-label">Wali:</p>
+                                        <p class="data-value">{{ $siswa->wali->nama }}</p>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6">
-                                    <p><strong>Pekerjaan Wali:</strong></p>
-                                    <p>{{ $siswa->wali->pekerjaan ?? '-' }}</p>
+                                <div class="col-md-6 col-12">
+                                    <div class="data-row">
+                                        <p class="data-label">Pekerjaan Wali:</p>
+                                        <p class="data-value">{{ $siswa->wali->pekerjaan ?? '-' }}</p>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <p><strong>Telepon Wali:</strong></p>
-                                    <p>{{ $siswa->wali->telepon ?? '-' }}</p>
+                                <div class="col-md-6 col-12">
+                                    <div class="data-row">
+                                        <p class="data-label">Telepon Wali:</p>
+                                        <p class="data-value">{{ $siswa->wali->telepon ?? '-' }}</p>
+                                    </div>
                                 </div>
                             </div>
                         @endif
@@ -365,7 +590,7 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-4 col-12">
             @if($siswa->foto)
                 <div class="photo-container">
                     <img src="{{ asset('storage/' . $siswa->foto) }}" alt="Foto {{ $siswa->nama_lengkap }}" style="height: 400px; object-fit: cover;">
@@ -374,7 +599,7 @@
                 <div class="photo-placeholder">
                     <div>
                         <i class="fas fa-image"></i>
-                        <p class="mt-3">Foto tidak tersedia</p>
+                        <p>Foto tidak tersedia</p>
                     </div>
                 </div>
             @endif

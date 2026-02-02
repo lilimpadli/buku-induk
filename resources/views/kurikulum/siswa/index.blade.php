@@ -4,7 +4,7 @@
 
 @section('content')
 <style>
-    /* ===================== STYLE DAFTAR SISWA ===================== */
+    /* ===================== STYLE DAFTAR SISWA - RESPONSIVE ===================== */
     
     :root {
         --primary-color: #2F53FF;
@@ -22,15 +22,16 @@
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    h3.mb-3 {
+    /* Header Styles */
+    h3.page-title {
         font-size: 28px;
         color: #1E293B;
         position: relative;
         padding-left: 15px;
-        margin-bottom: 25px !important;
+        margin-bottom: 0 !important;
     }
 
-    h3.mb-3::before {
+    h3.page-title::before {
         content: "";
         position: absolute;
         left: 0;
@@ -56,14 +57,48 @@
     }
 
     /* Filter Button Styles */
-    .btn-group .btn {
-        border-radius: 8px;
-        margin-right: 5px;
-        transition: all 0.3s ease;
+    .filter-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
     }
 
-    .btn-group .btn:hover {
+    .filter-buttons .btn {
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+    .filter-buttons .btn:hover {
         transform: translateY(-2px);
+    }
+
+    /* Search Form Styles */
+    .search-card {
+        border-radius: 16px;
+        border: none;
+        box-shadow: var(--card-shadow);
+    }
+
+    .search-card .card-body {
+        background-color: #F8FAFC;
+        padding: 20px;
+    }
+
+    .input-group-text {
+        background: white;
+        border: 1px solid #E2E8F0;
+        border-right: none;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #E2E8F0;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(47, 83, 255, 0.1);
     }
 
     /* List Group Styles */
@@ -106,21 +141,12 @@
         transform: scaleY(1);
     }
 
-    .list-group-item-action {
-        cursor: pointer;
-        text-decoration: none;
-        color: inherit;
-    }
-
-    .list-group-item-action:hover {
-        color: var(--primary-color);
-    }
-
     /* Student Info */
     .student-info {
         display: flex;
         align-items: center;
         gap: 15px;
+        flex-wrap: wrap;
     }
 
     .student-avatar {
@@ -151,6 +177,11 @@
         object-fit: cover;
     }
 
+    .student-details {
+        flex: 1;
+        min-width: 150px;
+    }
+
     .student-details strong {
         font-size: 16px;
         font-weight: 600;
@@ -165,7 +196,6 @@
     }
 
     .student-class {
-        margin-left: auto;
         background-color: rgba(47, 83, 255, 0.1);
         color: var(--primary-color);
         padding: 6px 12px;
@@ -175,16 +205,19 @@
         white-space: nowrap;
     }
 
-    .student-gender {
-        margin-right: 15px;
-        color: #64748B;
-        font-size: 14px;
-    }
-
     /* Action Buttons */
     .student-actions {
         display: flex;
         gap: 5px;
+        flex-wrap: wrap;
+    }
+
+    .student-actions .btn {
+        min-width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
     /* Empty State */
@@ -215,38 +248,264 @@
         animation: fadeIn 0.5s ease-out;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-        h3.mb-3 {
+    /* Alert Styles */
+    .alert {
+        border-radius: 12px;
+        border: none;
+    }
+
+    /* ===================== RESPONSIVE STYLES ===================== */
+
+    /* Tablet (768px - 991px) */
+    @media (max-width: 991px) {
+        h3.page-title {
             font-size: 24px;
         }
-        
+
+        .filter-buttons .btn {
+            font-size: 13px;
+            padding: 7px 14px;
+        }
+    }
+
+    /* Mobile (max-width: 767px) */
+    @media (max-width: 767px) {
+        /* Container padding */
+        .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        /* Header */
+        h3.page-title {
+            font-size: 22px;
+            padding-left: 12px;
+        }
+
+        h3.page-title::before {
+            width: 4px;
+        }
+
+        /* Header buttons */
+        .header-section {
+            flex-direction: column;
+            align-items: stretch !important;
+            gap: 12px;
+        }
+
+        .header-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .header-buttons .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Filter buttons */
+        .filter-buttons {
+            gap: 6px;
+        }
+
+        .filter-buttons .btn {
+            flex: 1;
+            min-width: calc(50% - 3px);
+            font-size: 12px;
+            padding: 8px 10px;
+        }
+
+        /* Search form */
+        .search-card .card-body {
+            padding: 15px;
+        }
+
+        .search-form .col-md-6,
+        .search-form .col-md-4,
+        .search-form .col-md-2 {
+            margin-bottom: 10px;
+        }
+
+        .search-form .d-flex {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .search-form .btn {
+            width: 100%;
+        }
+
+        /* Student list item */
         .list-group-flush > .list-group-item {
             padding: 15px;
         }
-        
+
+        .list-group-flush > .list-group-item:hover {
+            padding-left: 20px;
+        }
+
         .student-info {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
+            gap: 12px;
         }
-        
+
+        .student-avatar {
+            width: 45px;
+            height: 45px;
+            font-size: 18px;
+        }
+
+        .student-details {
+            flex: 1 1 100%;
+            min-width: auto;
+        }
+
+        .student-details strong {
+            font-size: 15px;
+        }
+
+        .student-details small {
+            font-size: 13px;
+        }
+
         .student-class {
-            margin-left: 0;
-            align-self: flex-start;
+            order: 3;
+            margin-top: -8px;
+            font-size: 11px;
+            padding: 5px 10px;
         }
-        
+
         .student-actions {
-            margin-top: 10px;
+            order: 4;
+            width: 100%;
+            justify-content: flex-start;
+            margin-top: 8px;
+            gap: 6px;
+        }
+
+        .student-actions .btn {
+            min-width: 40px;
+            height: 34px;
+            font-size: 14px;
+        }
+
+        /* Pagination */
+        .pagination {
+            font-size: 14px;
+        }
+
+        .pagination .page-link {
+            padding: 6px 12px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            padding: 40px 15px;
+        }
+
+        .empty-state i {
+            font-size: 40px;
+        }
+
+        .empty-state h5 {
+            font-size: 16px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+    }
+
+    /* Small Mobile (max-width: 480px) */
+    @media (max-width: 480px) {
+        h3.page-title {
+            font-size: 20px;
+        }
+
+        .filter-buttons .btn {
+            font-size: 11px;
+            padding: 7px 8px;
+        }
+
+        .student-avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+            border: 2px solid white;
+        }
+
+        .student-details strong {
+            font-size: 14px;
+        }
+
+        .student-details small {
+            font-size: 12px;
+        }
+
+        .student-class {
+            font-size: 10px;
+            padding: 4px 8px;
+        }
+
+        .student-actions .btn {
+            min-width: 36px;
+            height: 32px;
+            font-size: 13px;
+        }
+    }
+
+    /* Desktop (min-width: 1200px) */
+    @media (min-width: 1200px) {
+        .container {
+            max-width: 1140px;
+        }
+
+        h3.page-title {
+            font-size: 30px;
+        }
+
+        .student-info {
+            gap: 20px;
+        }
+
+        .student-avatar {
+            width: 55px;
+            height: 55px;
+            font-size: 22px;
+        }
+
+        .student-details strong {
+            font-size: 17px;
+        }
+    }
+
+    /* Print Styles */
+    @media print {
+        .header-buttons,
+        .filter-buttons,
+        .search-card,
+        .student-actions,
+        .pagination {
+            display: none !important;
+        }
+
+        .card {
+            box-shadow: none;
+            border: 1px solid #ddd;
+        }
+
+        .list-group-item {
+            page-break-inside: avoid;
         }
     }
 </style>
 
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="mb-3">Daftar Siswa</h3>
-        <div>
-            <a href="{{ route('kurikulum.data-siswa.create') }}" class="btn btn-primary me-2">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4 header-section">
+        <h3 class="page-title">Daftar Siswa</h3>
+        <div class="header-buttons">
+            <a href="{{ route('kurikulum.data-siswa.create') }}" class="btn btn-primary">
                 <i class="fas fa-plus me-1"></i> Tambah Siswa
             </a>
             <a href="{{ route('kurikulum.siswa.import.form') }}" class="btn btn-outline-secondary">
@@ -255,28 +514,48 @@
         </div>
     </div>
 
+    <!-- Filter Buttons -->
     <div class="mb-3">
         @php $currentTingkat = request()->query('tingkat', ''); @endphp
-        <div class="btn-group" role="group">
-            <a href="{{ request()->fullUrlWithQuery(['tingkat' => 'X', 'page' => 1]) }}" class="btn btn-sm {{ $currentTingkat == 'X' ? 'btn-primary' : 'btn-outline-secondary' }}">Kelas X</a>
-            <a href="{{ request()->fullUrlWithQuery(['tingkat' => 'XI', 'page' => 1]) }}" class="btn btn-sm {{ $currentTingkat == 'XI' ? 'btn-primary' : 'btn-outline-secondary' }}">Kelas XI</a>
-            <a href="{{ request()->fullUrlWithQuery(['tingkat' => 'XII', 'page' => 1]) }}" class="btn btn-sm {{ $currentTingkat == 'XII' ? 'btn-primary' : 'btn-outline-secondary' }}">Kelas XII</a>
-            <a href="{{ route('kurikulum.siswa.index') }}" class="btn btn-sm btn-outline-secondary">Semua</a>
+        <div class="filter-buttons">
+            <a href="{{ request()->fullUrlWithQuery(['tingkat' => 'X', 'page' => 1]) }}" 
+               class="btn btn-sm {{ $currentTingkat == 'X' ? 'btn-primary' : 'btn-outline-secondary' }}">
+                Kelas X
+            </a>
+            <a href="{{ request()->fullUrlWithQuery(['tingkat' => 'XI', 'page' => 1]) }}" 
+               class="btn btn-sm {{ $currentTingkat == 'XI' ? 'btn-primary' : 'btn-outline-secondary' }}">
+                Kelas XI
+            </a>
+            <a href="{{ request()->fullUrlWithQuery(['tingkat' => 'XII', 'page' => 1]) }}" 
+               class="btn btn-sm {{ $currentTingkat == 'XII' ? 'btn-primary' : 'btn-outline-secondary' }}">
+                Kelas XII
+            </a>
+            <a href="{{ route('kurikulum.siswa.index') }}" 
+               class="btn btn-sm btn-outline-secondary">
+                Semua
+            </a>
         </div>
     </div>
 
-    <div class="card mb-3" style="border-radius: 16px; border: none; box-shadow: var(--card-shadow);">
-        <div class="card-body" style="background-color: #F8FAFC;">
-            <form method="GET" action="{{ route('kurikulum.siswa.index') }}" class="row g-2">
+    <!-- Search Form -->
+    <div class="card mb-3 search-card">
+        <div class="card-body">
+            <form method="GET" action="{{ route('kurikulum.siswa.index') }}" class="row g-2 search-form">
                 <div class="col-md-6">
                     <div class="input-group">
-                        <span class="input-group-text" style="background:white;border:1px solid #E2E8F0;"><i class="bi bi-search"></i></span>
-                        <input type="text" name="search" class="form-control" placeholder="Cari nama, NIS, atau NISN..." value="{{ $search ?? '' }}" style="border:1px solid #E2E8F0;">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" 
+                               name="search" 
+                               class="form-control" 
+                               placeholder="Cari nama, NIS, atau NISN..." 
+                               value="{{ $search ?? '' }}">
                     </div>
                 </div>
 
                 <div class="col-md-4">
-                    <select name="rombel" class="form-select" style="border:1px solid #E2E8F0;">
+                    <select name="rombel" class="form-select">
                         <option value="">-- Semua Rombel --</option>
                         @foreach(($allRombels ?? collect()) as $r)
                             @php
@@ -301,6 +580,7 @@
         </div>
     </div>
 
+    <!-- Success Alert -->
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -308,6 +588,7 @@
         </div>
     @endif
 
+    <!-- Student List -->
     <div class="card shadow">
         @if($siswas->count() > 0)
             <div class="list-group list-group-flush">
@@ -333,10 +614,8 @@
                                 $rombel = $siswa->rombel ?? null;
                                 $rombelNama = $rombel->nama ?? null;
                                 $tingkatVal = optional($rombel->kelas)->tingkat ?? null;
-                                // Remove any existing tingkat tokens (X, XI, XII) from rombel name to avoid duplication
                                 $rombelWithoutTingkat = $rombelNama ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama) : null;
                                 $rombelWithoutTingkat = $rombelWithoutTingkat ? trim($rombelWithoutTingkat) : null;
-                                // Insert space between letters and trailing digits, e.g. RPL1 -> RPL 1
                                 $formatted = $rombelWithoutTingkat ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat) : null;
                             @endphp
                             @if($rombel)
@@ -349,7 +628,9 @@
                                 </div>
                             @endif
                             <div class="student-actions">
-                                <a href="{{ route('kurikulum.data-siswa.show', $siswa->id) }}" class="btn btn-sm btn-info" title="Detail">
+                                <a href="{{ route('kurikulum.data-siswa.show', $siswa->id) }}" 
+                                   class="btn btn-sm btn-info" 
+                                   title="Detail">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 <a href="{{ route('kurikulum.data-siswa.edit', $siswa->id) }}" class="btn btn-sm btn-warning" title="Edit Data Diri">
@@ -371,6 +652,7 @@
                 @endforeach
             </div>
             
+            <!-- Pagination -->
             <div class="d-flex justify-content-center mt-3 p-3">
                 {{ $siswas->links('pagination::bootstrap-4') }}
             </div>

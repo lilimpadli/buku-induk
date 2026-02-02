@@ -187,6 +187,74 @@
         margin-bottom: 10px;
     }
 
+    /* Header Actions */
+    .header-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        position: relative;
+    }
+
+    .header-actions .btn {
+        white-space: nowrap;
+    }
+
+    /* Mobile Menu Dropdown */
+    .mobile-menu-toggle {
+        display: none;
+        position: relative;
+    }
+
+    .mobile-menu-toggle .btn {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+    }
+
+    .mobile-dropdown {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 48px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        min-width: 200px;
+        z-index: 1000;
+        overflow: hidden;
+    }
+
+    .mobile-dropdown.show {
+        display: block;
+    }
+
+    .mobile-dropdown a {
+        display: block;
+        padding: 12px 16px;
+        color: #1E293B;
+        text-decoration: none;
+        border-bottom: 1px solid #E2E8F0;
+        transition: background-color 0.2s;
+    }
+
+    .mobile-dropdown a:last-child {
+        border-bottom: none;
+    }
+
+    .mobile-dropdown a:hover {
+        background-color: #F8FAFC;
+    }
+
+    .mobile-dropdown a i {
+        margin-right: 8px;
+        width: 20px;
+        display: inline-block;
+    }
+
     /* Animations */
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
@@ -197,26 +265,258 @@
         animation: fadeIn 0.5s ease-out;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
+    /* ===================== RESPONSIVE STYLES ===================== */
+    
+    /* Tablet (768px - 991px) */
+    @media (max-width: 991px) {
         h3.mb-3 {
-            font-size: 24px;
+            font-size: 26px;
         }
-        
+
+        .teacher-avatar {
+            width: 55px;
+            height: 55px;
+            font-size: 22px;
+        }
+
+        .teacher-details strong {
+            font-size: 16px;
+        }
+    }
+
+    /* Mobile Large (576px - 767px) */
+    @media (max-width: 767px) {
+        .container {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        h3.mb-3 {
+            font-size: 20px;
+            padding-left: 12px;
+        }
+
+        h3.mb-3::before {
+            width: 4px;
+        }
+
+        /* Header with mobile menu */
+        .d-flex.justify-content-between {
+            align-items: center;
+        }
+
+        .d-flex.justify-content-between h3 {
+            margin-bottom: 0 !important;
+            flex: 1;
+        }
+
+        /* Hide desktop menu, show mobile menu */
+        .header-actions > a,
+        .header-actions > .btn {
+            display: none !important;
+        }
+
+        .mobile-menu-toggle {
+            display: block;
+        }
+
+        /* Filter Card */
+        .card-body {
+            padding: 12px !important;
+        }
+
+        .form-label {
+            font-size: 12px !important;
+            margin-bottom: 6px;
+            font-weight: 600 !important;
+        }
+
+        .form-control, .form-select {
+            font-size: 14px;
+            padding: 10px 12px;
+            height: auto;
+        }
+
+        .input-group-text {
+            padding: 10px 12px;
+        }
+
+        /* Ensure form fields take full width */
+        .row.g-3 > div {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        /* Filter Buttons */
+        .col-md-2 {
+            width: 100%;
+        }
+
+        .col-md-2.d-flex {
+            margin-top: 8px;
+            gap: 8px !important;
+        }
+
+        .col-md-2.d-flex .btn {
+            font-size: 14px;
+            padding: 10px 16px;
+        }
+
+        /* List Items */
         .list-group-flush > .list-group-item {
-            padding: 15px;
+            padding: 15px 12px;
         }
-        
+
+        .list-group-flush > .list-group-item:hover {
+            padding-left: 16px;
+        }
+
         .teacher-info {
             flex-direction: column;
             align-items: flex-start;
-            gap: 10px;
+            gap: 12px;
         }
-        
+
+        .teacher-avatar {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            border-width: 2px;
+        }
+
+        .teacher-details {
+            width: 100%;
+        }
+
+        .teacher-details strong {
+            font-size: 16px;
+        }
+
+        .teacher-details small {
+            font-size: 13px;
+        }
+
+        .teacher-classes .badge {
+            font-size: 11px;
+            padding: 4px 8px;
+        }
+
         .teacher-actions {
             margin-left: 0;
-            margin-top: 10px;
+            margin-top: 8px;
             width: 100%;
+            justify-content: center;
+        }
+
+        .teacher-actions .btn-group {
+            width: 100%;
+        }
+
+        .teacher-actions .btn-group .btn {
+            flex: 1;
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 40px 15px;
+        }
+
+        .empty-state i {
+            font-size: 40px;
+        }
+
+        .empty-state h5 {
+            font-size: 16px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+    }
+
+    /* Mobile Small (max 575px) */
+    @media (max-width: 575px) {
+        h3.mb-3 {
+            font-size: 18px;
+        }
+
+        .teacher-details strong {
+            font-size: 15px;
+        }
+
+        .teacher-details small {
+            font-size: 12px;
+        }
+
+        .btn-sm {
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+    }
+
+    /* Desktop Large (1200px+) */
+    @media (min-width: 1200px) {
+        .container {
+            max-width: 1140px;
+        }
+
+        h3.mb-3 {
+            font-size: 30px;
+        }
+
+        .teacher-avatar {
+            width: 65px;
+            height: 65px;
+            font-size: 26px;
+        }
+
+        .teacher-details strong {
+            font-size: 19px;
+        }
+
+        .list-group-flush > .list-group-item {
+            padding: 24px;
+        }
+    }
+
+    /* Improve button group on mobile */
+    @media (max-width: 767px) {
+        .btn-group {
+            display: flex;
+            width: 100%;
+        }
+
+        .btn-group .btn {
+            border-radius: 6px !important;
+            margin: 0 2px;
+        }
+
+        .btn-group .btn:first-child {
+            margin-left: 0;
+        }
+
+        .btn-group .btn:last-child {
+            margin-right: 0;
+        }
+
+        .btn-group form {
+            flex: 1;
+            display: flex;
+        }
+
+        .btn-group form button {
+            width: 100%;
+        }
+    }
+
+    /* Pagination responsive */
+    @media (max-width: 575px) {
+        .pagination {
+            font-size: 14px;
+        }
+
+        .pagination .page-link {
+            padding: 6px 10px;
         }
     }
 </style>
@@ -224,14 +524,36 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="mb-3">Daftar Guru</h3>
-        <div>
-            <a href="{{ route('kurikulum.guru.export', request()->only(['search','jurusan'])) }}" class="btn btn-outline-primary me-2">
-                <i class="fas fa-file-export"></i> Export Excel
+        
+        <!-- Desktop Menu -->
+        <div class="header-actions">
+            <a href="{{ route('kurikulum.guru.export', request()->only(['search','jurusan'])) }}" class="btn btn-outline-primary">
+                <i class="fas fa-file-export"></i> Export
             </a>
-            <a href="{{ route('kurikulum.guru.importForm') }}" class="btn btn-outline-secondary me-2">
-                <i class="fas fa-file-import"></i> Import Excel
+            <a href="{{ route('kurikulum.guru.importForm') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-file-import"></i> Import
             </a>
-            <a href="{{ route('kurikulum.guru.manage.create') }}" class="btn btn-primary">Tambah Guru</a>
+            <a href="{{ route('kurikulum.guru.manage.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Tambah Guru
+            </a>
+            
+            <!-- Mobile Menu Toggle -->
+            <div class="mobile-menu-toggle">
+                <button class="btn btn-outline-secondary" type="button" onclick="toggleMobileMenu()">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="mobile-dropdown" id="mobileMenuDropdown">
+                    <a href="{{ route('kurikulum.guru.export', request()->only(['search','jurusan'])) }}">
+                        <i class="fas fa-file-export"></i> Export Excel
+                    </a>
+                    <a href="{{ route('kurikulum.guru.importForm') }}">
+                        <i class="fas fa-file-import"></i> Import Excel
+                    </a>
+                    <a href="{{ route('kurikulum.guru.manage.create') }}">
+                        <i class="fas fa-plus"></i> Tambah Guru
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -240,16 +562,16 @@
         <div class="card-body" style="background-color: #F8FAFC;">
             <form method="GET" action="{{ route('kurikulum.guru.index') }}" class="row g-3 align-items-end">
                 <!-- Search -->
-                <div class="col-md-4">
+                <div class="col-md-4 col-12">
                     <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Cari Guru</label>
                     <div class="input-group">
                         <span class="input-group-text" style="background:white;border:1px solid #E2E8F0;"><i class="bi bi-search"></i></span>
-                        <input type="text" name="search" class="form-control" placeholder="Nama, NIP, atau email..." value="{{ $search ?? '' }}" style="border:1px solid #E2E8F0;">
+                        <input type="text" name="search" class="form-control" placeholder="Nama, NIP, email..." value="{{ $search ?? '' }}" style="border:1px solid #E2E8F0;">
                     </div>
                 </div>
 
                 <!-- Filter Jurusan -->
-                <div class="col-md-3">
+                <div class="col-md-3 col-sm-6 col-12">
                     <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Jurusan</label>
                     <select name="jurusan" class="form-select" style="border:1px solid #E2E8F0;">
                         <option value="">-- Semua Jurusan --</option>
@@ -262,7 +584,7 @@
                 </div>
 
                 <!-- Filter Role -->
-                <div class="col-md-3">
+                <div class="col-md-3 col-sm-6 col-12">
                     <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Role</label>
                     <select name="role" class="form-select" style="border:1px solid #E2E8F0;">
                         <option value="">-- Semua Role --</option>
@@ -275,7 +597,7 @@
                 </div>
 
                 <!-- Buttons -->
-                <div class="col-md-2 d-flex gap-2">
+                <div class="col-md-2 col-12 d-flex gap-2">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-search"></i> Cari
                     </button>
@@ -311,7 +633,6 @@
                                 
                                 @if($g->rombels && $g->rombels->count())
                                     <div class="teacher-classes">
-                                       
                                         @foreach($g->rombels as $r)
                                             @php
                                                 $kelas = $r->kelas;
@@ -363,4 +684,21 @@
         @endif
     </div>
 </div>
+
+<script>
+function toggleMobileMenu() {
+    const dropdown = document.getElementById('mobileMenuDropdown');
+    dropdown.classList.toggle('show');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const toggle = document.querySelector('.mobile-menu-toggle');
+    const dropdown = document.getElementById('mobileMenuDropdown');
+    
+    if (toggle && dropdown && !toggle.contains(event.target)) {
+        dropdown.classList.remove('show');
+    }
+});
+</script>
 @endsection

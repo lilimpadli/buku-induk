@@ -24,7 +24,7 @@
     }
 
     h1.h3 {
-        font-size: 28px;
+        font-size: clamp(20px, 5vw, 28px);
         color: #1E293B;
         position: relative;
         padding-left: 15px;
@@ -109,6 +109,7 @@
         padding: 15px;
         vertical-align: middle;
         text-align: center;
+        white-space: nowrap;
     }
 
     .table tbody tr {
@@ -175,6 +176,7 @@
         border: 3px solid white;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease;
+        margin: 0 auto;
     }
 
     .table tbody tr:hover .student-avatar {
@@ -224,25 +226,278 @@
         animation: fadeIn 0.5s ease-out;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-        h1.h3 {
-            font-size: 24px;
+    /* Header Section */
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    /* Mobile Card View */
+    .mobile-card-view {
+        display: none;
+    }
+
+    .student-card {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s ease;
+    }
+
+    .student-card:hover {
+        box-shadow: var(--hover-shadow);
+        transform: translateY(-2px);
+    }
+
+    .student-card-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #F1F5F9;
+    }
+
+    .student-card-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 24px;
+        flex-shrink: 0;
+        border: 3px solid white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .student-card-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .student-card-info {
+        flex: 1;
+    }
+
+    .student-card-name {
+        font-weight: 600;
+        font-size: 16px;
+        color: #1E293B;
+        margin-bottom: 5px;
+    }
+
+    .student-card-nis {
+        font-size: 13px;
+        color: #64748B;
+    }
+
+    .student-card-body {
+        display: grid;
+        gap: 10px;
+    }
+
+    .student-card-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+    }
+
+    .student-card-label {
+        font-size: 12px;
+        color: #64748B;
+        font-weight: 500;
+    }
+
+    .student-card-value {
+        font-size: 14px;
+        color: #1E293B;
+        font-weight: 500;
+    }
+
+    .student-card-actions {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #F1F5F9;
+        display: flex;
+        gap: 10px;
+    }
+
+    .student-card-actions .btn {
+        flex: 1;
+        font-size: 14px;
+    }
+
+    /* Responsive Styles */
+    /* Mobile First - Small devices */
+    @media (max-width: 767px) {
+        .container {
+            padding-left: 10px;
+            padding-right: 10px;
         }
-        
-        .table thead th, .table tbody td {
+
+        h1.h3 {
+            font-size: 18px;
+            padding-left: 12px;
+        }
+
+        h1.h3 i {
+            display: none;
+        }
+
+        .header-section {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Hide table, show mobile cards */
+        .table-responsive {
+            display: none !important;
+        }
+
+        .mobile-card-view {
+            display: block;
+        }
+
+        /* Filter Form */
+        .card-body .row {
+            gap: 10px;
+        }
+
+        .card-body .col-md-4 {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .form-control, .form-select {
+            font-size: 14px;
+            padding: 8px 12px;
+        }
+
+        .btn-primary {
             padding: 10px;
             font-size: 14px;
         }
-        
+
+        .badge {
+            font-size: 11px;
+            padding: 4px 10px;
+        }
+
+        /* Pagination */
+        .pagination {
+            font-size: 14px;
+        }
+
+        .page-link {
+            padding: 6px 12px;
+        }
+    }
+
+    /* Tablet devices */
+    @media (min-width: 768px) and (max-width: 991px) {
+        .table thead th, 
+        .table tbody td {
+            padding: 12px 10px;
+            font-size: 13px;
+        }
+
+        .student-avatar {
+            width: 45px;
+            height: 45px;
+            font-size: 18px;
+        }
+
         .btn-group-sm .btn {
-            padding: 5px 8px;
+            padding: 6px 10px;
+            font-size: 13px;
+        }
+
+        h1.h3 {
+            font-size: 24px;
+        }
+    }
+
+    /* Desktop devices */
+    @media (min-width: 992px) {
+        .table thead th, 
+        .table tbody td {
+            padding: 15px;
+        }
+
+        .mobile-card-view {
+            display: none !important;
+        }
+    }
+
+    /* Large desktop */
+    @media (min-width: 1200px) {
+        .container {
+            max-width: 1140px;
+        }
+    }
+
+    /* Extra large screens */
+    @media (min-width: 1400px) {
+        .container {
+            max-width: 1320px;
+        }
+    }
+
+    /* Landscape orientation on mobile */
+    @media (max-width: 767px) and (orientation: landscape) {
+        .student-card {
+            padding: 12px;
+        }
+
+        .student-card-header {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+        }
+
+        .student-card-avatar {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+        }
+    }
+
+    /* Print styles */
+    @media print {
+        .btn, .header-section .btn-secondary, .card-body form {
+            display: none !important;
+        }
+
+        .card {
+            box-shadow: none;
+            border: 1px solid #ddd;
+        }
+
+        .table tbody tr:hover {
+            background-color: transparent;
         }
     }
 </style>
 
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="header-section">
         <h1 class="h3 mb-0">
             <i class="fas fa-book text-primary"></i> Daftar Buku Induk Siswa
         </h1>
@@ -255,11 +510,11 @@
     <div class="card mb-4">
         <div class="card-body">
             <form method="GET" class="row g-3">
-                <div class="col-md-4">
+                <div class="col-md-4 col-12">
                     <input type="text" name="search" class="form-control" placeholder="Cari nama, NIS, atau NISN siswa..." 
                         value="{{ request('search') }}">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 col-12">
                     <select name="jurusan_id" class="form-select">
                         <option value="">-- Semua Jurusan --</option>
                         @foreach($jurusans as $jurusan)
@@ -269,7 +524,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 col-12">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="fas fa-search me-1"></i> Cari
                     </button>
@@ -278,7 +533,7 @@
         </div>
     </div>
 
-    <!-- Tabel Siswa -->
+    <!-- Desktop Table View -->
     <div class="card shadow">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
@@ -371,6 +626,88 @@
             </div>
         @endif
     </div>
+
+    <!-- Mobile Card View -->
+    <div class="mobile-card-view">
+        @forelse($siswas as $siswa)
+            <div class="student-card">
+                <div class="student-card-header">
+                    <div class="student-card-avatar">
+                        @if($siswa->user && $siswa->user->photo)
+                            <img src="{{ Storage::url($siswa->user->photo) }}" alt="{{ $siswa->nama_lengkap }}">
+                        @else
+                            {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
+                        @endif
+                    </div>
+                    <div class="student-card-info">
+                        <div class="student-card-name">{{ $siswa->nama_lengkap }}</div>
+                        <div class="student-card-nis">NIS: {{ $siswa->nis }} | NISN: {{ $siswa->nisn ?? '-' }}</div>
+                    </div>
+                </div>
+
+                <div class="student-card-body">
+                    <div class="student-card-row">
+                        <span class="student-card-label">Jenis Kelamin</span>
+                        <span class="student-card-value">
+                            @if($siswa->jenis_kelamin == 'L')
+                                <span class="badge bg-info">Laki-laki</span>
+                            @elseif($siswa->jenis_kelamin == 'P')
+                                <span class="badge bg-danger">Perempuan</span>
+                            @else
+                                {{ $siswa->jenis_kelamin }}
+                            @endif
+                        </span>
+                    </div>
+
+                    <div class="student-card-row">
+                        <span class="student-card-label">Rombel</span>
+                        <span class="student-card-value">
+                            @if($siswa->rombel)
+                                <span class="badge bg-primary">{{ $siswa->rombel->nama }}</span>
+                            @else
+                                <span class="text-muted">-</span>
+                            @endif
+                        </span>
+                    </div>
+
+                    <div class="student-card-row">
+                        <span class="student-card-label">Status</span>
+                        <span class="student-card-value">
+                            @if($siswa->mutasiTerakhir)
+                                <span class="badge bg-{{ $siswa->mutasiTerakhir->status_color }}">
+                                    {{ $siswa->mutasiTerakhir->status_label }}
+                                </span>
+                            @else
+                                <span class="badge bg-secondary">Aktif</span>
+                            @endif
+                        </span>
+                    </div>
+                </div>
+
+                <div class="student-card-actions">
+                    <a href="{{ route('tu.buku-induk.show', $siswa) }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i> Lihat
+                    </a>
+                    <a href="{{ route('tu.buku-induk.cetak', $siswa) }}" target="_blank" class="btn btn-success btn-sm">
+                        <i class="fas fa-print me-1"></i> Cetak
+                    </a>
+                </div>
+            </div>
+        @empty
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h5>Tidak ada data siswa</h5>
+                <p>Belum ada siswa yang terdaftar.</p>
+            </div>
+        @endforelse
+    </div>
+
+    <!-- Pagination - Single location at bottom -->
+    @if($siswas->hasPages())
+        <div class="mt-3">
+            {{ $siswas->links() }}
+        </div>
+    @endif
 </div>
 
 @push('scripts')

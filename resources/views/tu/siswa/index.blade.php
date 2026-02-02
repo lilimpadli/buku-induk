@@ -86,11 +86,6 @@
         border-radius: 0 4px 4px 0;
     }
 
-    .list-group-flush > .list-group-item:hover {
-        background-color: rgba(47, 83, 255, 0.03);
-        padding-left: 25px;
-    }
-
     .list-group-flush > .list-group-item:hover::before {
         transform: scaleY(1);
     }
@@ -100,6 +95,7 @@
         display: flex;
         align-items: center;
         gap: 15px;
+        flex-wrap: wrap;
     }
 
     .student-avatar {
@@ -130,21 +126,32 @@
         object-fit: cover;
     }
 
+    .student-details {
+        flex: 1;
+        min-width: 0;
+    }
+
     .student-details strong {
         font-size: 16px;
         font-weight: 600;
         color: #1E293B;
         display: block;
         margin-bottom: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .student-details small {
         color: #64748B;
         font-size: 14px;
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .student-class {
-        margin-left: auto;
         background-color: rgba(47, 83, 255, 0.1);
         color: var(--primary-color);
         padding: 6px 12px;
@@ -152,10 +159,11 @@
         font-size: 12px;
         font-weight: 600;
         white-space: nowrap;
+        flex-shrink: 0;
     }
     
     .student-actions {
-        margin-left: 10px;
+        flex-shrink: 0;
     }
 
     /* Empty State */
@@ -186,34 +194,167 @@
         animation: fadeIn 0.5s ease-out;
     }
 
+    /* Filter Section */
+    .filter-section {
+        background: white;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 20px;
+    }
+
+    .btn-group-responsive {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .btn-group-responsive .btn {
+        flex: 1;
+        min-width: fit-content;
+    }
+
     /* Responsive */
-    @media (max-width: 768px) {
-        h3.mb-3 {
-            font-size: 24px;
-        }
-        
-        .list-group-flush > .list-group-item {
-            padding: 15px;
-        }
-        
+    @media (max-width: 992px) {
         .student-info {
-            flex-direction: column;
-            align-items: flex-start;
             gap: 10px;
         }
         
+        .student-details small {
+            font-size: 12px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        h3.mb-3 {
+            font-size: 22px;
+            padding-left: 12px;
+        }
+
+        h3.mb-3::before {
+            width: 4px;
+        }
+        
+        .list-group-flush > .list-group-item {
+            padding: 15px 12px;
+        }
+
+        .list-group-flush > .list-group-item:hover {
+            padding-left: 17px;
+        }
+        
+        .student-avatar {
+            width: 44px;
+            height: 44px;
+            font-size: 18px;
+        }
+
+        .student-details strong {
+            font-size: 15px;
+        }
+
+        .student-details small {
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
         .student-class {
-            margin-left: 0;
-            align-self: flex-start;
+            font-size: 11px;
+            padding: 5px 10px;
+        }
+
+        .btn-group .btn {
+            padding: 0.35rem 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .filter-section {
+            padding: 12px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        h3.mb-3 {
+            font-size: 20px;
+        }
+
+        .student-info {
+            gap: 8px;
+        }
+
+        .student-avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+            border-width: 2px;
+        }
+
+        .student-details strong {
+            font-size: 14px;
+        }
+
+        .student-details small {
+            font-size: 10px;
+        }
+
+        .student-class {
+            width: 100%;
+            text-align: center;
+            order: 3;
+        }
+
+        .student-actions {
+            order: 4;
+            width: 100%;
+        }
+
+        .student-actions .btn-group {
+            width: 100%;
+            display: flex;
+        }
+
+        .student-actions .btn-group .btn,
+        .student-actions .btn-group form {
+            flex: 1;
+        }
+
+        .student-actions .btn-group .btn {
+            border-radius: 0 !important;
+        }
+
+        .student-actions .btn-group .btn:first-child {
+            border-radius: 0.25rem 0 0 0.25rem !important;
+        }
+
+        .student-actions .btn-group form:last-child .btn {
+            border-radius: 0 0.25rem 0.25rem 0 !important;
+        }
+
+        .empty-state {
+            padding: 40px 15px;
+        }
+
+        .empty-state i {
+            font-size: 36px;
+        }
+
+        .empty-state h5 {
+            font-size: 16px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
         }
     }
 </style>
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container-fluid px-3 px-md-4 mt-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-3 mb-md-4 gap-2">
         <h3 class="mb-0">Daftar Siswa</h3>
-        <a href="{{ route('tu.siswa.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-1"></i> Tambah Siswa
+        <a href="{{ route('tu.siswa.create') }}" class="btn btn-primary btn-sm btn-md-md">
+            <i class="fas fa-plus me-1"></i> 
+            <span class="d-none d-sm-inline">Tambah </span>Siswa
         </a>
     </div>
 
@@ -233,42 +374,68 @@
 
     <div class="mb-3">
         @php $currentTingkat = request()->query('tingkat', ''); @endphp
-        <div class="btn-group" role="group">
-            <a href="{{ request()->url() }}?tingkat=X" class="btn btn-sm {{ $currentTingkat == 'X' ? 'btn-primary' : 'btn-outline-secondary' }}">Kelas X</a>
-            <a href="{{ request()->url() }}?tingkat=XI" class="btn btn-sm {{ $currentTingkat == 'XI' ? 'btn-primary' : 'btn-outline-secondary' }}">Kelas XI</a>
-            <a href="{{ request()->url() }}?tingkat=XII" class="btn btn-sm {{ $currentTingkat == 'XII' ? 'btn-primary' : 'btn-outline-secondary' }}">Kelas XII</a>
-            <a href="{{ route('tu.siswa.index') }}" class="btn btn-sm btn-outline-secondary">Semua</a>
+        <div class="btn-group-responsive" role="group">
+            <a href="{{ request()->url() }}?tingkat=X" class="btn btn-sm {{ $currentTingkat == 'X' ? 'btn-primary' : 'btn-outline-secondary' }}">
+                Kelas X
+            </a>
+            <a href="{{ request()->url() }}?tingkat=XI" class="btn btn-sm {{ $currentTingkat == 'XI' ? 'btn-primary' : 'btn-outline-secondary' }}">
+                Kelas XI
+            </a>
+            <a href="{{ request()->url() }}?tingkat=XII" class="btn btn-sm {{ $currentTingkat == 'XII' ? 'btn-primary' : 'btn-outline-secondary' }}">
+                Kelas XII
+            </a>
+            <a href="{{ route('tu.siswa.index') }}" class="btn btn-sm btn-outline-secondary">
+                Semua
+            </a>
         </div>
     </div>
 
-    <form method="GET" action="{{ route('tu.siswa.index') }}" class="mb-3 d-flex gap-2">
-        <input type="text" name="search" value="{{ $search ?? '' }}" class="form-control" placeholder="Cari nama / NIS / NISN">
-        <select name="rombel" class="form-select" style="width:200px">
-            <option value="">-- Semua Rombel --</option>
-            @foreach(($allRombels ?? collect()) as $r)
-                @php
-                    $rombelNama = $r->nama ?? null;
-                    $tingkatVal = optional($r->kelas)->tingkat ?? null;
-                    $rombelWithoutTingkat = $rombelNama ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama) : null;
-                    $rombelWithoutTingkat = $rombelWithoutTingkat ? trim($rombelWithoutTingkat) : null;
-                    $formattedRombel = $rombelWithoutTingkat ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat) : ($rombelNama ?? '');
-                @endphp
-                <option value="{{ $r->id }}" {{ (isset($filterRombel) && $filterRombel == $r->id) ? 'selected' : '' }}>
-                    {{ $tingkatVal ? $tingkatVal . ' ' . $formattedRombel : $formattedRombel }}
-                </option>
-            @endforeach
-        </select>
-        <button class="btn btn-primary" type="submit">Filter</button>
-        <a href="{{ route('tu.siswa.index') }}" class="btn btn-outline-secondary">Reset</a>
+    <!-- Filter Form -->
+    <form method="GET" action="{{ route('tu.siswa.index') }}" class="mb-3">
+        <div class="row g-2">
+            <div class="col-12 col-md-5">
+                <input type="text" name="search" value="{{ $search ?? '' }}" class="form-control form-control-sm" placeholder="Cari nama / NIS / NISN">
+            </div>
+            <div class="col-12 col-md-4">
+                <select name="rombel" class="form-select form-select-sm">
+                    <option value="">-- Semua Rombel --</option>
+                    @foreach(($allRombels ?? collect()) as $r)
+                        @php
+                            $rombelNama = $r->nama ?? null;
+                            $tingkatVal = optional($r->kelas)->tingkat ?? null;
+                            $rombelWithoutTingkat = $rombelNama ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama) : null;
+                            $rombelWithoutTingkat = $rombelWithoutTingkat ? trim($rombelWithoutTingkat) : null;
+                            $formattedRombel = $rombelWithoutTingkat ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat) : ($rombelNama ?? '');
+                        @endphp
+                        <option value="{{ $r->id }}" {{ (isset($filterRombel) && $filterRombel == $r->id) ? 'selected' : '' }}>
+                            {{ $tingkatVal ? $tingkatVal . ' ' . $formattedRombel : $formattedRombel }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary btn-sm flex-fill" type="submit">
+                        <i class="fas fa-filter me-1"></i>Filter
+                    </button>
+                    <a href="{{ route('tu.siswa.index') }}" class="btn btn-outline-secondary btn-sm flex-fill">
+                        <i class="fas fa-redo me-1"></i>Reset
+                    </a>
+                </div>
+            </div>
+        </div>
     </form>
 
+    <!-- Alert -->
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
+    <!-- Student List -->
     <div class="card shadow">
         @if($siswas->count() > 0)
             <div class="list-group list-group-flush">

@@ -118,20 +118,25 @@
         overflow: hidden;
     }
 
-    .form-control {
+    .form-control, .form-select {
         border: 1px solid #E2E8F0;
-        border-radius: 8px 0 0 8px;
+        border-radius: 8px;
         padding: 8px 12px;
         transition: all 0.3s ease;
     }
 
-    .form-control:focus {
+    .form-control:focus, .form-select:focus {
         border-color: var(--primary-color);
         box-shadow: 0 0 0 3px rgba(47, 83, 255, 0.1);
     }
 
-    .btn-outline-secondary {
-        border-radius: 0 8px 8px 0;
+    .input-group-text {
+        background: white;
+        border: 1px solid #E2E8F0;
+        border-right: none;
+    }
+
+    .input-group .form-control {
         border-left: none;
     }
 
@@ -209,6 +214,18 @@
         box-shadow: 0 4px 8px rgba(47, 83, 255, 0.3);
     }
 
+    /* Filter Card */
+    .filter-card {
+        border: 1px solid #E2E8F0;
+        border-radius: 12px;
+        background-color: white;
+    }
+
+    .filter-card .card-body {
+        background-color: #F8FAFC;
+        padding: 1.25rem;
+    }
+
     /* Animations */
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
@@ -220,56 +237,123 @@
     }
 
     /* Responsive */
+    @media (max-width: 992px) {
+        h2.fw-bold {
+            font-size: 26px;
+        }
+    }
+
     @media (max-width: 768px) {
         h2.fw-bold {
             font-size: 24px;
+            padding-left: 12px;
         }
-        
-        .d-flex.justify-content-between {
-            flex-direction: column;
-            align-items: stretch !important;
+
+        h2.fw-bold::before {
+            width: 4px;
         }
-        
-        .form-control {
-            border-radius: 8px;
+
+        .filter-card .card-body {
+            padding: 1rem;
         }
-        
-        .btn-outline-secondary {
-            border-radius: 8px;
-            border-left: 1px solid #E2E8F0;
-            margin-top: 8px;
+
+        .form-label {
+            font-size: 13px !important;
+            margin-bottom: 0.4rem !important;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+        }
+
+        .badge {
+            font-size: 10px !important;
+        }
+    }
+
+    @media (max-width: 576px) {
+        h2.fw-bold {
+            font-size: 20px;
+            padding-left: 10px;
+        }
+
+        .filter-card .card-body {
+            padding: 0.875rem;
+        }
+
+        .form-label {
+            font-size: 12px !important;
+        }
+
+        .form-control, .form-select {
+            font-size: 0.875rem;
+            padding: 6px 10px;
+        }
+
+        .input-group-text {
+            padding: 6px 10px;
+            font-size: 0.875rem;
+        }
+
+        .btn {
+            font-size: 0.875rem;
+            padding: 6px 12px;
+        }
+
+        .card-body {
+            padding: 0.875rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+        }
+
+        .card-text, .card p {
+            font-size: 0.875rem;
+        }
+
+        .btn-sm {
+            font-size: 0.8rem;
+            padding: 0.35rem 0.65rem;
         }
     }
 </style>
 
-<div class="container-fluid mt-4">
+<div class="container-fluid px-3 px-md-4 mt-3 mt-md-4">
     <!-- JUDUL -->
-    <h2 class="fw-bold mb-4">Data Rombel</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4">
+        <h2 class="fw-bold mb-0">Data Rombel</h2>
+    </div>
 
     <!-- INFO PAGINATION -->
     @if($rombels->total() > 0)
-        <p class="text-muted mb-3">
+        <p class="text-muted mb-3 small">
+            <i class="fas fa-info-circle me-1"></i>
             Menampilkan {{ $rombels->firstItem() }}-{{ $rombels->lastItem() }} dari {{ $rombels->total() }} rombel
         </p>
     @endif
 
     <!-- FILTER + BUTTON -->
-    <div class="card mb-4" style="border: 1px solid #E2E8F0; border-radius: 8px;">
-        <div class="card-body" style="background-color: #F8FAFC;">
-            <form action="{{ route('tu.kelas.index') }}" method="GET" class="row g-3 align-items-end">
+    <div class="card filter-card mb-3 mb-md-4">
+        <div class="card-body">
+            <form action="{{ route('tu.kelas.index') }}" method="GET" class="row g-2 g-md-3 align-items-end">
                 <!-- Search -->
-                <div class="col-md-5">
+                <div class="col-12 col-md-5">
                     <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Cari Rombel</label>
                     <div class="input-group">
-                        <span class="input-group-text" style="background:white;border:1px solid #E2E8F0;"><i class="bi bi-search"></i></span>
-                        <input type="text" name="search" class="form-control" placeholder="Nama rombel, tingkat, jurusan..." value="{{ $search ?? '' }}" style="border:1px solid #E2E8F0;">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" name="search" class="form-control" placeholder="Nama rombel, tingkat..." value="{{ $search ?? '' }}">
                     </div>
                 </div>
 
                 <!-- Filter Jurusan -->
-                <div class="col-md-4">
+                <div class="col-12 col-md-4">
                     <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Jurusan</label>
-                    <select name="jurusan" class="form-select" style="border:1px solid #E2E8F0;">
+                    <select name="jurusan" class="form-select">
                         <option value="">-- Semua Jurusan --</option>
                         @foreach(($allJurusans ?? collect()) as $j)
                             <option value="{{ $j->id }}" {{ (isset($jurusan_id) && $jurusan_id == $j->id) ? 'selected' : '' }}>
@@ -280,42 +364,51 @@
                 </div>
 
                 <!-- Buttons -->
-                <div class="col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-search"></i> Cari
-                    </button>
-                    <a href="{{ route('tu.kelas.index') }}" class="btn btn-outline-secondary w-100">
-                        <i class="bi bi-arrow-counterclockwise"></i> Reset
-                    </a>
+                <div class="col-12 col-md-3">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            <i class="bi bi-search"></i> 
+                            <span class="d-none d-sm-inline">Cari</span>
+                        </button>
+                        <a href="{{ route('tu.kelas.index') }}" class="btn btn-outline-secondary flex-fill">
+                            <i class="bi bi-arrow-counterclockwise"></i> 
+                            <span class="d-none d-sm-inline">Reset</span>
+                        </a>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- TOMBOL TAMBAH ROMBEL -->
-    <div class="mb-4">
+    <div class="mb-3 mb-md-4">
         <a href="{{ route('tu.kelas.create') }}" class="btn btn-primary">
-            <i class="fa fa-plus me-2"></i> Tambah Rombel
+            <i class="fa fa-plus me-1 me-md-2"></i> 
+            <span class="d-none d-sm-inline">Tambah </span>Rombel
         </a>
     </div>
 
     <!-- KARTU KELAS -->
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-2 g-md-3">
         @forelse($rombels as $rombel)
             <div class="col">
                 <div class="card h-100 shadow-sm border-0 {{ $rombel->id == 5 ? 'bg-primary text-white' : '' }}">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <h5 class="card-title fw-bold {{ $rombel->id == 5 ? 'text-white' : '' }}">{{ $rombel->nama }}</h5>
-                            <span class="badge bg-secondary">ID: {{ $rombel->id }}</span>
+                        <div class="d-flex justify-content-between align-items-start mb-2 mb-md-3">
+                            <h5 class="card-title fw-bold mb-0 {{ $rombel->id == 5 ? 'text-white' : '' }}">
+                                {{ $rombel->nama }}
+                            </h5>
+                            <span class="badge bg-secondary ms-2">ID: {{ $rombel->id }}</span>
                         </div>
                         
-                        <div class="mb-3">
-                            <p class="mb-1 {{ $rombel->id == 5 ? 'text-white-50' : 'text-muted' }}">
-                                <i class="fas fa-school me-2"></i> Kelas: {{ $rombel->kelas->tingkat ?? '-' }} {{ $rombel->kelas->jurusan->nama ?? '-' }}
+                        <div class="mb-2 mb-md-3">
+                            <p class="mb-1 small {{ $rombel->id == 5 ? 'text-white-50' : 'text-muted' }}">
+                                <i class="fas fa-school me-1 me-md-2"></i> 
+                                Kelas: {{ $rombel->kelas->tingkat ?? '-' }} {{ $rombel->kelas->jurusan->nama ?? '-' }}
                             </p>
-                            <p class="mb-0 {{ $rombel->id == 5 ? 'text-white-50' : 'text-muted' }}">
-                                <i class="fas fa-user-tie me-2"></i> Wali Rombel: {{ $rombel->guru->nama ?? '-' }}
+                            <p class="mb-0 small {{ $rombel->id == 5 ? 'text-white-50' : 'text-muted' }}">
+                                <i class="fas fa-user-tie me-1 me-md-2"></i> 
+                                Wali: {{ $rombel->guru->nama ?? '-' }}
                             </p>
                         </div>
                         
@@ -332,10 +425,14 @@
                             </div>
 
                             <div class="dropdown">
-                                <button class="btn {{ $rombel->id == 5 ? 'btn-light' : 'btn-outline-secondary' }} btn-sm dropdown-toggle" type="button" id="dropdownMenuButton{{ $rombel->id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="btn {{ $rombel->id == 5 ? 'btn-light' : 'btn-outline-secondary' }} btn-sm dropdown-toggle" 
+                                        type="button" 
+                                        id="dropdownMenuButton{{ $rombel->id }}" 
+                                        data-bs-toggle="dropdown" 
+                                        aria-expanded="false">
                                     <i class="fas fa-ellipsis-v"></i>
                                 </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $rombel->id }}">
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton{{ $rombel->id }}">
                                     <li>
                                         <a class="dropdown-item" href="{{ route('tu.kelas.edit', $rombel->id) }}">
                                             <i class="fa fa-edit me-2"></i> Edit
@@ -370,7 +467,7 @@
 
     <!-- PAGINATION -->
     @if($rombels->hasPages())
-        <div class="d-flex justify-content-center mt-4">
+        <div class="d-flex justify-content-center mt-3 mt-md-4">
             {{ $rombels->links('pagination::bootstrap-4') }}
         </div>
     @endif

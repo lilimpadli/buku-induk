@@ -55,6 +55,18 @@
         box-shadow: var(--hover-shadow);
     }
 
+    /* Filter Card */
+    .filter-card {
+        border-radius: 16px;
+        border: none;
+        box-shadow: var(--card-shadow);
+    }
+
+    .filter-card .card-body {
+        background-color: #F8FAFC;
+        padding: 1.25rem;
+    }
+
     /* List Group Styles */
     .list-group {
         border-radius: 16px;
@@ -86,11 +98,6 @@
         border-radius: 0 4px 4px 0;
     }
 
-    .list-group-flush > .list-group-item:hover {
-        background-color: rgba(47, 83, 255, 0.03);
-        padding-left: 25px;
-    }
-
     .list-group-flush > .list-group-item:hover::before {
         transform: scaleY(1);
     }
@@ -100,6 +107,7 @@
         display: flex;
         align-items: center;
         gap: 15px;
+        flex-wrap: wrap;
     }
 
     .teacher-avatar {
@@ -131,7 +139,8 @@
     }
 
     .teacher-details {
-        flex-grow: 1;
+        flex: 1;
+        min-width: 0;
     }
 
     .teacher-details strong {
@@ -151,22 +160,22 @@
 
     .teacher-classes {
         margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
     }
 
     .teacher-classes .badge {
-        margin-right: 5px;
-        margin-bottom: 5px;
         font-size: 12px;
         padding: 5px 10px;
         border-radius: 20px;
         background-color: rgba(47, 83, 255, 0.1);
         color: var(--primary-color);
+        font-weight: 500;
     }
 
     .teacher-actions {
-        margin-left: auto;
-        display: flex;
-        align-items: center;
+        flex-shrink: 0;
     }
 
     /* Empty State */
@@ -197,31 +206,198 @@
         animation: fadeIn 0.5s ease-out;
     }
 
+    /* Form Controls */
+    .form-control, .form-select {
+        border: 1px solid #E2E8F0;
+        border-radius: 8px;
+    }
+
+    .input-group-text {
+        background: white;
+        border: 1px solid #E2E8F0;
+        border-right: none;
+    }
+
+    .input-group .form-control {
+        border-left: none;
+    }
+
     /* Responsive */
+    @media (max-width: 992px) {
+        h3.mb-3 {
+            font-size: 26px;
+        }
+
+        .teacher-avatar {
+            width: 55px;
+            height: 55px;
+            font-size: 22px;
+        }
+
+        .teacher-details strong {
+            font-size: 17px;
+        }
+    }
+
     @media (max-width: 768px) {
         h3.mb-3 {
             font-size: 24px;
+            padding-left: 12px;
+        }
+
+        h3.mb-3::before {
+            width: 4px;
+        }
+
+        .filter-card .card-body {
+            padding: 1rem;
+        }
+
+        .form-label {
+            font-size: 13px !important;
+            margin-bottom: 0.4rem !important;
         }
         
         .list-group-flush > .list-group-item {
             padding: 15px;
         }
-        
-        .teacher-info {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
+
+        .list-group-flush > .list-group-item:hover {
+            padding-left: 20px;
         }
         
+        .teacher-info {
+            gap: 12px;
+        }
+
+        .teacher-avatar {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            border-width: 2px;
+        }
+
+        .teacher-details strong {
+            font-size: 16px;
+        }
+
+        .teacher-details small {
+            font-size: 13px;
+        }
+
+        .teacher-classes .badge {
+            font-size: 11px;
+            padding: 4px 8px;
+        }
+
+        .teacher-actions .btn {
+            font-size: 0.875rem;
+            padding: 0.4rem 0.75rem;
+        }
+
+        .empty-state {
+            padding: 40px 15px;
+        }
+
+        .empty-state i {
+            font-size: 40px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        h3.mb-3 {
+            font-size: 20px;
+            padding-left: 10px;
+        }
+
+        .filter-card .card-body {
+            padding: 0.875rem;
+        }
+
+        .form-label {
+            font-size: 12px !important;
+        }
+
+        .form-control, .form-select {
+            font-size: 0.875rem;
+            padding: 6px 10px;
+        }
+
+        .input-group-text {
+            padding: 6px 10px;
+            font-size: 0.875rem;
+        }
+
+        .btn {
+            font-size: 0.875rem;
+            padding: 6px 12px;
+        }
+
+        .list-group-flush > .list-group-item {
+            padding: 12px;
+        }
+
+        .list-group-flush > .list-group-item:hover {
+            padding-left: 17px;
+        }
+        
+        .teacher-info {
+            gap: 10px;
+        }
+
+        .teacher-avatar {
+            width: 45px;
+            height: 45px;
+            font-size: 18px;
+        }
+
+        .teacher-details strong {
+            font-size: 15px;
+        }
+
+        .teacher-details small {
+            font-size: 12px;
+        }
+
+        .teacher-classes {
+            margin-top: 6px;
+        }
+
+        .teacher-classes .badge {
+            font-size: 10px;
+            padding: 3px 7px;
+        }
+
         .teacher-actions {
-            margin-left: 0;
-            margin-top: 10px;
             width: 100%;
+            order: 3;
+        }
+
+        .teacher-actions .btn {
+            width: 100%;
+            font-size: 0.8rem;
+            padding: 0.45rem 0.75rem;
+        }
+
+        .empty-state {
+            padding: 30px 12px;
+        }
+
+        .empty-state i {
+            font-size: 36px;
+        }
+
+        .empty-state h5 {
+            font-size: 1rem;
+        }
+
+        .empty-state p {
+            font-size: 0.875rem;
         }
     }
 </style>
 
-<div class="container mt-4">
+<div class="container-fluid px-3 px-md-4 mt-3 mt-md-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="mb-3">Daftar Guru</h3>
         <a href="{{ route('tu.guru.export') }}" class="btn btn-success btn-sm">
@@ -230,15 +406,15 @@
     </div>
 
     <!-- FILTER CARD -->
-    <div class="card mb-3" style="border-radius: 16px; border: none; box-shadow: var(--card-shadow);">
-        <div class="card-body" style="background-color: #F8FAFC;">
-            <form method="GET" action="{{ route('tu.guru.index') }}" class="row g-3 align-items-end">
+    <div class="card filter-card mb-3 mb-md-4">
+        <div class="card-body">
+            <form method="GET" action="{{ route('tu.guru.index') }}" class="row g-2 g-md-3 align-items-end">
                 <!-- Search -->
                 <div class="col-md-4">
                     <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Cari Guru</label>
                     <div class="input-group">
-                        <span class="input-group-text" style="background:white;border:1px solid #E2E8F0;"><i class="bi bi-search"></i></span>
-                        <input type="text" name="search" class="form-control" placeholder="Nama, NIP, atau email..." value="{{ $search ?? '' }}" style="border:1px solid #E2E8F0;">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" name="search" class="form-control" placeholder="Nama, NIP, atau email..." value="{{ $search ?? '' }}">
                     </div>
                 </div>
 
@@ -258,7 +434,7 @@
                 <!-- Filter Jurusan -->
                 <div class="col-md-3">
                     <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Jurusan</label>
-                    <select name="jurusan" class="form-select" style="border:1px solid #E2E8F0;">
+                    <select name="jurusan" class="form-select">
                         <option value="">-- Semua Jurusan --</option>
                         @foreach(($allJurusans ?? collect()) as $j)
                             <option value="{{ $j->id }}" {{ (isset($jurusan_id) && $jurusan_id == $j->id) ? 'selected' : '' }}>
@@ -305,10 +481,16 @@
                                                 $kelas = $r->kelas;
                                             @endphp
                                             <span class="badge">
+                                                <i class="fas fa-chalkboard me-1 d-none d-sm-inline"></i>
                                                 {{ $kelas?->tingkat ? $kelas->tingkat . ' - ' . ($kelas->jurusan->nama ?? '') : '-' }} / {{ $r->nama }}
                                             </span>
                                         @endforeach
                                     </div>
+                                @else
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Belum mengajar rombel
+                                    </small>
                                 @endif
                             </div>
                             <div class="teacher-actions">

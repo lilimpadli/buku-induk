@@ -23,7 +23,7 @@
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    /* Header Styles */
+    /* ===== HEADER ===== */
     .dashboard-header {
         background: var(--primary-gradient);
         color: white;
@@ -49,7 +49,7 @@
 
     .dashboard-header h1 {
         font-weight: 700;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
         position: relative;
         z-index: 1;
         font-size: 1.75rem;
@@ -59,40 +59,10 @@
         color: rgba(255, 255, 255, 0.8) !important;
         position: relative;
         z-index: 1;
+        margin-bottom: 0;
     }
 
-    .search-and-actions {
-        position: relative;
-        z-index: 1;
-    }
-
-    .search-box input {
-        border-radius: 10px;
-        border: none;
-        padding: 0.6rem 1.2rem;
-        font-weight: 500;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Button Styles */
-    .btn-primary {
-        background: rgba(255, 255, 255, 0.25);
-        border: 2px solid rgba(255, 255, 255, 0.5);
-        color: white;
-        font-weight: 600;
-        padding: 0.6rem 1.5rem;
-        border-radius: 10px;
-        transition: var(--transition);
-    }
-
-    .btn-primary:hover {
-        background: rgba(255, 255, 255, 0.4);
-        border-color: white;
-        color: white;
-        transform: translateY(-2px);
-    }
-
-    /* Stat Cards */
+    /* ===== STAT CARDS ===== */
     .stat-card {
         border-radius: 20px;
         border: none;
@@ -119,17 +89,9 @@
         height: 5px;
     }
 
-    .stat-card:nth-child(1)::before {
-        background: var(--primary-gradient);
-    }
-
-    .stat-card:nth-child(2)::before {
-        background: var(--success-gradient);
-    }
-
-    .stat-card:nth-child(3)::before {
-        background: var(--warning-gradient);
-    }
+    .stat-card:nth-child(1)::before { background: var(--primary-gradient); }
+    .stat-card:nth-child(2)::before { background: var(--success-gradient); }
+    .stat-card:nth-child(3)::before { background: var(--warning-gradient); }
 
     .stat-card-header {
         display: flex;
@@ -147,46 +109,41 @@
         color: white;
         font-size: 24px;
         margin-right: 1rem;
+        flex-shrink: 0;
         transition: var(--transition);
     }
 
-    .stat-card:hover .stat-icon {
-        transform: scale(1.15);
-    }
+    .stat-card:hover .stat-icon { transform: scale(1.15); }
 
-    .stat-card:nth-child(1) .stat-icon {
-        background: var(--primary-gradient);
-    }
-
-    .stat-card:nth-child(2) .stat-icon {
-        background: var(--success-gradient);
-    }
-
-    .stat-card:nth-child(3) .stat-icon {
-        background: var(--warning-gradient);
-    }
+    .stat-card:nth-child(1) .stat-icon { background: var(--primary-gradient); }
+    .stat-card:nth-child(2) .stat-icon { background: var(--success-gradient); }
+    .stat-card:nth-child(3) .stat-icon { background: var(--warning-gradient); }
 
     .stat-title {
         color: #64748B;
         font-size: 14px;
         font-weight: 600;
+        margin-bottom: 0.1rem;
     }
 
     .stat-label {
         color: #94A3B8;
         font-size: 12px;
+        margin-bottom: 0;
     }
 
     .stat-value {
         font-size: 2.5rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: var(--primary-gradient);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        background-clip: text;
         margin-top: 0.5rem;
+        margin-bottom: 0;
     }
 
-    /* Activity Card */
+    /* ===== ACTIVITY CARD (DESKTOP TABLE) ===== */
     .activity-card {
         border-radius: var(--border-radius);
         border: none;
@@ -248,67 +205,7 @@
         font-size: 14px;
     }
 
-    /* Info Cards */
-    .info-cards-section {
-        margin-top: 3rem;
-    }
-
-    .info-card {
-        border-radius: var(--border-radius);
-        border: 1px solid #E2E8F0;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        transition: var(--transition);
-        background: white;
-        padding: 1.5rem;
-        text-align: center;
-        height: 100%;
-    }
-
-    .info-card:hover {
-        box-shadow: var(--card-shadow);
-        transform: translateY(-4px);
-    }
-
-    .info-label {
-        color: #94A3B8;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.5rem;
-    }
-
-    .info-value {
-        font-size: 1.75rem;
-        font-weight: 800;
-        color: #1E293B;
-        margin-bottom: 0.5rem;
-    }
-
-    .info-desc {
-        color: #64748B;
-        font-size: 13px;
-        margin: 0;
-    }
-
-    .info-section-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #1E293B;
-        margin-bottom: 1.5rem;
-    }
-
-    /* Animations */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .fade-in {
-        animation: fadeIn 0.6s ease-out;
-    }
-
-    /* Status Badges */
+    /* ===== STATUS BADGES ===== */
     .badge-status {
         font-size: 12px;
         font-weight: 600;
@@ -316,6 +213,7 @@
         border-radius: 6px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        display: inline-block;
     }
 
     .badge-processed {
@@ -333,48 +231,153 @@
         color: #F5576C;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
+    /* ===== MOBILE CARD LIST ===== */
+    .mobile-ppdb-card {
+        padding: 14px 16px;
+        border-bottom: 1px solid #E2E8F0;
+        transition: background 0.2s ease;
+    }
+
+    .mobile-ppdb-card:last-child {
+        border-bottom: none;
+    }
+
+    .mobile-ppdb-card:active {
+        background-color: rgba(102, 126, 234, 0.04);
+    }
+
+    .mobile-ppdb-card .mobile-top-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .mobile-ppdb-card .mobile-name {
+        font-weight: 600;
+        color: #1E293B;
+        font-size: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+    }
+
+    .mobile-ppdb-card .mobile-meta {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        font-size: 13px;
+        color: #64748B;
+    }
+
+    .mobile-ppdb-card .mobile-meta span {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .mobile-ppdb-card .mobile-meta .meta-label {
+        color: #94A3B8;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        font-weight: 600;
+    }
+
+    .mobile-ppdb-empty {
+        padding: 2.5rem 1rem;
+        text-align: center;
+        color: #94A3B8;
+    }
+
+    .mobile-ppdb-empty i {
+        font-size: 1.8rem;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    /* ===== FOOTER LINK ===== */
+    .activity-footer {
+        text-align: center;
+        padding: 0.85rem 1rem;
+        border-top: 1px solid #E2E8F0;
+    }
+
+    .activity-footer a {
+        color: #667eea;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .activity-footer a:hover {
+        text-decoration: underline;
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 767.98px) {
         .dashboard-header {
-            flex-direction: column;
-            padding: 1.5rem 1rem;
+            padding: 1.25rem 1rem;
         }
 
-        .search-and-actions {
-            flex-direction: column;
-            width: 100%;
-            margin-top: 1rem;
+        .dashboard-header h1 {
+            font-size: 1.35rem;
         }
 
-        .search-box {
-            width: 100%;
+        .dashboard-header .text-muted {
+            font-size: 13px;
         }
 
-        .search-box input {
-            width: 100%;
+        .stat-card {
+            padding: 1.1rem 1rem;
         }
 
-        .btn-primary {
-            width: 100%;
+        .stat-card-header {
+            margin-bottom: 0.75rem;
+        }
+
+        .stat-icon {
+            width: 42px;
+            height: 42px;
+            font-size: 20px;
+            margin-right: 0.75rem;
         }
 
         .stat-value {
             font-size: 2rem;
+            margin-top: 0.25rem;
+        }
+
+        .card-header-custom {
+            padding: 1rem 1rem;
+        }
+
+        .activity-card {
+            margin-bottom: 1.5rem;
         }
     }
 </style>
 
-<div class="dashboard-header d-flex justify-content-between align-items-start mb-4 fade-in">
-    <div>
-        <h1>Selamat Datang, Kurikulum! 👋</h1>
-        <p class="text-muted">Monitoring pembelajaran calon siswa baru tahun ajaran 2024/2025</p>
-    </div>
-
-    
+{{-- HEADER --}}
+<div class="dashboard-header fade-in">
+    <h1>Selamat Datang, Kurikulum! 👋</h1>
+    <p class="text-muted">Monitoring pembelajaran calon siswa baru tahun ajaran 2024/2025</p>
 </div>
 
 {{-- STATISTIK --}}
-<div class="stats-row mb-4 d-grid gap-4" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); animation: fadeIn 0.6s ease-out 0.1s both;">
+<div class="stats-row mb-4 d-grid gap-3 gap-md-4" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); animation: fadeIn 0.6s ease-out 0.1s both;">
 
     <div class="stat-card">
         <div class="stat-card-header">
@@ -421,10 +424,10 @@
 <div class="activity-card card fade-in" style="animation-delay: 0.2s;">
     <div class="card-header-custom">
         <h5>Peserta PPDB Terbaru</h5>
-       
     </div>
 
-    <div class="table-responsive">
+    {{-- DESKTOP TABLE --}}
+    <div class="table-responsive d-none d-md-block">
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
                 <tr>
@@ -436,7 +439,6 @@
                 </tr>
             </thead>
             <tbody>
-
                 @forelse ($aktivitas as $a)
                 <tr>
                     <td>
@@ -447,9 +449,9 @@
                             $status = strtoupper($a['aktivitas'] ?? 'PROCESSED');
                             $badgeClass = match($status) {
                                 'PROCESSED' => 'badge-processed',
-                                'ACCEPTED' => 'badge-accepted',
-                                'REJECTED' => 'badge-rejected',
-                                default => 'badge-processed'
+                                'ACCEPTED'  => 'badge-accepted',
+                                'REJECTED'  => 'badge-rejected',
+                                default     => 'badge-processed'
                             };
                         @endphp
                         <span class="badge-status {{ $badgeClass }}">{{ $status }}</span>
@@ -466,18 +468,55 @@
                     </td>
                 </tr>
                 @endforelse
-
             </tbody>
         </table>
     </div>
 
-    <div class="text-center py-3" style="border-top: 1px solid #E2E8F0;">
-        <a href="{{ route('kurikulum.siswa.index') }}" class="link-primary fw-600" style="text-decoration: none;">Lihat Semua Pendaftar</a>
+    {{-- MOBILE CARD LIST --}}
+    <div class="d-md-none">
+        @forelse ($aktivitas as $a)
+            @php
+                $status = strtoupper($a['aktivitas'] ?? 'PROCESSED');
+                $badgeClass = match($status) {
+                    'PROCESSED' => 'badge-processed',
+                    'ACCEPTED'  => 'badge-accepted',
+                    'REJECTED'  => 'badge-rejected',
+                    default     => 'badge-processed'
+                };
+            @endphp
+
+            <div class="mobile-ppdb-card">
+                <div class="mobile-top-row">
+                    <div class="mobile-name">{{ $a['nama'] ?? 'Data tidak tersedia' }}</div>
+                    <span class="badge-status {{ $badgeClass }} flex-shrink-0">{{ $status }}</span>
+                </div>
+                <div class="mobile-meta">
+                    <span>
+                        <span class="meta-label">Jurusan</span>
+                        {{ $a['kelas'] ?? '-' }}
+                    </span>
+                    <span>
+                        <span class="meta-label">Daftar</span>
+                        {{ $a['waktu'] ?? '-' }}
+                    </span>
+                    <a href="#" class="link-primary ms-auto" style="font-size: 15px;">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                </div>
+            </div>
+        @empty
+            <div class="mobile-ppdb-empty">
+                <i class="fas fa-inbox"></i>
+                Tidak ada data peserta PPDB.
+            </div>
+        @endforelse
     </div>
 
+    <div class="activity-footer">
+        <a href="{{ route('kurikulum.siswa.index') }}">Lihat Semua Pendaftar</a>
+    </div>
 </div>
 
 {{-- INFORMASI SEKOLAH --}}
-
 
 @endsection

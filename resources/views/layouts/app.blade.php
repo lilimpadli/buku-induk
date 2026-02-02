@@ -283,6 +283,11 @@
                 padding-left: 16px;
                 padding-right: 16px;
             }
+
+            /* Keep collapsed styling behavior for small screens when sidebar-collapsed is set */
+            body.sidebar-collapsed .sidebar{
+                left: -100%;
+            }
         }
 
         /* Desktop - hide mobile elements */
@@ -647,11 +652,27 @@
             var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
                 return new bootstrap.Dropdown(dropdownToggleEl);
             });
+
+            // On resize, ensure overlay is closed when moving to desktop and re-apply collapsed state
+            window.addEventListener('resize', function(){
+                if (window.innerWidth > 991) {
+                    // close overlay if open
+                    if (document.body.classList.contains('show-sidebar')) {
+                        document.body.classList.remove('show-sidebar');
+                        if (sidebarBackdrop) sidebarBackdrop.classList.remove('visible');
+                    }
+                    // re-apply saved collapsed state
+                    applySavedSidebarState();
+                }
+            });
         });
     </script>
+
+    <!-- Backdrop for mobile sidebar -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
 
     @stack('scripts')
 
 </body>
 
-</html>
+</html> 
