@@ -324,4 +324,9 @@ class GuruController extends Controller
 
         return Excel::download(new GuruExport($search, $jurusan_id), 'gurus.xlsx');
     }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new \App\Exports\GuruImportTemplateExport(), 'template_import_guru.xlsx');
+    }
 }

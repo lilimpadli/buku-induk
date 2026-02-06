@@ -411,7 +411,7 @@
                                 <div class="nav-section-title">DATA</div>
 
                                 <a href="{{ route('siswa.dataDiri') }}" class="nav-link {{ request()->routeIs('siswa.dataDiri*') ? 'active' : '' }}">
-                                    <i class="fas fa-user"></i> <span>Data Pribadi Siswa</span>
+                                    <i class="fas fa-user"></i> <span>Data Pribadi </span>
                                 </a>
 
                                 <a href="{{ route('siswa.raport') }}" class="nav-link {{ request()->routeIs('siswa.raport') ? 'active' : '' }}">
@@ -428,7 +428,7 @@
                                 <div class="nav-section-title">DATA</div>
 
                                 <a href="{{ route('guru.profile.index') }}" class="nav-link {{ request()->routeIs('guru.profile.*') ? 'active' : '' }}">
-                                    <i class="fas fa-user"></i> <span>Data Pribadi Siswa</span>
+                                    <i class="fas fa-user"></i> <span>Data Pribadi </span>
                                 </a>
                             @endif
 
@@ -441,7 +441,7 @@
                                 <div class="nav-section-title">DATA</div>
 
                                 <a href="{{ route('walikelas.data_diri.profile') }}" class="nav-link {{ request()->routeIs('walikelas.data_diri.profile') ? 'active' : '' }}">
-                                    <i class="fas fa-user"></i> <span>Data Pribadi Siswa</span>
+                                    <i class="fas fa-user"></i> <span>Data Pribadi </span>
                                 </a>
 
                                 <a href="{{ route('walikelas.siswa.index') }}" class="nav-link {{ request()->routeIs('walikelas.siswa.*') ? 'active' : '' }}">

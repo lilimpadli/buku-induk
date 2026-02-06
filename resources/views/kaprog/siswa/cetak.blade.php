@@ -1,65 +1,146 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Cetak Data Siswa</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 14px; }
-        table { width: 100%; margin-bottom: 10px; }
-        td { padding: 4px; vertical-align: top; }
-        .judul { text-align:center; font-weight:bold; font-size:18px; margin-bottom:20px; }
-        .foto { width: 120px; height: 150px; border: 1px solid #000; object-fit: cover; }
-        .ttd { text-align: right; margin-top: 40px; }
-    </style>
+    @page {
+        size: A4;
+        margin: 30px;
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+        background: #e5e5e5;
+        margin: 0;
+        padding: 30px;
+    }
+
+    .title {
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 25px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        line-height: 1.6;
+    }
+
+    td {
+        padding: 2px 0;
+        vertical-align: top;
+    }
+
+    .no {
+        width: 4%;
+        text-align: right;
+        padding-right: 6px;
+    }
+
+    .label {
+        width: 36%;
+    }
+
+    .colon {
+        width: 2%;
+        text-align: center;
+    }
+
+    .value {
+        width: 58%;
+        text-align: left;
+    }
+
+    .photo {
+        width: 100px;
+        height: 130px;
+        object-fit: cover;
+    }
+
+    .footer {
+        margin-top: 35px;
+        position: relative;
+        width: 100%;
+    }
+
+    .ttd {
+        position: absolute;
+        right: 0;
+        top: 0;
+        text-align: left;
+        line-height: 1.6;
+        margin-top: 48px; /* ≈ 3x enter */
+    }
+</style>
 </head>
 <body>
 
-<div class="judul">KETERANGAN TENTANG DIRI PESERTA DIDIK</div>
+<div class="container">
 
-<table>
-    <tr><td width="35%">Nama Peserta Didik</td><td>: {{ $siswa->nama_lengkap }}</td></tr>
-    <tr><td>Nomor Induk / NISN</td><td>: {{ $siswa->nis }} / {{ $siswa->nisn }}</td></tr>
-    <tr><td>Tempat, Tanggal Lahir</td><td>: {{ $siswa->tempat_lahir }}, {{ $siswa->tanggal_lahir }}</td></tr>
-    <tr><td>Jenis Kelamin</td><td>: {{ $siswa->jenis_kelamin }}</td></tr>
-    <tr><td>Agama</td><td>: {{ $siswa->agama }}</td></tr>
-    <tr><td>Status dalam Keluarga</td><td>: {{ $siswa->status_keluarga }}</td></tr>
-    <tr><td>Anak Ke</td><td>: {{ $siswa->anak_ke }}</td></tr>
-    <tr><td>Alamat Peserta Didik</td><td>: {{ $siswa->alamat }}</td></tr>
-    <tr><td>Nomor Telepon</td><td>: {{ $siswa->no_hp }}</td></tr>
-    <tr><td>Sekolah Asal</td><td>: {{ $siswa->sekolah_asal }}</td></tr>
-    <tr><td>Diterima di kelas</td><td>: {{ $siswa->kelas }}</td></tr>
-    <tr><td>Pada tanggal</td><td>: {{ $siswa->tanggal_diterima }}</td></tr>
+    <div class="title">KETERANGAN TENTANG DIRI PESERTA DIDIK</div>
 
-    <tr><td>Nama Ayah</td><td>: {{ $siswa->nama_ayah }}</td></tr>
-    <tr><td>Pekerjaan Ayah</td><td>: {{ $siswa->pekerjaan_ayah }}</td></tr>
-    <tr><td>Telepon Ayah</td><td>: {{ $siswa->telepon_ayah }}</td></tr>
+    <table>
+        <tr><td class="label">1. Nama Peserta Didik (Lengkap)</td><td class="colon">:</td><td class="value">{{ $siswa->nama_lengkap }}</td></tr>
+        <tr><td class="label">2. Nomor Induk / NISN</td><td class="colon">:</td><td class="value">{{ $siswa->nis ?? '-' }} / {{ $siswa->nisn ?? '-' }}</td></tr>
+        <tr><td class="label">3. Tempat, Tanggal Lahir</td><td class="colon">:</td><td class="value">{{ $siswa->tempat_lahir ?? '-' }}, {{ optional(\Carbon\Carbon::parse($siswa->tanggal_lahir))->translatedFormat('d F Y') ?? '-' }}</td></tr>
+        <tr><td class="label">4. Jenis Kelamin</td><td class="colon">:</td><td class="value">{{ $siswa->jenis_kelamin ?? '-' }}</td></tr>
+        <tr><td class="label">5. Agama</td><td class="colon">:</td><td class="value">{{ $siswa->agama ?? '-' }}</td></tr>
+        <tr><td class="label">6. Status Dalam Keluarga</td><td class="colon">:</td><td class="value">{{ $siswa->status_keluarga ?? '-' }}</td></tr>
+        <tr><td class="label">7. Anak Ke</td><td class="colon">:</td><td class="value">{{ $siswa->anak_ke ?? '-' }}</td></tr>
+        <tr><td class="label">8. Alamat Peserta Didik</td><td class="colon">:</td><td class="value">{{ $siswa->alamat ?? '-' }}</td></tr>
+        <tr><td class="label">9. Nomor Telepon Rumah</td><td class="colon">:</td><td class="value">{{ $siswa->no_hp ?? '-' }}</td></tr>
+        <tr><td class="label">10. Sekolah Asal</td><td class="colon">:</td><td class="value">{{ $siswa->sekolah_asal ?? '-' }}</td></tr>
 
-    <tr><td>Nama Ibu</td><td>: {{ $siswa->nama_ibu }}</td></tr>
-    <tr><td>Pekerjaan Ibu</td><td>: {{ $siswa->pekerjaan_ibu }}</td></tr>
-    <tr><td>Telepon Ibu</td><td>: {{ $siswa->telepon_ibu }}</td></tr>
+        <tr><td class="label">11. Diterima di sekolah ini</td><td class="colon">:</td><td class="value"></td></tr>
+        <tr><td class="label">&nbsp;&nbsp;&nbsp;Di kelas</td><td class="colon">:</td><td class="value">{{ $siswa->rombel->nama ?? ($siswa->kelas ?? '-') }}</td></tr>
+        <tr><td class="label">&nbsp;&nbsp;&nbsp;Pada tanggal</td><td class="colon">:</td><td class="value">{{ optional(\Carbon\Carbon::parse($siswa->tanggal_diterima))->translatedFormat('d F Y') ?? '-' }}</td></tr>
 
-    <tr><td>Nama Wali</td><td>: {{ $siswa->nama_wali }}</td></tr>
-    <tr><td>Alamat Wali</td><td>: {{ $siswa->alamat_wali }}</td></tr>
-    <tr><td>Telepon Wali</td><td>: {{ $siswa->telepon_wali }}</td></tr>
-    <tr><td>Pekerjaan Wali</td><td>: {{ $siswa->pekerjaan_wali }}</td></tr>
-</table>
+        <tr><td class="label">Nama Orang Tua</td><td class="colon">:</td><td class="value"></td></tr>
+        <tr><td class="label">&nbsp;&nbsp;&nbsp;a. Ayah</td><td class="colon">:</td><td class="value">{{ $siswa->ayah->nama ?? '-' }}</td></tr>
+        <tr><td class="label">&nbsp;&nbsp;&nbsp;b. Ibu</td><td class="colon">:</td><td class="value">{{ $siswa->ibu->nama ?? '-' }}</td></tr>
 
-<br><br>
+        <tr><td class="label">12. Alamat Orang Tua</td><td class="colon">:</td><td class="value">{{ $siswa->alamat ?? '-' }}</td></tr>
+        <tr><td class="label">Nomor Telepon Rumah</td><td class="colon">:</td><td class="value">{{ $siswa->no_hp ?? '-' }}</td></tr>
 
-<div style="display:flex; justify-content:space-between;">
-    <div>
-        @if($siswa->foto)
-            <img src="{{ public_path('storage/'.$siswa->foto) }}" class="foto">
-        @else
-            <div class="foto"></div>
-        @endif
+        <tr><td class="label">13. Pekerjaan Orang Tua</td><td class="colon">:</td><td class="value"></td></tr>
+        <tr><td class="label">&nbsp;&nbsp;&nbsp;a. Ayah</td><td class="colon">:</td><td class="value">{{ $siswa->ayah->pekerjaan ?? '-' }}</td></tr>
+        <tr><td class="label">&nbsp;&nbsp;&nbsp;b. Ibu</td><td class="colon">:</td><td class="value">{{ $siswa->ibu->pekerjaan ?? '-' }}</td></tr>
+
+        <tr><td class="label">14. Nama Wali Peserta Didik</td><td class="colon">:</td><td class="value">{{ $siswa->wali->nama ?? '-' }}</td></tr>
+        <tr><td class="label">15. Alamat Wali Peserta Didik</td><td class="colon">:</td><td class="value">{{ $siswa->wali->alamat ?? '-' }}</td></tr>
+        <tr><td class="label">Nomor Telepon Rumah</td><td class="colon">:</td><td class="value">{{ $siswa->wali->telepon ?? '-' }}</td></tr>
+        <tr><td class="label">16. Pekerjaan Wali Peserta Didik</td><td class="colon">:</td><td class="value">{{ $siswa->wali->pekerjaan ?? '-' }}</td></tr>
+    </table>
+
+    <div class="footer">
+        <div class="photo-box">
+            @if($siswa->foto)
+                @php
+                    $diskPath = storage_path('app/public/' . $siswa->foto);
+                    $imgData = null;
+                    if (file_exists($diskPath)) {
+                        $type = pathinfo($diskPath, PATHINFO_EXTENSION);
+                        $data = file_get_contents($diskPath);
+                        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                        $imgData = $base64;
+                    }
+                @endphp
+                @if(!empty($imgData))
+                    <img src="{{ $imgData }}" class="photo">
+                @endif
+            @endif
+        </div>
+
+        <div class="ttd">
+            Ciamis, {{ optional(\Carbon\Carbon::parse($siswa->tanggal_diterima))->translatedFormat('d F Y') ?? '-' }}<br>
+            Kepala Sekolah<br><br><br>
+            <b>CEPY WAHYUDIN, A.Md., S.Kom., M.Kom.</b><br>
+            NIP. 19342738121894378123
+        </div>
     </div>
 
-    <div class="ttd">
-        Ciamis, {{ now()->format('d F Y') }} <br>
-        Kepala Sekolah <br><br><br><br>
-        <u>....................................</u><br>
-        NIP: ..................................
-    </div>
 </div>
 
 </body>

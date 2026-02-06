@@ -500,10 +500,23 @@
 
                                 <!-- Agama, Status Keluarga, Anak Ke -->
                                 <div class="col-md-4">
-                                    <label class="form-label fw-semibold">Agama <span class="text-danger">*</span></label>
-                                    <input type="text" name="agama" class="form-control step1-field" value="{{ $siswa->agama ?? old('agama') }}" required>
-                                    @error('agama')<div class="text-danger small">{{ $message }}</div>@enderror
-                                </div>
+    <label class="form-label fw-semibold">Agama <span class="text-danger">*</span></label>
+    
+    <select name="agama" class="form-control step1-field" required>
+        <option value="">-- Pilih Agama --</option>
+        <option value="Islam" {{ ($siswa->agama ?? old('agama')) == 'Islam' ? 'selected' : '' }}>Islam</option>
+        <option value="Kristen" {{ ($siswa->agama ?? old('agama')) == 'Kristen' ? 'selected' : '' }}>Kristen</option>
+        <option value="Katolik" {{ ($siswa->agama ?? old('agama')) == 'Katolik' ? 'selected' : '' }}>Katolik</option>
+        <option value="Hindu" {{ ($siswa->agama ?? old('agama')) == 'Hindu' ? 'selected' : '' }}>Hindu</option>
+        <option value="Buddha" {{ ($siswa->agama ?? old('agama')) == 'Buddha' ? 'selected' : '' }}>Buddha</option>
+        <option value="Konghucu" {{ ($siswa->agama ?? old('agama')) == 'Konghucu' ? 'selected' : '' }}>Konghucu</option>
+    </select>
+
+    @error('agama')
+        <div class="text-danger small">{{ $message }}</div>
+    @enderror
+</div>
+
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold">Status Keluarga <span class="text-danger">*</span></label>

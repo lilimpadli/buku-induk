@@ -375,7 +375,7 @@ class TUController extends Controller
                 NilaiRaport::find($id)?->delete();
             } catch (\Throwable $e) {
                 // ignore errors to avoid breaking UI; log if needed
-                \Log::error('Failed to delete NilaiRaport: ' . $e->getMessage());
+                Log::error('Failed to delete NilaiRaport: ' . $e->getMessage());
             }
         }
 

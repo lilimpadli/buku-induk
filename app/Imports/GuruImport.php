@@ -21,50 +21,152 @@ class GuruImport implements ToModel, WithStartRow, SkipsEmptyRows, WithHeadingRo
 
     public function startRow(): int
     {
-        return 6; // Data mulai dari baris 6 (setelah header di baris 5)
+        return 2; // Data mulai dari baris 2 (setelah header di baris 1)
     }
 
     public function headingRow(): int
     {
-        return 5; // Header ada di baris 5
+        return 1; // Header ada di baris 1
+    }
+
+    /**
+     * Normalize row keys to standard lowercase format
+     * Handles various column name formats (camelCase, spaces, etc.)
+     */
+    protected function normalizeRowKeys(array $row): array
+    {
+        $normalized = [];
+        $keyMap = [
+            'nama' => ['nama', 'Nama', 'NAMA', 'name'],
+            'nomor_induk' => ['nomor_induk', 'nomor induk', 'nip', 'NIP', 'nip_guru', 'niP', 'Nomor Induk', 'nomor_induk'],
+            'jenis_kelamin' => ['jenis_kelamin', 'jenis kelamin', 'jenis_kelamin', 'Jenis Kelamin', 'gender'],
+            'email' => ['email', 'Email', 'EMAIL', 'e_mail'],
+            'role' => ['role', 'Role', 'ROLE', 'jabatan'],
+            'rombel_id' => ['rombel_id', 'rombel_Id', 'rombel', 'rombel id', 'rombelid'],
+            'jurusan_id' => ['jurusan_id', 'jurusan_Id', 'jurusan', 'jurusan id', 'jurusanid'],
+        ];
+
+        // Map each key to its standard form
+        foreach ($row as $key => $value) {
+            // Normalize key: lowercase and replace spaces with underscores
+            $normalizedKey = strtolower(str_replace(' ', '_', trim($key)));
+            
+            // Find which standard key this maps to
+            $standardKey = $normalizedKey;
+            foreach ($keyMap as $standard => $variants) {
+                if (in_array($normalizedKey, array_map('strtolower', $variants))) {
+                    $standardKey = $standard;
+                    break;
+                }
+            }
+            
+            $normalized[$standardKey] = $value;
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Normalize role values to match enum values
+     * Handles typos and variations like 'kurrikulum' -> 'kurikulum'
+     */
+    protected function normalizeRole(string $role): string
+    {
+        $role = strtolower(trim($role));
+        
+        // Map common typos and variations
+        $roleMap = [
+            'guru' => 'guru',
+            'walikelas' => 'walikelas',
+            'wali_kelas' => 'walikelas',
+            'wali kelas' => 'walikelas',
+            'kaprog' => 'kaprog',
+            'kepala program' => 'kaprog',
+            'kaprogdam' => 'kaprog',
+            'tu' => 'tu',
+            'tatausa' => 'tu',
+            'tata_usaha' => 'tu',
+            'tata usaha' => 'tu',
+            'kurikulum' => 'kurikulum',
+            'kurrikulum' => 'kurikulum',  // Common typo
+            'kurukulum' => 'kurikulum',   // Another typo
+            'calon_siswa' => 'calon_siswa',
+            'calon siswa' => 'calon_siswa',
+            'kepala_sekolah' => 'guru',  // Map to guru as fallback
+            'kepala sekolah' => 'guru',
+            'siswa' => 'siswa',
+        ];
+        
+        // Try direct match first
+        if (isset($roleMap[$role])) {
+            return $roleMap[$role];
+        }
+        
+        // Try fuzzy matching with common patterns
+        foreach ($roleMap as $key => $value) {
+            if (strpos($role, str_replace('_', '', $key)) !== false || 
+                strpos(str_replace(' ', '', $key), str_replace(' ', '', $role)) !== false) {
+                return $value;
+            }
+        }
+        
+        // Default to guru if no match
+        return 'guru';
     }
 
     public function model(array $row)
     {
-        // Debug: log raw row
-        Log::info('GuruImport Row', ['row' => $row]);
+        // Debug: log raw row and keys
+        Log::info('GuruImport Row Keys', ['keys' => array_keys($row)]);
+        Log::info('GuruImport Row Data', ['row' => $row]);
 
-        // Skip if nama is empty
-        if (empty($row['nama'] ?? null)) {
-            $this->errors[] = "Baris skip: Kolom 'nama' kosong";
+        // Normalize row keys to lowercase and handle various formats
+        $normalizedRow = $this->normalizeRowKeys($row);
+        
+        // Get nama - required field
+        $nama = trim($normalizedRow['nama'] ?? '');
+        if (empty($nama)) {
+            $this->errors[] = "Baris skip: Kolom 'nama' kosong. Kunci tersedia: " . implode(', ', array_keys($normalizedRow));
             return null;
         }
 
         try {
-            // Extract data from row with proper key access
-            $nama = trim($row['nama'] ?? '');
-            $nomor_induk = trim($row['nomor_induk'] ?? '');
-            $jenis_kelamin = trim($row['jenis_kelamin'] ?? 'L');
-            $role = trim($row['role'] ?? 'walikelas');
-            $rombel_id = !empty($row['rombel_id']) ? (int)$row['rombel_id'] : null;
-            $jurusan_id = !empty($row['jurusan_id']) ? (int)$row['jurusan_id'] : null;
+            // Extract data from normalized row
+            $nomor_induk = trim($normalizedRow['nomor_induk'] ?? $normalizedRow['nip'] ?? '');
+            $jenis_kelamin = trim($normalizedRow['jenis_kelamin'] ?? 'L');
+            $role = trim($normalizedRow['role'] ?? 'guru');
+            $rombel_id = !empty($normalizedRow['rombel_id']) ? (int)$normalizedRow['rombel_id'] : null;
+            $jurusan_id = !empty($normalizedRow['jurusan_id']) ? (int)$normalizedRow['jurusan_id'] : null;
+
+            // Validate and normalize role - map to valid enum values
+            $validRoles = ['siswa', 'guru', 'walikelas', 'kaprog', 'tu', 'kurikulum', 'calon_siswa'];
+            $normalizedRole = $this->normalizeRole($role);
             
+            if (!in_array($normalizedRole, $validRoles)) {
+                // Default to 'guru' if role is invalid
+                $this->errors[] = "Warning: Role '$role' tidak valid untuk guru {$nama}, menggunakan default 'guru'";
+                $normalizedRole = 'guru';
+            }
+            
+            $role = $normalizedRole;
+
+            // Handle case where nomor_induk is empty - use nama as fallback
+            if (empty($nomor_induk)) {
+                $nomor_induk = $nama;
+            }
+
             // Generate email dari nama jika tidak ada
-            if (!empty($row['email'])) {
-                $email = trim($row['email']);
+            if (!empty($normalizedRow['email'] ?? '')) {
+                $email = trim($normalizedRow['email']);
             } else {
-                $email = strtolower(str_replace(' ', '', $nama)) . "@smkn1kawali.sch.id";
+                $email = strtolower(str_replace(' ', '', $nama)) . time() . "@smkn1x.sch.id";
             }
 
-            // Validate required fields
-            if (empty($nama)) {
-                $this->errors[] = "Nama guru tidak boleh kosong";
-                return null;
-            }
-
-            // Handle case where nomor_induk is same as nama
-            if (empty($nomor_induk) || $nomor_induk === $nama) {
-                $nomor_induk = $nama; // Use nama as nomor_induk if it's empty or same as nama
+            // Handle duplicate email - tambahkan timestamp jika sudah ada
+            $emailExists = User::where('email', $email)->first();
+            if ($emailExists && (!empty($normalizedRow['email'] ?? '') === false)) {
+                // Email sudah digunakan dan bukan dari user input, generate unique email
+                $email = strtolower(str_replace(' ', '', $nama)) . "." . time() . "@smkn1x.sch.id";
             }
 
             // Check if user already exists
@@ -74,15 +176,15 @@ class GuruImport implements ToModel, WithStartRow, SkipsEmptyRows, WithHeadingRo
                 $user = $existingUser;
                 $user->update([
                     'name' => $nama,
-                    'email' => $email ?? $user->email,
-                    'role' => $role,  // Update role jika ada
+                    'email' => $email,
+                    'role' => $role,
                 ]);
             } else {
                 // Create new user
                 $user = User::create([
                     'name' => $nama,
                     'nomor_induk' => $nomor_induk,
-                    'email' => $email ?? strtolower(str_replace(' ', '', $nama)) . "@smkn1kawali.sch.id",
+                    'email' => $email,
                     'password' => Hash::make($this->defaultPassword),
                     'role' => $role,
                 ]);
@@ -90,13 +192,6 @@ class GuruImport implements ToModel, WithStartRow, SkipsEmptyRows, WithHeadingRo
 
             // Check if guru already exists
             $guru = Guru::where('nip', $nomor_induk)->first();
-            
-            // Handle duplicate email - tambahkan timestamp jika sudah ada
-            $emailExists = Guru::where('email', $email)->first();
-            if ($emailExists && (!$guru || $guru->email !== $email)) {
-                // Email sudah digunakan, generate unique email
-                $email = strtolower(str_replace(' ', '', $nama)) . "." . time() . "@smkn1kawali.sch.id";
-            }
             
             if (!$guru) {
                 $guru = new Guru();
@@ -107,25 +202,45 @@ class GuruImport implements ToModel, WithStartRow, SkipsEmptyRows, WithHeadingRo
             $guru->email = $email;  // HARUS DIISI karena unique dan NOT NULL
             $guru->jenis_kelamin = $jenis_kelamin;
             $guru->user_id = $user->id;
-            $guru->jurusan_id = $jurusan_id;
-            $guru->save();
 
-            // Add to rombel atau jurusan berdasarkan role
-            if ($role === 'walikelas' || $role === 'guru') {
-                // Wali kelas gunakan rombel_id
+            // Normalize role values for assignment logic
+            $roleNorm = strtolower(str_replace([' ', '_'], '', $role));
+            
+            // Set jurusan_id dan rombel_id berdasarkan role
+            if (in_array($roleNorm, ['walikelas', 'wali'])) {
+                // Wali kelas: isi rombel_id, kosongkan jurusan_id
+                $guru->rombel_id = $rombel_id;
+                $guru->jurusan_id = null;
+            } elseif (in_array($roleNorm, ['kaprog', 'program'])) {
+                // Kaprog: isi jurusan_id, kosongkan rombel_id
+                $guru->jurusan_id = $jurusan_id;
+                $guru->rombel_id = null;
+            } else {
+                // Guru biasa: kosongkan keduanya
+                $guru->rombel_id = null;
+                $guru->jurusan_id = null;
+            }
+            
+            // Save guru first (harus di-save sebelum digunakan untuk foreign key)
+            $guru->save();
+            
+            // Setelah guru di-save, update rombel jika walikelas
+            if (in_array($roleNorm, ['walikelas', 'wali'])) {
                 if ($rombel_id) {
                     $rombel = Rombel::find($rombel_id);
                     if ($rombel) {
-                        $guru->rombels()->syncWithoutDetaching([$rombel_id]);
+                        // Update rombel dengan guru_id (HARUS guru->id, bukan user->id)
+                        $rombel->guru_id = $guru->id;
+                        $rombel->save();
                     } else {
                         $this->errors[] = "Warning: Rombel dengan ID {$rombel_id} tidak ditemukan untuk guru {$nama}";
                     }
+                } else {
+                    $this->errors[] = "Warning: Walikelas {$nama} tidak memiliki rombel_id";
                 }
-            } elseif ($role === 'kaprog') {
-                // Kaprog gunakan jurusan_id
-                if ($jurusan_id) {
-                    $guru->jurusan_id = $jurusan_id;
-                    $guru->save();
+            } elseif (in_array($roleNorm, ['kaprog', 'program'])) {
+                if (!$jurusan_id) {
+                    $this->errors[] = "Warning: Kaprog {$nama} tidak memiliki jurusan_id";
                 }
             }
 

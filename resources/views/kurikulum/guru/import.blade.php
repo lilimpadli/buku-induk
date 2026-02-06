@@ -23,10 +23,12 @@
                 <li><strong>jurusan_id</strong> - ID jurusan (opsional)</li>
             </ul>
 
-            <p class="text-muted mt-3">
+            <div class="alert alert-info mt-3">
                 <i class="fas fa-info-circle"></i>
-                Password default untuk akun baru adalah: <strong>12345678</strong>
-            </p>
+                <strong>Password default</strong> untuk akun baru adalah: <strong>12345678</strong>
+                <br>
+                <small>Ubah password setelah guru login pertama kali</small>
+            </div>
 
             @if(session('error'))
                 <div class="alert alert-danger alert-dismissible fade show mt-3">
@@ -47,6 +49,15 @@
                 </div>
             @endif
 
+
+            <div class="alert alert-light border border-secondary mt-4">
+                <strong>💡 Tips:</strong> Gunakan template di bawah ini sebagai referensi untuk format file Anda.
+                <br>
+                <a href="{{ route('kurikulum.guru.import.template') }}" class="btn btn-sm btn-outline-secondary mt-2">
+                    <i class="fas fa-download"></i> Download Template Excel
+                </a>
+            </div>
+
             <form action="{{ route('kurikulum.guru.import') }}" method="POST" enctype="multipart/form-data" class="mt-4">
                 @csrf
                 <div class="mb-3">
@@ -63,7 +74,6 @@
                     </button>
                 </div>
             </form>
-
             <hr class="my-4">
 
             <h5 class="card-title mb-3">Contoh Format File</h5>

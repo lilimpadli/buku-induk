@@ -558,6 +558,8 @@ Route::middleware(['auth'])->group(function () {
             // Guru import
             Route::get('/guru/import', [App\Http\Controllers\Kurikulum\GuruController::class, 'importForm'])
                 ->name('guru.importForm');
+            Route::get('/guru/import/template', [App\Http\Controllers\Kurikulum\GuruController::class, 'downloadTemplate'])
+                ->name('guru.import.template');
             Route::post('/guru/import', [App\Http\Controllers\Kurikulum\GuruController::class, 'import'])
                 ->name('guru.import');
             // Guru export (Excel)
