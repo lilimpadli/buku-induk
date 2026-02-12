@@ -91,15 +91,33 @@ class AlumniController extends Controller
         return view('tu.alumni.index', compact('allJurusanCards', 'tahunAjaranList', 'tahunSearch'));
     }
 
-    public function byJurusan($tahun, $jurusanId)
+    public function byJurusan($jurusanId)
     {
         $jurusanId = (int) $jurusanId;
+        $tahun = trim(request('tahun', 'Semua Tahun')); // Read from query string
+        
+        // Ambil daftar tahun ajaran yang tersedia untuk jurusan ini
+        $tahunAjaranList = KenaikanKelas::where('status', 'lulus')
+            ->with(['siswa.rombel.kelas.jurusan', 'rombelTujuan.kelas.jurusan'])
+            ->get()
+            ->filter(function($k) use ($jurusanId) {
+                $siswa = $k->siswa;
+                $rombel = $k->rombelTujuan ?? $siswa->rombel;
+                $kelas = $rombel?->kelas;
+                $jurusan = $kelas?->jurusan;
+                return $jurusan && (int) $jurusan->id === $jurusanId;
+            })
+            ->pluck('tahun_ajaran')
+            ->unique()
+            ->sort()
+            ->reverse()
+            ->values();
         
         // Ambil data alumni berdasarkan tahun dan jurusan
         $query = KenaikanKelas::where('status', 'lulus');
         
-        // Hanya filter tahun jika bukan "Semua Tahun"
-        if ($tahun !== 'Semua Tahun') {
+        // Filter tahun jika bukan "Semua Tahun"
+        if ($tahun !== 'Semua Tahun' && !empty($tahun)) {
             $query->where('tahun_ajaran', $tahun);
         }
         
@@ -113,13 +131,6 @@ class AlumniController extends Controller
             ])
             ->orderBy('tahun_ajaran', 'desc')
             ->get();
-        
-        // DEBUG
-        \Log::debug('ByJurusan Debug', [
-            'tahun' => $tahun,
-            'jurusanId' => $jurusanId,
-            'kelulusan_count' => $kelulusan->count(),
-        ]);
 
         // Filter berdasarkan jurusan
         $alumni = [];
@@ -131,13 +142,6 @@ class AlumniController extends Controller
             $kelas = $rombel?->kelas;
             $jurusan = $kelas?->jurusan;
             
-            \Log::debug('Alumni item', [
-                'siswa_id' => $siswa->id ?? 'N/A',
-                'jurusan_id' => $jurusan->id ?? 'N/A',
-                'kelas_id' => $kelas?->id ?? 'N/A',
-                'rombel_id' => $rombel?->id ?? 'N/A',
-            ]);
-            
             if ($jurusan && (int) $jurusan->id === $jurusanId) {
                 $namaJurusan = $jurusan->nama;
                 $alumni[] = [
@@ -148,7 +152,7 @@ class AlumniController extends Controller
             }
         }
 
-        return view('tu.alumni.by-jurusan', compact('alumni', 'tahun', 'jurusanId', 'namaJurusan'));
+        return view('tu.alumni.by-jurusan', compact('alumni', 'tahun', 'jurusanId', 'namaJurusan', 'tahunAjaranList'));
     }
 
     public function show($id)

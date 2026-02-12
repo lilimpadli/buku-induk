@@ -11,6 +11,8 @@ use App\Models\Kelas;
 use App\Models\Jurusan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Str;
@@ -60,18 +62,18 @@ class KurikulumSiswaController extends Controller
 
         // Ensure we select distinct data_siswa rows (prevents duplicates if joins are present)
         if (config('app.debug')) {
-            \DB::enableQueryLog();
+            DB::enableQueryLog();
         }
 
         $siswas = $query->select('data_siswa.*')->distinct()->latest()->paginate(15)->withQueryString();
 
         if (config('app.debug')) {
-            \Log::info('KurikulumSiswaController::index queries', \DB::getQueryLog());
+            Log::info('KurikulumSiswaController::index queries', DB::getQueryLog());
             try {
                 $ids = $siswas->pluck('id')->toArray();
-                \Log::info('KurikulumSiswaController::index result_ids', $ids);
+                Log::info('KurikulumSiswaController::index result_ids', $ids);
             } catch (\Throwable $e) {
-                \Log::info('KurikulumSiswaController::index result_ids error', ['err' => $e->getMessage()]);
+                Log::info('KurikulumSiswaController::index result_ids error', ['err' => $e->getMessage()]);
             }
         }
 

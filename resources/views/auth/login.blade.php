@@ -70,7 +70,7 @@
             </div>
 
             <div class="text-end mb-3">
-                <a href="#" class="forgot-link">Lupa Password?</a>
+                <a href="{{ route('siswa.password.reset.form') }}" class="forgot-link">Lupa Password?</a>
             </div>
 
             <!-- LOGIN BUTTON -->

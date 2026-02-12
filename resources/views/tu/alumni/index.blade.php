@@ -56,7 +56,7 @@
                         </div>
                         <div class="card-footer bg-white border-top">
                             @if($card['count'] > 0)
-                                <a href="{{ route('tu.alumni.by-jurusan', [$card['tahun'], $card['jurusan_id']]) }}" class="btn btn-sm btn-primary w-100">
+                                <a href="{{ route('tu.alumni.by-jurusan', ['jurusanId' => $card['jurusan_id']]) }}?tahun={{ urlencode($card['tahun']) }}" class="btn btn-sm btn-primary w-100">
                                     <i class="bi bi-eye"></i> Lihat Detail
                                 </a>
                             @else

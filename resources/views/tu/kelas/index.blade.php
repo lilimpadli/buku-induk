@@ -380,13 +380,7 @@
         </div>
     </div>
 
-    <!-- TOMBOL TAMBAH ROMBEL -->
-    <div class="mb-3 mb-md-4">
-        <a href="{{ route('tu.kelas.create') }}" class="btn btn-primary">
-            <i class="fa fa-plus me-1 me-md-2"></i> 
-            <span class="d-none d-sm-inline">Tambah </span>Rombel
-        </a>
-    </div>
+    
 
     <!-- KARTU KELAS -->
     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-2 g-md-3">

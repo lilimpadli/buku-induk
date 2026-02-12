@@ -91,15 +91,33 @@ class AlumniController extends Controller
         return view('kurikulum.alumni.index', compact('allJurusanCards', 'tahunAjaranList', 'tahunSearch'));
     }
 
-    public function byJurusan($tahun, $jurusanId)
+    public function byJurusan($jurusanId)
     {
         $jurusanId = (int) $jurusanId;
+        $tahun = trim(request('tahun', 'Semua Tahun')); // Read from query string
+        
+        // Ambil daftar tahun ajaran yang tersedia untuk jurusan ini
+        $tahunAjaranList = KenaikanKelas::where('status', 'lulus')
+            ->with(['siswa.rombel.kelas.jurusan', 'rombelTujuan.kelas.jurusan'])
+            ->get()
+            ->filter(function($k) use ($jurusanId) {
+                $siswa = $k->siswa;
+                $rombel = $k->rombelTujuan ?? $siswa->rombel;
+                $kelas = $rombel?->kelas;
+                $jurusan = $kelas?->jurusan;
+                return $jurusan && (int) $jurusan->id === $jurusanId;
+            })
+            ->pluck('tahun_ajaran')
+            ->unique()
+            ->sort()
+            ->reverse()
+            ->values();
         
         // Ambil data alumni berdasarkan tahun dan jurusan
         $query = KenaikanKelas::where('status', 'lulus');
         
-        // Hanya filter tahun jika bukan "Semua Tahun"
-        if ($tahun !== 'Semua Tahun') {
+        // Filter tahun jika bukan "Semua Tahun"
+        if ($tahun !== 'Semua Tahun' && !empty($tahun)) {
             $query->where('tahun_ajaran', $tahun);
         }
         
@@ -134,7 +152,7 @@ class AlumniController extends Controller
             }
         }
 
-        return view('kurikulum.alumni.by-jurusan', compact('alumni', 'tahun', 'jurusanId', 'namaJurusan'));
+        return view('kurikulum.alumni.by-jurusan', compact('alumni', 'tahun', 'jurusanId', 'namaJurusan', 'tahunAjaranList'));
     }
 
     public function show($id)
@@ -262,7 +280,7 @@ class AlumniController extends Controller
             ->first();
         
         // Ambil kenaikan kelas
-        $kenaikan = \App\Models\KenaikanKelas::where('siswa_id', $siswa_id)
+        $kenaikan = KenaikanKelas::where('siswa_id', $siswa_id)
             ->where('tahun_ajaran', $tahun)
             ->first();
         

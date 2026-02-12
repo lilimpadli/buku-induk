@@ -45,7 +45,7 @@
                 @foreach($fields1 as $f)
                     @php $val = $data['tahap1'][$f] ?? ''; $isRange = in_array($f, $rangeFields1, true); @endphp
                     <div class="mb-2">
-                        <label>{{ ucfirst(str_replace('_',' ', $f)) }}</label>
+                        <label>{{ $f === 'sanggah' ? 'Sampai' : ucfirst(str_replace('_',' ', $f)) }}</label>
                         <input type="text" name="tahap1[{{ $f }}]" class="form-control {{ $isRange ? 'flatpickr-range' : 'flatpickr-single' }}" placeholder="{{ $isRange ? 'Pilih rentang tanggal' : 'Pilih tanggal' }}" value="{{ $val }}">
                     </div>
                 @endforeach
@@ -84,7 +84,7 @@
                 @foreach($fields2 as $f)
                     @php $val = $data['tahap2'][$f] ?? ''; $isRange = in_array($f, $rangeFields2, true); @endphp
                     <div class="mb-2">
-                        <label>{{ ucfirst(str_replace('_',' ', $f)) }}</label>
+                        <label>{{ $f === 'sanggah' ? 'Sampai' : ucfirst(str_replace('_',' ', $f)) }}</label>
                         <input type="text" name="tahap2[{{ $f }}]" class="form-control {{ $isRange ? 'flatpickr-range' : 'flatpickr-single' }}" placeholder="{{ $isRange ? 'Pilih rentang tanggal' : 'Pilih tanggal' }}" value="{{ $val }}">
                     </div>
                 @endforeach

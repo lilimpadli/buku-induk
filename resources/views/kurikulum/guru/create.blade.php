@@ -45,7 +45,8 @@
 
             <div class="col-md-4">
                 <label>Role</label>
-                <select name="role" class="form-control" required>
+                <select id="roleSelect" name="role" class="form-control" required>
+                    <option value="">-- Pilih Role --</option>
                     @foreach($roles as $key => $label)
                         <option value="{{ $key }}" {{ old('role') == $key ? 'selected' : '' }}>
                             {{ $label }}
@@ -64,7 +65,7 @@
         <div class="row mt-3">
 
             {{-- JURUSAN --}}
-            <div class="col-md-4">
+            <div class="col-md-4" id="jurusanDiv">
                 <label>Jurusan</label>
                 <select id="jurusanSelect" name="jurusan_id" class="form-control">
                     <option value="">-- Pilih Jurusan --</option>
@@ -77,7 +78,7 @@
             </div>
 
             {{-- KELAS --}}
-            <div class="col-md-4">
+            <div class="col-md-4" id="kelasDiv">
                 <label>Kelas</label>
                 <select id="kelasSelect" name="kelas_id" class="form-control">
                     <option value="">-- Pilih Kelas --</option>
@@ -92,7 +93,7 @@
             </div>
 
             {{-- ROMBEL --}}
-            <div class="col-md-4">
+            <div class="col-md-4" id="rombelDiv">
                 <label>Rombel (Wali Kelas)</label>
                 <select id="rombelSelect" name="rombel_id" class="form-control">
                     <option value="">-- Tidak sebagai wali --</option>
@@ -117,6 +118,11 @@
 @endsection
 
 @push('scripts')
+<style>
+#kelasDiv.hidden, #rombelDiv.hidden {
+    display: none !important;
+}
+</style>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -128,6 +134,48 @@ document.addEventListener('DOMContentLoaded', function () {
     const kelasAll = @json($kelasArr);
 
     const rombelAll = @json($rombelArr);
+
+    const roleSelect = document.getElementById('roleSelect');
+    const jurusanDiv = document.getElementById('jurusanDiv');
+    const kelasDiv = document.getElementById('kelasDiv');
+    const rombelDiv = document.getElementById('rombelDiv');
+
+    function updateAssignmentFields() {
+        const role = roleSelect.value;
+        console.log('Role selected:', role);
+
+        // Role rules:
+        // - walikelas: show jurusan, kelas, rombel
+        // - guru, kaprog, kepala_jurusan: show jurusan only
+        // - kurikulum, tu, etc: hide all assignment fields
+        const isWaliKelas = (role === 'walikelas');
+        const showJurusan = (role === 'guru' || role === 'kaprog' || role === 'kepala_jurusan' || role === 'walikelas');
+        
+        console.log('isWaliKelas:', isWaliKelas, 'showJurusan:', showJurusan);
+        
+        // Use class to apply strong display:none with !important
+        if (showJurusan) {
+            jurusanDiv.classList.remove('hidden');
+        } else {
+            jurusanDiv.classList.add('hidden');
+        }
+        
+        if (isWaliKelas) {
+            kelasDiv.classList.remove('hidden');
+            rombelDiv.classList.remove('hidden');
+        } else {
+            kelasDiv.classList.add('hidden');
+            rombelDiv.classList.add('hidden');
+        }
+        
+        console.log('Jurusan hidden:', jurusanDiv.classList.contains('hidden'));
+        console.log('Kelas hidden:', kelasDiv.classList.contains('hidden'));
+        console.log('Rombel hidden:', rombelDiv.classList.contains('hidden'));
+    }
+
+    roleSelect.addEventListener('change', function () {
+        updateAssignmentFields();
+    });
 
     function renderKelas(jurusanId) {
         // clear and add placeholder
@@ -195,6 +243,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (oldRombel && Array.from(rombel.options).some(o => o.value === oldRombel)) {
         rombel.value = oldRombel;
     }
+    // initialize assignment fields visibility based on currently selected role
+    updateAssignmentFields();
 });
 </script>
 @endpush

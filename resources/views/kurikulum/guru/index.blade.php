@@ -588,6 +588,8 @@
                     <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Role</label>
                     <select name="role" class="form-select" style="border:1px solid #E2E8F0;">
                         <option value="">-- Semua Role --</option>
+                        <option value="tu" {{ (isset($role) && $role == 'tu') ? 'selected' : '' }}>Tu</option>
+                        <option value="kurikulum" {{ (isset($role) && $role == 'kurikulum') ? 'selected' : '' }}>Kurikulum</option>
                         @foreach(($allRoles ?? collect()) as $r)
                             <option value="{{ $r }}" {{ (isset($role) && $role == $r) ? 'selected' : '' }}>
                                 {{ ucfirst(str_replace('_', ' ', $r)) }}

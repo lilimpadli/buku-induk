@@ -494,17 +494,28 @@
 </style>
 
 <div class="container py-4">
-    <!-- Back Button -->
+    <!-- Back Button & Filter -->
     <div class="mb-4">
-        <div class="d-flex align-items-center gap-2">
-            <!-- Menu Toggle (Mobile Only) -->
-            <button class="menu-toggle d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
-                <i class="bi bi-list"></i>
-            </button>
-            
-            <a href="{{ route('kurikulum.alumni.index') }}" class="btn btn-secondary btn-sm">
-                <i class="bi bi-arrow-left"></i> Kembali
-            </a>
+        <div class="row align-items-end gap-2">
+            <div class="col-auto">
+                <a href="{{ route('kurikulum.alumni.index') }}" class="btn btn-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Kembali
+                </a>
+            </div>
+            <div class="col-auto">
+                <form method="GET" action="{{ route('kurikulum.alumni.by-jurusan', ['jurusanId' => $jurusanId]) }}" class="d-flex gap-2">
+                    <select name="tahun" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit();">
+                        <option value="">-- Pilih Tahun Ajaran --</option>
+                        <option value="Semua Tahun" {{ $tahun === 'Semua Tahun' ? 'selected' : '' }}>Semua Tahun Ajaran</option>
+                        @forelse($tahunAjaranList as $t)
+                            <option value="{{ $t }}" {{ $tahun === $t ? 'selected' : '' }}>
+                                Tahun Ajaran {{ $t }}
+                            </option>
+                        @empty
+                        @endforelse
+                    </select>
+                </form>
+            </div>
         </div>
     </div>
 

@@ -12,6 +12,7 @@ use App\Models\KenaikanKelas;
 use App\Models\Rombel;
 use App\Exports\NilaiRaportExport;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -54,7 +55,7 @@ class KurikulumRaportController extends Controller
         
         // Debug: Log jika tidak ada nilai yang ditemukan
         if ($nilaiRaports->isEmpty()) {
-            \Log::warning('No NilaiRaport found', [
+            Log::warning('No NilaiRaport found', [
                 'siswa_id' => $id,
                 'semester' => $semester,
                 'tahun_ajaran' => $tahun_ajaran

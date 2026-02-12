@@ -83,7 +83,8 @@ class GuruController extends Controller
         });
 
         $roles = [
-            'walikelas' => 'Guru',
+            'guru'      => 'Guru',
+            'walikelas' => 'Wali Kelas',
             'kaprog'    => 'Kaprog',
             'tu'        => 'TU',
             'kurikulum' => 'Kurikulum',
@@ -178,7 +179,8 @@ class GuruController extends Controller
     });
 
     $roles = [
-        'walikelas' => 'Guru',
+        'guru'      => 'Guru',
+        'walikelas' => 'Wali Kelas',
         'kaprog'    => 'Kaprog',
         'tu'        => 'TU',
         'kurikulum' => 'Kurikulum',

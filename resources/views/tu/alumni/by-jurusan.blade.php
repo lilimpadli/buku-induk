@@ -4,10 +4,29 @@
 
 @section('content')
 <div class="container py-4">
+    <!-- Back Button & Filter -->
     <div class="mb-4">
-        <a href="{{ route('tu.alumni.index') }}" class="btn btn-secondary btn-sm">
-            <i class="bi bi-arrow-left"></i> Kembali
-        </a>
+        <div class="row align-items-end gap-2">
+            <div class="col-auto">
+                <a href="{{ route('tu.alumni.index') }}" class="btn btn-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Kembali
+                </a>
+            </div>
+            <div class="col-auto">
+                <form method="GET" action="{{ route('tu.alumni.by-jurusan', ['jurusanId' => $jurusanId]) }}" class="d-flex gap-2">
+                    <select name="tahun" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit();">
+                        <option value="">-- Pilih Tahun Ajaran --</option>
+                        <option value="Semua Tahun" {{ $tahun === 'Semua Tahun' ? 'selected' : '' }}>Semua Tahun Ajaran</option>
+                        @forelse($tahunAjaranList as $t)
+                            <option value="{{ $t }}" {{ $tahun === $t ? 'selected' : '' }}>
+                                Tahun Ajaran {{ $t }}
+                            </option>
+                        @empty
+                        @endforelse
+                    </select>
+                </form>
+            </div>
+        </div>
     </div>
 
     <div class="mb-4">
