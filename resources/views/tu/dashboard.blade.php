@@ -318,7 +318,7 @@
     <div class="dashboard-header fade-in">
         <div class="d-flex align-items-center justify-content-between">
             <div>
-                <h2 class="mb-1">Dashboard Tata Usaha 👋</h2>
+                <h2 class="mb-1">Dashboard TU KESISWAAN  👋</h2>
                 <div class="text-muted">Kelola data siswa, wali kelas, dan kelas — cepat, informatif, dan responsif</div>
             </div>
             <div class="d-flex gap-2">

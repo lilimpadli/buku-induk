@@ -555,7 +555,19 @@ Route::middleware(['auth'])->group(function () {
         ->group(function () {
             Route::get('/dashboard', [TUKepegawaianController::class, 'dashboard'])->name('dashboard');
             Route::get('/guru', [TUKepegawaianController::class, 'guruIndex'])->name('guru.index');
+            Route::get('/guru/create', [TUKepegawaianController::class, 'guruCreate'])->name('guru.create');
+            Route::post('/guru', [TUKepegawaianController::class, 'guruStore'])->name('guru.store');
+            Route::get('/guru/{id}', [TUKepegawaianController::class, 'guruShow'])->name('guru.show');
+            Route::get('/guru/{id}/edit', [TUKepegawaianController::class, 'guruEdit'])->name('guru.edit');
+            Route::put('/guru/{id}', [TUKepegawaianController::class, 'guruUpdate'])->name('guru.update');
+            Route::delete('/guru/{id}', [TUKepegawaianController::class, 'guruDestroy'])->name('guru.destroy');
             Route::get('/tu', [TUKepegawaianController::class, 'tuIndex'])->name('tu.index');
+            Route::get('/tu/create', [TUKepegawaianController::class, 'tuCreate'])->name('tu.create');
+            Route::post('/tu', [TUKepegawaianController::class, 'tuStore'])->name('tu.store');
+            Route::get('/tu/{id}', [TUKepegawaianController::class, 'tuShow'])->name('tu.show');
+            Route::get('/tu/{id}/edit', [TUKepegawaianController::class, 'tuEdit'])->name('tu.edit');
+            Route::put('/tu/{id}', [TUKepegawaianController::class, 'tuUpdate'])->name('tu.update');
+            Route::delete('/tu/{id}', [TUKepegawaianController::class, 'tuDestroy'])->name('tu.destroy');
         });
 
     /*
