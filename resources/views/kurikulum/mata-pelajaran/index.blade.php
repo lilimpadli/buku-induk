@@ -531,6 +531,7 @@
                         <tr>
                             <th>Nama</th>
                             <th>Kelompok</th>
+                            <th>Kurikulum</th>
                             <th>Jurusan</th>
                             <th>Tingkat</th>
                             <th>Urutan</th>
@@ -544,7 +545,24 @@
                             <td>
                                 <span class="badge bg-secondary">{{ $m->kelompok }}</span>
                             </td>
-                            <td>{{ optional($m->jurusan)->nama ?? '-' }}</td>
+                            <td>
+                                @if($m->kurikulums->count() > 0)
+                                    @foreach($m->kurikulums as $kurikulum)
+                                        <span class="badge bg-info me-1">{{ $kurikulum->nama_kurikulum }}</span>
+                                    @endforeach
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td>
+                                @if($m->jurusans->count() > 0)
+                                    @foreach($m->jurusans as $jurusan)
+                                        <span class="badge bg-warning text-dark me-1">{{ $jurusan->nama }}</span>
+                                    @endforeach
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td>{{ ($m->tingkats ?? collect())->pluck('tingkat')->implode(', ') }}</td>
                             <td>
                                 <span class="badge bg-primary">{{ $m->urutan }}</span>
@@ -566,7 +584,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center">
+                            <td colspan="7" class="text-center">
                                 <div class="empty-state">
                                     <i class="fas fa-book"></i>
                                     <p>Belum ada mata pelajaran.</p>

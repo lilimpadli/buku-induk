@@ -31,15 +31,39 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Jurusan (opsional)</label>
-                    @php $selJur = old('jurusan_id', $mapel->jurusan_id ?? ''); @endphp
-                    <select name="jurusan_id" class="form-select @error('jurusan_id') is-invalid @enderror">
-                        <option value="">Semua Jurusan</option>
-                        @foreach(($jurusans ?? collect()) as $j)
-                            <option value="{{ $j->id }}" {{ (string)$selJur === (string)$j->id ? 'selected' : '' }}>{{ $j->nama }}</option>
+                    <label class="form-label">Kurikulum</label>
+                    @php
+                        $selKur = old('kurikulum_ids', isset($mapel) ? $mapel->kurikulums->pluck('id')->toArray() : []);
+                    @endphp
+                    <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                        @foreach(($kurikulums ?? collect()) as $k)
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="kurikulum_ids[]" value="{{ $k->id }}" id="kurikulum_{{ $k->id }}" {{ in_array($k->id, $selKur) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="kurikulum_{{ $k->id }}">
+                                    {{ $k->nama_kurikulum }}
+                                </label>
+                            </div>
                         @endforeach
-                    </select>
-                    @error('jurusan_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    @error('kurikulum_ids')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Jurusan</label>
+                    @php
+                        $selJur = old('jurusan_ids', isset($mapel) ? $mapel->jurusans->pluck('id')->toArray() : []);
+                    @endphp
+                    <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                        @foreach(($jurusans ?? collect()) as $j)
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="jurusan_ids[]" value="{{ $j->id }}" id="jurusan_{{ $j->id }}" {{ in_array($j->id, $selJur) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="jurusan_{{ $j->id }}">
+                                    {{ $j->nama }}
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                    @error('jurusan_ids')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="mb-3">

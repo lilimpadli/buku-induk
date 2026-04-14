@@ -27,4 +27,10 @@ class Jurusan extends Model
     {
         return $this->hasMany(\App\Models\Guru::class, 'jurusan_id');
     }
+
+    // Relasi: satu jurusan punya banyak mata pelajaran (many-to-many)
+    public function mataPelajarans()
+    {
+        return $this->belongsToMany(MataPelajaran::class, 'jurusan_mata_pelajaran', 'jurusan_id', 'mata_pelajaran_id');
+    }
 }

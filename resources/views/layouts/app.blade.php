@@ -559,6 +559,14 @@
                                 <a href="{{ route('tu_kepegawaian.tu.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.tu*') ? 'active' : '' }}">
                                     <i class="fas fa-user-tie"></i> <span>Data TU</span>
                                 </a>
+
+                                <a href="{{ route('tu_kepegawaian.kurikulum.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.kurikulum*') ? 'active' : '' }}">
+                                    <i class="fas fa-book"></i> <span>Data Kurikulum</span>
+                                </a>
+
+                                <a href="{{ route('tu_kepegawaian.mata-pelajaran.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.mata-pelajaran*') ? 'active' : '' }}">
+                                    <i class="fas fa-graduation-cap"></i> <span>Data Mata Pelajaran</span>
+                                </a>
                             @endif
 
                             {{-- ROLE: KURIKULUM --}}
@@ -593,6 +601,10 @@
                                         <li><a class="dropdown-item {{ request()->routeIs('kurikulum.ppdb.timeline') ? 'active' : '' }}" href="{{ route('kurikulum.ppdb.timeline') }}"><i class="fas fa-clock"></i> Timeline PPDB</a></li>
                                     </ul>
                                 </div>
+
+                                <a href="{{ route('kurikulum.kurikulum.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kurikulum*') ? 'active' : '' }}">
+                                    <i class="fas fa-graduation-cap"></i> <span>Manajemen Kurikulum</span>
+                                </a>
 
                                 <a href="{{ route('kurikulum.jurusan.index') }}" class="nav-link {{ request()->routeIs('kurikulum.jurusan*') ? 'active' : '' }}">
                                     <i class="fas fa-graduation-cap"></i> <span>Manajemen Jurusan</span>

@@ -568,6 +568,20 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/tu/{id}/edit', [TUKepegawaianController::class, 'tuEdit'])->name('tu.edit');
             Route::put('/tu/{id}', [TUKepegawaianController::class, 'tuUpdate'])->name('tu.update');
             Route::delete('/tu/{id}', [TUKepegawaianController::class, 'tuDestroy'])->name('tu.destroy');
+            Route::get('/kurikulum', [TUKepegawaianController::class, 'kurikulumIndex'])->name('kurikulum.index');
+            Route::get('/kurikulum/create', [TUKepegawaianController::class, 'kurikulumCreate'])->name('kurikulum.create');
+            Route::post('/kurikulum', [TUKepegawaianController::class, 'kurikulumStore'])->name('kurikulum.store');
+            Route::get('/kurikulum/{id}', [TUKepegawaianController::class, 'kurikulumShow'])->name('kurikulum.show');
+            Route::get('/kurikulum/{id}/edit', [TUKepegawaianController::class, 'kurikulumEdit'])->name('kurikulum.edit');
+            Route::put('/kurikulum/{id}', [TUKepegawaianController::class, 'kurikulumUpdate'])->name('kurikulum.update');
+            Route::delete('/kurikulum/{id}', [TUKepegawaianController::class, 'kurikulumDestroy'])->name('kurikulum.destroy');
+            Route::get('/mata-pelajaran', [TUKepegawaianController::class, 'mataPelajaranIndex'])->name('mata-pelajaran.index');
+            Route::get('/mata-pelajaran/create', [TUKepegawaianController::class, 'mataPelajaranCreate'])->name('mata-pelajaran.create');
+            Route::post('/mata-pelajaran', [TUKepegawaianController::class, 'mataPelajaranStore'])->name('mata-pelajaran.store');
+            Route::get('/mata-pelajaran/{id}', [TUKepegawaianController::class, 'mataPelajaranShow'])->name('mata-pelajaran.show');
+            Route::get('/mata-pelajaran/{id}/edit', [TUKepegawaianController::class, 'mataPelajaranEdit'])->name('mata-pelajaran.edit');
+            Route::put('/mata-pelajaran/{id}', [TUKepegawaianController::class, 'mataPelajaranUpdate'])->name('mata-pelajaran.update');
+            Route::delete('/mata-pelajaran/{id}', [TUKepegawaianController::class, 'mataPelajaranDestroy'])->name('mata-pelajaran.destroy');
         });
 
     /*
@@ -636,6 +650,17 @@ Route::middleware(['auth'])->group(function () {
                 Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\GuruController::class, 'edit'])->name('edit');
                 Route::put('/{id}', [App\Http\Controllers\Kurikulum\GuruController::class, 'update'])->name('update');
                 Route::delete('/{id}', [App\Http\Controllers\Kurikulum\GuruController::class, 'destroy'])->name('destroy');
+            });
+
+            // Kurikulum Management (Kurikulum)
+            Route::prefix('kurikulum')->name('kurikulum.')->group(function () {
+                Route::get('/', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'index'])->name('index');
+                Route::get('/create', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'create'])->name('create');
+                Route::post('/', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'store'])->name('store');
+                Route::get('/{id}', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'show'])->name('show');
+                Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'edit'])->name('edit');
+                Route::put('/{id}', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'update'])->name('update');
+                Route::delete('/{id}', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'destroy'])->name('destroy');
             });
 
             // Mata Pelajaran (Kurikulum)

@@ -7,6 +7,8 @@ use App\Models\Guru;
 use App\Models\Jurusan;
 use App\Models\Kelas;
 use App\Models\Rombel;
+use App\Models\Kurikulum;
+use App\Models\MataPelajaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -421,5 +423,188 @@ class TUKepegawaianController extends Controller
         $user->delete();
 
         return redirect()->route('tu_kepegawaian.tu.index')->with('success', 'Akun TU berhasil dihapus.');
+    }
+
+    // CRUD Kurikulum
+    public function kurikulumIndex(Request $request)
+    {
+        $search = $request->get('search');
+
+        $query = Kurikulum::query();
+
+        if ($search) {
+            $query->where('nama_kurikulum', 'like', '%' . $search . '%');
+        }
+
+        $kurikulum = $query->withCount('mataPelajarans')->orderBy('nama_kurikulum')->paginate(10)->withQueryString();
+
+        return view('tu_kepegawaian.kurikulum.index', compact('kurikulum', 'search'));
+    }
+
+    public function kurikulumCreate()
+    {
+        return view('tu_kepegawaian.kurikulum.create');
+    }
+
+    public function kurikulumStore(Request $request)
+    {
+        $request->validate([
+            'nama_kurikulum' => 'required|string|max:255|unique:kurikum,nama_kurikulum',
+        ]);
+
+        Kurikulum::create($request->only('nama_kurikulum'));
+
+        return redirect()->route('tu_kepegawaian.kurikulum.index')->with('success', 'Kurikulum berhasil ditambahkan.');
+    }
+
+    public function kurikulumShow($id)
+    {
+        $kurikulum = Kurikulum::with('mataPelajarans')->findOrFail($id);
+        return view('tu_kepegawaian.kurikulum.show', compact('kurikulum'));
+    }
+
+    public function kurikulumEdit($id)
+    {
+        $kurikulum = Kurikulum::findOrFail($id);
+        return view('tu_kepegawaian.kurikulum.edit', compact('kurikulum'));
+    }
+
+    public function kurikulumUpdate(Request $request, $id)
+    {
+        $kurikulum = Kurikulum::findOrFail($id);
+
+        $request->validate([
+            'nama_kurikulum' => 'required|string|max:255|unique:kurikum,nama_kurikulum,' . $id,
+        ]);
+
+        $kurikulum->update($request->only('nama_kurikulum'));
+
+        return redirect()->route('tu_kepegawaian.kurikulum.index')->with('success', 'Kurikulum berhasil diperbarui.');
+    }
+
+    public function kurikulumDestroy($id)
+    {
+        $kurikulum = Kurikulum::findOrFail($id);
+        $kurikulum->delete();
+
+        return redirect()->route('tu_kepegawaian.kurikulum.index')->with('success', 'Kurikulum berhasil dihapus.');
+    }
+
+    // CRUD Mata Pelajaran
+    public function mataPelajaranIndex(Request $request)
+    {
+        $search = $request->get('search');
+        $kurikulum_id = $request->get('kurikulum_id');
+        $kelompok = $request->get('kelompok');
+
+        $query = MataPelajaran::with(['kurikulums', 'jurusans']);
+
+        if ($search) {
+            $query->where('nama', 'like', '%' . $search . '%');
+        }
+
+        if ($kurikulum_id) {
+            $query->whereHas('kurikulums', function ($q) use ($kurikulum_id) {
+                $q->where('kurikulum_id', $kurikulum_id);
+            });
+        }
+
+        if ($kelompok) {
+            $query->where('kelompok', $kelompok);
+        }
+
+        $mataPelajarans = $query->orderBy('kelompok')->orderBy('urutan')->paginate(10)->withQueryString();
+        $kurikulums = Kurikulum::orderBy('nama_kurikulum')->get();
+
+        return view('tu_kepegawaian.mata-pelajaran.index', compact(
+            'mataPelajarans',
+            'search',
+            'kurikulum_id',
+            'kelompok',
+            'kurikulums'
+        ));
+    }
+
+    public function mataPelajaranCreate()
+    {
+        $kurikulums = Kurikulum::orderBy('nama_kurikulum')->get();
+        $jurusans = Jurusan::orderBy('nama')->get();
+
+        return view('tu_kepegawaian.mata-pelajaran.create', compact('kurikulums', 'jurusans'));
+    }
+
+    public function mataPelajaranStore(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'kelompok' => 'required|in:A,B',
+            'urutan' => 'nullable|integer|min:1',
+            'kurikulum_ids' => 'nullable|array',
+            'kurikulum_ids.*' => 'exists:kurikum,id',
+            'jurusan_ids' => 'nullable|array',
+            'jurusan_ids.*' => 'exists:jurusans,id',
+        ]);
+
+        $mataPelajaran = MataPelajaran::create($request->only(['nama', 'kelompok', 'urutan']));
+
+        // Sync kurikulum
+        if ($request->has('kurikulum_ids')) {
+            $mataPelajaran->kurikulums()->sync($request->kurikulum_ids);
+        }
+
+        // Sync jurusan
+        if ($request->has('jurusan_ids')) {
+            $mataPelajaran->jurusans()->sync($request->jurusan_ids);
+        }
+
+        return redirect()->route('tu_kepegawaian.mata-pelajaran.index')->with('success', 'Mata pelajaran berhasil ditambahkan.');
+    }
+
+    public function mataPelajaranShow($id)
+    {
+        $mataPelajaran = MataPelajaran::with(['kurikulums', 'jurusans', 'tingkats', 'nilai'])->findOrFail($id);
+        return view('tu_kepegawaian.mata-pelajaran.show', compact('mataPelajaran'));
+    }
+
+    public function mataPelajaranEdit($id)
+    {
+        $mataPelajaran = MataPelajaran::findOrFail($id);
+        $kurikulums = Kurikulum::orderBy('nama_kurikulum')->get();
+        $jurusans = Jurusan::orderBy('nama')->get();
+
+        return view('tu_kepegawaian.mata-pelajaran.edit', compact('mataPelajaran', 'kurikulums', 'jurusans'));
+    }
+
+    public function mataPelajaranUpdate(Request $request, $id)
+    {
+        $mataPelajaran = MataPelajaran::findOrFail($id);
+
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'kelompok' => 'required|in:A,B',
+            'urutan' => 'nullable|integer|min:1',
+            'kurikulum_ids' => 'nullable|array',
+            'kurikulum_ids.*' => 'exists:kurikum,id',
+            'jurusan_ids' => 'nullable|array',
+            'jurusan_ids.*' => 'exists:jurusans,id',
+        ]);
+
+        $mataPelajaran->update($request->only(['nama', 'kelompok', 'urutan']));
+
+        // Sync kurikulum
+        $mataPelajaran->kurikulums()->sync($request->kurikulum_ids ?? []);
+
+        // Sync jurusan
+        $mataPelajaran->jurusans()->sync($request->jurusan_ids ?? []);
+
+        return redirect()->route('tu_kepegawaian.mata-pelajaran.index')->with('success', 'Mata pelajaran berhasil diperbarui.');
+    }
+
+    public function mataPelajaranDestroy($id)
+    {
+        $mataPelajaran = MataPelajaran::findOrFail($id);
+        $mataPelajaran->delete();
+
+        return redirect()->route('tu_kepegawaian.mata-pelajaran.index')->with('success', 'Mata pelajaran berhasil dihapus.');
     }
 }
