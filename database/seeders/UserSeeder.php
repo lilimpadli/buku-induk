@@ -40,10 +40,10 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password123'),
             ],
             [
-                'name' => 'Kurikulum Default',
-                'nomor_induk' => '1977665544',
-                'email' => 'kurikulum@example.com',
-                'role' => 'kurikulum',
+                'name' => 'TU Kepegawaian Default',
+                'nomor_induk' => '1991556677',
+                'email' => 'tu_kepegawaian@example.com',
+                'role' => 'tu_kepegawaian',
                 'password' => Hash::make('password123'),
             ],
         ];

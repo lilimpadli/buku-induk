@@ -105,12 +105,15 @@ class GuruController extends Controller
         $data = $request->validate([
             'nama'        => 'required|string|max:255',
             'nomor_induk' => 'required|string|max:50|unique:users,nomor_induk',
-            'email'       => 'nullable|email',
+            'email'       => 'nullable|email|unique:users,email',
             'password'    => 'required|string|min:6',
             'role'        => 'required|string',
             'jurusan_id'  => 'nullable|exists:jurusans,id',
             'kelas_id'    => 'nullable|exists:kelas,id',
             'rombel_id'   => 'nullable|exists:rombels,id',
+        ], [
+            'email.unique' => 'Email sudah terdaftar oleh pengguna lain. Gunakan email yang berbeda.',
+            'nomor_induk.unique' => 'NIP/Nomor Induk sudah terdaftar. Gunakan nomor induk yang berbeda.',
         ]);
 
         $user = User::create([
@@ -211,12 +214,15 @@ class GuruController extends Controller
         $data = $request->validate([
             'nama'        => 'required|string|max:255',
             'nomor_induk' => 'required|string|max:50|unique:users,nomor_induk,' . $guru->user_id,
-            'email'       => 'nullable|email',
+            'email'       => 'nullable|email|unique:users,email,' . $guru->user_id,
             'password'    => 'nullable|string|min:6',
             'role'        => 'required|string',
             'jurusan_id'  => 'nullable|exists:jurusans,id',
             'kelas_id'    => 'nullable|exists:kelas,id',
             'rombel_id'   => 'nullable|exists:rombels,id',
+        ], [
+            'email.unique' => 'Email sudah terdaftar oleh pengguna lain. Gunakan email yang berbeda.',
+            'nomor_induk.unique' => 'NIP/Nomor Induk sudah terdaftar. Gunakan nomor induk yang berbeda.',
         ]);
 
         /* ========= USER ========= */

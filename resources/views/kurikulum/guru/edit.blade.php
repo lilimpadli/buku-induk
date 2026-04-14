@@ -21,6 +21,14 @@
             </div>
         @endif
 
+        {{-- WARNING --}}
+        @if(session('warning'))
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ session('warning') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         {{-- ================= DATA GURU ================= --}}
         <div class="row">
             <div class="col-md-6">
@@ -86,6 +94,18 @@
 
         {{-- ================= ROLE & PASSWORD ================= --}}
         <div class="row mt-3">
+            <div class="col-md-4">
+                <label>Email (opsional)</label>
+                <input type="email" name="email" id="emailInput" class="form-control @error('email') is-invalid @enderror"
+                       value="{{ old('email', $guru->email) }}">
+                @error('email')
+                    <div class="invalid-feedback d-block">
+                        <strong>⚠️ {{ $message }}</strong>
+                    </div>
+                @enderror
+                <small class="form-text text-muted" id="emailStatus"></small>
+            </div>
+
             <div class="col-md-4">
                 <label>Role</label>
                 <select name="role" class="form-control" required>
@@ -186,6 +206,50 @@ document.addEventListener('DOMContentLoaded', function () {
     const oldRombel = '{{ old('rombel_id', $guru->rombel_id) }}';
     if (oldRombel && Array.from(rombel.options).some(o => o.value === oldRombel)) {
         rombel.value = oldRombel;
+    }
+
+    // Email validation - check if email already exists (excluding current user)
+    const emailInput = document.getElementById('emailInput');
+    const emailStatus = document.getElementById('emailStatus');
+    const currentEmail = '{{ $guru->email }}';
+    
+    if (emailInput) {
+        emailInput.addEventListener('blur', async function() {
+            const email = this.value.trim();
+            
+            if (email === '' || email === currentEmail) {
+                emailStatus.textContent = '';
+                emailInput.classList.remove('is-invalid', 'is-valid');
+                return;
+            }
+            
+            try {
+                const response = await fetch('{{ route('api.check-email') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ email: email, userId: {{ $guru->user_id }} })
+                });
+                
+                const data = await response.json();
+                
+                if (data.exists) {
+                    emailInput.classList.add('is-invalid');
+                    emailInput.classList.remove('is-valid');
+                    emailStatus.textContent = '❌ Email sudah terdaftar';
+                    emailStatus.className = 'form-text text-danger';
+                } else {
+                    emailInput.classList.add('is-valid');
+                    emailInput.classList.remove('is-invalid');
+                    emailStatus.textContent = '✓ Email tersedia';
+                    emailStatus.className = 'form-text text-success';
+                }
+            } catch (error) {
+                console.error('Error checking email:', error);
+            }
+        });
     }
 
 });

@@ -28,6 +28,11 @@
             --muted: #6b7280;
         }
 
+        html,
+        body {
+            overflow-x: hidden;
+        }
+
         body {
             background: #f6f7fb;
             transition: var(--transition, 0.2s) ease;
@@ -237,8 +242,20 @@
             background: #f8f9fa;
             padding: 30px 28px;
             margin-left: 280px;
+            max-width: calc(100% - 280px);
             min-height: 100vh;
+            box-sizing: border-box;
+            overflow-x: hidden;
             transition: margin-left .3s ease;
+        }
+
+        .container-fluid {
+            overflow-x: hidden;
+        }
+
+        .container-fluid > .row {
+            margin-left: 0;
+            margin-right: 0;
         }
 
         /* Mobile Styles */
@@ -527,6 +544,23 @@
                                 </a>
                             @endif
 
+                            {{-- ROLE: TU KEPEGAWAIAN --}}
+                            @if(Auth::user()->role == 'tu_kepegawaian')
+                                <a href="{{ route('tu_kepegawaian.dashboard') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.dashboard') ? 'active' : '' }}">
+                                    <i class="fas fa-home"></i> <span>Dashboard</span>
+                                </a>
+
+                                <div class="nav-section-title">KEPEGAWAIAN</div>
+
+                                <a href="{{ route('tu_kepegawaian.guru.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.guru*') ? 'active' : '' }}">
+                                    <i class="fas fa-chalkboard-teacher"></i> <span>Data Guru</span>
+                                </a>
+
+                                <a href="{{ route('tu_kepegawaian.tu.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.tu*') ? 'active' : '' }}">
+                                    <i class="fas fa-user-tie"></i> <span>Data TU</span>
+                                </a>
+                            @endif
+
                             {{-- ROLE: KURIKULUM --}}
                             @if(Auth::user()->role == 'kurikulum')
                                 <a href="{{ route('kurikulum.dashboard') }}" class="nav-link {{ request()->routeIs('kurikulum.dashboard') ? 'active' : '' }}">
@@ -607,7 +641,7 @@
             @endunless
 
             <!-- MAIN CONTENT -->
-            <main>
+            <main class="col">
                 @include('partials._alerts')
                 @yield('content')
             </main>

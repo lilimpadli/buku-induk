@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Http\Request;
 use App\Models\PpdbTimeline;
 
 /*
@@ -31,6 +32,7 @@ use App\Http\Controllers\WaliKelas\NilaiRaportController;
 use App\Http\Controllers\TU\TambahKelasController;
 use App\Http\Controllers\TU\KelastuController;
 use App\Http\Controllers\TU\WaliKelasController;
+use App\Http\Controllers\SuperAdminController;
 
 // KURIKULUM
 use App\Http\Controllers\Kurikulum\KurikulumDashboardController;
@@ -50,6 +52,7 @@ use App\Http\Controllers\TU\AlumniController;
 use App\Http\Controllers\TU\MutasiController;
 use App\Http\Controllers\TU\DataPribadiController;
 use App\Http\Controllers\TU\BukuIndukController;
+use App\Http\Controllers\TUKepegawaianController;
 
 // KAPROG
 use App\Http\Controllers\Kaprog\KaprogDashboardController;
@@ -170,16 +173,34 @@ Route::middleware(['auth'])->group(function () {
     // Redirect dashboard sesuai role
     Route::get('/dashboard', function () {
         return match (Auth::user()->role) {
-            'siswa'       => redirect()->route('siswa.dashboard'),
-            'guru'        => redirect()->route('guru.dashboard'),
-            'walikelas'   => redirect()->route('walikelas.dashboard'),
-            'kaprog'      => redirect()->route('kaprog.dashboard'),
-            'tu'          => redirect()->route('tu.dashboard'),
-            'kurikulum'   => redirect()->route('kurikulum.dashboard'),
-            'calon_siswa' => redirect()->route('calon.dashboard'),
-            default       => abort(403, 'Role tidak dikenali'),
+            'siswa'         => redirect()->route('siswa.dashboard'),
+            'guru'          => redirect()->route('guru.dashboard'),
+            'walikelas'     => redirect()->route('walikelas.dashboard'),
+            'kaprog'        => redirect()->route('kaprog.dashboard'),
+            'tu'            => redirect()->route('tu.dashboard'),
+            'tu_kepegawaian' => redirect()->route('tu_kepegawaian.dashboard'),
+            'super_admin'   => redirect()->route('super_admin.dashboard'),
+            'kurikulum'     => redirect()->route('kurikulum.dashboard'),
+            'calon_siswa'   => redirect()->route('calon.dashboard'),
+            default         => abort(403, 'Role tidak dikenali'),
         };
     })->name('dashboard');
+
+    // API Routes
+    Route::post('/api/check-email', function (Request $request) {
+        $email = $request->input('email');
+        $userId = $request->input('userId', null);
+        
+        $query = \App\Models\User::where('email', $email);
+        
+        if ($userId) {
+            $query->where('id', '!=', $userId);
+        }
+        
+        $exists = $query->exists();
+        
+        return response()->json(['exists' => $exists]);
+    })->name('api.check-email');
 
     /*
     |--------------------------------------------------------------------------
@@ -521,6 +542,34 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/alumni/{siswa_id}/raport', [AlumniController::class, 'raporList'])->name('alumni.raport.list');
             Route::get('/alumni/jurusan/{jurusanId}', [AlumniController::class, 'byJurusan'])->name('alumni.by-jurusan');
             Route::get('/alumni/{id}', [AlumniController::class, 'show'])->where('id', '[0-9]+')->name('alumni.show');
+        });
+
+    /*
+    |--------------------------------------------------------------------------
+    | TU KEPEGAWAIAN
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('tu_kepegawaian')
+        ->name('tu_kepegawaian.')
+        ->middleware('role:tu_kepegawaian')
+        ->group(function () {
+            Route::get('/dashboard', [TUKepegawaianController::class, 'dashboard'])->name('dashboard');
+            Route::get('/guru', [TUKepegawaianController::class, 'guruIndex'])->name('guru.index');
+            Route::get('/tu', [TUKepegawaianController::class, 'tuIndex'])->name('tu.index');
+        });
+
+    /*
+    |--------------------------------------------------------------------------
+    | SUPER ADMIN
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('super_admin')
+        ->name('super_admin.')
+        ->middleware('role:super_admin')
+        ->group(function () {
+            Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
+            Route::get('/users', [SuperAdminController::class, 'usersIndex'])->name('users.index');
+            Route::get('/system', [SuperAdminController::class, 'systemIndex'])->name('system.index');
         });
 
     /*
