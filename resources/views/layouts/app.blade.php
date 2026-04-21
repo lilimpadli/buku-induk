@@ -427,12 +427,9 @@
 
                                 <div class="nav-section-title">DATA</div>
 
-                                <a href="{{ route('siswa.dataDiri') }}" class="nav-link {{ request()->routeIs('siswa.dataDiri*') ? 'active' : '' }}">
-                                    <i class="fas fa-user"></i> <span>Data Pribadi </span>
-                                </a>
 
-                                <a href="{{ route('siswa.raport') }}" class="nav-link {{ request()->routeIs('siswa.raport') ? 'active' : '' }}">
-                                    <i class="fas fa-clipboard"></i> <span>Raport</span>
+                                <a href="{{ route('siswa.bukuInduk.show') }}" class="nav-link {{ request()->routeIs('siswa.bukuInduk*') ? 'active' : '' }}">
+                                    <i class="fas fa-book"></i> <span>Buku Induk</span>
                                 </a>
                             @endif
 
@@ -560,12 +557,8 @@
                                     <i class="fas fa-user-tie"></i> <span>Data TU</span>
                                 </a>
 
-                                <a href="{{ route('tu_kepegawaian.kurikulum.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.kurikulum*') ? 'active' : '' }}">
-                                    <i class="fas fa-book"></i> <span>Data Kurikulum</span>
-                                </a>
-
-                                <a href="{{ route('tu_kepegawaian.mata-pelajaran.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.mata-pelajaran*') ? 'active' : '' }}">
-                                    <i class="fas fa-graduation-cap"></i> <span>Data Mata Pelajaran</span>
+                                <a href="{{ route('tu_kepegawaian.tugas_tambahan.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.tugas_tambahan*') ? 'active' : '' }}">
+                                    <i class="fas fa-tasks"></i> <span>Tugas Tambahan</span>
                                 </a>
                             @endif
 

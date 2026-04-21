@@ -53,6 +53,7 @@ use App\Http\Controllers\TU\MutasiController;
 use App\Http\Controllers\TU\DataPribadiController;
 use App\Http\Controllers\TU\BukuIndukController;
 use App\Http\Controllers\TUKepegawaianController;
+use App\Http\Controllers\TugaTambahanController;
 
 // KAPROG
 use App\Http\Controllers\Kaprog\KaprogDashboardController;
@@ -231,6 +232,9 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/raport', [SiswaController::class, 'raport'])->name('raport');
             Route::get('/raport/{semester}/{tahun}', [SiswaController::class, 'raportShow'])->name('raport.show');
             Route::get('/raport/{semester}/{tahun}/pdf', [SiswaController::class, 'raportPDF'])->name('raport.pdf');
+
+            // Buku Induk
+            Route::get('/buku-induk', [SiswaController::class, 'bukuIndukShow'])->name('bukuInduk.show');
 
             // Catatan
             Route::get('/catatan', [SiswaController::class, 'catatan'])->name('catatan');
@@ -584,6 +588,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/mata-pelajaran/{id}/edit', [TUKepegawaianController::class, 'mataPelajaranEdit'])->name('mata-pelajaran.edit');
             Route::put('/mata-pelajaran/{id}', [TUKepegawaianController::class, 'mataPelajaranUpdate'])->name('mata-pelajaran.update');
             Route::delete('/mata-pelajaran/{id}', [TUKepegawaianController::class, 'mataPelajaranDestroy'])->name('mata-pelajaran.destroy');
+            Route::resource('tugas_tambahan', \App\Http\Controllers\TugaTambahanController::class, ['names' => 'tugas_tambahan']);
         });
 
     /*

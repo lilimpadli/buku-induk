@@ -101,4 +101,17 @@ class DataSiswa extends Model
     {
         return $this->hasMany(KenaikanKelas::class, 'siswa_id');
     }
+
+    /* ================================
+     |  RELASI MUTASI SISWA
+     ================================= */
+    public function mutasis()
+    {
+        return $this->hasMany(MutasiSiswa::class, 'siswa_id');
+    }
+
+    public function mutasiTerakhir()
+    {
+        return $this->hasOne(MutasiSiswa::class, 'siswa_id')->latestOfMany();
+    }
 }
