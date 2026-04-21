@@ -329,6 +329,37 @@
         <h2 class="fw-bold mb-0">Data Rombel</h2>
     </div>
 
+    <!-- Search & Action Bar -->
+    <div class="mb-4">
+        <div class="row g-2 mb-3">
+            <div class="col-lg-4">
+                <form method="GET" class="d-flex gap-2" action="">
+                    <input type="text" name="search" value="{{ request('search', $search ?? '') }}" class="form-control" placeholder="Cari nama rombel, tingkat...">
+                    <button class="btn btn-primary" type="submit">Cari</button>
+                    <a href="{{ route('tu.kelas.index') }}" class="btn btn-outline-secondary">Reset</a>
+                </form>
+            </div>
+            <div class="col-lg-4">
+                <select name="jurusan" class="form-select" onchange="this.form.submit()">
+                    <option value="">-- Semua Jurusan --</option>
+                    @foreach(($allJurusans ?? collect()) as $j)
+                        <option value="{{ $j->id }}" {{ (isset($jurusan_id) && $jurusan_id == $j->id) ? 'selected' : '' }}>
+                            {{ $j->nama }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-lg-4 d-flex gap-2 justify-content-lg-end">
+                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#downloadTemplateModal">
+                    <i class="fas fa-download"></i> Download Template
+                </button>
+                <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#importLegerModal">
+                    <i class="fas fa-upload"></i> Import Leger
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- INFO PAGINATION -->
     @if($rombels->total() > 0)
         <p class="text-muted mb-3 small">
@@ -336,51 +367,6 @@
             Menampilkan {{ $rombels->firstItem() }}-{{ $rombels->lastItem() }} dari {{ $rombels->total() }} rombel
         </p>
     @endif
-
-    <!-- FILTER + BUTTON -->
-    <div class="card filter-card mb-3 mb-md-4">
-        <div class="card-body">
-            <form action="{{ route('tu.kelas.index') }}" method="GET" class="row g-2 g-md-3 align-items-end">
-                <!-- Search -->
-                <div class="col-12 col-md-5">
-                    <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Cari Rombel</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-search"></i></span>
-                        <input type="text" name="search" class="form-control" placeholder="Nama rombel, tingkat..." value="{{ $search ?? '' }}">
-                    </div>
-                </div>
-
-                <!-- Filter Jurusan -->
-                <div class="col-12 col-md-4">
-                    <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Jurusan</label>
-                    <select name="jurusan" class="form-select">
-                        <option value="">-- Semua Jurusan --</option>
-                        @foreach(($allJurusans ?? collect()) as $j)
-                            <option value="{{ $j->id }}" {{ (isset($jurusan_id) && $jurusan_id == $j->id) ? 'selected' : '' }}>
-                                {{ $j->nama }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <!-- Buttons -->
-                <div class="col-12 col-md-3">
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary flex-fill">
-                            <i class="bi bi-search"></i> 
-                            <span class="d-none d-sm-inline">Cari</span>
-                        </button>
-                        <a href="{{ route('tu.kelas.index') }}" class="btn btn-outline-secondary flex-fill">
-                            <i class="bi bi-arrow-counterclockwise"></i> 
-                            <span class="d-none d-sm-inline">Reset</span>
-                        </a>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    
 
     <!-- KARTU KELAS -->
     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-2 g-md-3">
@@ -465,6 +451,109 @@
             {{ $rombels->links('pagination::bootstrap-4') }}
         </div>
     @endif
+</div>
+
+<!-- Modal Download Template -->
+<div class="modal fade" id="downloadTemplateModal" tabindex="-1" aria-labelledby="downloadTemplateLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="modal-title" id="downloadTemplateLabel">
+                    <i class="fas fa-download text-success me-2"></i>Download Template Leger
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Panduan:</strong> Download template untuk rombel tertentu, isi data nilai siswa, kemudian import kembali.
+                </div>
+                <form id="downloadTemplateForm" method="POST" action="{{ route('tu.kelas.download_template') }}">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Pilih Rombel</label>
+                        <select name="rombel_id" class="form-select" required>
+                            <option value="">-- Pilih Rombel --</option>
+                            @foreach($allRombels as $rombel)
+                                <option value="{{ $rombel->id }}">{{ $rombel->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Semester</label>
+                        <select name="semester" class="form-select" required>
+                            <option value="1">Semester 1 (Ganjil)</option>
+                            <option value="2">Semester 2 (Genap)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tahun Ajaran</label>
+                        <input type="text" name="tahun_ajaran" class="form-control" placeholder="2024/2025" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" form="downloadTemplateForm" class="btn btn-success">
+                    <i class="fas fa-download me-2"></i>Download Template
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Import Leger -->
+<div class="modal fade" id="importLegerModal" tabindex="-1" aria-labelledby="importLegerLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="modal-title" id="importLegerLabel">
+                    <i class="fas fa-upload text-info me-2"></i>Import Leger Nilai
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Panduan:</strong> Upload file Excel (.xlsx, .xls, .csv) yang telah diisi dengan data nilai siswa. Pastikan format sesuai dengan template.
+                </div>
+                <form id="importLegerForm" method="POST" action="{{ route('tu.kelas.import') }}" enctype="multipart/form-data">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Pilih Rombel</label>
+                        <select name="rombel_id" class="form-select" required>
+                            <option value="">-- Pilih Rombel --</option>
+                            @foreach($allRombels as $rombel)
+                                <option value="{{ $rombel->id }}">{{ $rombel->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Semester</label>
+                        <select name="semester" class="form-select" required>
+                            <option value="1">Semester 1 (Ganjil)</option>
+                            <option value="2">Semester 2 (Genap)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tahun Ajaran</label>
+                        <input type="text" name="tahun_ajaran" class="form-control" placeholder="2024/2025" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">File Leger</label>
+                        <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
+                        <div class="form-text">Format yang didukung: .xlsx, .xls, .csv</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" form="importLegerForm" class="btn btn-info">
+                    <i class="fas fa-upload me-2"></i>Import Leger
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @endsection

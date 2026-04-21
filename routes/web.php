@@ -482,6 +482,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/kelas', [TUController::class, 'kelasStore'])->name('kelas.store');
             // Export siswa per rombel (TU) - mirror Kaprog export
             Route::get('/kelas/{id}/export', [TUController::class, 'exportSiswaByRombel'])->name('kelas.export');
+            Route::post('/kelas/download-template', [TUController::class, 'downloadTemplate'])->name('kelas.download_template');
+            Route::post('/kelas/import', [TUController::class, 'importLedger'])->name('kelas.import');
             Route::get('/kelas/{id}', [TUController::class, 'kelasDetail'])->name('kelas.show');
             Route::get('/kelas/{id}/edit', [TUController::class, 'kelasEdit'])->name('kelas.edit');
             Route::put('/kelas/{id}', [TUController::class, 'kelasUpdate'])->name('kelas.update');

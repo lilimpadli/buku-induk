@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\LegerImport;
+use App\Exports\LegerTemplate;
 use App\Exports\KaprogSiswaByRombelExport;
 use App\Exports\KaprogSiswaByJurusanExport;
 use App\Exports\KaprogSiswaByAngkatanExport;
@@ -1188,7 +1190,10 @@ class TUController extends Controller
 
     $allJurusans = Jurusan::orderBy('nama')->get();
 
-    return view('tu.kelas.index', compact('rombels', 'allJurusans', 'search', 'jurusan_id'));
+    // Get all rombels for modal dropdowns (unpaginated)
+    $allRombels = Rombel::with(['kelas.jurusan', 'guru'])->orderBy('nama')->get();
+
+    return view('tu.kelas.index', compact('rombels', 'allJurusans', 'search', 'jurusan_id', 'allRombels'));
 }
 
     /**
@@ -1281,6 +1286,78 @@ class TUController extends Controller
         $kelas->delete();
         return redirect()->route('tu.kelas.index')
             ->with('success', 'Data kelas berhasil dihapus.');
+    }
+
+    public function downloadTemplate(Request $request)
+    {
+        $request->validate([
+            'rombel_id' => 'required|exists:rombels,id',
+            'semester' => 'required|in:1,2',
+            'tahun_ajaran' => 'required|string',
+        ]);
+
+        $rombelId = $request->rombel_id;
+        $rombel = Rombel::findOrFail($rombelId);
+
+        $semester = $request->semester;
+        $tahunAjaran = $request->tahun_ajaran;
+
+        // Sanitize filename - remove "/" and "\" characters
+        $rombelName = str_replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], '-', $rombel->nama);
+        $tahunAjaranClean = str_replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], '-', $tahunAjaran);
+
+        $export = new LegerTemplate($rombelId, $semester, $tahunAjaran);
+        $filename = "Leger_{$rombelName}_Sem{$semester}_{$tahunAjaranClean}.xlsx";
+
+        return Excel::download($export, $filename);
+    }
+
+    public function importLedger(Request $request)
+    {
+        $request->validate([
+            'rombel_id' => 'required|exists:rombels,id',
+            'semester' => 'required|in:1,2',
+            'tahun_ajaran' => 'required|string',
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        $rombelId = $request->rombel_id;
+        $rombel = Rombel::findOrFail($rombelId);
+
+        try {
+            $semester = $request->semester;
+            $tahunAjaran = $request->tahun_ajaran;
+
+            $import = new LegerImport($rombelId, $semester, $tahunAjaran);
+            Excel::import($import, $request->file('file'));
+
+            // Ambil data laporan import
+            $errors = $import->getErrors();
+            $successCount = $import->getSuccessCount();
+
+            if (count($errors) > 0) {
+                // Ada error - tampilkan warning dengan detail error
+                $errorDisplay = array_slice($errors, 0, 5); // Tampilkan max 5 error
+                $errorMsg = "Import selesai dengan " . count($errors) . " warning. Siswa berhasil diproses: {$successCount}. Error: " . implode(' | ', $errorDisplay);
+                if (count($errors) > 5) {
+                    $errorMsg .= " ... dan " . (count($errors) - 5) . " error lainnya";
+                }
+                return redirect()->route('tu.kelas.index')
+                    ->with('warning', $errorMsg);
+            }
+
+            if ($successCount > 0) {
+                return redirect()->route('tu.kelas.index')
+                    ->with('success', "Import berhasil! {$successCount} siswa telah diproses untuk rombel " . $rombel->nama);
+            } else {
+                return redirect()->route('tu.kelas.index')
+                    ->with('warning', 'Import selesai tetapi tidak ada data siswa yang berhasil diproses. Cek format file atau NIS/NISN siswa.');
+            }
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
+        }
     }
     
     /**
