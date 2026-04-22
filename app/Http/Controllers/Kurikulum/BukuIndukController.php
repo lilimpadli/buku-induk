@@ -167,7 +167,9 @@ class BukuIndukController extends Controller
             $jurusanId = $siswa->rombel->kelas->jurusan->id;
             
             // Get all mata pelajaran for this specific jurusan
-            $mapels = MataPelajaran::where('jurusan_id', $jurusanId)
+            $mapels = MataPelajaran::whereHas('jurusans', function($q) use ($jurusanId) {
+                $q->where('jurusan_id', $jurusanId);
+            })
                                    ->orderBy('kelompok')
                                    ->orderBy('urutan')
                                    ->get();
@@ -233,7 +235,9 @@ class BukuIndukController extends Controller
         if (empty($mapelByKelompok) && !($siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan)) {
             $firstJurusan = Jurusan::first();
             if ($firstJurusan) {
-                $mapels = MataPelajaran::where('jurusan_id', $firstJurusan->id)
+                $mapels = MataPelajaran::whereHas('jurusans', function($q) use ($firstJurusan) {
+                    $q->where('jurusan_id', $firstJurusan->id);
+                })
                                        ->orderBy('kelompok')
                                        ->orderBy('urutan')
                                        ->get();

@@ -66,11 +66,7 @@ class KelaskaprogController extends Controller
 
         // Apply jenis kelamin filter
         if ($filterJenisKelamin) {
-            // The stored values may be 'L'/'P' or full labels; try both
-            $siswaQuery->where(function($q) use ($filterJenisKelamin) {
-                $q->where('jenis_kelamin', $filterJenisKelamin)
-                  ->orWhere('jenis_kelamin', $filterJenisKelamin == 'Laki-laki' ? 'L' : ($filterJenisKelamin == 'Perempuan' ? 'P' : null));
-            });
+            $siswaQuery->where('jenis_kelamin', $filterJenisKelamin);
         }
 
         $siswa = $siswaQuery->orderBy('nama_lengkap')->get();

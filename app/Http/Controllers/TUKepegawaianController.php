@@ -345,11 +345,26 @@ class TUKepegawaianController extends Controller
     /**
      * Index data TU
      */
-    public function tuIndex()
+    public function tuIndex(Request $request)
     {
-        $tu = User::whereIn('role', ['tu', 'tu_kepegawaian'])
-            ->orderBy('name')
-            ->paginate(10);
+        $query = User::whereIn('role', ['tu', 'tu_kepegawaian']);
+        
+        // Filter berdasarkan role
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+        
+        // Filter berdasarkan search (nama atau nomor induk)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('nomor_induk', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+        
+        $tu = $query->orderBy('name')->paginate(10)->withQueryString();
 
         return view('tu_kepegawaian.tu.index', compact('tu'));
     }

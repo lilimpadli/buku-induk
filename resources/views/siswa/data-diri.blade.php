@@ -528,6 +528,11 @@
                             </div>
 
                             <div class="col-md-4">
+                                <label class="form-label fw-semibold">Kewarganegaraan</label>
+                                <p class="form-control-plaintext">{{ $siswa->kewarganegaraan ?? '-' }}</p>
+                            </div>
+
+                            <div class="col-md-4">
                                 <label class="form-label fw-semibold">Status Keluarga</label>
                                 <p class="form-control-plaintext">{{ $siswa->status_keluarga }}</p>
                             </div>
@@ -537,9 +542,39 @@
                                 <p class="form-control-plaintext">{{ $siswa->anak_ke }}</p>
                             </div>
 
-                            <div class="col-12 mt-2">
-                                <label class="form-label fw-semibold">Alamat</label>
-                                <p class="form-control-plaintext">{{ $siswa->alamat }}</p>
+                            <!-- ALAMAT TERSTRUKTUR -->
+                            <div class="col-12 mt-4 data-section">
+                                <h5 class="border-bottom pb-2 fw-semibold">Alamat Siswa</h5>
+                            </div>
+
+                            <div class="col-md-3 col-6">
+                                <label class="form-label fw-semibold">Dusun</label>
+                                <p class="form-control-plaintext">{{ $siswa->dusun ?? '-' }}</p>
+                            </div>
+
+                            <div class="col-md-3 col-6">
+                                <label class="form-label fw-semibold">RT</label>
+                                <p class="form-control-plaintext">{{ $siswa->rt ?? '-' }}</p>
+                            </div>
+
+                            <div class="col-md-3 col-6">
+                                <label class="form-label fw-semibold">RW</label>
+                                <p class="form-control-plaintext">{{ $siswa->rw ?? '-' }}</p>
+                            </div>
+
+                            <div class="col-md-3 col-6">
+                                <label class="form-label fw-semibold">Kode Pos</label>
+                                <p class="form-control-plaintext">{{ $siswa->kode_pos ?? '-' }}</p>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Kelurahan (Desa)</label>
+                                <p class="form-control-plaintext">{{ $siswa->kelurahan ?? '-' }}</p>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Kecamatan</label>
+                                <p class="form-control-plaintext">{{ $siswa->kecamatan ?? '-' }}</p>
                             </div>
 
                             <div class="col-md-4">

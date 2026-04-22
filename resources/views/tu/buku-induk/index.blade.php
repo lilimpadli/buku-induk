@@ -567,9 +567,9 @@
                             <td>{{ $siswa->nisn ?? '-' }}</td>
                             <td>{{ $siswa->nama_lengkap }}</td>
                             <td>
-                                @if($siswa->jenis_kelamin == 'L')
+                                @if($siswa->jenis_kelamin == 'Laki-laki')
                                     <span class="badge bg-info">Laki-laki</span>
-                                @elseif($siswa->jenis_kelamin == 'P')
+                                @elseif($siswa->jenis_kelamin == 'Perempuan')
                                     <span class="badge bg-danger">Perempuan</span>
                                 @else
                                     {{ $siswa->jenis_kelamin }}
@@ -649,12 +649,9 @@
                     <div class="student-card-row">
                         <span class="student-card-label">Jenis Kelamin</span>
                         <span class="student-card-value">
-                            @if($siswa->jenis_kelamin == 'L')
-                                <span class="badge bg-info">Laki-laki</span>
-                            @elseif($siswa->jenis_kelamin == 'P')
-                                <span class="badge bg-danger">Perempuan</span>
-                            @else
-                                {{ $siswa->jenis_kelamin }}
+                                @if($siswa->jenis_kelamin == 'Laki-laki')
+                                    <span class="badge bg-info">Laki-laki</span>
+                                @elseif($siswa->jenis_kelamin == 'Perempuan')
                             @endif
                         </span>
                     </div>

@@ -16,7 +16,8 @@
         <p class="mb-1"><strong>NIS:</strong> {{ $siswa->nis ?? '-' }}</p>
         <p class="mb-1"><strong>Kelas:</strong> {{ $siswa->kelas ?? ($siswa->rombel->nama ?? '-') }}</p>
         <p class="mb-1"><strong>Jenis Kelamin:</strong> {{ $siswa->jenis_kelamin ?? '-' }}</p>
-        <p class="mb-1"><strong>Alamat:</strong> {{ $siswa->alamat ?? '-' }}</p>
+        <p class="mb-1"><strong>Kewarganegaraan:</strong> {{ $siswa->kewarganegaraan ?? '-' }}</p>
+        <p class="mb-1"><strong>Alamat:</strong> Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</p>
         <a href="{{ route('kaprog.dashboard') }}" class="btn btn-sm btn-outline-secondary mt-3">Kembali</a>
     </div>
 </div>

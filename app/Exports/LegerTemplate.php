@@ -75,10 +75,13 @@ class LegerTemplate implements FromArray, WithStyles, WithColumnWidths
             });
         }
 
-        // Filter by jurusan: include global (jurusan_id NULL) and subjects for the kelas's jurusan
+        // Filter by jurusan: include global (no jurusan association) and subjects for the kelas's jurusan
         if ($jurusanId) {
             $mapelQuery = $mapelQuery->where(function($q) use ($jurusanId) {
-                $q->whereNull('jurusan_id')->orWhere('jurusan_id', $jurusanId);
+                $q->whereDoesntHave('jurusans')
+                  ->orWhereHas('jurusans', function($jq) use ($jurusanId) {
+                      $jq->where('jurusan_id', $jurusanId);
+                  });
             });
         }
 

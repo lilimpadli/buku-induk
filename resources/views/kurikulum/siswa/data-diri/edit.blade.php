@@ -87,9 +87,39 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label">Alamat</label>
-                        <textarea name="alamat" class="form-control" rows="3">{{ old('alamat', $siswa->alamat) }}</textarea>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Kewarganegaraan</label>
+                        <input type="text" name="kewarganegaraan" class="form-control" value="{{ old('kewarganegaraan', $siswa->kewarganegaraan) }}">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Dusun</label>
+                        <input type="text" name="dusun" class="form-control" value="{{ old('dusun', $siswa->dusun) }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">RT</label>
+                        <input type="text" name="rt" class="form-control" value="{{ old('rt', $siswa->rt) }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">RW</label>
+                        <input type="text" name="rw" class="form-control" value="{{ old('rw', $siswa->rw) }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Kode Pos</label>
+                        <input type="text" name="kode_pos" class="form-control" value="{{ old('kode_pos', $siswa->kode_pos) }}">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Kelurahan / Desa</label>
+                        <input type="text" name="kelurahan" class="form-control" value="{{ old('kelurahan', $siswa->kelurahan) }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Kecamatan</label>
+                        <input type="text" name="kecamatan" class="form-control" value="{{ old('kecamatan', $siswa->kecamatan) }}">
                     </div>
                 </div>
 

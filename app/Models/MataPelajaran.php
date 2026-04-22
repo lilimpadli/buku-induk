@@ -20,11 +20,6 @@ class MataPelajaran extends Model
         return $this->hasMany(NilaiRaport::class, 'mata_pelajaran_id');
     }
 
-    public function jurusan()
-    {
-        return $this->belongsTo(Jurusan::class, 'jurusan_id');
-    }
-
     public function kurikulums()
     {
         return $this->belongsToMany(Kurikulum::class, 'kurikulum_mata_pelajaran', 'mata_pelajaran_id', 'kurikulum_id');

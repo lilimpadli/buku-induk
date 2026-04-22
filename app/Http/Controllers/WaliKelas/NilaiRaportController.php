@@ -202,10 +202,16 @@ class NilaiRaportController extends Controller
 
                     if (!empty($currentJurusanId)) {
                         $kelompokA = $kelompokA->where(function($q) use ($currentJurusanId) {
-                            $q->whereNull('jurusan_id')->orWhere('jurusan_id', $currentJurusanId);
+                            $q->whereDoesntHave('jurusans')
+                              ->orWhereHas('jurusans', function($jq) use ($currentJurusanId) {
+                                  $jq->where('jurusan_id', $currentJurusanId);
+                              });
                         });
                         $kelompokB = $kelompokB->where(function($q) use ($currentJurusanId) {
-                            $q->whereNull('jurusan_id')->orWhere('jurusan_id', $currentJurusanId);
+                            $q->whereDoesntHave('jurusans')
+                              ->orWhereHas('jurusans', function($jq) use ($currentJurusanId) {
+                                  $jq->where('jurusan_id', $currentJurusanId);
+                              });
                         });
                     }
                 } catch (\Exception $e) {
@@ -330,10 +336,16 @@ class NilaiRaportController extends Controller
 
                     if (!empty($currentJurusanId)) {
                         $kelompokA = $kelompokA->where(function($q) use ($currentJurusanId) {
-                            $q->whereNull('jurusan_id')->orWhere('jurusan_id', $currentJurusanId);
+                            $q->whereDoesntHave('jurusans')
+                              ->orWhereHas('jurusans', function($jq) use ($currentJurusanId) {
+                                  $jq->where('jurusan_id', $currentJurusanId);
+                              });
                         });
                         $kelompokB = $kelompokB->where(function($q) use ($currentJurusanId) {
-                            $q->whereNull('jurusan_id')->orWhere('jurusan_id', $currentJurusanId);
+                            $q->whereDoesntHave('jurusans')
+                              ->orWhereHas('jurusans', function($jq) use ($currentJurusanId) {
+                                  $jq->where('jurusan_id', $currentJurusanId);
+                              });
                         });
                     }
                 } catch (\Exception $e) {
@@ -446,10 +458,16 @@ class NilaiRaportController extends Controller
 
                     if (!empty($currentJurusanId)) {
                         $kelompokA = $kelompokA->where(function($q) use ($currentJurusanId) {
-                            $q->whereNull('jurusan_id')->orWhere('jurusan_id', $currentJurusanId);
+                            $q->whereDoesntHave('jurusans')
+                              ->orWhereHas('jurusans', function($jq) use ($currentJurusanId) {
+                                  $jq->where('jurusan_id', $currentJurusanId);
+                              });
                         });
                         $kelompokB = $kelompokB->where(function($q) use ($currentJurusanId) {
-                            $q->whereNull('jurusan_id')->orWhere('jurusan_id', $currentJurusanId);
+                            $q->whereDoesntHave('jurusans')
+                              ->orWhereHas('jurusans', function($jq) use ($currentJurusanId) {
+                                  $jq->where('jurusan_id', $currentJurusanId);
+                              });
                         });
                     }
                 } catch (\Exception $e) {

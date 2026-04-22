@@ -81,6 +81,12 @@
                                 </div>
 
                                 <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Kewarganegaraan <span class="text-danger">*</span></label>
+                                    <input type="text" name="kewarganegaraan" class="form-control step1-field" value="{{ old('kewarganegaraan') }}" required>
+                                    @error('kewarganegaraan')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-4">
                                     <label class="form-label fw-semibold">Status Keluarga <span class="text-danger">*</span></label>
                                     <input type="text" name="status_keluarga" class="form-control step1-field" placeholder="Contoh: Anak Kandung" value="{{ old('status_keluarga') }}" required>
                                     @error('status_keluarga')<div class="text-danger small">{{ $message }}</div>@enderror
@@ -92,11 +98,45 @@
                                     @error('anak_ke')<div class="text-danger small">{{ $message }}</div>@enderror
                                 </div>
 
-                                <!-- Alamat, No HP -->
-                                <div class="col-md-12">
-                                    <label class="form-label fw-semibold">Alamat <span class="text-danger">*</span></label>
-                                    <textarea name="alamat" class="form-control step1-field" rows="3" required>{{ old('alamat') }}</textarea>
-                                    @error('alamat')<div class="text-danger small">{{ $message }}</div>@enderror
+                                <!-- ALAMAT TERSTRUKTUR -->
+                                <div class="col-12 mt-3">
+                                    <h5 class="mb-3">Alamat Siswa</h5>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Dusun <span class="text-danger">*</span></label>
+                                    <input type="text" name="dusun" class="form-control step1-field" value="{{ old('dusun') }}" required>
+                                    @error('dusun')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">RT <span class="text-danger">*</span></label>
+                                    <input type="text" name="rt" class="form-control step1-field" placeholder="001" value="{{ old('rt') }}" required>
+                                    @error('rt')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">RW <span class="text-danger">*</span></label>
+                                    <input type="text" name="rw" class="form-control step1-field" placeholder="001" value="{{ old('rw') }}" required>
+                                    @error('rw')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Kode Pos <span class="text-danger">*</span></label>
+                                    <input type="text" name="kode_pos" class="form-control step1-field" value="{{ old('kode_pos') }}" required>
+                                    @error('kode_pos')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Kelurahan / Desa <span class="text-danger">*</span></label>
+                                    <input type="text" name="kelurahan" class="form-control step1-field" value="{{ old('kelurahan') }}" required>
+                                    @error('kelurahan')<div class="text-danger small">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Kecamatan <span class="text-danger">*</span></label>
+                                    <input type="text" name="kecamatan" class="form-control step1-field" value="{{ old('kecamatan') }}" required>
+                                    @error('kecamatan')<div class="text-danger small">{{ $message }}</div>@enderror
                                 </div>
 
                                 <div class="col-md-4">

@@ -332,8 +332,8 @@
                         <div>
                             <div class="text-muted small">Jenis Kelamin</div>
                             @php
-                                $laki = $siswas->where('jenis_kelamin', 'L')->count();
-                                $perempuan = $siswas->where('jenis_kelamin', 'P')->count();
+                                $laki = $siswas->where('jenis_kelamin', 'Laki-laki')->count();
+                                $perempuan = $siswas->where('jenis_kelamin', 'Perempuan')->count();
                             @endphp
                             <div class="h5 mb-0" style="font-size: 1.1rem;">{{ $laki }}L / {{ $perempuan }}P</div>
                         </div>

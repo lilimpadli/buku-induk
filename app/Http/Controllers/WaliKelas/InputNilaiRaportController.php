@@ -122,14 +122,20 @@ class InputNilaiRaportController extends Controller
                 $q->whereIn('tingkat', $opts);
             });
 
-            // filter by jurusan: include global (jurusan_id NULL) and subjects for the student's jurusan
+            // filter by jurusan: include global (no jurusan association) and subjects for the student's jurusan
             if ($currentJurusanId) {
                 $kelompokA = $kelompokA->where(function($q) use ($currentJurusanId) {
-                    $q->whereNull('jurusan_id')->orWhere('jurusan_id', $currentJurusanId);
+                    $q->whereDoesntHave('jurusans')
+                      ->orWhereHas('jurusans', function($jq) use ($currentJurusanId) {
+                          $jq->where('jurusan_id', $currentJurusanId);
+                      });
                 });
 
                 $kelompokB = $kelompokB->where(function($q) use ($currentJurusanId) {
-                    $q->whereNull('jurusan_id')->orWhere('jurusan_id', $currentJurusanId);
+                    $q->whereDoesntHave('jurusans')
+                      ->orWhereHas('jurusans', function($jq) use ($currentJurusanId) {
+                          $jq->where('jurusan_id', $currentJurusanId);
+                      });
                 });
             }
         }
@@ -495,10 +501,16 @@ class InputNilaiRaportController extends Controller
 
             if ($currentJurusanId) {
                 $kelompokA = $kelompokA->where(function($q) use ($currentJurusanId) {
-                    $q->whereNull('jurusan_id')->orWhere('jurusan_id', $currentJurusanId);
+                    $q->whereDoesntHave('jurusans')
+                      ->orWhereHas('jurusans', function($jq) use ($currentJurusanId) {
+                          $jq->where('jurusan_id', $currentJurusanId);
+                      });
                 });
                 $kelompokB = $kelompokB->where(function($q) use ($currentJurusanId) {
-                    $q->whereNull('jurusan_id')->orWhere('jurusan_id', $currentJurusanId);
+                    $q->whereDoesntHave('jurusans')
+                      ->orWhereHas('jurusans', function($jq) use ($currentJurusanId) {
+                          $jq->where('jurusan_id', $currentJurusanId);
+                      });
                 });
             }
         }

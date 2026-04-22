@@ -35,89 +35,127 @@
     </div>
 
     <div class="card shadow-sm">
-        @if(count($alumni) > 0)
+        @if(count($groupedAlumni) > 0)
 
-            {{-- DESKTOP TABLE --}}
-            <div class="table-responsive d-none d-md-block">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 5%">#</th>
-                            <th style="width: 30%">Nama Siswa</th>
-                            <th style="width: 12%">NIS</th>
-                            <th style="width: 12%">NISN</th>
-                            <th style="width: 15%">Kelas</th>
-                            <th style="width: 15%">Rombel</th>
-                            <th style="width: 15%">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($alumni as $index => $data)
-                            <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        @if($data['siswa']->foto)
-                                            <img src="{{ asset('storage/' . $data['siswa']->foto) }}" class="rounded-circle" width="32" height="32" alt="{{ $data['siswa']->nama_lengkap }}" style="object-fit: cover;">
-                                        @else
-                                            <div class="avatar-initials rounded-circle bg-light d-flex align-items-center justify-content-center">
-                                                {{ strtoupper(substr($data['siswa']->nama_lengkap, 0, 1)) }}
-                                            </div>
-                                        @endif
-                                        <strong>{{ $data['siswa']->nama_lengkap }}</strong>
-                                    </div>
-                                </td>
-                                <td>{{ $data['siswa']->nis }}</td>
-                                <td>{{ $data['siswa']->nisn }}</td>
-                                <td><span class="badge bg-secondary">{{ $data['kelas'] }}</span></td>
-                                <td>{{ $data['rombel'] }}</td>
-                                <td>
-                                    <a href="{{ route('tu.alumni.show', $data['siswa']->id) }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-eye"></i> Detail
-                                    </a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-
-            {{-- MOBILE CARD LIST --}}
-            <div class="d-md-none">
-                @foreach($alumni as $index => $data)
-                    <div class="mobile-card {{ !$loop->last ? 'border-bottom' : '' }}">
-                        <div class="d-flex align-items-start justify-content-between gap-3">
-                            <div class="d-flex align-items-center gap-3 min-width-0">
-                                {{-- Avatar --}}
-                                @if($data['siswa']->foto)
-                                    <img src="{{ asset('storage/' . $data['siswa']->foto) }}" class="rounded-circle flex-shrink-0" width="44" height="44" alt="{{ $data['siswa']->nama_lengkap }}" style="object-fit: cover;">
-                                @else
-                                    <div class="avatar-initials-mobile rounded-circle bg-light d-flex align-items-center justify-content-center flex-shrink-0">
-                                        {{ strtoupper(substr($data['siswa']->nama_lengkap, 0, 1)) }}
-                                    </div>
-                                @endif
-
-                                {{-- Info --}}
-                                <div class="min-width-0">
-                                    <div class="fw-semibold text-truncate">{{ $data['siswa']->nama_lengkap }}</div>
-                                    <div class="text-muted" style="font-size: 13px;">
-                                        <span class="badge bg-secondary me-1">{{ $data['kelas'] }}</span>
-                                        {{ $data['rombel'] }}
-                                    </div>
+            {{-- DESKTOP GROUPED VIEW --}}
+            <div class="d-none d-md-block">
+                @foreach($groupedAlumni as $compositeKey => $groupData)
+                    <div class="rombel-section border-bottom last:border-bottom-0">
+                        <!-- Rombel Header -->
+                        <div class="rombel-header bg-light p-3" 
+                             data-bs-toggle="collapse" 
+                             data-bs-target="#rombel-{{ $loop->index }}" 
+                             style="cursor: pointer; background-color: #F1F5F9; border-bottom: 2px solid #E2E8F0;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-chevron-down collapse-icon" style="transition: transform 0.3s;"></i>
+                                    <h5 class="mb-0" style="color: #1E293B; font-weight: 600;">
+                                        {{ $groupData['display_name'] }}
+                                    </h5>
                                 </div>
+                                <span class="badge bg-primary">{{ count($groupData['students']) }} Siswa</span>
                             </div>
-
-                            {{-- Detail Button --}}
-                            <a href="{{ route('tu.alumni.show', $data['siswa']->id) }}" class="btn btn-sm btn-outline-primary flex-shrink-0">
-                                <i class="bi bi-eye"></i>
-                            </a>
                         </div>
 
-                        <div class="mobile-meta mt-2 ms-0 ms-sm-4 ps-0 ps-sm-3" style="margin-left: 60px;">
-                            <div class="d-flex flex-wrap gap-x-3 gap-y-1">
-                                <span><span class="text-muted">NIS:</span> {{ $data['siswa']->nis }}</span>
-                                <span><span class="text-muted">NISN:</span> {{ $data['siswa']->nisn }}</span>
+                        <!-- Students Table -->
+                        <div id="rombel-{{ $loop->index }}" class="collapse show">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 5%">#</th>
+                                            <th style="width: 35%">Nama Siswa</th>
+                                            <th style="width: 15%">NIS</th>
+                                            <th style="width: 15%">NISN</th>
+                                            <th style="width: 30%">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($groupData['students'] as $index => $data)
+                                            <tr>
+                                                <td>{{ $index + 1 }}</td>
+                                                <td>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        @if($data['siswa']->foto)
+                                                            <img src="{{ asset('storage/' . $data['siswa']->foto) }}" class="rounded-circle" width="32" height="32" alt="{{ $data['siswa']->nama_lengkap }}" style="object-fit: cover;">
+                                                        @else
+                                                            <div class="avatar-initials rounded-circle bg-light d-flex align-items-center justify-content-center">
+                                                                {{ strtoupper(substr($data['siswa']->nama_lengkap, 0, 1)) }}
+                                                            </div>
+                                                        @endif
+                                                        <strong>{{ $data['siswa']->nama_lengkap }}</strong>
+                                                    </div>
+                                                </td>
+                                                <td>{{ $data['siswa']->nis }}</td>
+                                                <td>{{ $data['siswa']->nisn }}</td>
+                                                <td>
+                                                    <a href="{{ route('tu.alumni.show', $data['siswa']->id) }}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="bi bi-eye"></i> Detail
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            {{-- MOBILE GROUPED CARD LIST --}}
+            <div class="d-md-none">
+                @foreach($groupedAlumni as $compositeKey => $groupData)
+                    <div class="mobile-rombel-section">
+                        <!-- Rombel Header Mobile -->
+                        <div class="mobile-rombel-header p-3 bg-light border-bottom" 
+                             data-bs-toggle="collapse" 
+                             data-bs-target="#rombel-mobile-{{ $loop->index }}" 
+                             style="cursor: pointer; background-color: #F1F5F9;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-chevron-down collapse-icon" style="transition: transform 0.3s;"></i>
+                                    <span class="fw-semibold" style="color: #1E293B;">{{ $groupData['display_name'] }}</span>
+                                </div>
+                                <span class="badge bg-primary" style="font-size: 11px;">{{ count($groupData['students']) }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Students Mobile Cards -->
+                        <div id="rombel-mobile-{{ $loop->index }}" class="collapse show">
+                            @foreach($groupData['students'] as $index => $data)
+                                <div class="mobile-card {{ !$loop->last ? 'border-bottom' : '' }}" style="padding: 12px 14px;">
+                                    <div class="d-flex align-items-start justify-content-between gap-3">
+                                        <div class="d-flex align-items-center gap-3 min-width-0">
+                                            {{-- Avatar --}}
+                                            @if($data['siswa']->foto)
+                                                <img src="{{ asset('storage/' . $data['siswa']->foto) }}" class="rounded-circle flex-shrink-0" width="40" height="40" alt="{{ $data['siswa']->nama_lengkap }}" style="object-fit: cover;">
+                                            @else
+                                                <div class="avatar-initials-mobile rounded-circle bg-light d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
+                                                    {{ strtoupper(substr($data['siswa']->nama_lengkap, 0, 1)) }}
+                                                </div>
+                                            @endif
+
+                                            {{-- Info --}}
+                                            <div class="min-width-0">
+                                                <div class="fw-semibold text-truncate">{{ $data['siswa']->nama_lengkap }}</div>
+                                            </div>
+                                        </div>
+
+                                        {{-- Detail Button --}}
+                                        <a href="{{ route('tu.alumni.show', $data['siswa']->id) }}" class="btn btn-sm btn-outline-primary flex-shrink-0">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </div>
+
+                                    <div class="mobile-meta mt-2" style="margin-left: 52px;">
+                                        <div class="d-flex flex-wrap gap-x-3 gap-y-1" style="font-size: 12px;">
+                                            <span><span class="text-muted">NIS:</span> {{ $data['siswa']->nis }}</span>
+                                            <span><span class="text-muted">NISN:</span> {{ $data['siswa']->nisn }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
                 @endforeach
@@ -129,6 +167,23 @@
             </div>
         @endif
     </div>
+
+    <script>
+        // Enhance collapse animation for chevron icon
+        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(header => {
+            const icon = header.querySelector('.collapse-icon');
+            const target = document.querySelector(header.dataset.bsTarget);
+            
+            if (target) {
+                target.addEventListener('show.bs.collapse', () => {
+                    icon.style.transform = 'rotate(180deg)';
+                });
+                target.addEventListener('hide.bs.collapse', () => {
+                    icon.style.transform = 'rotate(0deg)';
+                });
+            }
+        });
+    </script>
 </div>
 
 <style>

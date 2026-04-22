@@ -132,8 +132,8 @@ class AlumniController extends Controller
             ->orderBy('tahun_ajaran', 'desc')
             ->get();
 
-        // Filter berdasarkan jurusan
-        $alumni = [];
+        // Filter berdasarkan jurusan dan group berdasarkan kelas + rombel
+        $groupedAlumni = [];
         $namaJurusan = '';
         
         foreach ($kelulusan as $k) {
@@ -144,15 +144,34 @@ class AlumniController extends Controller
             
             if ($jurusan && (int) $jurusan->id === $jurusanId) {
                 $namaJurusan = $jurusan->nama;
-                $alumni[] = [
+                
+                // Composite key untuk grouping berdasarkan kelas + rombel
+                $kelasId = $kelas?->id ?? 0;
+                $rombelId = $rombel?->id ?? 0;
+                $compositeKey = $kelasId . '_' . $rombelId;
+                
+                $tingkat = $kelas?->tingkat ?? '-';
+                $rombelNama = $rombel?->nama ?? 'Rombel Tidak Diketahui';
+                
+                // Inisialisasi group jika belum ada
+                if (!isset($groupedAlumni[$compositeKey])) {
+                    $groupedAlumni[$compositeKey] = [
+                        'composite_key' => $compositeKey,
+                        'kelas_tingkat' => $tingkat,
+                        'rombel_nama' => $rombelNama,
+                        'display_name' => 'Kelas ' . $tingkat . ' - ' . $rombelNama,
+                        'students' => []
+                    ];
+                }
+                
+                // Tambahkan siswa ke group
+                $groupedAlumni[$compositeKey]['students'][] = [
                     'siswa' => $siswa,
-                    'kelas' => 'Kelas ' . $kelas?->tingkat . ' ' . $jurusan?->nama ?? '-',
-                    'rombel' => $rombel?->nama ?? '-',
                 ];
             }
         }
 
-        return view('tu.alumni.by-jurusan', compact('alumni', 'tahun', 'jurusanId', 'namaJurusan', 'tahunAjaranList'));
+        return view('tu.alumni.by-jurusan', compact('groupedAlumni', 'tahun', 'jurusanId', 'namaJurusan', 'tahunAjaranList'));
     }
 
     public function show($id)

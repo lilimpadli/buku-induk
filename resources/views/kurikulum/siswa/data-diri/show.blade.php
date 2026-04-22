@@ -563,8 +563,12 @@
                                 <td>: {{ $siswa->agama }}</td>
                             </tr>
                             <tr>
+                                <td>Kewarganegaraan</td>
+                                <td>: {{ $siswa->kewarganegaraan ?? '-' }}</td>
+                            </tr>
+                            <tr>
                                 <td>Alamat</td>
-                                <td>: {{ $siswa->alamat }}</td>
+                                <td>: Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</td>
                             </tr>
                             <tr>
                                 <td>No HP</td>

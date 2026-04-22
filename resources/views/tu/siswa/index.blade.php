@@ -358,7 +358,7 @@
         </a>
     </div>
 
-    <div class="mb-3 d-flex align-items-center gap-2">
+    <div class="mb-3 d-flex align-items-center gap-2 flex-wrap">
         <form id="exportForm" class="d-flex align-items-center gap-2">
             <select id="exportJurusan" class="form-select form-select-sm" style="width:240px">
                 <option value="">-- Pilih Jurusan untuk Export --</option>
@@ -369,6 +369,16 @@
 
             
             <a id="btnExportAngkatan" href="#" class="btn btn-outline-secondary btn-sm">Export Per Angkatan</a>
+        </form>
+
+        <form id="importForm" class="d-flex align-items-center gap-2">
+            <input type="file" id="importFile" name="import_file" accept=".xlsx,.xls,.csv" style="display:none;">
+            <a href="{{ route('tu.siswa.template.download') }}" class="btn btn-outline-info btn-sm" title="Download template import">
+                <i class="fas fa-download me-1"></i>Template
+            </a>
+            <button type="button" id="btnImportSiswa" class="btn btn-outline-success btn-sm">
+                <i class="fas fa-upload me-1"></i>Import Siswa
+            </button>
         </form>
     </div>
 
@@ -457,8 +467,8 @@
 
                                 @php
                                     $rombel = $siswa->rombel ?? null;
-                                    $rombelNama = $rombel->nama ?? null;
-                                    $tingkatVal = optional($rombel->kelas)->tingkat ?? null;
+                                    $rombelNama = $rombel ? ($rombel->nama ?? null) : null;
+                                    $tingkatVal = $rombel && $rombel->kelas ? ($rombel->kelas->tingkat ?? null) : null;
                                     $rombelWithoutTingkat = $rombelNama ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama) : null;
                                     $rombelWithoutTingkat = $rombelWithoutTingkat ? trim($rombelWithoutTingkat) : null;
                                     $formatted = $rombelWithoutTingkat ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat) : null;
@@ -514,8 +524,11 @@ document.addEventListener('DOMContentLoaded', function(){
     const select = document.getElementById('exportJurusan');
     const btnJ = document.getElementById('btnExportJurusan');
     const btnA = document.getElementById('btnExportAngkatan');
+    const btnImport = document.getElementById('btnImportSiswa');
+    const importFile = document.getElementById('importFile');
     const baseJurusan = "{{ url('tu/siswa/export/jurusan') }}";
     const baseAngkatan = "{{ url('tu/siswa/export/angkatan') }}";
+    const importUrl = "{{ route('tu.siswa.import') }}";
 
     function getId(){ return select ? select.value : null; }
 
@@ -534,6 +547,129 @@ document.addEventListener('DOMContentLoaded', function(){
             const id = getId();
             if(!id){ alert('Pilih jurusan terlebih dahulu'); return; }
             window.location = baseAngkatan + '/' + id;
+        });
+    }
+
+    // Import functionality
+    if(btnImport){
+        btnImport.addEventListener('click', function(e){
+            e.preventDefault();
+            importFile.click();
+        });
+    }
+
+    if(importFile){
+        importFile.addEventListener('change', function(e){
+            if(!this.files || this.files.length === 0) return;
+            
+            const fileName = this.files[0].name;
+            const fileSize = (this.files[0].size / 1024 / 1024).toFixed(2); // Size in MB
+            
+            console.log(`Uploading file: ${fileName} (${fileSize} MB)`);
+
+            const formData = new FormData();
+            formData.append('file', this.files[0]);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            // Show loading indicator
+            const originalBtnText = btnImport.innerHTML;
+            btnImport.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Proses...';
+            btnImport.disabled = true;
+
+            fetch(importUrl, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                // Log response info
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                btnImport.innerHTML = originalBtnText;
+                btnImport.disabled = false;
+
+                console.log('Import result:', data);
+
+                if(data.success){
+                    // Success message
+                    let message = data.message || 'Import berhasil';
+                    
+                    if(data.warnings && data.warnings.length > 0) {
+                        // Show success with warnings
+                        let warningHtml = '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
+                        warningHtml += '<i class="fas fa-exclamation-triangle me-2"></i>';
+                        warningHtml += '<strong>Peringatan:</strong> ' + message + '<br>';
+                        warningHtml += '<small>';
+                        data.warnings.slice(0, 5).forEach(warning => {
+                            warningHtml += '• ' + warning + '<br>';
+                        });
+                        if(data.warning_count > 5) {
+                            warningHtml += '• ... dan ' + (data.warning_count - 5) + ' peringatan lainnya';
+                        }
+                        warningHtml += '</small>';
+                        warningHtml += '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+                        warningHtml += '</div>';
+                        
+                        // Insert warning before the card
+                        const alertContainer = document.createElement('div');
+                        alertContainer.innerHTML = warningHtml;
+                        document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.card'));
+                    } else {
+                        // Show pure success
+                        let successHtml = '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+                        successHtml += '<i class="fas fa-check-circle me-2"></i>' + message;
+                        successHtml += '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+                        successHtml += '</div>';
+                        
+                        const alertContainer = document.createElement('div');
+                        alertContainer.innerHTML = successHtml;
+                        document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.card'));
+                    }
+
+                    // Reload page after 2 seconds
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    // Error message
+                    let errorHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                    errorHtml += '<i class="fas fa-times-circle me-2"></i>';
+                    errorHtml += '<strong>Error:</strong> ' + (data.message || 'Import gagal') + '<br>';
+                    if(data.errors && data.errors.length > 0) {
+                        errorHtml += '<small>';
+                        data.errors.slice(0, 5).forEach(error => {
+                            errorHtml += '• ' + error + '<br>';
+                        });
+                        if(data.errors.length > 5) {
+                            errorHtml += '• ... dan ' + (data.errors.length - 5) + ' error lainnya';
+                        }
+                        errorHtml += '</small>';
+                    }
+                    errorHtml += '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+                    errorHtml += '</div>';
+                    
+                    const alertContainer = document.createElement('div');
+                    alertContainer.innerHTML = errorHtml;
+                    document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.card'));
+                }
+            })
+            .catch(error => {
+                btnImport.innerHTML = originalBtnText;
+                btnImport.disabled = false;
+                
+                console.error('Error:', error);
+                let errorHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                errorHtml += '<i class="fas fa-exclamation-circle me-2"></i>';
+                errorHtml += 'Terjadi kesalahan saat mengupload file: ' + error.message;
+                errorHtml += '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+                errorHtml += '</div>';
+                
+                const alertContainer = document.createElement('div');
+                alertContainer.innerHTML = errorHtml;
+                document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.card'));
+            });
+
+            // Reset file input
+            this.value = '';
         });
     }
 });

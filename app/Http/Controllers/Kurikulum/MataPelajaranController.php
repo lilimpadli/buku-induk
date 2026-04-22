@@ -22,11 +22,10 @@ class MataPelajaranController extends Controller
         $query = MataPelajaran::query();
 
         if ($jurusan) {
-            // only apply jurusan filter if the column exists in the table
-            if (Schema::hasColumn('mata_pelajarans', 'jurusan_id')) {
-                $query->where('jurusan_id', $jurusan);
-            }
-            // otherwise skip jurusan filtering (legacy schema)
+            // Use many-to-many relationship instead of direct jurusan_id column
+            $query->whereHas('jurusans', function($q) use ($jurusan) {
+                $q->where('jurusans.id', $jurusan);
+            });
         }
 
         if ($tingkat) {

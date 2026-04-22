@@ -310,13 +310,14 @@
                             <tr><th>Jenis Kelamin</th><td>{{ $s->jenis_kelamin }}</td></tr>
                             <tr><th>Tempat, Tanggal Lahir</th><td>{{ $s->tempat_lahir ?? '-' }}, {{ $s->tanggal_lahir ?? '-' }}</td></tr>
                             <tr><th>Agama</th><td>{{ $s->agama ?? '-' }}</td></tr>
+                            <tr><th>Kewarganegaraan</th><td>{{ $s->kewarganegaraan ?? '-' }}</td></tr>
                             <tr><th>Status Keluarga</th><td>{{ $s->status_keluarga ?? '-' }}</td></tr>
                             <tr><th>Anak Ke</th><td>{{ $s->anak_ke ?? '-' }}</td></tr>
                         </table>
                     </div>
                     <div class="col-md-6">
                         <table class="table table-borderless table-sm">
-                            <tr><th>Alamat</th><td>{{ $s->alamat ?? '-' }}</td></tr>
+                            <tr><th>Alamat</th><td>Dusun {{ $s->dusun ?? '-' }}, RT/RW {{ $s->rt ?? '-' }}/{{ $s->rw ?? '-' }}, {{ $s->kelurahan ?? '-' }}, {{ $s->kecamatan ?? '-' }}, {{ $s->kode_pos ?? '-' }}</td></tr>
                             <tr><th>Sekolah Asal</th><td>{{ $s->sekolah_asal ?? '-' }}</td></tr>
                             <tr><th>Tanggal Diterima</th><td>{{ $s->tanggal_diterima ?? '-' }}</td></tr>
                             <tr><th>Rombel</th><td>{{ $s->rombel->nama ?? ($s->rombel_id ? 'Rombel #' . $s->rombel_id : '-') }}</td></tr>

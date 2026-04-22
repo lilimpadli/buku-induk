@@ -639,10 +639,16 @@ class TUController extends Controller
 
                     if (!empty($currentJurusanId)) {
                         $kelompokA = $kelompokA->where(function($q) use ($currentJurusanId) {
-                            $q->whereNull('jurusan_id')->orWhere('jurusan_id', $currentJurusanId);
+                            $q->whereDoesntHave('jurusans')
+                              ->orWhereHas('jurusans', function($jq) use ($currentJurusanId) {
+                                  $jq->where('jurusan_id', $currentJurusanId);
+                              });
                         });
                         $kelompokB = $kelompokB->where(function($q) use ($currentJurusanId) {
-                            $q->whereNull('jurusan_id')->orWhere('jurusan_id', $currentJurusanId);
+                            $q->whereDoesntHave('jurusans')
+                              ->orWhereHas('jurusans', function($jq) use ($currentJurusanId) {
+                                  $jq->where('jurusan_id', $currentJurusanId);
+                              });
                         });
                     }
                 } catch (\Exception $e) {
@@ -976,7 +982,13 @@ class TUController extends Controller
             'tempat_lahir'     => 'nullable|string|max:255',
             'tanggal_lahir'    => 'nullable|date',
             'agama'            => 'nullable|string|max:50',
-            'alamat'           => 'nullable|string|max:1000',
+            'kewarganegaraan'  => 'nullable|string|max:100',
+            'dusun'            => 'nullable|string|max:255',
+            'rt'               => 'nullable|string|max:10',
+            'rw'               => 'nullable|string|max:10',
+            'kelurahan'        => 'nullable|string|max:255',
+            'kecamatan'        => 'nullable|string|max:255',
+            'kode_pos'         => 'nullable|string|max:10',
             'no_hp'            => 'nullable|string|max:30',
             'tanggal_diterima' => 'nullable|date',
             'kelas'            => 'nullable|string|max:50',
@@ -1014,7 +1026,13 @@ class TUController extends Controller
                 $siswa->tanggal_lahir = $request->input('tanggal_lahir');
             }
             $siswa->agama = $request->input('agama');
-            $siswa->alamat = $request->input('alamat');
+            $siswa->kewarganegaraan = $request->input('kewarganegaraan');
+            $siswa->dusun = $request->input('dusun');
+            $siswa->rt = $request->input('rt');
+            $siswa->rw = $request->input('rw');
+            $siswa->kelurahan = $request->input('kelurahan');
+            $siswa->kecamatan = $request->input('kecamatan');
+            $siswa->kode_pos = $request->input('kode_pos');
             $siswa->no_hp = $request->input('no_hp');
             if ($request->filled('tanggal_diterima')) {
                 $siswa->tanggal_diterima = $request->input('tanggal_diterima');
@@ -1157,6 +1175,113 @@ class TUController extends Controller
             DB::rollBack();
             return redirect()->back()
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Download template import data diri siswa
+     */
+    public function downloadSiswaTemplate()
+    {
+        $filename = 'Template_Import_Data_Diri_Siswa_' . date('Y-m-d') . '.xlsx';
+        return Excel::download(new \App\Exports\SiswaImportTemplate(), $filename);
+    }
+
+    /**
+     * Import data diri siswa dari file Excel
+     */
+    public function importSiswa(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:5120',
+        ], [
+            'file.required' => 'File tidak boleh kosong',
+            'file.mimes' => 'Format file harus .xlsx, .xls, atau .csv',
+            'file.max' => 'Ukuran file maksimal 5MB',
+        ]);
+
+        try {
+            Log::info('Starting siswa import', [
+                'filename' => $request->file('file')->getClientOriginalName(),
+                'size' => $request->file('file')->getSize(),
+            ]);
+
+            $import = new \App\Imports\SiswaImport();
+            Excel::import($import, $request->file('file'));
+
+            $successCount = $import->getSuccessCount();
+            $errors = $import->getErrors();
+            $processedRows = $import->getProcessedRows();
+            $skippedEmptyRows = $import->getSkippedEmptyRows();
+            $totalRows = $import->getRowCount();
+
+            Log::info('Siswa import completed', [
+                'success' => $successCount,
+                'errors_count' => count($errors),
+                'processed_rows' => $processedRows,
+                'skipped_empty' => $skippedEmptyRows,
+                'total_rows' => $totalRows,
+            ]);
+
+            if ($successCount > 0) {
+                $message = "Import berhasil: {$successCount} data siswa berhasil diimport";
+                
+                if (count($errors) > 0) {
+                    // Return with partial success and warnings
+                    return response()->json([
+                        'success' => true,
+                        'message' => $message,
+                        'warnings' => $errors,
+                        'warning_count' => count($errors),
+                    ]);
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                ]);
+            } else {
+                // No success, provide detailed diagnostic message
+                $diagnostics = [];
+                $diagnostics[] = "Total baris di file: {$totalRows}";
+                $diagnostics[] = "Baris dengan data: {$processedRows}";
+                $diagnostics[] = "Baris kosong: {$skippedEmptyRows}";
+                
+                $errorMessage = "Tidak ada data yang berhasil diimport.\n\n";
+                
+                if ($totalRows <= 1) {
+                    $errorMessage .= "⚠️ File Anda hanya memiliki " . $totalRows . " baris (kemungkinan hanya HEADER).\n";
+                    $errorMessage .= "Pastikan data siswa sudah diisi di baris kedua dan seterusnya.\n";
+                } elseif ($processedRows === 0 && $skippedEmptyRows > 0) {
+                    $errorMessage .= "⚠️ Semua baris data kosong atau hanya header.\n";
+                    $errorMessage .= "Pastikan ada isi di kolom: NIS, NISN, atau Nama Lengkap.\n";
+                } elseif (count($errors) > 0) {
+                    $errorMessage .= "Terdapat " . count($errors) . " error:\n";
+                    $errorMessage .= implode("\n", array_slice($errors, 0, 10));
+                    if (count($errors) > 10) {
+                        $errorMessage .= "\n... dan " . (count($errors) - 10) . " error lainnya";
+                    }
+                }
+                
+                $errorMessage .= "\n\nDiagnostik:\n" . implode("\n", $diagnostics);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Import gagal: ' . $errorMessage,
+                    'errors' => $errors,
+                    'diagnostics' => $diagnostics,
+                ], 422);
+            }
+        } catch (\Exception $e) {
+            Log::error('Siswa import error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengimport file: ' . $e->getMessage(),
+            ], 500);
         }
     }
     

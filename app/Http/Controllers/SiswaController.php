@@ -109,7 +109,13 @@ class SiswaController extends Controller
             'tempat_lahir'     => 'required|string|max:255',
             'tanggal_lahir'    => 'required|date',
             'agama'            => 'required|string|max:50',
-            'alamat'           => 'required|string',
+            'kewarganegaraan'  => 'required|string|max:100',
+            'dusun'            => 'required|string|max:255',
+            'rt'               => 'required|string|max:10',
+            'rw'               => 'required|string|max:10',
+            'kelurahan'        => 'required|string|max:255',
+            'kecamatan'        => 'required|string|max:255',
+            'kode_pos'         => 'required|string|max:10',
             'no_hp'            => 'required|string|max:20',
 
             // Data Ayah
@@ -168,7 +174,13 @@ class SiswaController extends Controller
             'tempat_lahir' => $request->tempat_lahir,
             'tanggal_lahir' => $request->tanggal_lahir,
             'agama' => $request->agama,
-            'alamat' => $request->alamat,
+            'kewarganegaraan' => $request->kewarganegaraan,
+            'dusun' => $request->dusun,
+            'rt' => $request->rt,
+            'rw' => $request->rw,
+            'kelurahan' => $request->kelurahan,
+            'kecamatan' => $request->kecamatan,
+            'kode_pos' => $request->kode_pos,
             'no_hp' => $request->no_hp,
             'ayah_id' => $ayah->id,
             'ibu_id' => $ibu->id,
@@ -205,11 +217,17 @@ class SiswaController extends Controller
             'tempat_lahir'     => 'required|string|max:255',
             'tanggal_lahir'    => 'required|date',
             'agama'            => 'required|string|max:50',
+            'kewarganegaraan'  => 'required|string|max:100',
             'status_keluarga'  => 'required|string|max:50',
             'anak_ke'          => 'required|integer|min:1',
             'sekolah_asal'     => 'required|string|max:255',
             'tanggal_diterima' => 'required|date',
-            'alamat'           => 'required|string',
+            'dusun'            => 'required|string|max:255',
+            'rt'               => 'required|string|max:10',
+            'rw'               => 'required|string|max:10',
+            'kelurahan'        => 'required|string|max:255',
+            'kecamatan'        => 'required|string|max:255',
+            'kode_pos'         => 'required|string|max:10',
             'no_hp'            => 'required|string|max:20',
 
             // Data Ayah
@@ -239,11 +257,17 @@ class SiswaController extends Controller
             'tempat_lahir' => $request->tempat_lahir,
             'tanggal_lahir' => $request->tanggal_lahir,
             'agama' => $request->agama,
+            'kewarganegaraan' => $request->kewarganegaraan,
             'status_keluarga' => $request->status_keluarga,
             'anak_ke' => $request->anak_ke,
             'sekolah_asal' => $request->sekolah_asal,
             'tanggal_diterima' => $request->tanggal_diterima,
-            'alamat' => $request->alamat,
+            'dusun' => $request->dusun,
+            'rt' => $request->rt,
+            'rw' => $request->rw,
+            'kelurahan' => $request->kelurahan,
+            'kecamatan' => $request->kecamatan,
+            'kode_pos' => $request->kode_pos,
             'no_hp' => $request->no_hp,
         ]);
 
@@ -744,8 +768,10 @@ class SiswaController extends Controller
         if ($siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan) {
             $jurusanId = $siswa->rombel->kelas->jurusan->id;
             
-            // Get all mata pelajaran for this specific jurusan
-            $mapels = MataPelajaran::where('jurusan_id', $jurusanId)
+            // Get all mata pelajaran for this specific jurusan (via many-to-many relationship)
+            $mapels = MataPelajaran::whereHas('jurusans', function($q) use ($jurusanId) {
+                                       $q->where('jurusan_id', $jurusanId);
+                                   })
                                    ->orderBy('kelompok')
                                    ->orderBy('urutan')
                                    ->get();
@@ -811,7 +837,9 @@ class SiswaController extends Controller
         if (empty($mapelByKelompok) && !($siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan)) {
             $firstJurusan = Jurusan::first();
             if ($firstJurusan) {
-                $mapels = MataPelajaran::where('jurusan_id', $firstJurusan->id)
+                $mapels = MataPelajaran::whereHas('jurusans', function($q) use ($firstJurusan) {
+                                           $q->where('jurusan_id', $firstJurusan->id);
+                                       })
                                        ->orderBy('kelompok')
                                        ->orderBy('urutan')
                                        ->get();

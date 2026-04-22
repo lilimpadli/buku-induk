@@ -472,6 +472,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/siswa/export/jurusan/{jurusanId}', [TUController::class, 'exportSiswaByJurusan'])->name('siswa.export.jurusan');
             Route::get('/siswa/export/angkatan/{jurusanId}', [TUController::class, 'exportSiswaByAngkatan'])->name('siswa.export.angkatan');
             Route::get('/siswa/{id}/export-pdf', [TUController::class, 'siswaExportPdf'])->name('siswa.exportPDF');
+            Route::get('/siswa/template/download', [TUController::class, 'downloadSiswaTemplate'])->name('siswa.template.download');
+            Route::post('/siswa/import', [TUController::class, 'importSiswa'])->name('siswa.import');
             Route::get('/siswa/create', [TUController::class, 'siswaCreate'])->name('siswa.create');
             Route::post('/siswa', [TUController::class, 'siswaStore'])->name('siswa.store');
             Route::get('/siswa/{id}', [TUController::class, 'siswaDetail'])->name('siswa.detail');
@@ -528,6 +530,8 @@ Route::middleware(['auth'])->group(function () {
 
             // Mutasi Siswa (TU)
             Route::get('/mutasi/laporan', [MutasiController::class, 'laporan'])->name('mutasi.laporan');
+            Route::post('/mutasi/bulk', [MutasiController::class, 'bulk'])->name('mutasi.bulk');
+            Route::post('/mutasi/up-all', [MutasiController::class, 'upAll'])->name('mutasi.up-all');
             Route::resource('/mutasi', MutasiController::class)->names('mutasi');
 
             // Buku Induk (TU)

@@ -264,13 +264,14 @@
                                 <p class="info-item"><strong>NIS:</strong> {{ $siswa->nis }}</p>
                                 <p class="info-item"><strong>NISN:</strong> {{ $siswa->nisn ?? '-' }}</p>
                                 <p class="info-item"><strong>Nama Lengkap:</strong> {{ $siswa->nama_lengkap }}</p>
-                                <p class="info-item"><strong>Jenis Kelamin:</strong> {{ $siswa->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</p>
+                                <p class="info-item"><strong>Jenis Kelamin:</strong> {{ $siswa->jenis_kelamin }}</p>
                             </div>
                             <div class="col-12 col-md-6">
                                 <p class="info-item"><strong>Tempat Lahir:</strong> {{ $siswa->tempat_lahir ?? '-' }}</p>
                                 <p class="info-item"><strong>Tanggal Lahir:</strong> {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d F Y') : '-' }}</p>
                                 <p class="info-item"><strong>Agama:</strong> {{ $siswa->agama ?? '-' }}</p>
-                                <p class="info-item"><strong>Alamat:</strong> {{ $siswa->alamat ?? '-' }}</p>
+                                <p class="info-item"><strong>Kewarganegaraan:</strong> {{ $siswa->kewarganegaraan ?? '-' }}</p>
+                                <p class="info-item"><strong>Alamat:</strong> Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</p>
                             </div>
                         </div>
                     </div>

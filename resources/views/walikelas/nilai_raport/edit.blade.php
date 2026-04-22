@@ -451,7 +451,7 @@
                     <div class="col-md-6">
                         <label>Status</label>
                         @php
-                            $kStatus = strtolower(str_replace([' ', '_'], '', trim($kenaikan->status ?? '')));
+                            $kStatus = strtolower(str_replace([' ', '_'], '', trim($kenaikan?->status ?? '')));
                         @endphp
                         <select name="kenaikan[status]" class="form-control" id="statusKenaikanSelect">
                             <option value="Naik Kelas" {{ in_array($kStatus, ['naik','naikkelas']) ? 'selected' : '' }}>Naik Kelas</option>
@@ -463,13 +463,13 @@
                         <label>Ke Kelas</label>
                         @php
                             $rombelSource = isset($rombelsFiltered) && $rombelsFiltered->count() > 0 ? $rombelsFiltered : $rombels;
-                            $statusNorm = strtolower(str_replace([' ', '_'], '', trim($kenaikan->status ?? '')));
+                            $statusNorm = strtolower(str_replace([' ', '_'], '', trim($kenaikan?->status ?? '')));
                             $rombelDisabled = ($semester && strtolower($semester) === 'ganjil') || ($statusNorm !== 'naikkelas');
                         @endphp
                         <select name="kenaikan[rombel_tujuan_id]" class="form-control" id="rombelTujuanSelect" {{ $rombelDisabled ? 'disabled' : '' }}>
                             <option value="">-- Pilih Kelas --</option>
                             @foreach($rombelSource as $rombel)
-                                <option value="{{ $rombel->id }}" {{ ($kenaikan->rombel_tujuan_id == $rombel->id) ? 'selected' : '' }}>
+                                <option value="{{ $rombel->id }}" {{ ($kenaikan && $kenaikan->rombel_tujuan_id == $rombel->id) ? 'selected' : '' }}>
                                     {{ $rombel->nama }} @if(isset($rombel->kelas)) ({{ $rombel->kelas->tingkat }} - {{ $rombel->kelas->jurusan->nama ?? '' }}) @endif
                                 </option>
                             @endforeach
@@ -484,7 +484,7 @@
                 <div class="mt-3">
                     <label>Catatan</label>
                     <textarea name="kenaikan[catatan]" class="form-control"
-                        rows="2">{{ $kenaikan->catatan ?? '' }}</textarea>
+                        rows="2">{{ $kenaikan?->catatan ?? '' }}</textarea>
                 </div>
             </div>
         </div>

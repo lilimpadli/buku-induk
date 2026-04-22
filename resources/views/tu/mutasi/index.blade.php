@@ -433,6 +433,12 @@
             <a href="{{ route('tu.mutasi.create') }}" class="btn btn-primary btn-sm">
                 <i class="fas fa-plus me-1"></i> Tambah Mutasi
             </a>
+            <button type="button" id="bulkMutasiBtn" class="btn btn-success btn-sm" style="display: none;">
+                <i class="fas fa-arrow-up me-1"></i> Naik Kelas (<span id="selectedCount">0</span>)
+            </button>
+            <button type="button" id="upAllBtn" class="btn btn-info btn-sm" onclick="confirmUpAll()">
+                <i class="fas fa-arrow-up me-1"></i> UP ALL
+            </button>
             <a href="{{ route('tu.mutasi.laporan') }}" class="btn btn-info btn-sm">
                 <i class="fas fa-file-pdf me-1"></i> Laporan
             </a>
@@ -469,9 +475,12 @@
     <!-- Desktop Table View -->
     <div class="card">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover mb-0" id="mutasiTable">
                 <thead class="table-light">
                     <tr>
+                        <th style="width: 40px;">
+                            <input type="checkbox" id="selectAll" class="form-check-input">
+                        </th>
                         <th style="width: 50px;">No</th>
                         <th>NIS</th>
                         <th>Nama Siswa</th>
@@ -484,6 +493,9 @@
                 <tbody>
                     @forelse($mutasis as $index => $mutasi)
                         <tr>
+                            <td>
+                                <input type="checkbox" class="form-check-input mutasi-checkbox" value="{{ $mutasi->siswa->id }}">
+                            </td>
                             <td class="text-center">{{ $mutasis->firstItem() + $index }}</td>
                             <td class="text-center"><strong>{{ $mutasi->siswa->nis }}</strong></td>
                             <td>{{ $mutasi->siswa->nama_lengkap }}</td>
@@ -524,7 +536,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center py-5">
+                            <td colspan="8" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-inbox"></i>
                                     <p class="mt-3 mb-0">Belum ada data mutasi siswa</p>
@@ -616,6 +628,271 @@
             return new bootstrap.Tooltip(tooltipTriggerEl)
         })
     });
+
+    // Handle Select All
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const mutasiCheckboxes = document.querySelectorAll('.mutasi-checkbox');
+    const bulkMutasiBtn = document.getElementById('bulkMutasiBtn');
+    const selectedCount = document.getElementById('selectedCount');
+
+    function updateBulkButton() {
+        const checkedCount = document.querySelectorAll('.mutasi-checkbox:checked').length;
+        selectedCount.textContent = checkedCount;
+        if (checkedCount > 0) {
+            bulkMutasiBtn.style.display = 'inline-block';
+        } else {
+            bulkMutasiBtn.style.display = 'none';
+        }
+    }
+
+    selectAllCheckbox.addEventListener('change', function() {
+        mutasiCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateBulkButton();
+    });
+
+    mutasiCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const allChecked = Array.from(mutasiCheckboxes).every(cb => cb.checked);
+            const someChecked = Array.from(mutasiCheckboxes).some(cb => cb.checked);
+            selectAllCheckbox.checked = allChecked;
+            selectAllCheckbox.indeterminate = someChecked && !allChecked;
+            updateBulkButton();
+        });
+    });
+
+    // Handle Bulk Mutasi
+    bulkMutasiBtn.addEventListener('click', function() {
+        const selectedSiswaIds = Array.from(document.querySelectorAll('.mutasi-checkbox:checked'))
+            .map(checkbox => checkbox.value);
+        
+        if (selectedSiswaIds.length === 0) {
+            alert('Pilih minimal satu siswa');
+            return;
+        }
+
+        // Show bulk mutasi modal
+        const bulkMutasiModal = new bootstrap.Modal(document.getElementById('bulkMutasiModal'));
+        bulkMutasiModal.show();
+        
+        // Store selected IDs in form
+        document.getElementById('selectedSiswaIds').value = selectedSiswaIds.join(',');
+    });
+
+    // Form submission for bulk mutasi
+    document.getElementById('bulkMutasiForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const selectedSiswaIds = document.getElementById('selectedSiswaIds').value.split(',');
+        const kelasId = document.getElementById('kelasIdInput').value;
+        const rombelId = document.getElementById('rombelIdInput').value;
+        const keterangan = document.getElementById('keteranganInput').value;
+
+        if (!kelasId) {
+            alert('Pilih kelas tujuan');
+            return;
+        }
+
+        // AJAX request
+        fetch('{{ route("tu.mutasi.bulk") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                siswa_ids: selectedSiswaIds,
+                kelas_id: kelasId,
+                rombel_id: rombelId,
+                keterangan: keterangan
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Mutasi berhasil dilakukan untuk ' + data.count + ' siswa');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan');
+        });
+    });
+
+    // Handle UP ALL
+    function confirmUpAll() {
+        // Show modal untuk input tahun ajaran
+        const modal = new bootstrap.Modal(document.getElementById('upAllModal'));
+        modal.show();
+    }
+
+    function performUpAll() {
+        const tahunAjaran = document.getElementById('tahunAjaranInput').value;
+        
+        if (!tahunAjaran) {
+            alert('Tahun ajaran harus diisi!');
+            return;
+        }
+
+        // Hide modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('upAllModal'));
+        modal.hide();
+
+        // Show loading state
+        const upAllBtn = document.getElementById('upAllBtn');
+        const originalHtml = upAllBtn.innerHTML;
+        upAllBtn.disabled = true;
+        upAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Loading...';
+
+        // AJAX request dengan tahun ajaran
+        fetch('{{ route("tu.mutasi.up-all") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                tahun_ajaran: tahunAjaran
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            upAllBtn.disabled = false;
+            upAllBtn.innerHTML = originalHtml;
+
+            if (data.success) {
+                const message = `✓ SUKSES!\n\n` +
+                               `Siswa Naik Kelas: ${data.naik_kelas}\n` +
+                               `Siswa Lulus: ${data.lulus}\n\n` +
+                               `Total: ${data.naik_kelas + data.lulus}`;
+                
+                alert(message);
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            upAllBtn.disabled = false;
+            upAllBtn.innerHTML = originalHtml;
+            alert('Terjadi kesalahan: ' + error.message);
+        });
+    }
 </script>
 @endpush
+
+<!-- Modal UP ALL -->
+<div class="modal fade" id="upAllModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-arrow-up text-info me-2"></i>UP ALL - Naik Semua Kelas
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <strong><i class="fas fa-exclamation-triangle me-2"></i>Perhatian!</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>✓ Naik semua siswa kelas X ke XI</li>
+                        <li>✓ Naik semua siswa kelas XI ke XII</li>
+                        <li>✓ Lulus semua siswa kelas XII</li>
+                    </ul>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tahun Ajaran <span class="text-danger">*</span></label>
+                    <input type="text" id="tahunAjaranInput" class="form-control" 
+                        placeholder="Cth: 2025/2026" required>
+                    <small class="text-muted">Format: YYYY/YYYY (Contoh: 2025/2026)</small>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>Info:</strong> Tahun ajaran akan disimpan untuk siswa yang lulus sehingga terlihat di Buku Induk Alumni.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-info" onclick="performUpAll()">
+                    <i class="fas fa-arrow-up me-1"></i>Lanjutkan UP ALL
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Bulk Mutasi -->
+<div class="modal fade" id="bulkMutasiModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Naik Kelas Siswa Terpilih</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="bulkMutasiForm">
+                <div class="modal-body">
+                    <input type="hidden" id="selectedSiswaIds">
+
+                    <div class="mb-3">
+                        <label class="form-label">Kelas Tujuan <span class="text-danger">*</span></label>
+                        <select id="kelasIdInput" class="form-select" required>
+                            <option value="">-- Pilih Kelas --</option>
+                            @php
+                                $kelas = \App\Models\Kelas::with('jurusan')->orderBy('tingkat')->get();
+                            @endphp
+                            @foreach($kelas as $k)
+                                <option value="{{ $k->id }}">{{ $k->tingkat }} - {{ $k->jurusan->nama ?? 'N/A' }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Rombongan Belajar</label>
+                        <select id="rombelIdInput" class="form-select">
+                            <option value="">-- Pilih Rombel (Opsional) --</option>
+                            @php
+                                $rombel = \App\Models\Rombel::with('kelas.jurusan')->orderBy('nama')->get();
+                            @endphp
+                            @foreach($rombel as $r)
+                                <option value="{{ $r->id }}">{{ $r->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Keterangan</label>
+                        <textarea id="keteranganInput" class="form-control" rows="3" placeholder="Opsional"></textarea>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>Jumlah siswa:</strong> <span id="bulkSiswaCount">0</span> siswa akan dinaikkan kelasnya
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check me-1"></i> Naik Kelas
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Update bulk siswa count in modal
+    const bulkMutasiBtn2 = document.getElementById('bulkMutasiBtn');
+    if (bulkMutasiBtn2) {
+        bulkMutasiBtn2.addEventListener('click', function() {
+            const count = document.querySelectorAll('.mutasi-checkbox:checked').length;
+            document.getElementById('bulkSiswaCount').textContent = count;
+        });
+    }
+</script>
 @endsection

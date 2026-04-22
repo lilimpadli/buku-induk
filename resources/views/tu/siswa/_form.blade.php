@@ -78,4 +78,74 @@
         <label class="form-label fw-semibold">Konfirmasi Password</label>
         <input type="password" name="password_confirmation" class="form-control" {{ isset($siswa) ? '' : 'required' }}>
     </div>
+
+    <!-- DATA PRIBADI SISWA -->
+    <div class="col-12 mt-4">
+        <h5 class="border-bottom pb-2 fw-semibold">Data Pribadi Siswa</h5>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">Tempat Lahir</label>
+        <input type="text" name="tempat_lahir" class="form-control" value="{{ old('tempat_lahir', $siswa->tempat_lahir ?? '') }}">
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">Tanggal Lahir</label>
+        <input type="date" name="tanggal_lahir" class="form-control" value="{{ old('tanggal_lahir', $siswa->tanggal_lahir ?? '') }}">
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold">Agama</label>
+        <input type="text" name="agama" class="form-control" value="{{ old('agama', $siswa->agama ?? '') }}">
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold">Kewarganegaraan</label>
+        <input type="text" name="kewarganegaraan" class="form-control" value="{{ old('kewarganegaraan', $siswa->kewarganegaraan ?? '') }}">
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold">No HP</label>
+        <input type="text" name="no_hp" class="form-control" value="{{ old('no_hp', $siswa->no_hp ?? '') }}">
+    </div>
+
+    <!-- ALAMAT TERSTRUKTUR -->
+    <div class="col-12 mt-4">
+        <h5 class="border-bottom pb-2 fw-semibold">Alamat Siswa</h5>
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label fw-semibold">Dusun</label>
+        <input type="text" name="dusun" class="form-control" value="{{ old('dusun', $siswa->dusun ?? '') }}">
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label fw-semibold">RT</label>
+        <input type="text" name="rt" class="form-control" placeholder="001" value="{{ old('rt', $siswa->rt ?? '') }}">
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label fw-semibold">RW</label>
+        <input type="text" name="rw" class="form-control" placeholder="001" value="{{ old('rw', $siswa->rw ?? '') }}">
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label fw-semibold">Kode Pos</label>
+        <input type="text" name="kode_pos" class="form-control" value="{{ old('kode_pos', $siswa->kode_pos ?? '') }}">
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">Kelurahan / Desa</label>
+        <input type="text" name="kelurahan" class="form-control" value="{{ old('kelurahan', $siswa->kelurahan ?? '') }}">
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label fw-semibold">Kecamatan</label>
+        <input type="text" name="kecamatan" class="form-control" value="{{ old('kecamatan', $siswa->kecamatan ?? '') }}">
+    </div>
+
+    <div class="col-md-12">
+        <label class="form-label fw-semibold">Tanggal Diterima</label>
+        <input type="date" name="tanggal_diterima" class="form-control" value="{{ old('tanggal_diterima', $siswa->tanggal_diterima ?? '') }}">
+    </div>
 </div>

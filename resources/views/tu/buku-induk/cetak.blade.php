@@ -381,7 +381,7 @@
                     </div>
                     <div class="data-row">
                         <div class="data-label">Jenis Kelamin</div>
-                        <div class="data-value">{{ $siswa->jenis_kelamin == 'L' ? 'L' : 'P' }}</div>
+                        <div class="data-value">{{ substr($siswa->jenis_kelamin, 0, 1) }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">Tempat/Tgl.Lahir</div>
@@ -396,8 +396,16 @@
                         <div class="data-value">{{ $siswa->agama ?? '-' }}</div>
                     </div>
                     <div class="data-row">
+                        <div class="data-label">Kewarganegaraan</div>
+                        <div class="data-value">{{ $siswa->kewarganegaraan ?? '-' }}</div>
+                    </div>
+                    <div class="data-row">
                         <div class="data-label">Alamat Siswa</div>
-                        <div class="data-value">{{ $siswa->alamat ?? '-' }}</div>
+                        <div class="data-value">Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">Alamat Siswa</div>
+                        <div class="data-value">Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</div>
                     </div>
                 </div>
 

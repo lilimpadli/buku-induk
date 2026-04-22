@@ -87,9 +87,10 @@
         <tr><td class="label">3. Tempat, Tanggal Lahir</td><td class="colon">:</td><td class="value">{{ $siswa->tempat_lahir ?? '-' }}, {{ optional(\Carbon\Carbon::parse($siswa->tanggal_lahir))->translatedFormat('d F Y') ?? '-' }}</td></tr>
         <tr><td class="label">4. Jenis Kelamin</td><td class="colon">:</td><td class="value">{{ $siswa->jenis_kelamin ?? '-' }}</td></tr>
         <tr><td class="label">5. Agama</td><td class="colon">:</td><td class="value">{{ $siswa->agama ?? '-' }}</td></tr>
+        <tr><td class="label">5a. Kewarganegaraan</td><td class="colon">:</td><td class="value">{{ $siswa->kewarganegaraan ?? '-' }}</td></tr>
         <tr><td class="label">6. Status Dalam Keluarga</td><td class="colon">:</td><td class="value">{{ $siswa->status_keluarga ?? '-' }}</td></tr>
         <tr><td class="label">7. Anak Ke</td><td class="colon">:</td><td class="value">{{ $siswa->anak_ke ?? '-' }}</td></tr>
-        <tr><td class="label">8. Alamat Peserta Didik</td><td class="colon">:</td><td class="value">{{ $siswa->alamat ?? '-' }}</td></tr>
+        <tr><td class="label">8. Alamat Peserta Didik</td><td class="colon">:</td><td class="value">Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</td></tr>
         <tr><td class="label">9. Nomor Telepon Rumah</td><td class="colon">:</td><td class="value">{{ $siswa->no_hp ?? '-' }}</td></tr>
         <tr><td class="label">10. Sekolah Asal</td><td class="colon">:</td><td class="value">{{ $siswa->sekolah_asal ?? '-' }}</td></tr>
 
@@ -101,7 +102,7 @@
         <tr><td class="label">&nbsp;&nbsp;&nbsp;a. Ayah</td><td class="colon">:</td><td class="value">{{ $siswa->ayah->nama ?? '-' }}</td></tr>
         <tr><td class="label">&nbsp;&nbsp;&nbsp;b. Ibu</td><td class="colon">:</td><td class="value">{{ $siswa->ibu->nama ?? '-' }}</td></tr>
 
-        <tr><td class="label">12. Alamat Orang Tua</td><td class="colon">:</td><td class="value">{{ $siswa->alamat ?? '-' }}</td></tr>
+        <tr><td class="label">12. Alamat Orang Tua</td><td class="colon">:</td><td class="value">{{ $siswa->ayah->alamat ?? ($siswa->ibu->alamat ?? '-') }}</td></tr>
         <tr><td class="label">Nomor Telepon Rumah</td><td class="colon">:</td><td class="value">{{ $siswa->no_hp ?? '-' }}</td></tr>
 
         <tr><td class="label">13. Pekerjaan Orang Tua</td><td class="colon">:</td><td class="value"></td></tr>

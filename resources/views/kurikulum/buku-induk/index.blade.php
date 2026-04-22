@@ -721,9 +721,9 @@
                         <div class="student-info-row">
                             <span class="student-info-label">Jenis Kelamin</span>
                             <span class="student-info-value">
-                                @if($siswa->jenis_kelamin == 'L')
+                                @if($siswa->jenis_kelamin == 'Laki-laki')
                                     <span class="badge bg-info">Laki-laki</span>
-                                @elseif($siswa->jenis_kelamin == 'P')
+                                @elseif($siswa->jenis_kelamin == 'Perempuan')
                                     <span class="badge bg-danger">Perempuan</span>
                                 @else
                                     {{ $siswa->jenis_kelamin }}
