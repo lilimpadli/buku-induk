@@ -102,7 +102,7 @@
         <tr><td class="label">&nbsp;&nbsp;&nbsp;a. Ayah</td><td class="colon">:</td><td class="value">{{ $siswa->ayah->nama ?? '-' }}</td></tr>
         <tr><td class="label">&nbsp;&nbsp;&nbsp;b. Ibu</td><td class="colon">:</td><td class="value">{{ $siswa->ibu->nama ?? '-' }}</td></tr>
 
-        <tr><td class="label">12. Alamat Orang Tua</td><td class="colon">:</td><td class="value">{{ $siswa->ayah->alamat ?? ($siswa->ibu->alamat ?? '-') }}</td></tr>
+        <tr><td class="label">12. Alamat Orang Tua</td><td class="colon">:</td><td class="value">Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</td></tr>
         <tr><td class="label">Nomor Telepon Rumah</td><td class="colon">:</td><td class="value">{{ $siswa->no_hp ?? '-' }}</td></tr>
 
         <tr><td class="label">13. Pekerjaan Orang Tua</td><td class="colon">:</td><td class="value"></td></tr>

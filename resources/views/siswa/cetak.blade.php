@@ -23,24 +23,24 @@
     <tr><td>Agama</td><td>: {{ $siswa->agama }}</td></tr>
     <tr><td>Status dalam Keluarga</td><td>: {{ $siswa->status_keluarga }}</td></tr>
     <tr><td>Anak Ke</td><td>: {{ $siswa->anak_ke }}</td></tr>
-    <tr><td>Alamat Peserta Didik</td><td>: {{ $siswa->alamat }}</td></tr>
     <tr><td>Nomor Telepon</td><td>: {{ $siswa->no_hp }}</td></tr>
     <tr><td>Sekolah Asal</td><td>: {{ $siswa->sekolah_asal }}</td></tr>
     <tr><td>Diterima di kelas</td><td>: {{ $siswa->kelas }}</td></tr>
     <tr><td>Pada tanggal</td><td>: {{ $siswa->tanggal_diterima }}</td></tr>
 
-    <tr><td>Nama Ayah</td><td>: {{ $siswa->nama_ayah }}</td></tr>
-    <tr><td>Pekerjaan Ayah</td><td>: {{ $siswa->pekerjaan_ayah }}</td></tr>
-    <tr><td>Telepon Ayah</td><td>: {{ $siswa->telepon_ayah }}</td></tr>
+    <tr><td>Nama Ayah</td><td>: {{ $siswa->ayah->nama ?? '-' }}</td></tr>
+    <tr><td>Pekerjaan Ayah</td><td>: {{ $siswa->ayah->pekerjaan ?? '-' }}</td></tr>
+    <tr><td>Telepon Ayah</td><td>: {{ $siswa->ayah->telepon ?? '-' }}</td></tr>
 
-    <tr><td>Nama Ibu</td><td>: {{ $siswa->nama_ibu }}</td></tr>
-    <tr><td>Pekerjaan Ibu</td><td>: {{ $siswa->pekerjaan_ibu }}</td></tr>
-    <tr><td>Telepon Ibu</td><td>: {{ $siswa->telepon_ibu }}</td></tr>
+    <tr><td>Nama Ibu</td><td>: {{ $siswa->ibu->nama ?? '-' }}</td></tr>
+    <tr><td>Pekerjaan Ibu</td><td>: {{ $siswa->ibu->pekerjaan ?? '-' }}</td></tr>
+    <tr><td>Telepon Ibu</td><td>: {{ $siswa->ibu->telepon ?? '-' }}</td></tr>
 
-    <tr><td>Nama Wali</td><td>: {{ $siswa->nama_wali }}</td></tr>
-    <tr><td>Alamat Wali</td><td>: {{ $siswa->alamat_wali }}</td></tr>
-    <tr><td>Telepon Wali</td><td>: {{ $siswa->telepon_wali }}</td></tr>
-    <tr><td>Pekerjaan Wali</td><td>: {{ $siswa->pekerjaan_wali }}</td></tr>
+    <tr><td>Alamat Rumah</td><td>: {{ $siswa->alamat }}</td></tr>
+
+    <tr><td>Nama Wali</td><td>: {{ $siswa->wali->nama ?? '-' }}</td></tr>
+    <tr><td>Telepon Wali</td><td>: {{ $siswa->wali->telepon ?? '-' }}</td></tr>
+    <tr><td>Pekerjaan Wali</td><td>: {{ $siswa->wali->pekerjaan ?? '-' }}</td></tr>
 </table>
 
 <br><br>

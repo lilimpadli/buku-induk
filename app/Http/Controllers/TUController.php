@@ -950,7 +950,7 @@ class TUController extends Controller
     }
     public function siswaEdit($id)
     {
-        $siswa = DataSiswa::with(['ayah', 'ibu', 'wali'])->findOrFail($id);
+        $siswa = DataSiswa::with(['rombel.kelas', 'ayah', 'ibu', 'wali'])->findOrFail($id);
         $jurusans = Jurusan::all();
         $rombels = Rombel::all();
         $kelas = Kelas::with('jurusan')->get();

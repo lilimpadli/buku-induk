@@ -35,6 +35,7 @@ class DataSiswa extends Model
         'foto',
         'catatan_wali_kelas',
         'rombel_id',
+        'kurikulum_id',
     ];
 
     /* ================================
@@ -98,6 +99,14 @@ class DataSiswa extends Model
     public function rombel()
     {
         return $this->belongsTo(Rombel::class);
+    }
+
+    /* ================================
+     |  RELASI KURIKULUM
+     ================================= */
+    public function kurikulum()
+    {
+        return $this->belongsTo(Kurikulum::class);
     }
 
     /* ================================

@@ -1,8 +1,8 @@
 @php
     $siswa = $siswa ?? null;
-    $selected_kelas = old('kelas_id', optional(optional($siswa)->rombel->kelas)->id);
-    $selected_rombel = old('rombel_id', $siswa->rombel_id ?? null);
-    $selected_jurusan = old('jurusan_id', optional(optional(optional($siswa)->rombel->kelas)->jurusan)->id);
+    $selected_kelas = old('kelas_id', $siswa?->rombel?->kelas?->id);
+    $selected_rombel = old('rombel_id', $siswa?->rombel_id);
+    $selected_jurusan = old('jurusan_id', $siswa?->rombel?->kelas?->jurusan?->id);
 @endphp
 
 <div class="row g-3">

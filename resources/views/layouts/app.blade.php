@@ -513,17 +513,12 @@
                                     <i class="fas fa-users"></i> <span>Data Siswa</span>
                                 </a>
 
-                                <a href="{{ route('tu.ppdb.index') }}" class="nav-link {{ request()->routeIs('tu.ppdb*') ? 'active' : '' }}">
-                                    <i class="fas fa-user-plus"></i> <span>PPDB</span>
-                                </a>
-
+                               
                                 <a href="{{ route('tu.kelas.index') }}" class="nav-link {{ request()->routeIs('tu.kelas*') ? 'active' : '' }}">
                                     <i class="fas fa-school"></i> <span>Manajemen Kelas</span>
                                 </a>
 
-                                <a href="{{ route('tu.guru.index') }}" class="nav-link {{ request()->routeIs('tu.guru*') ? 'active' : '' }}">
-                                    <i class="fas fa-chalkboard-teacher"></i> <span>Data Guru</span>
-                                </a>
+                               
 
                                 <div class="nav-section-title">BUKU INDUK</div>
 

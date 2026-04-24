@@ -55,4 +55,22 @@ class Siswa extends Model
     {
         return $this->belongsTo(Rombel::class, 'rombel_id');
     }
+
+    /**
+     * Relasi Orang Tua
+     */
+    public function ayah()
+    {
+        return $this->belongsTo(Ayah::class, 'ayah_id');
+    }
+
+    public function ibu()
+    {
+        return $this->belongsTo(Ibu::class, 'ibu_id');
+    }
+
+    public function wali()
+    {
+        return $this->belongsTo(Wali::class, 'wali_id');
+    }
 }

@@ -612,8 +612,8 @@
                          
                             @php
                                 $rombel = $siswa->rombel ?? null;
-                                $rombelNama = $rombel->nama ?? null;
-                                $tingkatVal = optional($rombel->kelas)->tingkat ?? null;
+                                $rombelNama = optional($rombel)->nama ?? null;
+                                $tingkatVal = optional($rombel)->kelas ? optional($rombel->kelas)->tingkat : null;
                                 $rombelWithoutTingkat = $rombelNama ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama) : null;
                                 $rombelWithoutTingkat = $rombelWithoutTingkat ? trim($rombelWithoutTingkat) : null;
                                 $formatted = $rombelWithoutTingkat ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat) : null;

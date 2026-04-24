@@ -76,6 +76,9 @@ class BukuIndukController extends Controller
         $siswa->load([
             'user', 
             'rombel.kelas.jurusan',
+            'ayah',
+            'ibu',
+            'wali',
             'mutasis', 
             'mutasiTerakhir',
             'nilaiRaports' => function($query) {
@@ -99,6 +102,9 @@ class BukuIndukController extends Controller
         $siswa->load([
             'user', 
             'rombel.kelas.jurusan',
+            'ayah',
+            'ibu',
+            'wali',
             'mutasis', 
             'mutasiTerakhir',
             'nilaiRaports' => function($query) {

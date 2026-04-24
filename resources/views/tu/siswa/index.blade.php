@@ -346,6 +346,12 @@
             font-size: 14px;
         }
     }
+
+    /* Hide duplicate plain pagination elements */
+    nav + nav,
+    .pagination + .pagination {
+        display: none;
+    }
 </style>
 
 <div class="container-fluid px-3 px-md-4 mt-4">
@@ -505,11 +511,11 @@
                     </div>
                 @endforeach
             </div>
-            @if(method_exists($siswas, 'links'))
-                <div class="p-3">
+            <div class="p-3">
+                @if(method_exists($siswas, 'links'))
                     {{ $siswas->links('pagination::bootstrap-4') }}
-                </div>
-            @endif
+                @endif
+            </div>
         @else
             <div class="empty-state">
                 <i class="fas fa-user-graduate"></i>

@@ -700,11 +700,7 @@
     </div>
 
     <!-- Pagination - Single location at bottom -->
-    @if($siswas->hasPages())
-        <div class="mt-3">
-            {{ $siswas->links() }}
-        </div>
-    @endif
+    
 </div>
 
 @push('scripts')
