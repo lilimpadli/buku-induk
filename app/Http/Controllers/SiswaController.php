@@ -604,6 +604,9 @@ class SiswaController extends Controller
             'user', 
             'rombel.kelas.jurusan',
             'mutasis',
+            'ayah',
+            'ibu',
+            'wali',
             'nilaiRaports' => function($query) {
                 $query->with('mapel')
                       ->orderBy('tahun_ajaran')
@@ -975,5 +978,43 @@ public function updatePassword(Request $request)
     ]);
     
     return redirect()->route('siswa.dashboard')->with('success', 'Password berhasil diperbarui.');
+}
+
+/**
+ * Cetak Buku Induk Siswa
+ */
+public function cetak($siswaId)
+{
+    $siswa = DataSiswa::findOrFail($siswaId);
+    
+    // Verify ownership - only allow siswa to view their own record
+    $user = Auth::user();
+    if ($user->role === 'siswa') {
+        $userSiswa = DataSiswa::where('nis', $user->nomor_induk)->first();
+        if (!$userSiswa || $userSiswa->id !== $siswa->id) {
+            abort(403, 'Unauthorized');
+        }
+    }
+
+    // Load relasi yang diperlukan untuk buku induk
+    $siswa->load([
+        'user', 
+        'rombel.kelas.jurusan',
+        'kurikulum',
+        'ayah',
+        'ibu',
+        'wali',
+        'mutasis',
+        'nilaiRaports' => function($query) {
+            $query->with('mapel')
+                  ->orderBy('tahun_ajaran')
+                  ->orderBy('semester');
+        }
+    ]);
+    
+    // Group nilai by kelompok and nama mata pelajaran
+    $nilaiByKelompok = $this->groupNilaiByKelompok($siswa);
+    
+    return view('siswa.buku-induk-cetak', compact('siswa', 'nilaiByKelompok'));
 }
 }

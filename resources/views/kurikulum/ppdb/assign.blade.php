@@ -83,13 +83,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <strong>Ayah</strong>
-                            <p>Nama: {{ $entry->nama_ayah ?? '-' }}<br>
-                            Pekerjaan: {{ $entry->pekerjaan_ayah ?? '-' }}</p>
+                            <p>Nama: {{ $entry->ayah->nama ?? '-' }}<br>
+                            Pekerjaan: {{ $entry->ayah->pekerjaan ?? '-' }}</p>
                         </div>
                         <div class="col-md-6">
                             <strong>Ibu</strong>
-                            <p>Nama: {{ $entry->nama_ibu ?? '-' }}<br>
-                            Pekerjaan: {{ $entry->pekerjaan_ibu ?? '-' }}</p>
+                            <p>Nama: {{ $entry->ibu->nama ?? '-' }}<br>
+                            Pekerjaan: {{ $entry->ibu->pekerjaan ?? '-' }}</p>
                         </div>
                     </div>
 

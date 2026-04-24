@@ -281,16 +281,16 @@
                         <h5>B. DATA ORANG TUA / WALI</h5>
                         <div class="row">
                             <div class="col-12 col-md-6">
-                                <p class="info-item"><strong>Nama Ayah:</strong> {{ $siswa->nama_ayah ?? '-' }}</p>
-                                <p class="info-item"><strong>Pekerjaan Ayah:</strong> {{ $siswa->pekerjaan_ayah ?? '-' }}</p>
-                                <p class="info-item"><strong>Nama Ibu:</strong> {{ $siswa->nama_ibu ?? '-' }}</p>
-                                <p class="info-item"><strong>Pekerjaan Ibu:</strong> {{ $siswa->pekerjaan_ibu ?? '-' }}</p>
+                                <p class="info-item"><strong>Nama Ayah:</strong> {{ $siswa->ayah->nama ?? '-' }}</p>
+                                <p class="info-item"><strong>Pekerjaan Ayah:</strong> {{ $siswa->ayah->pekerjaan ?? '-' }}</p>
+                                <p class="info-item"><strong>Nama Ibu:</strong> {{ $siswa->ibu->nama ?? '-' }}</p>
+                                <p class="info-item"><strong>Pekerjaan Ibu:</strong> {{ $siswa->ibu->pekerjaan ?? '-' }}</p>
                             </div>
                             <div class="col-12 col-md-6">
-                                <p class="info-item"><strong>Alamat Orang Tua:</strong> {{ $siswa->alamat ?? '-' }}</p>
-                                <p class="info-item"><strong>Nama Wali:</strong> {{ $siswa->nama_wali ?? '-' }}</p>
-                                <p class="info-item"><strong>Pekerjaan Wali:</strong> {{ $siswa->pekerjaan_wali ?? '-' }}</p>
-                                <p class="info-item"><strong>Alamat Wali:</strong> {{ $siswa->alamat_wali ?? '-' }}</p>
+                                <p class="info-item"><strong>Alamat Orang Tua:</strong> {{ $siswa->ayah->alamat ?? $siswa->ibu->alamat ?? '-' }}</p>
+                                <p class="info-item"><strong>Nama Wali:</strong> {{ $siswa->wali->nama ?? '-' }}</p>
+                                <p class="info-item"><strong>Pekerjaan Wali:</strong> {{ $siswa->wali->pekerjaan ?? '-' }}</p>
+                                <p class="info-item"><strong>Alamat Wali:</strong> {{ $siswa->wali->alamat ?? '-' }}</p>
                             </div>
                         </div>
                     </div>

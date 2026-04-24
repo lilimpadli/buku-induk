@@ -235,6 +235,7 @@ Route::middleware(['auth'])->group(function () {
 
             // Buku Induk
             Route::get('/buku-induk', [SiswaController::class, 'bukuIndukShow'])->name('bukuInduk.show');
+            Route::get('/cetak/{siswaId}', [SiswaController::class, 'cetak'])->name('cetak');
 
             // Catatan
             Route::get('/catatan', [SiswaController::class, 'catatan'])->name('catatan');
