@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buku Induk - {{ $siswa->nama_lengkap }}</title>
+    <title>Buku Induk Alumni - {{ $siswa->nama_lengkap }}</title>
     <style>
         * {
             margin: 0;
@@ -268,7 +268,7 @@
     <div class="container">
         <!-- Header -->
         <div class="buku-induk-header">
-            <h1>BUKU INDUK SISWA</h1>
+            <h1>BUKU INDUK SISWA ALUMNI</h1>
             <h2>SMKN 1 KAWALI</h2>
             <h2>KONSENTRASI: {{ $siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan ? $siswa->rombel->kelas->jurusan->nama : 'REKAYASA PERANGKAT LUNAK' }}</h2>
         </div>
@@ -360,11 +360,7 @@
                 <!-- Photo & Info Table -->
                 <div class="photo-info-container">
                     <div class="photo-box">
-                        @if(isset($siswa->user) && isset($siswa->user->photo))
-                            <img src="{{ asset('storage/' . $siswa->user->photo) }}" alt="{{ $siswa->nama_lengkap }}" onerror="this.style.display='none'">
-                        @else
-                            <span style="font-size: 8px; color: #999;">Photo</span>
-                        @endif
+                        <span style="font-size: 8px; color: #999;">Photo</span>
                     </div>
                     <!-- side-table removed: keeping underlined form fields only -->
                 </div>
@@ -373,7 +369,7 @@
                 <div class="data-section">
                     <div class="data-row">
                         <div class="data-label">NIS / NISN</div>
-                        <div class="data-value">{{ $siswa->nis }} / {{ $siswa->nisn ?? '-' }}</div>
+                        <div class="data-value">-</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">Nama Lengkap</div>
@@ -381,7 +377,7 @@
                     </div>
                     <div class="data-row">
                         <div class="data-label">Jenis Kelamin</div>
-                        <div class="data-value">{{ substr($siswa->jenis_kelamin, 0, 1) }}</div>
+                        <div class="data-value">{{ substr($siswa->jenis_kelamin ?? '-', 0, 1) }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">Tempat/Tgl.Lahir</div>
@@ -396,28 +392,15 @@
                         <div class="data-value">{{ $siswa->agama ?? '-' }}</div>
                     </div>
                     <div class="data-row">
-                        <div class="data-label">Kewarganegaraan</div>
-                        <div class="data-value">{{ $siswa->kewarganegaraan ?? '-' }}</div>
-                    </div>
-                    <div class="data-row">
                         <div class="data-label">Alamat Siswa</div>
-                        <div class="data-value">Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</div>
+                        <div class="data-value">{{ $siswa->alamat ?? '-' }}</div>
                     </div>
-<<<<<<< HEAD
-=======
-                    
->>>>>>> fa4d2120cd77b67cc2d3e6b1736c605e2b6926d5
                 </div>
 
                 <div class="data-section">
                     <div class="data-row">
-<<<<<<< HEAD
                         <div class="data-label">Nama Orang Tua</div>
                         <div class="data-value"></div>
-=======
-                       <div class="data-section-title">Nama Orang Tua</div>
-                       
->>>>>>> fa4d2120cd77b67cc2d3e6b1736c605e2b6926d5
                     </div>
                     <div class="data-row">
                         <div class="data-label">a. Ayah</div>
@@ -433,7 +416,7 @@
                     </div>
                     <div class="data-row">
                         <div class="data-label">d. Alamat Rumah</div>
-                        <div class="data-value">Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</div>
+                        <div class="data-value">{{ $siswa->alamat ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">Nama Wali</div>
@@ -445,11 +428,7 @@
                     </div>
                     <div class="data-row">
                         <div class="data-label">b. Alamat Rumah</div>
-<<<<<<< HEAD
                         <div class="data-value">{{ $siswa->wali->alamat ?? '-' }}</div>
-=======
-                        <div class="data-value">{{ $siswa->alamat_wali ?? '-' }}</div>
->>>>>>> fa4d2120cd77b67cc2d3e6b1736c605e2b6926d5
                     </div>
                 </div>
 
@@ -457,11 +436,11 @@
                     <div class="data-section-title">Diterima menjadi Siswa</div>
                     <div class="data-row">
                         <div class="data-label">a. Mulai Tanggal</div>
-                        <div class="data-value">{{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->format('d F Y') : '-' }}</div>
+                        <div class="data-value">-</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">b. Asal sekolah</div>
-                        <div class="data-value">{{ $siswa->sekolah_asal ?? '-' }}</div>
+                        <div class="data-value">-</div>
                     </div>
                 </div>
 
@@ -481,9 +460,9 @@
                         <div class="data-label">b. Alasan</div>
                         <div class="data-value">
                             @if($siswa->mutasiTerakhir)
-                                {{ $siswa->mutasiTerakhir->alasan_pindah ?? '-' }}
+                                {{ $siswa->mutasiTerakhir->alasan_pindah ?? 'Lulus' }}
                             @else
-                                -
+                                Lulus
                             @endif
                         </div>
                     </div>
@@ -546,8 +525,4 @@
         window.print();
     </script>
 </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> fa4d2120cd77b67cc2d3e6b1736c605e2b6926d5

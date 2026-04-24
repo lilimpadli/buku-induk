@@ -54,6 +54,7 @@ class BukuIndukController extends Controller
         $siswa->load([
             'user', 
             'rombel.kelas.jurusan',
+            'kurikulum',
             'mutasis',
             'nilaiRaports' => function($query) {
                 $query->with('mapel')
@@ -76,6 +77,7 @@ class BukuIndukController extends Controller
         $siswa->load([
             'user', 
             'rombel.kelas.jurusan',
+            'kurikulum',
             'ayah',
             'ibu',
             'wali',
@@ -102,6 +104,7 @@ class BukuIndukController extends Controller
         $siswa->load([
             'user', 
             'rombel.kelas.jurusan',
+            'kurikulum',
             'ayah',
             'ibu',
             'wali',
@@ -161,24 +164,74 @@ class BukuIndukController extends Controller
     }
 
     /**
-     * Get mata pelajaran by jurusan and kelompok
+     * Get mata pelajaran by jurusan, kurikulum, and kelas tingkat
      */
     private function getMataPelajaranByJurusan(Siswa $siswa)
     {
         $mapelByKelompok = [];
         
+        // Get tingkat kelas siswa
+        $tingkat = $siswa->rombel && $siswa->rombel->kelas ? 
+                   intval($siswa->rombel->kelas->tingkat) : 10;
+        
+        // Get kurikulum siswa
+        $kurikulumId = $siswa->kurikulum_id;
+        
         // First priority: Get from jurusan if siswa has one
         if ($siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan) {
             $jurusanId = $siswa->rombel->kelas->jurusan->id;
             
-            // Get all mata pelajaran for this specific jurusan
+            // Strategy 1: Try to get with jurusan + kurikulum + tingkat
             $mapels = MataPelajaran::whereHas('jurusans', function($q) use ($jurusanId) {
                 $q->where('jurusan_id', $jurusanId);
             })
-                                   ->orderBy('kelompok')
-                                   ->orderBy('urutan')
-                                   ->get();
+            ->whereHas('kurikulums', function($q) use ($kurikulumId) {
+                $q->where('kurikulum_id', $kurikulumId);
+            })
+            ->whereHas('tingkats', function($q) use ($tingkat) {
+                $q->where('tingkat', $tingkat);
+            })
+            ->orderBy('kelompok')
+            ->orderBy('urutan')
+            ->get();
             
+            // Strategy 2: If no result, try jurusan + tingkat (without kurikulum)
+            if ($mapels->count() === 0) {
+                $mapels = MataPelajaran::whereHas('jurusans', function($q) use ($jurusanId) {
+                    $q->where('jurusan_id', $jurusanId);
+                })
+                ->whereHas('tingkats', function($q) use ($tingkat) {
+                    $q->where('tingkat', $tingkat);
+                })
+                ->orderBy('kelompok')
+                ->orderBy('urutan')
+                ->get();
+            }
+            
+            // Strategy 3: If still no result, try jurusan + kurikulum (without tingkat)
+            if ($mapels->count() === 0 && $kurikulumId) {
+                $mapels = MataPelajaran::whereHas('jurusans', function($q) use ($jurusanId) {
+                    $q->where('jurusan_id', $jurusanId);
+                })
+                ->whereHas('kurikulums', function($q) use ($kurikulumId) {
+                    $q->where('kurikulum_id', $kurikulumId);
+                })
+                ->orderBy('kelompok')
+                ->orderBy('urutan')
+                ->get();
+            }
+            
+            // Strategy 4: If still no result, try jurusan only
+            if ($mapels->count() === 0) {
+                $mapels = MataPelajaran::whereHas('jurusans', function($q) use ($jurusanId) {
+                    $q->where('jurusan_id', $jurusanId);
+                })
+                ->orderBy('kelompok')
+                ->orderBy('urutan')
+                ->get();
+            }
+            
+            // Process mapels
             if ($mapels->count() > 0) {
                 foreach ($mapels as $mapel) {
                     $kelompok = $mapel->kelompok;

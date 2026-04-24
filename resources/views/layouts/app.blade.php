@@ -591,6 +591,17 @@
                                 </a>
                             @endif
 
+                            {{-- ROLE: SUPER ADMIN --}}
+                            @if(Auth::user()->role == 'super_admin')
+                                <a href="{{ route('super_admin.dashboard') }}" class="nav-link {{ request()->routeIs('super_admin.dashboard') ? 'active' : '' }}">
+                                    <i class="fas fa-home"></i> <span>Dashboard</span>
+                                </a>
+
+                                <div class="nav-section-title">SISTEM</div>
+
+                               
+                            @endif
+
                         </nav>
                     @endauth
                 </div>

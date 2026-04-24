@@ -58,7 +58,9 @@ class LoginController extends Controller
             'walikelas'    => redirect()->route('walikelas.dashboard'),
             'kaprog'       => redirect()->route('kaprog.dashboard'),
             'tu'           => redirect()->route('tu.dashboard'),
+            'tu_kepegawaian' => redirect()->route('tu_kepegawaian.dashboard'),
             'kurikulum'    => redirect()->route('kurikulum.dashboard'),
+            'super_admin'  => redirect()->route('super_admin.dashboard'),
             'calon_siswa'  => redirect()->route('calon.dashboard'),
             default        => redirect()->route('dashboard'),
         };

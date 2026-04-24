@@ -604,6 +604,9 @@ class SiswaController extends Controller
             'user', 
             'rombel.kelas.jurusan',
             'mutasis',
+            'ayah',
+            'ibu',
+            'wali',
             'nilaiRaports' => function($query) {
                 $query->with('mapel')
                       ->orderBy('tahun_ajaran')

@@ -120,16 +120,16 @@
                         <h5>B. DATA ORANG TUA / WALI</h5>
                         <div class="row">
                             <div class="col-md-6">
-                                <p><strong>Nama Ayah:</strong> {{ $siswa->nama_ayah ?? '-' }}</p>
-                                <p><strong>Pekerjaan Ayah:</strong> {{ $siswa->pekerjaan_ayah ?? '-' }}</p>
-                                <p><strong>Nama Ibu:</strong> {{ $siswa->nama_ibu ?? '-' }}</p>
-                                <p><strong>Pekerjaan Ibu:</strong> {{ $siswa->pekerjaan_ibu ?? '-' }}</p>
+                                <p><strong>Nama Ayah:</strong> {{ $siswa->ayah->nama ?? '-' }}</p>
+                                <p><strong>Pekerjaan Ayah:</strong> {{ $siswa->ayah->pekerjaan ?? '-' }}</p>
+                                <p><strong>Nama Ibu:</strong> {{ $siswa->ibu->nama ?? '-' }}</p>
+                                <p><strong>Pekerjaan Ibu:</strong> {{ $siswa->ibu->pekerjaan ?? '-' }}</p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Alamat Orang Tua:</strong> {{ $siswa->alamat ?? '-' }}</p>
-                                <p><strong>Nama Wali:</strong> {{ $siswa->nama_wali ?? '-' }}</p>
-                                <p><strong>Pekerjaan Wali:</strong> {{ $siswa->pekerjaan_wali ?? '-' }}</p>
-                                <p><strong>Alamat Wali:</strong> {{ $siswa->alamat_wali ?? '-' }}</p>
+                                <p><strong>Alamat Orang Tua:</strong> {{ $siswa->ayah->alamat ?? $siswa->ibu->alamat ?? '-' }}</p>
+                                <p><strong>Nama Wali:</strong> {{ $siswa->wali->nama ?? '-' }}</p>
+                                <p><strong>Pekerjaan Wali:</strong> {{ $siswa->wali->pekerjaan ?? '-' }}</p>
+                                <p><strong>Alamat Wali:</strong> {{ $siswa->wali->alamat ?? '-' }}</p>
                             </div>
                         </div>
                     </div>

@@ -46,6 +46,13 @@ class UserSeeder extends Seeder
                 'role' => 'tu_kepegawaian',
                 'password' => Hash::make('password123'),
             ],
+            [
+                'name' => 'Super Admin Default',
+                'nomor_induk' => '9999999999',
+                'email' => 'super_admin@example.com',
+                'role' => 'super_admin',
+                'password' => Hash::make('password123'),
+            ],
         ];
 
         foreach ($users as $user) {
