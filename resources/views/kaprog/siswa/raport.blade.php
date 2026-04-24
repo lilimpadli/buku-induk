@@ -233,30 +233,38 @@
             <div class="form-section">
                 <h5 class="fw-bold mb-4">Pilih Tahun Ajaran dan Semester</h5>
                 
-                <form method="GET" action="" id="raportForm">
-                    <div class="row mb-4">
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <label for="tahun_ajaran" class="form-label">Tahun Ajaran</label>
-                            <select name="tahun" id="tahun_ajaran" class="form-select" required>
-                                <option value="">-- Pilih Tahun Ajaran --</option>
-                                @foreach($raports as $r)
-                                    <option value="{{ str_replace('/', '-', $r->tahun_ajaran) }}">{{ $r->tahun_ajaran }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="semester" class="form-label">Semester</label>
-                            <select name="semester" id="semester" class="form-select" required>
-                                <option value="">-- Pilih Semester --</option>
-                                <option value="Ganjil">Ganjil</option>
-                                <option value="Genap">Genap</option>
-                            </select>
-                        </div>
+                @if($raports->isEmpty())
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Tidak ada data raport</strong><br>
+                        Siswa ini belum memiliki data raport dalam sistem. Pastikan nilai raport sudah diinput oleh guru.
                     </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-search me-2"></i>Lihat Raport
-                    </button>
-                </form>
+                @else
+                    <form method="GET" action="" id="raportForm">
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="tahun_ajaran" class="form-label">Tahun Ajaran</label>
+                                <select name="tahun" id="tahun_ajaran" class="form-select" required>
+                                    <option value="">-- Pilih Tahun Ajaran --</option>
+                                    @foreach($raports as $r)
+                                        <option value="{{ str_replace('/', '-', $r->tahun_ajaran) }}">{{ $r->tahun_ajaran }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="semester" class="form-label">Semester</label>
+                                <select name="semester" id="semester" class="form-select" required>
+                                    <option value="">-- Pilih Semester --</option>
+                                    <option value="Ganjil">Ganjil</option>
+                                    <option value="Genap">Genap</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Lihat Raport
+                        </button>
+                    </form>
+                @endif
             </div>
         </div>
     </div>
@@ -265,33 +273,36 @@
 
 @push('scripts')
 <script>
-document.getElementById('raportForm').addEventListener('submit', function(e) {
-    const tahun = document.getElementById('tahun_ajaran').value;
-    const semester = document.getElementById('semester').value;
-    if (!tahun || !semester) {
-        e.preventDefault();
-        
-        // Create a custom alert instead of using browser alert
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
-        alertDiv.innerHTML = `
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            Pilih tahun ajaran dan semester terlebih dahulu.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
-        
-        // Insert the alert at the beginning of the card body
-        const cardBody = document.querySelector('.card-body');
-        cardBody.insertBefore(alertDiv, cardBody.firstChild);
-        
-        // Auto remove the alert after 5 seconds
-        setTimeout(() => {
-            alertDiv.remove();
-        }, 5000);
-        
-        return;
-    }
-    this.action = '/kaprog/raport/siswa/{{ $siswa->id }}/' + semester + '/' + tahun.replace('/', '-');
-});
+const raportForm = document.getElementById('raportForm');
+if (raportForm) {
+    raportForm.addEventListener('submit', function(e) {
+        const tahun = document.getElementById('tahun_ajaran').value;
+        const semester = document.getElementById('semester').value;
+        if (!tahun || !semester) {
+            e.preventDefault();
+            
+            // Create a custom alert instead of using browser alert
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Pilih tahun ajaran dan semester terlebih dahulu.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            // Insert the alert at the beginning of the card body
+            const cardBody = document.querySelector('.card-body');
+            cardBody.insertBefore(alertDiv, cardBody.firstChild);
+            
+            // Auto remove the alert after 5 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+            
+            return;
+        }
+        this.action = '/kaprog/raport/siswa/{{ $siswa->id }}/' + semester + '/' + tahun.replace('/', '-');
+    });
+}
 </script>
 @endpush

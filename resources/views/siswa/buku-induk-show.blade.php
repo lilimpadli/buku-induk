@@ -380,7 +380,7 @@
             <a href="{{ route('siswa.dashboard') }}" class="btn btn-secondary btn-sm">
                 <i class="fas fa-arrow-left me-1"></i> Kembali
             </a>
-            <a href="javascript:window.print()" class="btn btn-primary btn-sm">
+            <a href="{{ route('siswa.bukuInduk.cetak') }}" target="_blank" class="btn btn-primary btn-sm">
                 <i class="fas fa-print me-1"></i> Cetak
             </a>
         </div>

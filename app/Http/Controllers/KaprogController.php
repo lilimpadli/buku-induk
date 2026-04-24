@@ -208,16 +208,20 @@ class KaprogController extends Controller
         // Cek apakah siswa di jurusan kaprog
         $user = Auth::user();
         $guru = Guru::where('user_id', $user->id)->first();
-        if ($guru && $guru->jurusan_id && !$siswa->rombel || $siswa->rombel->kelas->jurusan_id != $guru->jurusan_id) {
+        if ($guru && $guru->jurusan_id && (!$siswa->rombel || $siswa->rombel->kelas->jurusan_id != $guru->jurusan_id)) {
             return redirect()->route('kaprog.siswa.index')->with('error', 'Akses ditolak');
         }
 
         // Ambil daftar tahun ajaran unik untuk siswa ini
         $raports = NilaiRaport::select('tahun_ajaran')
             ->where('siswa_id', $siswa->id)
-            ->groupBy('tahun_ajaran')
+            ->distinct()
             ->orderBy('tahun_ajaran', 'desc')
             ->get();
+
+        if ($raports->isEmpty()) {
+            return redirect()->route('kaprog.siswa.index')->with('error', 'Tidak ada data raport untuk siswa ini');
+        }
 
         return view('kaprog.siswa.raport', compact('siswa', 'raports'));
     }
@@ -230,7 +234,7 @@ class KaprogController extends Controller
         // Cek akses
         $user = Auth::user();
         $guru = Guru::where('user_id', $user->id)->first();
-        if ($guru && $guru->jurusan_id && (!$siswa->rombel || $siswa->rombel->kelas->jurusan_id != $guru->jurusan_id)) {
+        if ($guru && $guru->jurusan_id && (!$siswa->rombel || !$siswa->rombel->kelas || $siswa->rombel->kelas->jurusan_id != $guru->jurusan_id)) {
             abort(403);
         }
 

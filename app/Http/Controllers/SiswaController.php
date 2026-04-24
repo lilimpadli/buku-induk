@@ -976,4 +976,33 @@ public function updatePassword(Request $request)
     
     return redirect()->route('siswa.dashboard')->with('success', 'Password berhasil diperbarui.');
 }
+
+/**
+ * Menampilkan versi cetak Buku Induk Siswa
+ */
+public function bukuIndukCetak()
+{
+    $siswa = $this->getSiswaLogin();
+
+    // Load relasi yang diperlukan untuk buku induk cetak
+    $siswa->load([
+        'user', 
+        'rombel.kelas.jurusan',
+        'ayah',
+        'ibu',
+        'wali',
+        'mutasis', 
+        'mutasiTerakhir',
+        'nilaiRaports' => function($query) {
+            $query->with('mapel')
+                  ->orderBy('tahun_ajaran')
+                  ->orderBy('semester');
+        }
+    ]);
+    
+    // Group nilai by kelompok and nama mata pelajaran
+    $nilaiByKelompok = $this->groupNilaiByKelompok($siswa);
+    
+    return view('siswa.buku-induk-cetak', compact('siswa', 'nilaiByKelompok'));
+}
 }

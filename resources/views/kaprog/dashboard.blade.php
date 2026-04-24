@@ -265,10 +265,6 @@
                 <h2 class="mb-1">Halo, Program Keahlian 👋</h2>
                 <div class="text-muted">Ringkasan program keahlian dan siswa — cepat, informatif, dan responsif</div>
             </div>
-            <div class="d-flex gap-2">
-                <a href="{{ route('kaprog.siswa.index') }}" class="btn btn-outline-gradient">Kelola Siswa</a>
-                <a href="{{ route('kaprog.guru.index') }}" class="btn btn-gradient">Kelola Guru</a>
-            </div>
         </div>
     </div>
 

@@ -574,23 +574,6 @@
                                     <i class="fas fa-school"></i> <span>Manajemen Kelas</span>
                                 </a>
 
-                                <a href="{{ route('kurikulum.siswa.index') }}" class="nav-link {{ request()->routeIs('kurikulum.siswa*') ? 'active' : '' }}">
-                                    <i class="fas fa-users"></i> <span>Manajemen Siswa</span>
-                                </a>
-
-                                @php
-                                    $ppdbActive = request()->is('kurikulum/ppdb*') || request()->routeIs('kurikulum.ppdb.*');
-                                @endphp
-                                <div class="dropdown">
-                                    <a class="nav-link dropdown-toggle {{ $ppdbActive ? 'active' : '' }}" href="#" id="ppdbDropdownKurikulum" role="button" data-bs-toggle="dropdown" aria-expanded="{{ $ppdbActive ? 'true' : 'false' }}">
-                                        <i class="fas fa-user-plus"></i> <span>PPDB</span>
-                                    </a>
-                                    <ul class="dropdown-menu {{ $ppdbActive ? 'show' : '' }}" aria-labelledby="ppdbDropdownKurikulum">
-                                        <li><a class="dropdown-item {{ request()->routeIs('kurikulum.ppdb.index') ? 'active' : '' }}" href="{{ route('kurikulum.ppdb.index') }}"><i class="fas fa-list"></i> Data PPDB</a></li>
-                                        <li><a class="dropdown-item {{ request()->routeIs('kurikulum.ppdb.timeline') ? 'active' : '' }}" href="{{ route('kurikulum.ppdb.timeline') }}"><i class="fas fa-clock"></i> Timeline PPDB</a></li>
-                                    </ul>
-                                </div>
-
                                 <a href="{{ route('kurikulum.kurikulum.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kurikulum*') ? 'active' : '' }}">
                                     <i class="fas fa-graduation-cap"></i> <span>Manajemen Kurikulum</span>
                                 </a>
@@ -605,22 +588,6 @@
 
                                 <a href="{{ route('kurikulum.mata-pelajaran.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mata-pelajaran*') ? 'active' : '' }}">
                                     <i class="fas fa-book-open"></i> <span>Manajemen Mata Pelajaran</span>
-                                </a>
-
-                                <div class="nav-section-title">BUKU INDUK</div>
-
-                                <a href="{{ route('kurikulum.buku-induk.index') }}" class="nav-link {{ request()->routeIs('kurikulum.buku-induk*') ? 'active' : '' }}">
-                                    <i class="fas fa-book"></i> <span>Buku Induk</span>
-                                </a>
-
-                                <a href="{{ route('kurikulum.mutasi.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mutasi*') ? 'active' : '' }}">
-                                    <i class="fas fa-exchange-alt"></i> <span>Mutasi Siswa</span>
-                                </a>
-
-                                <div class="nav-section-title">MANAJEMEN LULUSAN</div>
-
-                                <a href="{{ route('kurikulum.alumni.index') }}" class="nav-link {{ request()->routeIs('kurikulum.alumni*') ? 'active' : '' }}">
-                                    <i class="fas fa-user-graduate"></i> <span>Data Alumni</span>
                                 </a>
                             @endif
 

@@ -403,10 +403,6 @@
                         <div class="data-label">Alamat Siswa</div>
                         <div class="data-value">Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</div>
                     </div>
-                    <div class="data-row">
-                        <div class="data-label">Alamat Siswa</div>
-                        <div class="data-value">Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</div>
-                    </div>
                 </div>
 
                 <div class="data-section">
