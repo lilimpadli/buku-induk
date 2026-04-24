@@ -57,6 +57,14 @@ class Siswa extends Model
     }
 
     /**
+     * Relasi Kurikulum
+     */
+    public function kurikulum()
+    {
+        return $this->belongsTo(Kurikulum::class, 'kurikulum_id');
+    }
+
+    /**
      * Relasi Orang Tua
      */
     public function ayah()

@@ -380,7 +380,7 @@
             <a href="{{ route('siswa.dashboard') }}" class="btn btn-secondary btn-sm">
                 <i class="fas fa-arrow-left me-1"></i> Kembali
             </a>
-            <a href="javascript:window.print()" class="btn btn-primary btn-sm">
+            <a href="{{ route('siswa.cetak', $siswa->id) }}" target="_blank" class="btn btn-primary btn-sm">
                 <i class="fas fa-print me-1"></i> Cetak
             </a>
         </div>
@@ -421,7 +421,7 @@
                                 <p><strong>NIS:</strong> {{ $siswa->nis }}</p>
                                 <p><strong>NISN:</strong> {{ $siswa->nisn ?? '-' }}</p>
                                 <p><strong>Nama Lengkap:</strong> {{ $siswa->nama_lengkap }}</p>
-                                <p><strong>Jenis Kelamin:</strong> {{ $siswa->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</p>
+                                <p><strong>Jenis Kelamin:</strong> {{ $siswa->jenis_kelamin }}</p>
                             </div>
                             <div class="col-md-6 col-12">
                                 <p><strong>Tempat Lahir:</strong> {{ $siswa->tempat_lahir ?? '-' }}</p>
