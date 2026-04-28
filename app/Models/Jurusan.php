@@ -14,7 +14,13 @@ class Jurusan extends Model
     protected $fillable = [
         'kode',
         'nama',
+        'id_bidang',
     ];
+    // Relasi: satu jurusan milik satu bidang keahlian
+    public function bidangKeahlian()
+    {
+        return $this->belongsTo(\App\Models\BidangKeahlian::class, 'id_bidang');
+    }
 
     // Relasi: satu jurusan punya banyak kelas
     public function kelas()

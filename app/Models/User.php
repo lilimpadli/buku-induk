@@ -54,7 +54,31 @@ class User extends Authenticatable
         return 'nomor_induk';
     }
 
-    
+    /**
+     * Get label untuk role
+     */
+    public static function getRoleLabel($role)
+    {
+        $labels = [
+            'wali_kelas' => 'Wali Kelas',
+            'waka_kesiswaan' => 'Waka Kesiswaan',
+            'kaprog' => 'Kaprog',
+        ];
+
+        return $labels[$role] ?? $role;
+    }
+
+    /**
+     * Get all available roles
+     */
+    public static function getAvailableRoles()
+    {
+        return [
+            'wali_kelas' => 'Wali Kelas',
+            'waka_kesiswaan' => 'Waka Kesiswaan',
+            'kaprog' => 'Kaprog',
+        ];
+    }
 
 public function guru()
 {

@@ -1,3 +1,5 @@
+                   
+           
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -39,6 +41,9 @@ use App\Http\Controllers\Kurikulum\KurikulumDashboardController;
 use App\Http\Controllers\Kurikulum\KurikulumSiswaController;
 use App\Http\Controllers\Kurikulum\KelasController;
 use App\Http\Controllers\Kurikulum\JurusanController;
+use App\Http\Controllers\Kurikulum\ProgramKeahlianController;
+use App\Http\Controllers\Kurikulum\KonsentrasiKeahlianController;
+use App\Http\Controllers\Kurikulum\BidangKeahlianController;
 
 // KELAS KAPROG
 use App\Http\Controllers\KelaskaprogController;
@@ -638,9 +643,43 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/data-pribadi', [App\Http\Controllers\Kurikulum\DataPribadiController::class, 'update'])
                 ->name('data-pribadi.update');
 
+
             // Guru management (Kurikulum)
             Route::get('/guru', [App\Http\Controllers\Kurikulum\GuruController::class, 'index'])
                 ->name('guru.index');
+
+            // Bidang Keahlian (Kurikulum)
+            Route::prefix('bidang-keahlian')->name('bidang-keahlian.')->group(function () {
+                Route::get('/', [BidangKeahlianController::class, 'index'])->name('index');
+                Route::get('/create', [BidangKeahlianController::class, 'create'])->name('create');
+                Route::post('/', [BidangKeahlianController::class, 'store'])->name('store');
+                Route::get('/{id}', [BidangKeahlianController::class, 'show'])->name('show');
+                Route::get('/{id}/edit', [BidangKeahlianController::class, 'edit'])->name('edit');
+                Route::put('/{id}', [BidangKeahlianController::class, 'update'])->name('update');
+                Route::delete('/{id}', [BidangKeahlianController::class, 'destroy'])->name('destroy');
+            });
+
+             // Konsentrasi Keahlian (Kurikulum)
+            Route::prefix('konsentrasi-keahlian')->name('konsentrasi-keahlian.')->group(function () {
+                Route::get('/', [KonsentrasiKeahlianController::class, 'index'])->name('index');
+                Route::get('/create', [KonsentrasiKeahlianController::class, 'create'])->name('create');
+                Route::post('/', [KonsentrasiKeahlianController::class, 'store'])->name('store');
+                Route::get('/{id}', [KonsentrasiKeahlianController::class, 'show'])->name('show');
+                Route::get('/{id}/edit', [KonsentrasiKeahlianController::class, 'edit'])->name('edit');
+                Route::put('/{id}', [KonsentrasiKeahlianController::class, 'update'])->name('update');
+                Route::delete('/{id}', [KonsentrasiKeahlianController::class, 'destroy'])->name('destroy');
+            });
+
+             // Program Keahlian (Kurikulum)
+                    Route::prefix('program-keahlian')->name('program-keahlian.')->group(function () {
+                        Route::get('/', [ProgramKeahlianController::class, 'index'])->name('index');
+                        Route::get('/create', [ProgramKeahlianController::class, 'create'])->name('create');
+                        Route::post('/', [ProgramKeahlianController::class, 'store'])->name('store');
+                        Route::get('/{id}', [ProgramKeahlianController::class, 'show'])->name('show');
+                        Route::get('/{id}/edit', [ProgramKeahlianController::class, 'edit'])->name('edit');
+                        Route::put('/{id}', [ProgramKeahlianController::class, 'update'])->name('update');
+                        Route::delete('/{id}', [ProgramKeahlianController::class, 'destroy'])->name('destroy');
+                    });
 
             // Guru import
             Route::get('/guru/import', [App\Http\Controllers\Kurikulum\GuruController::class, 'importForm'])

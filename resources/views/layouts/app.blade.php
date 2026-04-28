@@ -574,6 +574,13 @@
                                     <i class="fas fa-school"></i> <span>Manajemen Kelas</span>
                                 </a>
 
+<<<<<<< Updated upstream
+=======
+                                
+
+                                
+
+>>>>>>> Stashed changes
                                 <a href="{{ route('kurikulum.kurikulum.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kurikulum*') ? 'active' : '' }}">
                                     <i class="fas fa-graduation-cap"></i> <span>Manajemen Kurikulum</span>
                                 </a>
@@ -588,6 +595,20 @@
 
                                 <a href="{{ route('kurikulum.mata-pelajaran.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mata-pelajaran*') ? 'active' : '' }}">
                                     <i class="fas fa-book-open"></i> <span>Manajemen Mata Pelajaran</span>
+                                </a>
+
+                                {{-- KURIKULUM: CRUD BIDANG/PROGRAM/KONSENTRASI KEAHLIAN --}}
+                                <div class="nav-section-title">KEAHLIAN</div>
+                                <a href="{{ route('kurikulum.bidang-keahlian.index') }}" class="nav-link {{ request()->routeIs('kurikulum.bidang-keahlian*') ? 'active' : '' }}">
+                                    <i class="fas fa-layer-group"></i> <span>Bidang Keahlian</span>
+                                </a>
+                               
+                                <a href="{{ route('kurikulum.program-keahlian.index') }}" class="nav-link {{ request()->routeIs('kurikulum.program-keahlian*') ? 'active' : '' }}">
+                                    <i class="fas fa-cube"></i> <span>Program Keahlian</span>
+                                </a>
+
+                                 <a href="{{ route('kurikulum.konsentrasi-keahlian.index') }}" class="nav-link {{ request()->routeIs('kurikulum.konsentrasi-keahlian*') ? 'active' : '' }}">
+                                    <i class="fas fa-cubes"></i> <span>Konsentrasi Keahlian</span>
                                 </a>
                             @endif
 
@@ -688,4 +709,4 @@
 
 </body>
 
-</html> 
+</html>

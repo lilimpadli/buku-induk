@@ -54,7 +54,17 @@ class TugaTambahanController extends Controller
         $gurus = Guru::with('user')->orderBy('nama')->get();
         $tipeOptions = TugasTambahan::getAvailableTipes();
         
-        return view('tu_kepegawaian.tugas_tambahan.create', compact('gurus', 'tipeOptions'));
+        // Tambahkan data guru dengan role untuk auto-fill
+        $guruData = $gurus->map(function($guru) {
+            return [
+                'id' => $guru->id,
+                'nama' => $guru->nama,
+                'nip' => $guru->nip,
+                'role' => $guru->user?->role
+            ];
+        });
+        
+        return view('tu_kepegawaian.tugas_tambahan.create', compact('gurus', 'tipeOptions', 'guruData'));
     }
 
     /**
@@ -64,9 +74,21 @@ class TugaTambahanController extends Controller
     {
         $validated = $request->validate([
             'guru_id' => 'required|exists:gurus,id',
-            'tipe_tugas' => 'required|in:wali_kelas,waka_kesiswaan,kaprog',
+            'tipe_tugas' => 'nullable|in:wali_kelas,waka_kesiswaan,kaprog',
             'tahun_ajaran' => 'nullable|string|max:50',
         ]);
+        
+        // Auto-fill tipe_tugas dari role guru jika tidak dipilih
+        if (empty($validated['tipe_tugas'])) {
+            $guru = Guru::with('user')->findOrFail($validated['guru_id']);
+            $validated['tipe_tugas'] = $guru->user?->role;
+            
+            if (empty($validated['tipe_tugas'])) {
+                return redirect()->back()
+                    ->withErrors(['tipe_tugas' => 'Guru ini belum memiliki role yang valid. Silakan pilih tipe tugas secara manual.'])
+                    ->withInput();
+            }
+        }
 
         // Check if this teacher already has this type of task
         $existing = TugasTambahan::where('guru_id', $validated['guru_id'])
@@ -104,7 +126,17 @@ class TugaTambahanController extends Controller
         $gurus = Guru::with('user')->orderBy('nama')->get();
         $tipeOptions = TugasTambahan::getAvailableTipes();
         
-        return view('tu_kepegawaian.tugas_tambahan.edit', compact('tugasTambahan', 'gurus', 'tipeOptions'));
+        // Tambahkan data guru dengan role untuk auto-fill
+        $guruData = $gurus->map(function($guru) {
+            return [
+                'id' => $guru->id,
+                'nama' => $guru->nama,
+                'nip' => $guru->nip,
+                'role' => $guru->user?->role
+            ];
+        });
+        
+        return view('tu_kepegawaian.tugas_tambahan.edit', compact('tugasTambahan', 'gurus', 'tipeOptions', 'guruData'));
     }
 
     /**
