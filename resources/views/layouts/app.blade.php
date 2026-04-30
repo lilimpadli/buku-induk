@@ -558,6 +558,45 @@
                                 </a>
                             @endif
 
+                            {{-- ROLE: SUPER ADMIN --}}
+                            @if(Auth::user()->role == 'super_admin')
+                                <a href="{{ route('super_admin.dashboard') }}" class="nav-link {{ request()->routeIs('super_admin.dashboard') ? 'active' : '' }}">
+                                    <i class="fas fa-home"></i> <span>Dashboard</span>
+                                </a>
+
+                                <div class="nav-section-title">MANAJEMEN SISTEM</div>
+
+                                <a href="{{ route('super_admin.users.index') }}" class="nav-link {{ request()->routeIs('super_admin.users*') ? 'active' : '' }}">
+                                    <i class="fas fa-users"></i> <span>Users</span>
+                                </a>
+
+                                <a href="{{ route('super_admin.system.index') }}" class="nav-link {{ request()->routeIs('super_admin.system*') ? 'active' : '' }}">
+                                    <i class="fas fa-cogs"></i> <span>System</span>
+                                </a>
+
+                                <div class="nav-section-title">DATA</div>
+
+                                <a href="{{ route('super_admin.manajemen-guru.index') }}" class="nav-link {{ request()->routeIs('super_admin.manajemen-guru*') ? 'active' : '' }}">
+                                    <i class="fas fa-chalkboard-teacher"></i> <span>Manajemen Guru</span>
+                                </a>
+
+                                <a href="{{ route('super_admin.manajemen-jurusan.index') }}" class="nav-link {{ request()->routeIs('super_admin.manajemen-jurusan*') ? 'active' : '' }}">
+                                    <i class="fas fa-graduation-cap"></i> <span>Manajemen Jurusan</span>
+                                </a>
+
+                                <a href="{{ route('super_admin.manajemen-kelas.index') }}" class="nav-link {{ request()->routeIs('super_admin.manajemen-kelas*') ? 'active' : '' }}">
+                                    <i class="fas fa-school"></i> <span>Manajemen Kelas</span>
+                                </a>
+
+                                <a href="{{ route('super_admin.manajemen-kurikulum.index') }}" class="nav-link {{ request()->routeIs('super_admin.manajemen-kurikulum*') ? 'active' : '' }}">
+                                    <i class="fas fa-book"></i> <span>Manajemen Kurikulum</span>
+                                </a>
+
+                                <a href="{{ route('super_admin.manajemen-siswa.index') }}" class="nav-link {{ request()->routeIs('super_admin.manajemen-siswa*') ? 'active' : '' }}">
+                                    <i class="fas fa-user-graduate"></i> <span>Manajemen Siswa</span>
+                                </a>
+                            @endif
+
                             {{-- ROLE: KURIKULUM --}}
                             @if(Auth::user()->role == 'kurikulum')
                                 <a href="{{ route('kurikulum.dashboard') }}" class="nav-link {{ request()->routeIs('kurikulum.dashboard') ? 'active' : '' }}">

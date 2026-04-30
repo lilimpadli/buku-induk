@@ -83,4 +83,9 @@ class SuperAdminController extends Controller
     {
         return view('super_admin.system.index');
     }
+
+    public function manajemenGuru()
+{
+    return view('super_admin.manajemen-guru');
+}
 }

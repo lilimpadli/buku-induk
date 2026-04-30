@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Rombel;
+use App\Models\DataSiswa;
 
 
 /**
@@ -83,6 +84,11 @@ class User extends Authenticatable
 public function guru()
 {
     return $this->hasOne(Guru::class, 'user_id');
+}
+
+public function siswa()
+{
+    return $this->hasOne(DataSiswa::class, 'user_id');
 }
 
 public function rombels()

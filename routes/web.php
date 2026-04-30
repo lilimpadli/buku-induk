@@ -35,6 +35,11 @@ use App\Http\Controllers\TU\TambahKelasController;
 use App\Http\Controllers\TU\KelastuController;
 use App\Http\Controllers\TU\WaliKelasController;
 use App\Http\Controllers\SuperAdminController;
+use App\Http\Controllers\SuperAdmin\ManajemenGuruController;
+use App\Http\Controllers\SuperAdmin\ManajemenJurusanController;
+use App\Http\Controllers\SuperAdmin\ManajemenKelasController;
+use App\Http\Controllers\SuperAdmin\ManajemenKurikulumController;
+use App\Http\Controllers\SuperAdmin\ManajemenSiswaController;
 
 // KURIKULUM
 use App\Http\Controllers\Kurikulum\KurikulumDashboardController;
@@ -613,6 +618,66 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
             Route::get('/users', [SuperAdminController::class, 'usersIndex'])->name('users.index');
             Route::get('/system', [SuperAdminController::class, 'systemIndex'])->name('system.index');
+
+            Route::prefix('manajemen-guru')->name('manajemen-guru.')->group(function () {
+                Route::get('/', [ManajemenGuruController::class, 'index'])->name('index');
+                Route::get('/create', [ManajemenGuruController::class, 'create'])->name('create');
+                Route::post('/', [ManajemenGuruController::class, 'store'])->name('store');
+                Route::get('/{id}', [ManajemenGuruController::class, 'show'])->name('show');
+                Route::get('/{id}/edit', [ManajemenGuruController::class, 'edit'])->name('edit');
+                Route::put('/{id}', [ManajemenGuruController::class, 'update'])->name('update');
+                Route::delete('/{id}', [ManajemenGuruController::class, 'destroy'])->name('destroy');
+
+                // Import/Export routes
+                Route::get('/import', [ManajemenGuruController::class, 'importForm'])->name('importForm');
+                Route::get('/import/template', [ManajemenGuruController::class, 'downloadTemplate'])->name('import.template');
+                Route::post('/import', [ManajemenGuruController::class, 'import'])->name('import');
+                Route::get('/export', [ManajemenGuruController::class, 'exportExcel'])->name('export');
+            });
+
+            Route::prefix('manajemen-jurusan')->name('manajemen-jurusan.')->group(function () {
+                Route::get('/', [ManajemenJurusanController::class, 'index'])->name('index');
+                Route::get('/create', [ManajemenJurusanController::class, 'create'])->name('create');
+                Route::post('/', [ManajemenJurusanController::class, 'store'])->name('store');
+                Route::get('/{id}', [ManajemenJurusanController::class, 'show'])->name('show');
+                Route::get('/{id}/edit', [ManajemenJurusanController::class, 'edit'])->name('edit');
+                Route::put('/{id}', [ManajemenJurusanController::class, 'update'])->name('update');
+                Route::delete('/{id}', [ManajemenJurusanController::class, 'destroy'])->name('destroy');
+            });
+
+            Route::prefix('manajemen-kelas')->name('manajemen-kelas.')->group(function () {
+                Route::get('/', [ManajemenKelasController::class, 'index'])->name('index');
+                Route::get('/create', [ManajemenKelasController::class, 'create'])->name('create');
+                Route::post('/', [ManajemenKelasController::class, 'store'])->name('store');
+                Route::get('/{id}', [ManajemenKelasController::class, 'show'])->name('show');
+                Route::get('/{id}/edit', [ManajemenKelasController::class, 'edit'])->name('edit');
+                Route::put('/{id}', [ManajemenKelasController::class, 'update'])->name('update');
+                Route::delete('/{id}', [ManajemenKelasController::class, 'destroy'])->name('destroy');
+                Route::get('/{id}/export', [ManajemenKelasController::class, 'export'])->name('export');
+            });
+
+            Route::prefix('manajemen-kurikulum')->name('manajemen-kurikulum.')->group(function () {
+                Route::get('/', [ManajemenKurikulumController::class, 'index'])->name('index');
+                Route::get('/create', [ManajemenKurikulumController::class, 'create'])->name('create');
+                Route::post('/', [ManajemenKurikulumController::class, 'store'])->name('store');
+                Route::get('/{id}', [ManajemenKurikulumController::class, 'show'])->name('show');
+                Route::get('/{id}/edit', [ManajemenKurikulumController::class, 'edit'])->name('edit');
+                Route::put('/{id}', [ManajemenKurikulumController::class, 'update'])->name('update');
+                Route::delete('/{id}', [ManajemenKurikulumController::class, 'destroy'])->name('destroy');
+            });
+
+            Route::prefix('manajemen-siswa')->name('manajemen-siswa.')->group(function () {
+                Route::get('/', [ManajemenSiswaController::class, 'index'])->name('index');
+                Route::get('/create', [ManajemenSiswaController::class, 'create'])->name('create');
+                Route::post('/', [ManajemenSiswaController::class, 'store'])->name('store');
+                Route::get('/{id}', [ManajemenSiswaController::class, 'show'])->name('show');
+                Route::get('/{id}/edit', [ManajemenSiswaController::class, 'edit'])->name('edit');
+                Route::put('/{id}', [ManajemenSiswaController::class, 'update'])->name('update');
+                Route::delete('/{id}', [ManajemenSiswaController::class, 'destroy'])->name('destroy');
+                Route::get('/export/jurusan', [ManajemenSiswaController::class, 'exportByJurusan'])->name('export.jurusan');
+                Route::get('/export/angkatan', [ManajemenSiswaController::class, 'exportByAngkatan'])->name('export.angkatan');
+                Route::post('/import', [ManajemenSiswaController::class, 'import'])->name('import');
+            });
         });
 
     /*
