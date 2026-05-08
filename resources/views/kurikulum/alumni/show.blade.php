@@ -265,7 +265,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <p><strong>Tempat, Tanggal Lahir:</strong></p>
-                            <p>{{ $siswa->tempat_lahir ?? '-' }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d F Y') : '-' }}</p>
+                            <p>{{ $siswa->tempat_lahir ?? '-' }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->translatedFormat('d F Y') : '-' }}</p>
                         </div>
                     </div>
                     <div class="row">

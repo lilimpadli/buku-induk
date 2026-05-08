@@ -58,7 +58,7 @@
                 <p class="mb-0">Laporan Data Mutasi Siswa</p>
                 <p class="text-muted mb-3">
                     @if(request('tanggal_dari') && request('tanggal_sampai'))
-                        Periode: {{ \Carbon\Carbon::parse(request('tanggal_dari'))->format('d F Y') }} s/d {{ \Carbon\Carbon::parse(request('tanggal_sampai'))->format('d F Y') }}
+                        Periode: {{ \Carbon\Carbon::parse(request('tanggal_dari'))->translatedFormat('d F Y') }} s/d {{ \Carbon\Carbon::parse(request('tanggal_sampai'))->translatedFormat('d F Y') }}
                     @elseif(request('status'))
                         Status: {{ $statuses[request('status')] ?? 'Semua Status' }}
                     @else

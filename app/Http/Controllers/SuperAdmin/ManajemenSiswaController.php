@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DataSiswa;
 use App\Models\Rombel;
 use App\Models\Jurusan;
+use App\Models\Kelas;
 use Illuminate\Http\Request;
 
 class ManajemenSiswaController extends Controller
@@ -49,7 +50,10 @@ class ManajemenSiswaController extends Controller
     public function create()
     {
         $rombels = Rombel::with('kelas.jurusan')->orderBy('nama')->get();
-        return view('super_admin.manajemen-siswa.create', compact('rombels'));
+        $kelas = Kelas::with('jurusan')->orderBy('tingkat')->get();
+        $jurusans = Jurusan::orderBy('nama')->get();
+
+        return view('super_admin.manajemen-siswa.create', compact('rombels', 'kelas', 'jurusans'));
     }
 
     public function store(Request $request)
@@ -68,9 +72,12 @@ class ManajemenSiswaController extends Controller
 
     public function edit($id)
     {
-        $siswa = DataSiswa::findOrFail($id);
+        $siswa = DataSiswa::with('rombel.kelas.jurusan')->findOrFail($id);
         $rombels = Rombel::with('kelas.jurusan')->orderBy('nama')->get();
-        return view('super_admin.manajemen-siswa.edit', compact('siswa', 'rombels'));
+        $kelas = Kelas::with('jurusan')->orderBy('tingkat')->get();
+        $jurusans = Jurusan::orderBy('nama')->get();
+
+        return view('super_admin.manajemen-siswa.edit', compact('siswa', 'rombels', 'kelas', 'jurusans'));
     }
 
     public function update(Request $request, $id)

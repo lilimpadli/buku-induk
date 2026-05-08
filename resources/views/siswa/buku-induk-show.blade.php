@@ -425,7 +425,7 @@
                             </div>
                             <div class="col-md-6 col-12">
                                 <p><strong>Tempat Lahir:</strong> {{ $siswa->tempat_lahir ?? '-' }}</p>
-                                <p><strong>Tanggal Lahir:</strong> {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d F Y') : '-' }}</p>
+                                <p><strong>Tanggal Lahir:</strong> {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->translatedFormat('d F Y') : '-' }}</p>
                                 <p><strong>Agama:</strong> {{ $siswa->agama ?? '-' }}</p>
                                 <p><strong>Kewarganegaraan:</strong> {{ $siswa->kewarganegaraan ?? '-' }}</p>
                                 <p><strong>Alamat:</strong> Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</p>
@@ -458,7 +458,7 @@
                         <div class="row">
                             <div class="col-md-6 col-12">
                                 <p><strong>Sekolah Asal:</strong> {{ $siswa->sekolah_asal ?? '-' }}</p>
-                                <p><strong>Tanggal Diterima:</strong> {{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->format('d F Y') : '-' }}</p>
+                                <p><strong>Tanggal Diterima:</strong> {{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->translatedFormat('d F Y') : '-' }}</p>
                                 <p><strong>Status Keluarga:</strong> {{ $siswa->status_keluarga ?? '-' }}</p>
                             </div>
                             <div class="col-md-6 col-12">
@@ -476,7 +476,7 @@
                             <div class="col-md-6 col-12">
                                 @if($siswa->mutasiTerakhir)
                                     <p><strong>Status:</strong> <span class="badge bg-{{ $siswa->mutasiTerakhir->status_color }}">{{ $siswa->mutasiTerakhir->status_label }}</span></p>
-                                    <p><strong>Tanggal Mutasi:</strong> {{ $siswa->mutasiTerakhir->tanggal_mutasi ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_mutasi)->format('d F Y') : '-' }}</p>
+                                    <p><strong>Tanggal Mutasi:</strong> {{ $siswa->mutasiTerakhir->tanggal_mutasi ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_mutasi)->translatedFormat('d F Y') : '-' }}</p>
                                     <p><strong>Keterangan:</strong> {{ $siswa->mutasiTerakhir->keterangan ?? '-' }}</p>
                                 @else
                                     <p><strong>Status:</strong> <span class="badge bg-success">Aktif</span></p>
@@ -489,7 +489,7 @@
                                     <p><strong>Alasan Pindah:</strong> {{ $siswa->mutasiTerakhir->alasan_pindah ?? '-' }}</p>
                                     <p><strong>Sekolah Tujuan:</strong> {{ $siswa->mutasiTerakhir->tujuan_pindah ?? '-' }}</p>
                                     <p><strong>No. SK Keluar:</strong> {{ $siswa->mutasiTerakhir->no_sk_keluar ?? '-' }}</p>
-                                    <p><strong>Tanggal SK Keluar:</strong> {{ $siswa->mutasiTerakhir->tanggal_sk_keluar ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_sk_keluar)->format('d F Y') : '-' }}</p>
+                                    <p><strong>Tanggal SK Keluar:</strong> {{ $siswa->mutasiTerakhir->tanggal_sk_keluar ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_sk_keluar)->translatedFormat('d F Y') : '-' }}</p>
                                 @else
                                     <p><strong>Alasan Pindah:</strong> -</p>
                                     <p><strong>Sekolah Tujuan:</strong> -</p>

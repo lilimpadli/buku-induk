@@ -513,7 +513,7 @@
                     </div>
                     <div class="info-item">
                         <strong>Tanggal Lahir:</strong>
-                        <p>{{ $mutasi->siswa->tanggal_lahir ? (\Carbon\Carbon::parse($mutasi->siswa->tanggal_lahir)->format('d F Y')) : '-' }}</p>
+                        <p>{{ $mutasi->siswa->tanggal_lahir ? (\Carbon\Carbon::parse($mutasi->siswa->tanggal_lahir)->translatedFormat('d F Y')) : '-' }}</p>
                     </div>
                     <div class="info-item">
                         <strong>Agama:</strong>

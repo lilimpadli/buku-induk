@@ -6,7 +6,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>Edit Akun Siswa</h3>
-        <a href="{{ route('tu.siswa.index') }}" class="btn btn-secondary">Kembali</a>
+        <a href="{{ route('super_admin.manajemen-siswa.index') }}" class="btn btn-secondary">Kembali</a>
     </div>
 
     @if ($errors->any())
@@ -21,11 +21,11 @@
 
     <div class="card shadow">
         <div class="card-body">
-            <form method="POST" action="{{ route('tu.siswa.update', $siswa->id) }}">
+            <form method="POST" action="{{ route('super_admin.manajemen-siswa.update', $siswa->id) }}">
                 @csrf
                 @method('PUT')
 
-                @include('tu.siswa._form')
+                @include('super_admin.manajemen-siswa._form')
 
                 <div class="mt-4 d-flex justify-content-end">
                     <a href="{{ route('tu.siswa.index') }}" class="btn btn-secondary me-2">Batal</a>

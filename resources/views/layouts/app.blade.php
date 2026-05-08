@@ -564,17 +564,19 @@
                                     <i class="fas fa-home"></i> <span>Dashboard</span>
                                 </a>
 
-                                <div class="nav-section-title">MANAJEMEN SISTEM</div>
+                                <div class="nav-section-title">KELOLA</div>
 
                                 <a href="{{ route('super_admin.users.index') }}" class="nav-link {{ request()->routeIs('super_admin.users*') ? 'active' : '' }}">
                                     <i class="fas fa-users"></i> <span>Users</span>
                                 </a>
 
+                                <div class="nav-section-title">SISTEM</div>
+
                                 <a href="{{ route('super_admin.system.index') }}" class="nav-link {{ request()->routeIs('super_admin.system*') ? 'active' : '' }}">
                                     <i class="fas fa-cogs"></i> <span>System</span>
                                 </a>
 
-                                <div class="nav-section-title">DATA</div>
+                                <div class="nav-section-title">MANAJEMEN</div>
 
                                 <a href="{{ route('super_admin.manajemen-guru.index') }}" class="nav-link {{ request()->routeIs('super_admin.manajemen-guru*') ? 'active' : '' }}">
                                     <i class="fas fa-chalkboard-teacher"></i> <span>Manajemen Guru</span>
@@ -649,17 +651,6 @@
                                  <a href="{{ route('kurikulum.konsentrasi-keahlian.index') }}" class="nav-link {{ request()->routeIs('kurikulum.konsentrasi-keahlian*') ? 'active' : '' }}">
                                     <i class="fas fa-cubes"></i> <span>Konsentrasi Keahlian</span>
                                 </a>
-                            @endif
-
-                            {{-- ROLE: SUPER ADMIN --}}
-                            @if(Auth::user()->role == 'super_admin')
-                                <a href="{{ route('super_admin.dashboard') }}" class="nav-link {{ request()->routeIs('super_admin.dashboard') ? 'active' : '' }}">
-                                    <i class="fas fa-home"></i> <span>Dashboard</span>
-                                </a>
-
-                                <div class="nav-section-title">SISTEM</div>
-
-                               
                             @endif
 
                         </nav>

@@ -268,7 +268,7 @@
                             </div>
                             <div class="col-12 col-md-6">
                                 <p class="info-item"><strong>Tempat Lahir:</strong> {{ $siswa->tempat_lahir ?? '-' }}</p>
-                                <p class="info-item"><strong>Tanggal Lahir:</strong> {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d F Y') : '-' }}</p>
+                                <p class="info-item"><strong>Tanggal Lahir:</strong> {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->translatedFormat('d F Y') : '-' }}</p>
                                 <p class="info-item"><strong>Agama:</strong> {{ $siswa->agama ?? '-' }}</p>
                                 <p class="info-item"><strong>Kewarganegaraan:</strong> {{ $siswa->kewarganegaraan ?? '-' }}</p>
                                 <p class="info-item"><strong>Alamat:</strong> Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</p>
@@ -301,7 +301,7 @@
                         <div class="row">
                             <div class="col-12 col-md-6">
                                 <p class="info-item"><strong>Sekolah Asal:</strong> {{ $siswa->sekolah_asal ?? '-' }}</p>
-                                <p class="info-item"><strong>Tanggal Diterima:</strong> {{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->format('d F Y') : '-' }}</p>
+                                <p class="info-item"><strong>Tanggal Diterima:</strong> {{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->translatedFormat('d F Y') : '-' }}</p>
                                 <p class="info-item"><strong>Status Keluarga:</strong> {{ $siswa->status_keluarga ?? '-' }}</p>
                             </div>
                             <div class="col-12 col-md-6">
@@ -319,7 +319,7 @@
                             <div class="col-12 col-md-6">
                                 @if($siswa->mutasiTerakhir)
                                     <p class="info-item"><strong>Status:</strong> <span class="badge bg-{{ $siswa->mutasiTerakhir->status_color }}">{{ $siswa->mutasiTerakhir->status_label }}</span></p>
-                                    <p class="info-item"><strong>Tanggal Mutasi:</strong> {{ $siswa->mutasiTerakhir->tanggal_mutasi ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_mutasi)->format('d F Y') : '-' }}</p>
+                                    <p class="info-item"><strong>Tanggal Mutasi:</strong> {{ $siswa->mutasiTerakhir->tanggal_mutasi ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_mutasi)->translatedFormat('d F Y') : '-' }}</p>
                                     <p class="info-item"><strong>Keterangan:</strong> {{ $siswa->mutasiTerakhir->keterangan ?? '-' }}</p>
                                 @else
                                     <p class="info-item"><strong>Status:</strong> <span class="badge bg-success">Aktif</span></p>
@@ -332,7 +332,7 @@
                                     <p class="info-item"><strong>Alasan Pindah:</strong> {{ $siswa->mutasiTerakhir->alasan_pindah ?? '-' }}</p>
                                     <p class="info-item"><strong>Sekolah Tujuan:</strong> {{ $siswa->mutasiTerakhir->tujuan_pindah ?? '-' }}</p>
                                     <p class="info-item"><strong>No. SK Keluar:</strong> {{ $siswa->mutasiTerakhir->no_sk_keluar ?? '-' }}</p>
-                                    <p class="info-item"><strong>Tanggal SK Keluar:</strong> {{ $siswa->mutasiTerakhir->tanggal_sk_keluar ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_sk_keluar)->format('d F Y') : '-' }}</p>
+                                    <p class="info-item"><strong>Tanggal SK Keluar:</strong> {{ $siswa->mutasiTerakhir->tanggal_sk_keluar ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_sk_keluar)->translatedFormat('d F Y') : '-' }}</p>
                                 @else
                                     <p class="info-item"><strong>Alasan Pindah:</strong> -</p>
                                     <p class="info-item"><strong>Sekolah Tujuan:</strong> -</p>

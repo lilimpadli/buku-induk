@@ -266,7 +266,7 @@
                         <div class="col-md-6">
                             <table class="table table-borderless table-sm">
                                 <tr><th>Tempat Lahir</th><td>{{ $guru && $guru->tempat_lahir ? $guru->tempat_lahir : '-' }}</td></tr>
-                                <tr><th>Tanggal Lahir</th><td>{{ $guru && $guru->tanggal_lahir ? \Carbon\Carbon::parse($guru->tanggal_lahir)->format('d F Y') : '-' }}</td></tr>
+                                <tr><th>Tanggal Lahir</th><td>{{ $guru && $guru->tanggal_lahir ? \Carbon\Carbon::parse($guru->tanggal_lahir)->translatedFormat('d F Y') : '-' }}</td></tr>
                                 <tr><th>Jenis Kelamin</th><td>
                                     @if($guru && $guru->jenis_kelamin == 'L')
                                         Laki-laki

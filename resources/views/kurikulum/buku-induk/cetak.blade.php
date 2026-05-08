@@ -385,7 +385,7 @@
                     </div>
                     <div class="data-row">
                         <div class="data-label">Tempat/Tgl.Lahir</div>
-                        <div class="data-value">{{ $siswa->tempat_lahir ?? '-' }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d F Y') : '-' }}</div>
+                        <div class="data-value">{{ $siswa->tempat_lahir ?? '-' }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->translatedFormat('d F Y') : '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">Warganegara</div>
@@ -444,7 +444,7 @@
                     <div class="data-section-title">Diterima menjadi Siswa</div>
                     <div class="data-row">
                         <div class="data-label">a. Mulai Tanggal</div>
-                        <div class="data-value">{{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->format('d F Y') : '-' }}</div>
+                        <div class="data-value">{{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->translatedFormat('d F Y') : '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">b. Asal sekolah</div>
@@ -458,7 +458,7 @@
                         <div class="data-label">a. Tanggal</div>
                         <div class="data-value">
                             @if($siswa->mutasiTerakhir)
-                                {{ $siswa->mutasiTerakhir->tanggal_mutasi ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_mutasi)->format('d F Y') : '-' }}
+                                {{ $siswa->mutasiTerakhir->tanggal_mutasi ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_mutasi)->translatedFormat('d F Y') : '-' }}
                             @else
                                 -
                             @endif

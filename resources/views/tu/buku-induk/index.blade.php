@@ -507,7 +507,7 @@
     </div>
 
     <!-- Filter -->
-    <div class="card mb-4">
+    <div class="card shadow mb-4">
         <div class="card-body">
             <form method="GET" class="row g-3">
                 <div class="col-md-4 col-12">
@@ -535,8 +535,9 @@
 
     <!-- Desktop Table View -->
     <div class="card shadow">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
                         <th style="width: 50px;">No</th>
@@ -617,6 +618,7 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
         </div>
 
         <!-- Pagination -->
@@ -649,9 +651,12 @@
                     <div class="student-card-row">
                         <span class="student-card-label">Jenis Kelamin</span>
                         <span class="student-card-value">
-                                @if($siswa->jenis_kelamin == 'Laki-laki')
-                                    <span class="badge bg-info">Laki-laki</span>
-                                @elseif($siswa->jenis_kelamin == 'Perempuan')
+                            @if($siswa->jenis_kelamin == 'Laki-laki')
+                                <span class="badge bg-info">Laki-laki</span>
+                            @elseif($siswa->jenis_kelamin == 'Perempuan')
+                                <span class="badge bg-danger">Perempuan</span>
+                            @else
+                                <span class="text-muted">-</span>
                             @endif
                         </span>
                     </div>

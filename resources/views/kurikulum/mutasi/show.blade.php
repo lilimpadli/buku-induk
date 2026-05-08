@@ -644,7 +644,7 @@
                     </p>
                     <p>
                         <strong>Tanggal Lahir:</strong><br>
-                        {{ $mutasi->siswa->tanggal_lahir ? (\Carbon\Carbon::parse($mutasi->siswa->tanggal_lahir)->format('d F Y')) : '-' }}
+                        {{ $mutasi->siswa->tanggal_lahir ? (\Carbon\Carbon::parse($mutasi->siswa->tanggal_lahir)->translatedFormat('d F Y')) : '-' }}
                     </p>
                     <p>
                         <strong>Agama:</strong><br>
