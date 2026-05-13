@@ -42,6 +42,10 @@ class MutasiController extends Controller
             'do' => 'Putus Sekolah (DO)',
             'meninggal' => 'Meninggal Dunia',
             'naik_kelas' => 'Naik Kelas',
+            'kelas' => 'Pindah Kelas',
+            'jurusan' => 'Pindah Jurusan',
+            'angkatan' => 'Pindah Angkatan',
+            'lulus' => 'Lulus',
         ];
 
         return view('tu.mutasi.index', compact('mutasis', 'statuses'));

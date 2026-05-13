@@ -615,13 +615,6 @@
                                     <i class="fas fa-school"></i> <span>Manajemen Kelas</span>
                                 </a>
 
-<<<<<<< Updated upstream
-=======
-                                
-
-                                
-
->>>>>>> Stashed changes
                                 <a href="{{ route('kurikulum.kurikulum.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kurikulum*') ? 'active' : '' }}">
                                     <i class="fas fa-graduation-cap"></i> <span>Manajemen Kurikulum</span>
                                 </a>
