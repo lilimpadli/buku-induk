@@ -59,16 +59,38 @@
                                 <td>{{ optional($rombel->kelas->jurusan)->nama ?? '-' }}</td>
                                 <td>{{ optional($rombel->guru)->nama ?? '-' }}</td>
                                 <td>{{ $rombel->siswa->count() }}</td>
-                                <td class="text-nowrap">
-                                    <a href="{{ route('super_admin.manajemen-kelas.show', $rombel->id) }}" class="btn btn-sm btn-info">Detail</a>
-                                    <a href="{{ route('super_admin.manajemen-kelas.edit', $rombel->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                                    <a href="{{ route('super_admin.manajemen-kelas.export', $rombel->id) }}" class="btn btn-sm btn-success">Cetak</a>
-                                    <form action="{{ route('super_admin.manajemen-kelas.destroy', $rombel->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus rombel ini?')">Hapus</button>
-                                    </form>
-                                </td>
+
+                                <td class="text-center">
+    <div class="d-inline-flex">
+
+        {{-- Detail --}}
+        <a href="{{ route('super_admin.manajemen-kelas.show', $rombel->id) }}"
+           class="btn btn-info text-dark rounded-start rounded-0 border-0">
+            <i class="fas fa-eye"></i>
+        </a>
+
+        {{-- Edit --}}
+        <a href="{{ route('super_admin.manajemen-kelas.edit', $rombel->id) }}"
+           class="btn btn-warning text-dark rounded-0 border-0">
+            <i class="fas fa-pen"></i>
+        </a>
+
+        {{-- Hapus --}}
+        <form action="{{ route('super_admin.manajemen-kelas.destroy', $rombel->id) }}"
+              method="POST"
+              class="d-inline">
+            @csrf
+            @method('DELETE')
+
+            <button type="submit"
+                    class="btn btn-danger rounded-end rounded-0 border-0"
+                    onclick="return confirm('Yakin ingin menghapus rombel ini?')">
+                <i class="fas fa-trash"></i>
+            </button>
+        </form>
+
+    </div>
+</td>
                             </tr>
                         @empty
                             <tr>

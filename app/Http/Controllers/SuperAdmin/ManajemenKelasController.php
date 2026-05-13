@@ -15,26 +15,29 @@ class ManajemenKelasController extends Controller
 {
     public function index(Request $request)
     {
+        // Query dasar dengan relasi
         $query = Rombel::with(['kelas.jurusan', 'guru', 'siswa']);
 
         $search = $request->get('search', '');
         $jurusan_id = $request->get('jurusan', '');
 
+        // Search
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', '%' . $search . '%')
-                  ->orWhereHas('kelas', function ($q2) use ($search) {
-                      $q2->where('tingkat', 'like', '%' . $search . '%')
-                         ->orWhereHas('jurusan', function ($q3) use ($search) {
-                             $q3->where('nama', 'like', '%' . $search . '%');
-                         });
-                  })
-                  ->orWhereHas('guru', function ($q2) use ($search) {
-                      $q2->where('nama', 'like', '%' . $search . '%');
-                  });
+                    ->orWhereHas('kelas', function ($q2) use ($search) {
+                        $q2->where('tingkat', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('kelas.jurusan', function ($q2) use ($search) {
+                        $q2->where('nama', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('guru', function ($q2) use ($search) {
+                        $q2->where('nama', 'like', '%' . $search . '%');
+                    });
             });
         }
 
+        // Filter jurusan
         if (!empty($jurusan_id)) {
             $query->whereHas('kelas', function ($q) use ($jurusan_id) {
                 $q->where('jurusan_id', $jurusan_id);
@@ -42,9 +45,16 @@ class ManajemenKelasController extends Controller
         }
 
         $allJurusans = Jurusan::all();
+
+        // Pagination
         $rombels = $query->paginate(12)->withQueryString();
 
-        return view('super_admin.manajemen-kelas.index', compact('rombels', 'allJurusans', 'search', 'jurusan_id'));
+        return view('super_admin.manajemen-kelas.index', compact(
+            'rombels',
+            'allJurusans',
+            'search',
+            'jurusan_id'
+        ));
     }
 
     public function create()
@@ -52,7 +62,12 @@ class ManajemenKelasController extends Controller
         $jurusans = Jurusan::all();
         $gurus = Guru::all();
         $tingkats = [10, 11, 12];
-        return view('super_admin.manajemen-kelas.create', compact('jurusans', 'gurus', 'tingkats'));
+
+        return view('super_admin.manajemen-kelas.create', compact(
+            'jurusans',
+            'gurus',
+            'tingkats'
+        ));
     }
 
     public function store(Request $request)
@@ -64,7 +79,7 @@ class ManajemenKelasController extends Controller
             'guru_id' => 'nullable|exists:gurus,id',
         ]);
 
-        // Create kelas first
+        // Create kelas
         $kelas = Kelas::create([
             'tingkat' => $request->tingkat,
             'jurusan_id' => $request->jurusan_id,
@@ -77,23 +92,36 @@ class ManajemenKelasController extends Controller
             'guru_id' => $request->guru_id,
         ]);
 
-        return redirect()->route('super_admin.manajemen-kelas.index')
+        return redirect()
+            ->route('super_admin.manajemen-kelas.index')
             ->with('success', 'Data kelas berhasil ditambahkan.');
     }
 
     public function show($id)
     {
-        $rombel = Rombel::with(['kelas.jurusan', 'guru', 'siswa'])->findOrFail($id);
+        $rombel = Rombel::with([
+            'kelas.jurusan',
+            'guru',
+            'siswa'
+        ])->findOrFail($id);
+
         return view('super_admin.manajemen-kelas.show', compact('rombel'));
     }
 
     public function edit($id)
     {
         $rombel = Rombel::with('kelas.jurusan')->findOrFail($id);
+
         $jurusans = Jurusan::all();
         $gurus = Guru::all();
         $tingkats = [10, 11, 12];
-        return view('super_admin.manajemen-kelas.edit', compact('rombel', 'jurusans', 'gurus', 'tingkats'));
+
+        return view('super_admin.manajemen-kelas.edit', compact(
+            'rombel',
+            'jurusans',
+            'gurus',
+            'tingkats'
+        ));
     }
 
     public function update(Request $request, $id)
@@ -120,22 +148,32 @@ class ManajemenKelasController extends Controller
             'guru_id' => $request->guru_id,
         ]);
 
-        return redirect()->route('super_admin.manajemen-kelas.index')
+        return redirect()
+            ->route('super_admin.manajemen-kelas.index')
             ->with('success', 'Data kelas berhasil diperbarui.');
     }
 
     public function destroy($id)
     {
         $rombel = Rombel::findOrFail($id);
+
         $rombel->delete();
 
-        return redirect()->route('super_admin.manajemen-kelas.index')
+        return redirect()
+            ->route('super_admin.manajemen-kelas.index')
             ->with('success', 'Data kelas berhasil dihapus.');
     }
 
     public function export($id)
     {
-        $rombel = Rombel::with(['kelas.jurusan', 'siswa'])->findOrFail($id);
-        return Excel::download(new KaprogSiswaByRombelExport($rombel), 'Data Siswa ' . $rombel->nama . '.xlsx');
+        $rombel = Rombel::with([
+            'kelas.jurusan',
+            'siswa'
+        ])->findOrFail($id);
+
+        return Excel::download(
+            new KaprogSiswaByRombelExport($rombel),
+            'Data Siswa ' . $rombel->nama . '.xlsx'
+        );
     }
 }

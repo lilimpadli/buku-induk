@@ -22,15 +22,19 @@
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    h3.mb-3 {
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    h3 {
         font-size: 28px;
         color: #1E293B;
         position: relative;
         padding-left: 15px;
-        margin-bottom: 10px !important;
+        margin-bottom: 5px !important;
     }
 
-    h3.mb-3::before {
+    h3::before {
         content: "";
         position: absolute;
         left: 0;
@@ -56,32 +60,59 @@
         transition: all 0.3s ease;
     }
 
+    .card:hover {
+        box-shadow: var(--hover-shadow);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        padding: 16px 24px;
+        border-bottom: none;
+    }
+
+    .card-header h5 {
+        color: white;
+        font-weight: 600;
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .card-header h5 i {
+        margin-right: 8px;
+    }
+
     /* Form Styles */
     .form-label {
         font-weight: 600;
         color: #374151;
-        font-size: 14px;
-        margin-bottom: 8px;
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .form-label i {
+        color: var(--primary-color);
+        width: 18px;
     }
 
     .form-control, .form-select {
         border: 1px solid #E2E8F0;
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 10px 14px;
-        font-size: 15px;
+        font-size: 14px;
         transition: all 0.3s ease;
     }
 
     .form-control:focus, .form-select:focus {
         border-color: var(--primary-color);
         box-shadow: 0 0 0 3px rgba(47, 83, 255, 0.1);
+        outline: none;
     }
     
     /* Button Styles */
     .btn-primary {
         background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         border: none;
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 10px 24px;
         font-weight: 600;
         transition: all 0.3s ease;
@@ -93,66 +124,127 @@
         color: white;
     }
 
-    .btn-light {
-        background-color: #F1F5F9;
+    .btn-secondary {
+        background-color: #64748B;
         border: none;
-        color: #475569;
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 10px 24px;
         font-weight: 600;
         transition: all 0.3s ease;
     }
 
-    .btn-light:hover {
-        background-color: #E2E8F0;
+    .btn-secondary:hover {
+        background-color: #475569;
         transform: translateY(-2px);
-        color: #334155;
+    }
+    
+    /* Divider */
+    .section-divider {
+        border-top: 1px solid #E2E8F0;
+        margin: 20px 0;
+        position: relative;
+    }
+    
+    .section-divider span {
+        background: white;
+        padding: 0 12px;
+        position: absolute;
+        top: -12px;
+        left: 15px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #94A3B8;
     }
     
     /* Responsive */
     @media (max-width: 768px) {
-        h3.mb-3 {
-            font-size: 24px;
+        h3 {
+            font-size: 22px;
+        }
+        .card-header {
+            padding: 12px 20px;
+        }
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            margin-top: 8px;
+        }
+        .d-flex.gap-2 {
+            flex-direction: column;
         }
         .text-muted {
             margin-left: 0;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
     }
 </style>
 
 <div class="container-fluid mt-4">
 
-    <!-- JUDUL -->
-    <h3 class="fw-bold mb-3">Edit Rombel</h3>
-    <p class="text-muted mb-4">
-        Perbarui data rombel yang ada.
-    </p>
+    <!-- PAGE HEADER -->
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h3 class="fw-bold mb-0">Edit Rombel</h3>
+            <p class="text-muted mt-1">Perbarui data rombel yang ada.</p>
+        </div>
+    </div>
 
+    <!-- MAIN CARD -->
     <div class="card shadow-sm border-0">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-edit"></i> Form Edit Rombel
+            </h5>
+        </div>
         <div class="card-body p-4">
 
             <form action="{{ route('super_admin.manajemen-kelas.update', $rombel->id) }}" method="POST">
                 @csrf
                 @method('PUT')
 
-                <div class="row mb-3">
+                {{-- ERROR MESSAGES --}}
+                @if($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i> <strong>Terjadi kesalahan:</strong>
+                        <ul class="mb-0 mt-2">
+                            @foreach($errors->all() as $e)
+                                <li>{{ $e }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                {{-- SUCCESS MESSAGES --}}
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                <div class="section-divider">
+                    <span>INFORMASI ROMBEL</span>
+                </div>
+
+                <div class="row g-3">
                     <!-- Tingkat -->
-                    <div class="col-md-6 mb-3">
-                        <label for="tingkat" class="form-label">Tingkat</label>
+                    <div class="col-md-6">
+                        <label for="tingkat" class="form-label">
+                            <i class="fas fa-layer-group"></i> Tingkat <span class="text-danger">*</span>
+                        </label>
                         <select name="tingkat" id="tingkat" class="form-select" required>
                             <option value="">Pilih Tingkat</option>
-                            @foreach($tingkats as $t)
-                                <option value="{{ $t }}" {{ $t == $rombel->kelas->tingkat ? 'selected' : '' }}>
-                                    Kelas {{ $t }}
-                                </option>
-                            @endforeach
+                            <option value="10" {{ $rombel->kelas->tingkat == '10' ? 'selected' : '' }}>Kelas 10</option>
+                            <option value="11" {{ $rombel->kelas->tingkat == '11' ? 'selected' : '' }}>Kelas 11</option>
+                            <option value="12" {{ $rombel->kelas->tingkat == '12' ? 'selected' : '' }}>Kelas 12</option>
                         </select>
                     </div>
 
                     <!-- Konsentrasi Keahlian -->
-                    <div class="col-md-6 mb-3">
-                        <label for="jurusan_id" class="form-label">Konsentrasi Keahlian</label>
+                    <div class="col-md-6">
+                        <label for="jurusan_id" class="form-label">
+                            <i class="fas fa-building"></i> Konsentrasi Keahlian <span class="text-danger">*</span>
+                        </label>
                         <select name="jurusan_id" id="jurusan_id" class="form-select" required>
                             <option value="">Pilih Konsentrasi Keahlian</option>
                             @foreach($jurusans as $j)
@@ -164,19 +256,25 @@
                     </div>
                 </div>
 
-                <div class="row mb-4">
+                <div class="row g-3 mt-2">
                     <!-- Nama Rombel -->
-                    <div class="col-md-6 mb-3">
-                        <label for="nama" class="form-label">Nama Rombel</label>
-                        <input type="text" name="nama" id="nama" class="form-control" placeholder="Contoh: RPL 1, TKJ 2"
+                    <div class="col-md-6">
+                        <label for="nama" class="form-label">
+                            <i class="fas fa-tag"></i> Nama Rombel <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="nama" id="nama" class="form-control" 
+                            placeholder="Contoh: X RPL 1, XI TKJ 2, XII DPIB 1"
                             value="{{ old('nama', $rombel->nama) }}" required>
+                        <small class="form-text text-muted">Contoh: X RPL 1, XI TKJ 2, XII DPIB 1</small>
                     </div>
 
                     <!-- Wali Kelas -->
-                    <div class="col-md-6 mb-3">
-                        <label for="guru_id" class="form-label">Wali Kelas</label>
-                        <select name="guru_id" id="guru_id" class="form-select" required>
-                            <option value="">Pilih Wali Kelas</option>
+                    <div class="col-md-6">
+                        <label for="guru_id" class="form-label">
+                            <i class="fas fa-chalkboard-user"></i> Wali Kelas
+                        </label>
+                        <select name="guru_id" id="guru_id" class="form-select">
+                            <option value="">-- Pilih Wali Kelas --</option>
                             @foreach($gurus as $guru)
                                 <option value="{{ $guru->id }}" {{ $guru->id == $rombel->guru_id ? 'selected' : '' }}>
                                     {{ $guru->nama }}
@@ -186,8 +284,16 @@
                     </div>
                 </div>
 
+
                 <div class="d-flex justify-content-end mt-4 gap-2">
                     <a href="{{ route('super_admin.manajemen-kelas.index') }}" class="btn btn-light">
+=======
+                <div class="section-divider mt-4"></div>
+
+                <!-- BUTTON ACTIONS -->
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a href="{{ route('super_admin.manajemen-kelas.index') }}" class="btn btn-secondary">
+>>>>>>> Stashed changes
                         <i class="fas fa-times me-2"></i> Batal
                     </a>
                     <button type="submit" class="btn btn-primary">

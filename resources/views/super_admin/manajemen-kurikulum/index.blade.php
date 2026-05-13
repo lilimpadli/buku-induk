@@ -52,15 +52,37 @@
                                 <td>{{ $k->nama_kurikulum }}</td>
                                 <td>{{ $k->mata_pelajarans_count }}</td>
                                 <td>{{ $k->created_at->format('d/m/Y') }}</td>
-                                <td>
-                                    <a href="{{ route('super_admin.manajemen-kurikulum.show', $k->id) }}" class="btn btn-sm btn-info">Detail</a>
-                                    <a href="{{ route('super_admin.manajemen-kurikulum.edit', $k->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                                    <form method="POST" action="{{ route('super_admin.manajemen-kurikulum.destroy', $k->id) }}" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus kurikulum ini?')">
+                            <td class="text-center">
+                                <div class="d-inline-flex">
+
+                                    {{-- Detail --}}
+                                    <a href="{{ route('super_admin.manajemen-kurikulum.show', $k->id) }}"
+                                    class="btn btn-info text-dark rounded-start rounded-0 border-0">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+
+                                    {{-- Edit --}}
+                                    <a href="{{ route('super_admin.manajemen-kurikulum.edit', $k->id) }}"
+                                    class="btn btn-warning text-dark rounded-0 border-0">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+
+                                    {{-- Hapus --}}
+                                    <form method="POST"
+                                        action="{{ route('super_admin.manajemen-kurikulum.destroy', $k->id) }}"
+                                        class="d-inline"
+                                        onsubmit="return confirm('Yakin ingin menghapus kurikulum ini?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+
+                                        <button type="submit"
+                                                class="btn btn-danger rounded-end rounded-0 border-0">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </form>
-                                </td>
+
+                                </div>
+                            </td>
                             </tr>
                         @empty
                             <tr>

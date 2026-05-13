@@ -29,7 +29,7 @@
 
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-primary">Simpan</button>
-                    <a href="{{ route('kurikulum.jurusan.index') }}" class="btn btn-secondary">Batal</a>
+                    <a href="javascript:history.back()" class="btn btn-secondary">Batal</a>
                 </div>
             </form>
         </div>
