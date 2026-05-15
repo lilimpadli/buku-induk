@@ -16,7 +16,7 @@ class ManajemenKelasController extends Controller
     public function index(Request $request)
     {
         // Query dasar dengan relasi
-        $query = Kelas::with(['jurusan', 'rombels']);
+        $query = Rombel::with(['kelas.jurusan', 'guru', 'siswa']);
 
         // Get search and filter parameters
         $search = $request->get('search', '');
@@ -24,32 +24,42 @@ class ManajemenKelasController extends Controller
 
         // Filter berdasarkan pencarian
         if (!empty($search)) {
-            $query->where('tingkat', 'like', '%' . $search . '%')
-                  ->orWhereHas('jurusan', function($q) use ($search) {
-                      $q->where('nama', 'like', '%' . $search . '%');
+            $query->where(function($q) use ($search) {
+                $q->where('nama', 'like', '%' . $search . '%')
+                  ->orWhereHas('kelas', function($q2) use ($search) {
+                      $q2->where('tingkat', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('kelas.jurusan', function($q2) use ($search) {
+                      $q2->where('nama', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('guru', function($q2) use ($search) {
+                      $q2->where('nama', 'like', '%' . $search . '%');
                   });
+            });
         }
 
         // Filter berdasarkan jurusan
         if (!empty($jurusan_id)) {
-            $query->where('jurusan_id', $jurusan_id);
+            $query->whereHas('kelas', function($q) use ($jurusan_id) {
+                $q->where('jurusan_id', $jurusan_id);
+            });
         }
 
         // Get all jurusans for dropdown
         $allJurusans = Jurusan::all();
 
         // Dapatkan hasil dengan pagination
-        $kelas = $query->paginate(12)->withQueryString();
+        $rombels = $query->paginate(12)->withQueryString();
 
-        return view('super_admin.manajemen-kelas.index', compact('kelas', 'allJurusans', 'search', 'jurusan_id'));
+        return view('super_admin.manajemen-kelas.index', compact('rombels', 'allJurusans', 'search', 'jurusan_id'));
     }
 
-    public function create()
-    {
-        $jurusans = Jurusan::all();
-        $gurus = Guru::all();
-        return view('super_admin.manajemen-kelas.create', compact('jurusans', 'gurus'));
-    }
+public function create()
+{
+    $jurusans = Jurusan::all();
+    $gurus = Guru::all();
+    return view('super_admin.manajemen-kelas.create', compact('jurusans', 'gurus'));
+}
 
     public function store(Request $request)
     {
