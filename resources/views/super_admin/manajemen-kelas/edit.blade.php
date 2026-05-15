@@ -284,6 +284,11 @@
                     </div>
                 </div>
 
+
+
+                <div class="d-flex justify-content-end mt-4 gap-2">
+                    <a href="{{ route('super_admin.manajemen-kelas.index') }}" class="btn btn-light">
+
                 <div class="section-divider mt-4"></div>
 
                 <!-- BUTTON ACTIONS -->

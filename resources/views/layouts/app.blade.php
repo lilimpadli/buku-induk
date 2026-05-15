@@ -13,6 +13,9 @@
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -37,6 +40,7 @@
         body {
             background: #f6f7fb;
             transition: var(--transition, 0.2s) ease;
+            font-family: 'Poppins', sans-serif;
         }
 
         /* Mobile Header */
@@ -150,7 +154,7 @@
         }
 
         .sidebar-content {
-            padding: 16px 12px;
+            padding: 14px 14px;
         }
 
         .user-mini {
@@ -169,33 +173,43 @@
         }
 
         .sidebar .nav-link {
-            color: #4b5563;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 4px;
+            color: #374151;
+            padding: 10px 14px;
+            border-radius: 12px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             font-size: 15px;
-            transition: all 0.2s ease;
+            transition: transform .25s ease, box-shadow .25s ease, background .25s ease, color .25s ease;
+            background: transparent;
         }
 
         .sidebar .nav-link i {
-            width: 20px;
-            text-align: center;
-            font-size: 18px;
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
         }
 
         .sidebar .nav-link:hover {
-            background: rgba(47,83,255,0.08);
+            transform: translateX(6px);
+            background: linear-gradient(90deg, rgba(47,83,255,0.06), rgba(124,58,237,0.04));
             color: var(--accent);
             text-decoration: none;
+            box-shadow: 0 8px 22px rgba(15,23,42,0.06);
         }
 
         .sidebar .nav-link.active {
-            background: var(--accent);
+            background: linear-gradient(135deg, #2F53FF 0%, #7C3AED 100%);
             color: #fff;
             font-weight: 600;
+            box-shadow: 0 12px 30px rgba(47,83,255,0.16);
+            border-left: none;
+            border-radius: 12px;
         }
 
         /* Dropdown in sidebar */
@@ -241,7 +255,7 @@
         /* Main Content */
         main {
             background: #f8f9fa;
-            padding: 30px 28px;
+            padding: 40px 50px;
             margin-left: 280px;
             max-width: calc(100% - 280px);
             min-height: 100vh;
@@ -615,13 +629,6 @@
                                     <i class="fas fa-school"></i> <span>Manajemen Kelas</span>
                                 </a>
 
-<<<<<<< Updated upstream
-=======
-                                
-
-                                
-
->>>>>>> Stashed changes
                                 <a href="{{ route('kurikulum.kurikulum.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kurikulum*') ? 'active' : '' }}">
                                     <i class="fas fa-graduation-cap"></i> <span>Manajemen Kurikulum</span>
                                 </a>

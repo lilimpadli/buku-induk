@@ -895,4 +895,4 @@
         });
     }
 </script>
-@endsection
+@endsection 

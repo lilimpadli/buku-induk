@@ -385,10 +385,10 @@
             <p class="rombel-subtitle mb-0">{{ $rombel->nama }}</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('tu.kelas.export', $rombel->id) }}" class="btn btn-success">
+            <a href="{{ route('super_admin.manajemen-kelas.export', $rombel->id) }}" class="btn btn-success">
                 <i class="fas fa-file-excel me-2"></i> Export Rombel
             </a>
-            <a href="{{ request()->header('referer') ?: route('tu.kelas.index') }}" class="btn btn-outline-secondary">
+            <a href="{{ request()->header('referer') ?: route('super_admin.manajemen-kelas.index') }}" class="btn btn-outline-secondary">
                 <i class="fa fa-arrow-left me-2"></i> Kembali
             </a>
         </div>
