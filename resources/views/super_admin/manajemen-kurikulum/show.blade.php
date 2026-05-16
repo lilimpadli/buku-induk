@@ -1,16 +1,18 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Kurikulum TU Kepegawaian')
+@section('title', 'Detail Kurikulum')
 
 @section('content')
 <div class="container-fluid px-3 px-md-4 mt-3 mt-md-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="mb-0">Detail Kurikulum</h3>
         <div>
-            <a href="{{ route('kurikulum.kurikulum.edit', $kurikulum->id) }}" class="btn btn-warning me-2">
+            {{-- PERBAIKI ROUTE DISINI --}}
+            <a href="{{ route('super_admin.manajemen-kurikulum.edit', $kurikulum->id) }}" class="btn btn-warning me-2">
                 <i class="fas fa-edit me-1"></i> Edit
             </a>
-            <a href="{{ route('kurikulum.kurikulum.index') }}" class="btn btn-secondary">
+            {{-- PERBAIKI ROUTE DISINI --}}
+            <a href="{{ route('super_admin.manajemen-kurikulum.index') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left me-1"></i> Kembali
             </a>
         </div>
