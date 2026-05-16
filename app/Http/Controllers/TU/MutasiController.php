@@ -7,6 +7,7 @@ use App\Models\MutasiSiswa;
 use App\Models\Siswa;
 use App\Models\Kelas;
 use App\Models\Rombel;
+use App\Models\Jurusan;
 use App\Models\KenaikanKelas;
 use Illuminate\Http\Request;
 
@@ -17,49 +18,32 @@ class MutasiController extends Controller
      */
     public function index(Request $request)
     {
-        $query = MutasiSiswa::with('siswa')
-            ->where('status', '!=', 'lulus')  // Exclude alumni (lulus)
-            ->latest('tanggal_mutasi');
+        // Load classes with rombels and students
+        $classes = Kelas::with(['jurusan', 'rombels.siswas'])
+            ->orderBy('tingkat')
+            ->orderBy('id')
+            ->get();
 
-        // Filter berdasarkan status
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        // Build array of all students by class for JSON in view
+        $allStudents = [];
+        foreach ($classes as $kelas) {
+            foreach ($kelas->rombels as $rombel) {
+                foreach ($rombel->siswas as $siswa) {
+                    $allStudents[] = [
+                        'id' => $siswa->id,
+                        'nis' => $siswa->nis,
+                        'nama_lengkap' => $siswa->nama_lengkap,
+                        'kelas_id' => $kelas->id,
+                        'rombel_name' => $rombel->nama
+                    ];
+                }
+            }
         }
 
-        // Filter berdasarkan nama siswa
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->whereHas('siswa', function ($q) use ($search) {
-                $q->where('nama_lengkap', 'like', "%{$search}%")
-                  ->orWhere('nis', 'like', "%{$search}%")
-                  ->orWhere('nisn', 'like', "%{$search}%");
-            });
-        }
-
-        $mutasis = $query->paginate(15);
-        $statuses = [
-            'pindah' => 'Pindah Sekolah',
-            'do' => 'Putus Sekolah (DO)',
-            'meninggal' => 'Meninggal Dunia',
-            'naik_kelas' => 'Naik Kelas',
-            'kelas' => 'Pindah Kelas',
-            'jurusan' => 'Pindah Jurusan',
-            'angkatan' => 'Pindah Angkatan',
-            'lulus' => 'Lulus',
-        ];
-
-        return view('tu.mutasi.index', compact('mutasis', 'statuses'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        $siswas = Siswa::whereDoesntHave('mutasiTerakhir', function ($q) {
-            $q->whereIn('status', ['lulus', 'pindah', 'do', 'meninggal']);
-        })
-            ->orderBy('nama_lengkap')
+        // Get existing mutasi records for reference
+        $mutasis = MutasiSiswa::with('siswa')
+            ->where('status', '!=', 'lulus')
+            ->latest('tanggal_mutasi')
             ->get();
 
         $statuses = [
@@ -70,7 +54,53 @@ class MutasiController extends Controller
             'lulus' => 'Lulus',
         ];
 
-        return view('tu.mutasi.create', compact('siswas', 'statuses'));
+        return view('tu.mutasi.index', compact('classes', 'allStudents', 'mutasis', 'statuses'));
+    }
+
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        $siswas = Siswa::with('rombel.kelas.jurusan')
+            ->whereDoesntHave('mutasiTerakhir', function ($q) {
+                $q->whereIn('status', ['lulus', 'pindah', 'do', 'meninggal']);
+            })
+            ->orderBy('nama_lengkap')
+            ->get();
+
+        $classes = Kelas::with('jurusan')
+            ->orderBy('tingkat')
+            ->orderBy('id')
+            ->get();
+
+        $statuses = [
+            'pindah' => 'Pindah Sekolah',
+            'do' => 'Putus Sekolah (DO)',
+            'meninggal' => 'Meninggal Dunia',
+            'naik_kelas' => 'Naik Kelas',
+            'lulus' => 'Lulus',
+        ];
+
+        return view('tu.mutasi.create', compact('siswas', 'classes', 'statuses'));
+    }
+
+    public function kelasByJurusan($jurusanId)
+    {
+        $jurusan = Jurusan::with(['kelas.rombels.siswas', 'kelas.rombels.guru'])->findOrFail($jurusanId);
+
+        return view('tu.mutasi.kelas.kelas', compact('jurusan'));
+    }
+
+    /**
+     * Show rombel for mutation with student grid
+     */
+    public function showRombel($rombelId)
+    {
+        $rombel = Rombel::with(['siswas.mutasiTerakhir', 'kelas.jurusan', 'guru'])->findOrFail($rombelId);
+
+        return view('tu.mutasi.kelas.show', compact('rombel'));
     }
 
     /**
@@ -157,44 +187,203 @@ class MutasiController extends Controller
     }
 
     /**
-     * Bulk mutasi siswa (naik kelas)
+     * Update/mutasi siswa from form
+     */
+    public function updateSiswa(Request $request)
+    {
+        $validated = $request->validate([
+            'siswa_ids' => 'required|array|min:1',
+            'siswa_ids.*' => 'exists:data_siswa,id',
+            'rombel_id' => 'required|exists:rombels,id',
+            'action' => 'required|in:lulus,naik_kelas,pindah,do,meninggal',
+            'tanggal_mutasi' => 'required|date',
+            'keterangan' => 'nullable|string',
+            'alasan_pindah' => 'nullable|string|required_if:action,pindah',
+            'tujuan_pindah' => 'nullable|string|required_if:action,pindah',
+            'no_sk_keluar' => 'nullable|string|required_if:action,do,meninggal',
+            'tanggal_sk_keluar' => 'nullable|date|required_if:action,do,meninggal',
+        ]);
+
+        try {
+            $rombel = Rombel::with('kelas.jurusan')->findOrFail($validated['rombel_id']);
+            $action = $validated['action'];
+            $currentKelas = $rombel->kelas;
+            $currentTingkat = $currentKelas->tingkat;
+            
+            // Validasi untuk aksi naik kelas
+            if ($action === 'naik_kelas') {
+                // Map tingkat ke level (X=10, XI=11, XII=12)
+                $tingkatMap = ['X' => 10, 'XI' => 11, 'XII' => 12, '10' => 10, '11' => 11, '12' => 12];
+                $reverseMap = [10 => 'XI', 11 => 'XII', 12 => 'XII'];
+                
+                if (!isset($tingkatMap[$currentTingkat])) {
+                    return redirect()
+                        ->back()
+                        ->with('error', 'Tingkat kelas tidak dikenali');
+                }
+                
+                $currentLevel = $tingkatMap[$currentTingkat];
+                
+                // Kelas XII harus LULUS, tidak boleh naik
+                if ($currentLevel === 12 || strtoupper($currentTingkat) === 'XII' || $currentTingkat === '12') {
+                    return redirect()
+                        ->back()
+                        ->with('error', '❌ Siswa kelas XII harus LULUS, bukan naik kelas. Silakan pilih aksi "Lulus Siswa".');
+                }
+                
+                // Tentukan kelas tujuan
+                $nextLevel = $currentLevel + 1;
+                $nextTingkat = $reverseMap[$nextLevel] ?? null;
+                if (!$nextTingkat) {
+                    return redirect()
+                        ->back()
+                        ->with('error', '❌ Tingkat tujuan tidak ditemukan untuk naik kelas.');
+                }
+                
+                // Cek apakah kelas tujuan ada
+                $nextKelas = Kelas::where('jurusan_id', $currentKelas->jurusan_id)
+                    ->where('tingkat', $nextTingkat)
+                    ->first();
+                
+                if (!$nextKelas) {
+                    $kelasName = $nextTingkat . ' ' . $currentKelas->jurusan->nama;
+                    return redirect()
+                        ->back()
+                        ->with('error', "❌ Kelas $kelasName belum ada di sistem. Silakan buat kelas terlebih dahulu sebelum melakukan naik kelas.");
+                }
+                
+                // Cari rombel tujuan dengan nomor/nama yang sama di kelas berikutnya
+                // Ambil nomor rombel dari nama (contoh: "RPL 1" -> 1, "IPA 2" -> 2)
+                $rombelNumber = preg_replace('/[^0-9]/', '', $rombel->nama);
+                
+                $nextRombel = Rombel::where('kelas_id', $nextKelas->id)
+                    ->where('nama', 'like', '%' . $rombelNumber . '%')
+                    ->first();
+                
+                if (!$nextRombel) {
+                    // Jika tidak ada dengan nomor sama, coba cari dengan nama yang sama persis
+                    $nextRombel = Rombel::where('kelas_id', $nextKelas->id)
+                        ->where('nama', $rombel->nama)
+                        ->first();
+                }
+                
+                if (!$nextRombel) {
+                    $rombelName = $nextTingkat . ' ' . $rombel->nama;
+                    return redirect()
+                        ->back()
+                        ->with('error', "❌ Rombel $rombelName belum ada di sistem. Silakan buat rombel terlebih dahulu sebelum melakukan naik kelas.");
+                }
+            }
+
+            $count = 0;
+            $today = now()->format('Y-m-d');
+            $status = $action;
+            $terminalStatuses = ['pindah', 'do', 'meninggal'];
+
+            foreach ($validated['siswa_ids'] as $siswaId) {
+                $siswa = Siswa::with('mutasiTerakhir')->find($siswaId);
+                $lastStatus = optional($siswa->mutasiTerakhir)->status;
+
+                if ($action === 'naik_kelas' && in_array($lastStatus, $terminalStatuses, true)) {
+                    if (isset($nextRombel) && isset($nextKelas)) {
+                        $siswa->update([
+                            'rombel_id' => $nextRombel->id,
+                            'kelas_id' => $nextKelas->id,
+                        ]);
+                    }
+                    $count++;
+                    continue;
+                }
+
+                $mutasiData = [
+                    'siswa_id' => $siswaId,
+                    'status' => $status,
+                    'tanggal_mutasi' => $validated['tanggal_mutasi'],
+                    'keterangan' => $validated['keterangan'] ?? null,
+                ];
+
+                if ($status === 'pindah') {
+                    $mutasiData['alasan_pindah'] = $validated['alasan_pindah'];
+                    $mutasiData['tujuan_pindah'] = $validated['tujuan_pindah'];
+                }
+
+                if (in_array($status, ['do', 'meninggal'], true)) {
+                    $mutasiData['no_sk_keluar'] = $validated['no_sk_keluar'];
+                    $mutasiData['tanggal_sk_keluar'] = $validated['tanggal_sk_keluar'];
+                }
+
+                MutasiSiswa::create($mutasiData);
+                $count++;
+            }
+
+            $statusLabel = [
+                'naik_kelas' => 'dinaikkan kelasnya',
+                'lulus' => 'lulus',
+                'pindah' => 'pindah sekolah',
+                'do' => 'keluar sekolah',
+                'meninggal' => 'tercatat meninggal dunia',
+            ][$status] ?? 'dimutasi';
+
+            return redirect()
+                ->route('tu.mutasi.kelas', ['jurusan' => $rombel->kelas->jurusan->id])
+                ->with('success', "✅ $count siswa berhasil $statusLabel!");
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Error: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Bulk mutasi siswa untuk berbagai status
      */
     public function bulk(Request $request)
     {
         $validated = $request->validate([
             'siswa_ids' => 'required|array|min:1',
             'siswa_ids.*' => 'exists:data_siswa,id',
-            'kelas_id' => 'required|exists:kelas,id',
-            'rombel_id' => 'nullable|exists:rombels,id',
+            'status' => 'required|in:naik_kelas,lulus,do,pindah,meninggal',
+            'kelas_id' => 'nullable|exists:kelas,id',
             'keterangan' => 'nullable|string',
+            'alasan_pindah' => 'nullable|string|required_if:status,pindah',
+            'tujuan_pindah' => 'nullable|string|required_if:status,pindah',
         ]);
 
         try {
             $count = 0;
             $today = now()->format('Y-m-d');
+            $status = $validated['status'];
 
             foreach ($validated['siswa_ids'] as $siswaId) {
-                // Create mutasi record
-                MutasiSiswa::create([
+                $mutasiData = [
                     'siswa_id' => $siswaId,
-                    'status' => 'naik_kelas',
+                    'status' => $status,
                     'tanggal_mutasi' => $today,
                     'keterangan' => $validated['keterangan'] ?? null,
-                ]);
+                ];
 
-                // Update siswa's kelas and rombel
-                Siswa::where('id', $siswaId)->update([
-                    'kelas_id' => $validated['kelas_id'],
-                    'rombel_id' => $validated['rombel_id'] ?? null,
-                ]);
+                // Add fields based on status
+                if ($status === 'pindah') {
+                    $mutasiData['alasan_pindah'] = $validated['alasan_pindah'] ?? null;
+                    $mutasiData['tujuan_pindah'] = $validated['tujuan_pindah'] ?? null;
+                }
 
+                MutasiSiswa::create($mutasiData);
                 $count++;
             }
+
+            $statusLabel = [
+                'naik_kelas' => 'dinaikkan kelasnya',
+                'lulus' => 'lulus',
+                'do' => 'putus sekolah',
+                'pindah' => 'pindah sekolah',
+                'meninggal' => 'tercatat meninggal dunia'
+            ][$status] ?? 'dimutasi';
 
             return response()->json([
                 'success' => true,
                 'count' => $count,
-                'message' => "$count siswa berhasil dinaikkan kelasnya"
+                'message' => "$count siswa berhasil $statusLabel"
             ]);
 
         } catch (\Exception $e) {

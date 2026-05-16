@@ -36,6 +36,22 @@
                 @csrf
 
                 <div class="row mb-4">
+                    <!-- Pilih Kelas -->
+                    <div class="col-md-6">
+                        <label for="filter_kelas" class="form-label">
+                            <i class="fas fa-chalkboard"></i> Kelas
+                        </label>
+                        <select id="filter_kelas" class="form-select">
+                            <option value="">-- Tampilkan Semua Kelas --</option>
+                            @foreach($classes as $kelas)
+                                <option value="{{ $kelas->id }}">
+                                    {{ $kelas->tingkat }} {{ $kelas->jurusan->nama ?? '' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Pilih kelas untuk menampilkan siswa terkait.</small>
+                    </div>
+
                     <!-- Pilih Siswa -->
                     <div class="col-md-6">
                         <label for="siswa_id" class="form-label">
@@ -44,8 +60,15 @@
                         <select name="siswa_id" id="siswa_id" class="form-select @error('siswa_id') is-invalid @enderror" required>
                             <option value="">-- Pilih Siswa --</option>
                             @foreach($siswas as $siswa)
-                                <option value="{{ $siswa->id }}" {{ old('siswa_id') == $siswa->id ? 'selected' : '' }}>
+                                <option value="{{ $siswa->id }}"
+                                    data-kelas-id="{{ optional(optional($siswa->rombel)->kelas)->id ?? '' }}"
+                                    data-kelas-name="{{ trim((optional(optional($siswa->rombel)->kelas)->tingkat ?? '') . ' ' . (optional(optional($siswa->rombel)->kelas)->jurusan->nama ?? '')) }}"
+                                    data-rombel-name="{{ $siswa->rombel->nama ?? '' }}"
+                                    {{ old('siswa_id') == $siswa->id ? 'selected' : '' }}>
                                     {{ $siswa->nis }} - {{ $siswa->nama_lengkap }}
+                                    @if($siswa->rombel)
+                                        ({{ $siswa->rombel->nama }})
+                                    @endif
                                 </option>
                             @endforeach
                         </select>
@@ -53,7 +76,21 @@
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>
+                </div>
 
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="alert alert-light border" id="studentClassInfo" style="display: none;">
+                            <strong>Kelas Saat Ini:</strong>
+                            <span id="currentKelasText">-</span>
+                            <br>
+                            <strong>Rombel:</strong>
+                            <span id="currentRombelText">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
                     <!-- Status Mutasi -->
                     <div class="col-md-6">
                         <label for="status" class="form-label">
@@ -192,16 +229,89 @@
         }
     }
 
-    // Jalankan saat halaman dimuat jika ada nilai yang dipilih
+    function updateStudentClassInfo() {
+        const siswaSelect = document.getElementById('siswa_id');
+        const selectedOption = siswaSelect.options[siswaSelect.selectedIndex];
+        const infoBox = document.getElementById('studentClassInfo');
+        const currentKelasText = document.getElementById('currentKelasText');
+        const currentRombelText = document.getElementById('currentRombelText');
+
+        if (selectedOption && selectedOption.value) {
+            currentKelasText.textContent = selectedOption.dataset.kelasName || '-';
+            currentRombelText.textContent = selectedOption.dataset.rombelName || '-';
+            infoBox.style.display = 'block';
+        } else {
+            currentKelasText.textContent = '-';
+            currentRombelText.textContent = '-';
+            infoBox.style.display = 'none';
+        }
+    }
+
+    function filterStudentsByClass() {
+        const kelasId = document.getElementById('filter_kelas').value;
+        const siswaSelect = document.getElementById('siswa_id');
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = '-- Pilih Siswa --';
+
+        siswaSelect.innerHTML = '';
+        siswaSelect.appendChild(placeholder);
+
+        allStudentOptions.forEach(item => {
+            if (!kelasId || item.kelasId === kelasId) {
+                const option = document.createElement('option');
+                option.value = item.value;
+                option.textContent = item.text;
+                option.dataset.kelasId = item.kelasId;
+                option.dataset.kelasName = item.kelasName;
+                option.dataset.rombelName = item.rombelName;
+                if (item.value === selectedSiswaId) {
+                    option.selected = true;
+                }
+                siswaSelect.appendChild(option);
+            }
+        });
+
+        siswaSelect.value = selectedSiswaId || '';
+        $('#siswa_id').trigger('change.select2');
+        updateStudentClassInfo();
+    }
+
+    let allStudentOptions = [];
+    let selectedSiswaId = '';
+
     document.addEventListener('DOMContentLoaded', function() {
-        // Inisialisasi Select2 untuk field siswa
+        const siswaSelect = document.getElementById('siswa_id');
+        const kelasFilter = document.getElementById('filter_kelas');
+
+        allStudentOptions = Array.from(siswaSelect.options).map(option => ({
+            value: option.value,
+            text: option.textContent,
+            kelasId: option.dataset.kelasId || '',
+            kelasName: option.dataset.kelasName || '',
+            rombelName: option.dataset.rombelName || ''
+        }));
+
+        selectedSiswaId = siswaSelect.value;
+
         $('#siswa_id').select2({
             placeholder: '-- Pilih atau Ketik Nama Siswa --',
             allowClear: true,
             width: '100%'
         });
 
+        kelasFilter.addEventListener('change', () => {
+            selectedSiswaId = siswaSelect.value;
+            filterStudentsByClass();
+        });
+
+        $('#siswa_id').on('change', function() {
+            selectedSiswaId = this.value;
+            updateStudentClassInfo();
+        });
+
         updateStatusFields();
+        updateStudentClassInfo();
         
         // Inisialisasi form validation
         const forms = document.querySelectorAll('.needs-validation');

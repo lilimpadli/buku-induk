@@ -905,8 +905,8 @@ class SiswaController extends Controller
     public function exportPDF()
     {
         $siswa = $this->getSiswaLogin();
-        // Load relasi orang tua
-        $siswa->load(['ayah', 'ibu', 'wali']);
+        // Load relasi yang diperlukan untuk export PDF
+        $siswa->load(['user', 'ayah', 'ibu', 'wali', 'rombel.kelas.jurusan']);
 
         $pdf = Pdf::loadView('siswa.pdf', compact('siswa'))
             ->setPaper('A4', 'portrait');

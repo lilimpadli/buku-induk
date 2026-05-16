@@ -23,6 +23,8 @@ class Siswa extends Model
         'nama_ibu',
         'pekerjaan_ayah',
         'pekerjaan_ibu',
+        'kelas_id',
+        'rombel_id',
     ];
 
     public function user()

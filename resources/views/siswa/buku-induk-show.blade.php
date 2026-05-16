@@ -4,187 +4,341 @@
 
 @section('content')
 <style>
+    /* CSS Variables untuk konsistensi */
     :root {
         --primary-color: #2F53FF;
         --secondary-color: #6366F1;
+        --success-color: #10B981;
+        --warning-color: #F59E0B;
+        --danger-color: #EF4444;
+        --info-color: #3B82F6;
         --light-bg: #F8FAFC;
         --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --border-radius: 12px;
+        --transition: all 0.3s ease;
     }
 
+    /* Base Styles */
     body {
         background-color: var(--light-bg);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: #1F2937;
     }
 
-    .buku-induk-container {
-        font-family: 'Times New Roman', serif;
-        line-height: 1.5;
-    }
-    
+    /* Header Styles */
     .buku-induk-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 2rem;
+        border-radius: var(--border-radius);
         text-align: center;
-        margin-bottom: 30px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #333;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .buku-induk-header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: float 20s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        50% { transform: translate(-30px, -30px) rotate(180deg); }
     }
 
     .buku-induk-header h3 {
-        font-size: clamp(18px, 4vw, 24px);
-        font-weight: bold;
+        font-size: clamp(20px, 4vw, 28px);
+        font-weight: 700;
         margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
     }
 
     .buku-induk-header h4 {
-        font-size: clamp(16px, 3.5vw, 20px);
+        font-size: clamp(16px, 3.5vw, 22px);
         margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
     }
 
     .buku-induk-header p {
         font-size: clamp(12px, 2.5vw, 14px);
-    }
-    
-    .buku-induk-section {
-        margin-bottom: 25px;
-    }
-    
-    .buku-induk-section h5 {
-        font-weight: bold;
-        margin-bottom: 15px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid #ddd;
-        font-size: clamp(14px, 3vw, 16px);
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
     }
 
-    .buku-induk-section p {
-        font-size: clamp(12px, 2.5vw, 14px);
-        margin-bottom: 0.75rem;
+    /* Card Styles */
+    .card {
+        border-radius: var(--border-radius);
+        border: 1px solid #E5E7EB;
+        box-shadow: var(--card-shadow);
+        background: white;
+        transition: var(--transition);
+    }
+
+    .card:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+        background: #F9FAFB;
+        border-bottom: 1px solid #E5E7EB;
+        padding: 1.5rem;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    /* Section Styles */
+    .info-section {
+        background: #F9FAFB;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #E5E7EB;
+        transition: var(--transition);
+    }
+
+    .info-section:hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-section h5 {
+        font-size: clamp(14px, 3vw, 18px);
+        font-weight: 700;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--primary-color);
+        color: var(--primary-color);
+        display: flex;
+            align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .info-label {
+        font-size: clamp(11px, 2vw, 13px);
+        font-weight: 600;
+        color: #6B7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-value {
+        font-size: clamp(13px, 2.5vw, 15px);
+        color: #1F2937;
         word-wrap: break-word;
     }
 
-    .buku-induk-section p strong {
-        display: inline-block;
-        min-width: 140px;
-    }
-    
-    .buku-induk-photo {
-        width: 100%;
-        max-width: 150px;
-        height: auto;
-        aspect-ratio: 3/4;
-        border: 1px solid #ddd;
-        object-fit: cover;
-    }
-    
-    .buku-induk-table {
-        font-size: clamp(9px, 2vw, 11px);
-    }
-    
-    .buku-induk-table th {
-        font-weight: bold;
-        background-color: #f8f9fa;
-        text-align: center;
-        padding: 8px 4px;
-        white-space: nowrap;
-    }
-    
-    .buku-induk-table td {
-        vertical-align: middle;
-        padding: 8px 4px;
-    }
-    
-    .signature-section {
-        margin-top: 50px;
-        padding-top: 20px;
-        border-top: 2px solid #333;
-    }
-    
-    .signature-box {
-        text-align: center;
-    }
-    
-    .signature-line {
-        border-top: 1px solid #000;
-        margin-top: 30px;
-        padding-top: 10px;
+    /* Photo Styles */
+    .photo-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        background: #F9FAFB;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        border: 1px solid #E5E7EB;
     }
 
+    .photo-wrapper {
+        position: relative;
+        width: 150px;
+        height: 200px;
+        overflow: hidden;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .photo-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .photo-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #E5E7EB, #D1D5DB);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: #6B7280;
+    }
+
+    .photo-placeholder i {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .photo-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #6B7280;
+    }
+
+    /* Badge Styles */
+    .badge-custom {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .badge-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Table Styles */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: var(--border-radius);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .table-custom {
+        font-size: clamp(10px, 2vw, 12px);
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-custom th {
+        background: #F3F4F6;
+        font-weight: 700;
+        text-align: center;
+        padding: 1rem 0.5rem;
+        border: 1px solid #E5E7EB;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .table-custom td {
+        padding: 0.75rem 0.5rem;
+        border: 1px solid #E5E7EB;
+        vertical-align: middle;
+    }
+
+    .table-custom tr:nth-child(even) {
+        background: #F9FAFB;
+    }
+
+    .table-custom tr:hover {
+        background: #F3F4F6;
+    }
+
+    /* Button Styles */
+    .btn-custom {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: var(--transition);
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary-custom {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+    }
+
+    .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(47, 83, 255, 0.3);
+        color: white;
+    }
+
+    .btn-secondary-custom {
+        background: #6B7280;
+        color: white;
+    }
+
+    .btn-secondary-custom:hover {
+        background: #4B5563;
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    /* Page Header */
     .page-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.5rem;
-        gap: 15px;
+        margin-bottom: 2rem;
+        gap: 1rem;
         flex-wrap: wrap;
     }
 
     .page-title {
-        font-size: clamp(18px, 4vw, 24px);
-        margin: 0;
-    }
-
-    .page-title i {
+        font-size: clamp(20px, 4vw, 28px);
+        font-weight: 700;
         color: var(--primary-color);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     .action-buttons {
         display: flex;
-        gap: 10px;
+        gap: 1rem;
         flex-wrap: wrap;
     }
 
-    .btn {
-        border-radius: 8px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        white-space: nowrap;
+    /* Loading Spinner */
+    .spinner-custom {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid #F3F4F6;
+        border-radius: 50%;
+        border-top-color: var(--primary-color);
+        animation: spin 0.8s linear infinite;
     }
 
-    .btn-secondary {
-        background-color: #64748B;
-        border: none;
-    }
-
-    .btn-secondary:hover {
-        background-color: #475569;
-        transform: translateY(-2px);
-    }
-
-    .btn-primary {
-        background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-        border: none;
-    }
-
-    .btn-primary:hover {
-        background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(47, 83, 255, 0.3);
-    }
-
-    .card {
-        border-radius: 16px;
-        border: none;
-        box-shadow: var(--card-shadow);
-    }
-
-    .badge {
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: clamp(10px, 2vw, 12px);
-        font-weight: 600;
-    }
-
-    /* Photo container */
-    .photo-container {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        margin-bottom: 20px;
+    @keyframes spin {
+        to { transform: rotate(360deg); }
     }
 
     /* Mobile Styles */
     @media (max-width: 767px) {
         .container-fluid {
-            padding-left: 10px;
-            padding-right: 10px;
+            padding-left: 1rem;
+            padding-right: 1rem;
         }
 
         .page-header {
@@ -192,310 +346,323 @@
             align-items: stretch;
         }
 
+        .page-title {
+            font-size: 1.5rem;
+            justify-content: center;
+        }
+
         .action-buttons {
             width: 100%;
+            justify-content: center;
         }
 
-        .action-buttons .btn {
+        .btn-custom {
             flex: 1;
-            font-size: 13px;
-            padding: 8px 12px;
-        }
-
-        .page-title i {
-            display: none;
+            justify-content: center;
+            font-size: 0.875rem;
+            padding: 0.625rem 1.25rem;
         }
 
         .card-body {
-            padding: 15px;
+            padding: 1.25rem;
         }
 
-        .buku-induk-header {
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-        }
-
-        .buku-induk-section {
-            margin-bottom: 20px;
-        }
-
-        .buku-induk-section h5 {
-            margin-bottom: 12px;
-            padding-bottom: 6px;
-        }
-
-        .buku-induk-section p {
-            margin-bottom: 0.5rem;
-        }
-
-        .buku-induk-section p strong {
-            display: block;
-            min-width: auto;
-            margin-bottom: 2px;
-            color: #64748B;
-            font-size: 11px;
-        }
-
-        /* Stack columns on mobile */
-        .row > div[class*='col-md'] {
-            margin-bottom: 15px;
+        .info-grid {
+            grid-template-columns: 1fr;
         }
 
         .photo-container {
             order: -1;
-            margin-bottom: 25px;
+            margin-bottom: 1.5rem;
         }
 
-        .buku-induk-photo {
-            max-width: 120px;
+        .table-custom {
+            font-size: 0.75rem;
         }
 
-        /* Table scroll on mobile */
-        .table-responsive {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin-bottom: 15px;
+        .table-custom th,
+        .table-custom td {
+            padding: 0.5rem 0.25rem;
         }
 
-        .buku-induk-table {
-            min-width: 600px;
-            font-size: 9px;
+        .info-section {
+            padding: 1rem;
         }
 
-        .buku-induk-table th,
-        .buku-induk-table td {
-            padding: 6px 3px;
-        }
-
-        .buku-induk-table th[rowspan] {
-            min-width: 100px;
-        }
-    }
-
-    /* Tablet Styles */
-    @media (min-width: 768px) and (max-width: 991px) {
-        .container-fluid {
-            padding-left: 15px;
-            padding-right: 15px;
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
-        .buku-induk-section p strong {
-            min-width: 120px;
-        }
-
-        .buku-induk-table {
-            font-size: 10px;
-        }
-
-        .buku-induk-table th,
-        .buku-induk-table td {
-            padding: 7px 4px;
-        }
-    }
-
-    /* Desktop Styles */
-    @media (min-width: 992px) {
-        .container-fluid {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .card-body {
-            padding: 30px;
-        }
-
-        .buku-induk-section p strong {
-            min-width: 160px;
-        }
-
-        .buku-induk-table th,
-        .buku-induk-table td {
-            padding: 8px 6px;
-        }
-    }
-
-    /* Large Desktop */
-    @media (min-width: 1400px) {
-        .container-fluid {
-            max-width: 1320px;
-        }
-    }
-
-    /* Landscape orientation on mobile */
-    @media (max-width: 767px) and (orientation: landscape) {
-        .buku-induk-photo {
-            max-width: 100px;
-        }
-
-        .card-body {
-            padding: 12px;
-        }
-
-        .buku-induk-section {
-            margin-bottom: 15px;
+        .info-section h5 {
+            font-size: 1rem;
         }
     }
 
     /* Print Styles */
     @media print {
         body {
-            background-color: white;
+            background: white;
         }
 
         .page-header,
         .action-buttons,
-        .btn {
+        .btn-custom {
             display: none !important;
         }
 
         .card {
             box-shadow: none;
-            border: 1px solid #ddd;
+            border: 1px solid #E5E7EB;
         }
 
-        .buku-induk-table {
+        .info-section {
+            break-inside: avoid;
+        }
+
+        .table-custom {
             font-size: 10pt;
-        }
-
-        .page-break {
-            page-break-after: always;
         }
 
         @page {
             margin: 2cm;
         }
     }
+
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
 </style>
 
-<div class="container-fluid buku-induk-container mt-4">
+<div class="container-fluid mt-4">
+    <!-- Page Header -->
     <div class="page-header">
         <h1 class="page-title">
-            <i class="fas fa-book"></i> Buku Induk Siswa
+            <i class="fas fa-book"></i>
+            Buku Induk Siswa
         </h1>
         <div class="action-buttons">
-            <a href="{{ route('siswa.dashboard') }}" class="btn btn-secondary btn-sm">
-                <i class="fas fa-arrow-left me-1"></i> Kembali
+            <a href="{{ route('siswa.dashboard') }}" class="btn-custom btn-secondary-custom">
+                <i class="fas fa-arrow-left"></i>
+                Kembali
             </a>
-            <a href="{{ route('siswa.bukuInduk.cetak') }}" target="_blank" class="btn btn-primary btn-sm">
-                <i class="fas fa-print me-1"></i> Cetak
+            <a href="{{ route('siswa.bukuInduk.cetak') }}" target="_blank" class="btn-custom btn-primary-custom">
+                <i class="fas fa-print"></i>
+                Cetak
             </a>
         </div>
     </div>
 
+    <!-- Main Card -->
     <div class="card">
-        <div class="card-body">
-            <!-- Header -->
-            <div class="buku-induk-header">
-                <h3 class="mb-2">BUKU INDUK SISWA</h3>
-                <h4 class="mb-1">SMKN 1 KAWALI</h4>
-                <p class="mb-0 text-muted"></p>
-                <p class="text-muted">KONSENTRASI KEAHLIAN: {{ $siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan ? $siswa->rombel->kelas->jurusan->nama : 'REKAYASA PERANGKAT LUNAK' }}</p>
-            </div>
+        <!-- Header -->
+        <div class="buku-induk-header">
+            <h3>BUKU INDUK SISWA</h3>
+            <h4>SMKN 1 KAWALI</h4>
+            <p>KONSENTRASI KEAHLIAN: {{ $siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan ? $siswa->rombel->kelas->jurusan->nama : 'REKAYASA PERANGKAT LUNAK' }}</p>
+        </div>
 
-            <!-- Info Siswa -->
+        <div class="card-body">
+            <!-- Photo Section -->
             <div class="row mb-4">
-                <!-- Photo - Will be reordered on mobile -->
-                <div class="col-md-3 order-md-2">
+                <div class="col-lg-3">
                     <div class="photo-container">
-                        @if(isset($siswa->user) && isset($siswa->user->photo))
-                            <img src="{{ asset('storage/' . $siswa->user->photo) }}" alt="{{ $siswa->nama_lengkap }}" class="buku-induk-photo">
-                        @else
-                            <div class="buku-induk-photo d-flex align-items-center justify-content-center bg-light">
-                                <span class="text-muted" style="font-size: 12px;">Tidak ada foto</span>
-                            </div>
-                        @endif
+                        <div class="photo-wrapper">
+                            @if(isset($siswa->user) && isset($siswa->user->photo))
+                                <img src="{{ asset('storage/' . $siswa->user->photo) }}" alt="{{ $siswa->nama_lengkap }}" loading="lazy">
+                            @else
+                                <div class="photo-placeholder">
+                                    <i class="fas fa-user"></i>
+                                    <span>Tidak ada foto</span>
+                                </div>
+                            @endif
+                        </div>
+                        <span class="photo-label">Foto Profil</span>
                     </div>
                 </div>
 
-                <!-- Data Siswa -->
-                <div class="col-md-9 order-md-1">
+                <div class="col-lg-9">
                     <!-- Data Pribadi -->
-                    <div class="buku-induk-section">
-                        <h5>A. DATA PRIBADI SISWA</h5>
-                        <div class="row">
-                            <div class="col-md-6 col-12">
-                                <p><strong>NIS:</strong> {{ $siswa->nis }}</p>
-                                <p><strong>NISN:</strong> {{ $siswa->nisn ?? '-' }}</p>
-                                <p><strong>Nama Lengkap:</strong> {{ $siswa->nama_lengkap }}</p>
-                                <p><strong>Jenis Kelamin:</strong> {{ $siswa->jenis_kelamin }}</p>
+                    <div class="info-section">
+                        <h5>
+                            <i class="fas fa-user"></i>
+                            A. DATA PRIBADI SISWA
+                        </h5>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">NIS</span>
+                                <span class="info-value">{{ $siswa->nis }}</span>
                             </div>
-                            <div class="col-md-6 col-12">
-                                <p><strong>Tempat Lahir:</strong> {{ $siswa->tempat_lahir ?? '-' }}</p>
-                                <p><strong>Tanggal Lahir:</strong> {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->translatedFormat('d F Y') : '-' }}</p>
-                                <p><strong>Agama:</strong> {{ $siswa->agama ?? '-' }}</p>
-                                <p><strong>Kewarganegaraan:</strong> {{ $siswa->kewarganegaraan ?? '-' }}</p>
-                                <p><strong>Alamat:</strong> Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</p>
+                            <div class="info-item">
+                                <span class="info-label">NISN</span>
+                                <span class="info-value">{{ $siswa->nisn ?? '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Nama Lengkap</span>
+                                <span class="info-value">{{ $siswa->nama_lengkap }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Jenis Kelamin</span>
+                                <span class="info-value">{{ $siswa->jenis_kelamin }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Tempat Lahir</span>
+                                <span class="info-value">{{ $siswa->tempat_lahir ?? '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Tanggal Lahir</span>
+                                <span class="info-value">{{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->translatedFormat('d F Y') : '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Agama</span>
+                                <span class="info-value">{{ $siswa->agama ?? '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Kewarganegaraan</span>
+                                <span class="info-value">{{ $siswa->kewarganegaraan ?? '-' }}</span>
+                            </div>
+                            <div class="info-item" style="grid-column: 1 / -1;">
+                                <span class="info-label">Alamat</span>
+                                <span class="info-value">
+                                    {{ $siswa->dusun ? 'Dusun ' . $siswa->dusun : '' }}
+                                    {{ $siswa->rt ? ', RT ' . $siswa->rt : '' }}
+                                    {{ $siswa->rw ? ', RW ' . $siswa->rw : '' }}
+                                    {{ $siswa->kelurahan ? ', ' . $siswa->kelurahan : '' }}
+                                    {{ $siswa->kecamatan ? ', ' . $siswa->kecamatan : '' }}
+                                    {{ $siswa->kode_pos ? ', ' . $siswa->kode_pos : '' }}
+                                </span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Data Orang Tua -->
-                    <div class="buku-induk-section">
-                        <h5>B. DATA ORANG TUA / WALI</h5>
-                        <div class="row">
-                            <div class="col-md-6 col-12">
-                                <p><strong>Nama Ayah:</strong> {{ $siswa->ayah->nama ?? '-' }}</p>
-                                <p><strong>Pekerjaan Ayah:</strong> {{ $siswa->ayah->pekerjaan ?? '-' }}</p>
-                                <p><strong>Nama Ibu:</strong> {{ $siswa->ibu->nama ?? '-' }}</p>
-                                <p><strong>Pekerjaan Ibu:</strong> {{ $siswa->ibu->pekerjaan ?? '-' }}</p>
+                    <div class="info-section">
+                        <h5>
+                            <i class="fas fa-users"></i>
+                            B. DATA ORANG TUA / WALI
+                        </h5>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Nama Ayah</span>
+                                <span class="info-value">{{ $siswa->ayah->nama ?? '-' }}</span>
                             </div>
-                            <div class="col-md-6 col-12">
-                                <p><strong>Alamat Orang Tua:</strong> {{ $siswa->ayah->alamat ?? $siswa->ibu->alamat ?? '-' }}</p>
-                                <p><strong>Nama Wali:</strong> {{ $siswa->wali->nama ?? '-' }}</p>
-                                <p><strong>Pekerjaan Wali:</strong> {{ $siswa->wali->pekerjaan ?? '-' }}</p>
-                                <p><strong>Alamat Wali:</strong> {{ $siswa->wali->alamat ?? '-' }}</p>
+                            <div class="info-item">
+                                <span class="info-label">Pekerjaan Ayah</span>
+                                <span class="info-value">{{ $siswa->ayah->pekerjaan ?? '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Nama Ibu</span>
+                                <span class="info-value">{{ $siswa->ibu->nama ?? '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Pekerjaan Ibu</span>
+                                <span class="info-value">{{ $siswa->ibu->pekerjaan ?? '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Alamat Orang Tua</span>
+                                <span class="info-value">{{ $siswa->ayah->alamat ?? $siswa->ibu->alamat ?? '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Nama Wali</span>
+                                <span class="info-value">{{ $siswa->wali->nama ?? '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Pekerjaan Wali</span>
+                                <span class="info-value">{{ $siswa->wali->pekerjaan ?? '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Alamat Wali</span>
+                                <span class="info-value">{{ $siswa->wali->alamat ?? '-' }}</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Data Pendaftaran -->
-                    <div class="buku-induk-section">
-                        <h5>C. DATA PENDAFTARAN</h5>
-                        <div class="row">
-                            <div class="col-md-6 col-12">
-                                <p><strong>Sekolah Asal:</strong> {{ $siswa->sekolah_asal ?? '-' }}</p>
-                                <p><strong>Tanggal Diterima:</strong> {{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->translatedFormat('d F Y') : '-' }}</p>
-                                <p><strong>Status Keluarga:</strong> {{ $siswa->status_keluarga ?? '-' }}</p>
+                    <div class="info-section">
+                        <h5>
+                            <i class="fas fa-file-alt"></i>
+                            C. DATA PENDAFTARAN
+                        </h5>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Sekolah Asal</span>
+                                <span class="info-value">{{ $siswa->sekolah_asal ?? '-' }}</span>
                             </div>
-                            <div class="col-md-6 col-12">
-                                <p><strong>Anak Ke-:</strong> {{ $siswa->anak_ke ?? '-' }}</p>
-                                <p><strong>No. HP:</strong> {{ $siswa->no_hp ?? '-' }}</p>
-                                <p><strong>Catatan Wali Kelas:</strong> {{ $siswa->catatan_wali_kelas ?? '-' }}</p>
+                            <div class="info-item">
+                                <span class="info-label">Tanggal Diterima</span>
+                                <span class="info-value">{{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->translatedFormat('d F Y') : '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Status Keluarga</span>
+                                <span class="info-value">{{ $siswa->status_keluarga ?? '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Anak Ke-</span>
+                                <span class="info-value">{{ $siswa->anak_ke ?? '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">No. HP</span>
+                                <span class="info-value">{{ $siswa->no_hp ?? '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Catatan Wali Kelas</span>
+                                <span class="info-value">{{ $siswa->catatan_wali_kelas ?? '-' }}</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Status Mutasi -->
-                    <div class="buku-induk-section">
-                        <h5>D. STATUS MUTASI</h5>
-                        <div class="row">
-                            <div class="col-md-6 col-12">
-                                @if($siswa->mutasiTerakhir)
-                                    <p><strong>Status:</strong> <span class="badge bg-{{ $siswa->mutasiTerakhir->status_color }}">{{ $siswa->mutasiTerakhir->status_label }}</span></p>
-                                    <p><strong>Tanggal Mutasi:</strong> {{ $siswa->mutasiTerakhir->tanggal_mutasi ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_mutasi)->translatedFormat('d F Y') : '-' }}</p>
-                                    <p><strong>Keterangan:</strong> {{ $siswa->mutasiTerakhir->keterangan ?? '-' }}</p>
-                                @else
-                                    <p><strong>Status:</strong> <span class="badge bg-success">Aktif</span></p>
-                                    <p><strong>Tanggal Mutasi:</strong> -</p>
-                                    <p><strong>Keterangan:</strong> -</p>
-                                @endif
+                    <div class="info-section">
+                        <h5>
+                            <i class="fas fa-exchange-alt"></i>
+                            D. STATUS MUTASI
+                        </h5>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Status</span>
+                                <span>
+                                    @if($siswa->mutasiTerakhir)
+                                        <span class="badge-custom" style="background-color: {{ $siswa->mutasiTerakhir->status_color }}; color: white;">
+                                            {{ $siswa->mutasiTerakhir->status_label }}
+                                        </span>
+                                    @else
+                                        <span class="badge-custom" style="background-color: var(--success-color); color: white;">
+                                            Aktif
+                                        </span>
+                                    @endif
+                                </span>
                             </div>
-                            <div class="col-md-6 col-12">
-                                @if($siswa->mutasiTerakhir)
-                                    <p><strong>Alasan Pindah:</strong> {{ $siswa->mutasiTerakhir->alasan_pindah ?? '-' }}</p>
-                                    <p><strong>Sekolah Tujuan:</strong> {{ $siswa->mutasiTerakhir->tujuan_pindah ?? '-' }}</p>
-                                    <p><strong>No. SK Keluar:</strong> {{ $siswa->mutasiTerakhir->no_sk_keluar ?? '-' }}</p>
-                                    <p><strong>Tanggal SK Keluar:</strong> {{ $siswa->mutasiTerakhir->tanggal_sk_keluar ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_sk_keluar)->translatedFormat('d F Y') : '-' }}</p>
-                                @else
-                                    <p><strong>Alasan Pindah:</strong> -</p>
-                                    <p><strong>Sekolah Tujuan:</strong> -</p>
-                                    <p><strong>No. SK Keluar:</strong> -</p>
-                                    <p><strong>Tanggal SK Keluar:</strong> -</p>
-                                @endif
+                            <div class="info-item">
+                                <span class="info-label">Tanggal Mutasi</span>
+                                <span class="info-value">
+                                    {{ $siswa->mutasiTerakhir && $siswa->mutasiTerakhir->tanggal_mutasi 
+                                        ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_mutasi)->translatedFormat('d F Y') 
+                                        : '-' }}
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Alasan Pindah</span>
+                                <span class="info-value">{{ $siswa->mutasiTerakhir->alasan_pindah ?? '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Sekolah Tujuan</span>
+                                <span class="info-value">{{ $siswa->mutasiTerakhir->tujuan_pindah ?? '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">No. SK Keluar</span>
+                                <span class="info-value">{{ $siswa->mutasiTerakhir->no_sk_keluar ?? '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Tanggal SK Keluar</span>
+                                <span class="info-value">
+                                    {{ $siswa->mutasiTerakhir && $siswa->mutasiTerakhir->tanggal_sk_keluar 
+                                        ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_sk_keluar)->translatedFormat('d F Y') 
+                                        : '-' }}
+                                </span>
+                            </div>
+                            <div class="info-item" style="grid-column: 1 / -1;">
+                                <span class="info-label">Keterangan</span>
+                                <span class="info-value">{{ $siswa->mutasiTerakhir->keterangan ?? '-' }}</span>
                             </div>
                         </div>
                     </div>
@@ -503,13 +670,16 @@
             </div>
 
             <!-- Nilai Raport -->
-            <div class="buku-induk-section">
-                <h5>E. HASIL PRESTASI PEMBELAJARAN</h5>
+            <div class="info-section">
+                <h5>
+                    <i class="fas fa-chart-line"></i>
+                    E. HASIL PRESTASI PEMBELAJARAN
+                </h5>
                 <div class="table-responsive">
-                    <table class="table table-sm table-bordered buku-induk-table">
+                    <table class="table-custom">
                         <thead>
                             <tr>
-                                <th rowspan="3" style="vertical-align: middle; width: 30%;">MATA PELAJARAN</th>
+                                <th style="width: 30%;">MATA PELAJARAN</th>
                                 @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
                                     <th colspan="2" class="text-center">{{ $tahunAjaran }}</th>
                                 @endforeach
@@ -530,7 +700,7 @@
                         <tbody>
                             @if(count($nilaiByKelompok['byKelompok']) > 0)
                                 @foreach($nilaiByKelompok['byKelompok'] as $kelompok => $mapelGroup)
-                                    <tr style="background-color: #f0f0f0; font-weight: bold;">
+                                    <tr style="background-color: #F3F4F6; font-weight: 700;">
                                         <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}">
                                             @if($kelompok === 'A')
                                                 A. KELOMPOK MATA PELAJARAN UMUM
@@ -552,7 +722,7 @@
                                     @endforeach
                                 @endforeach
                             @else
-                                <tr style="background-color: #f0f0f0; font-weight: bold;">
+                                <tr style="background-color: #F3F4F6; font-weight: 700;">
                                     <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}">A. KELOMPOK MATA PELAJARAN UMUM</td>
                                 </tr>
                                 <tr>
@@ -562,7 +732,7 @@
                                         <td class="text-center">-</td>
                                     @endforeach
                                 </tr>
-                                <tr style="background-color: #f0f0f0; font-weight: bold;">
+                                <tr style="background-color: #F3F4F6; font-weight: 700;">
                                     <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}">B. KELOMPOK MATA PELAJARAN KEAHLIAN</td>
                                 </tr>
                                 <tr>
@@ -580,4 +750,5 @@
         </div>
     </div>
 </div>
+
 @endsection

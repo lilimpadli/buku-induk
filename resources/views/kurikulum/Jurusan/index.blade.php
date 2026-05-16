@@ -517,7 +517,7 @@
                         </div>
                         
                         <div class="card-actions">
-                            <a href="{{ route('kurikulum.jurusan.show', $jurusan->id) }}" 
+                            <a href="{{ route('kurikulum.kelas.index', ['jurusan' => $jurusan->id]) }}" 
                                class="btn btn-outline-primary btn-sm">
                                 Detail
                             </a>

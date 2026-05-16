@@ -543,6 +543,9 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/mutasi/laporan', [MutasiController::class, 'laporan'])->name('mutasi.laporan');
             Route::post('/mutasi/bulk', [MutasiController::class, 'bulk'])->name('mutasi.bulk');
             Route::post('/mutasi/up-all', [MutasiController::class, 'upAll'])->name('mutasi.up-all');
+            Route::post('/mutasi/siswa', [MutasiController::class, 'updateSiswa'])->name('mutasi.siswa.update');
+            Route::get('/mutasi/kelas/rombel/{rombel}', [MutasiController::class, 'showRombel'])->name('mutasi.kelas.show');
+            Route::get('/mutasi/kelas/{jurusan}', [MutasiController::class, 'kelasByJurusan'])->name('mutasi.kelas');
             Route::resource('/mutasi', MutasiController::class)->names('mutasi');
 
             // Buku Induk (TU)
