@@ -33,64 +33,72 @@
             <!-- Statistik Utama -->
             <div class="row g-4 mb-5">
                 <div class="col-md-3">
-                    <div class="card border-0 shadow-sm rounded-4 h-100 stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                        <div class="card-body text-white p-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h2 class="card-title mb-1 fw-bold">{{ $totalUsers }}</h2>
-                                    <small class="opacity-75">Total Users</small>
-                                </div>
-                                <div class="stat-icon">
-                                    <i class="fas fa-users fa-3x opacity-75"></i>
+                    <a href="{{ route('super_admin.users.index') }}" class="stat-card-link">
+                        <div class="card border-0 shadow-sm rounded-4 h-100 stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <div class="card-body text-white p-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h2 class="card-title mb-1 fw-bold">{{ $totalUsers }}</h2>
+                                        <small class="opacity-75">Total Users</small>
+                                    </div>
+                                    <div class="stat-icon">
+                                        <i class="fas fa-users fa-3x opacity-75"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 <div class="col-md-3">
-                    <div class="card border-0 shadow-sm rounded-4 h-100 stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                        <div class="card-body text-white p-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h2 class="card-title mb-1 fw-bold">{{ $totalSiswa }}</h2>
-                                    <small class="opacity-75">Total Siswa</small>
-                                </div>
-                                <div class="stat-icon">
-                                    <i class="fas fa-user-graduate fa-3x opacity-75"></i>
+                    <a href="{{ route('super_admin.manajemen-siswa.index') }}" class="stat-card-link">
+                        <div class="card border-0 shadow-sm rounded-4 h-100 stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <div class="card-body text-white p-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h2 class="card-title mb-1 fw-bold">{{ $totalSiswa }}</h2>
+                                        <small class="opacity-75">Total Siswa</small>
+                                    </div>
+                                    <div class="stat-icon">
+                                        <i class="fas fa-user-graduate fa-3x opacity-75"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 <div class="col-md-3">
-                    <div class="card border-0 shadow-sm rounded-4 h-100 stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                        <div class="card-body text-white p-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h2 class="card-title mb-1 fw-bold">{{ $totalGuru }}</h2>
-                                    <small class="opacity-75">Total Guru</small>
-                                </div>
-                                <div class="stat-icon">
-                                    <i class="fas fa-chalkboard-teacher fa-3x opacity-75"></i>
+                    <a href="{{ route('super_admin.manajemen-guru.index') }}" class="stat-card-link">
+                        <div class="card border-0 shadow-sm rounded-4 h-100 stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <div class="card-body text-white p-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h2 class="card-title mb-1 fw-bold">{{ $totalGuru }}</h2>
+                                        <small class="opacity-75">Total Guru</small>
+                                    </div>
+                                    <div class="stat-icon">
+                                        <i class="fas fa-chalkboard-teacher fa-3x opacity-75"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 <div class="col-md-3">
-                    <div class="card border-0 shadow-sm rounded-4 h-100 stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                        <div class="card-body text-white p-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h2 class="card-title mb-1 fw-bold">{{ $totalSuperAdmin }}</h2>
-                                    <small class="opacity-75">Super Admin</small>
-                                </div>
-                                <div class="stat-icon">
-                                    <i class="fas fa-crown fa-3x opacity-75"></i>
+                    <a href="{{ route('super_admin.users.index') }}" class="stat-card-link">
+                        <div class="card border-0 shadow-sm rounded-4 h-100 stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                            <div class="card-body text-white p-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h2 class="card-title mb-1 fw-bold">{{ $totalSuperAdmin }}</h2>
+                                        <small class="opacity-75">Super Admin</small>
+                                    </div>
+                                    <div class="stat-icon">
+                                        <i class="fas fa-crown fa-3x opacity-75"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
 
@@ -135,7 +143,7 @@
                                 </div>
                                 <div class="card-body pt-0">
                                     <div class="timeline-modern">
-                                        @foreach($aktivitas as $item)
+                                        @forelse($aktivitas as $item)
                                         <div class="timeline-item-modern">
                                             <div class="timeline-marker-modern bg-{{ $item['tipe'] == 'system' ? 'info' : 'primary' }}"></div>
                                             <div class="timeline-content-modern">
@@ -146,7 +154,9 @@
                                                 <p class="timeline-text-modern mb-0 text-muted">{{ $item['aktivitas'] }}</p>
                                             </div>
                                         </div>
-                                        @endforeach
+                                        @empty
+                                        <div class="py-4 text-center text-muted">Belum ada aktivitas terbaru</div>
+                                        @endforelse
                                     </div>
                                 </div>
                             </div>
@@ -188,6 +198,7 @@
 .stat-card {
     transition: all 0.3s ease;
     border: none;
+    cursor: pointer;
 }
 
 .stat-card:hover {
@@ -203,6 +214,18 @@
 .stat-card:hover .stat-icon {
     opacity: 1;
     transform: scale(1.1);
+}
+
+/* Link styling untuk stat card */
+.stat-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.stat-card-link:hover {
+    text-decoration: none;
+    color: inherit;
 }
 
 /* Role Cards */

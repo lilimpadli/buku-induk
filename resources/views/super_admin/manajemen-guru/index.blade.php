@@ -6,8 +6,8 @@
 
 <style>
 :root {
-    --primary-blue: #2F53FF;
-    --secondary-blue: #7C3AED;
+    --primary-blue: #4facfe;
+    --secondary-blue: #00f2fe;
     --accent-cyan: #00D4FF;
     --accent-pink: #FF4D6D;
     --accent-green: #43E97B;
@@ -118,15 +118,15 @@ body{
     }
 
 .btn-primary-modern{
-    background: linear-gradient(135deg, #2F53FF 0%, #7C3AED 100%);
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
 }
 
 .btn-secondary-modern{
-    background: linear-gradient(135deg, #4F46E5 0%, #22D3EE 100%);
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
 }
 
 .btn-export-modern{
-    background: linear-gradient(135deg, #38BDF8 0%, #6366F1 100%);
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
 }
 
 /* ================= FILTER ================= */
@@ -265,7 +265,7 @@ body{
 /* ================= BADGE ================= */
 
 .class-badge{
-    background: linear-gradient(135deg, #2F53FF 0%, #22D3EE 100%);
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
     color: white;
     border-radius: 999px;
     padding: 8px 14px;

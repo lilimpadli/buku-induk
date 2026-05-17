@@ -5,8 +5,8 @@
 @section('content')
 <style>
 :root {
-    --primary-blue: #2F53FF;
-    --secondary-blue: #7C3AED;
+    --primary-blue: #f093fb;
+    --secondary-blue: #f5576c;
     --accent-cyan: #00D4FF;
     --accent-pink: #FF4D6D;
     --accent-green: #43E97B;
@@ -15,8 +15,8 @@
     --text-dark: #1E293B;
     --text-muted: #64748B;
     --shadow-light: 0 4px 18px rgba(15,23,42,0.06);
-    --shadow-medium: 0 12px 30px rgba(15,23,42,0.08);
-    --shadow-hover: 0 16px 40px rgba(47,83,255,0.16);
+    --shadow-medium: 0 12px 30px rgba(245,87,108,0.08);
+    --shadow-hover: 0 16px 40px rgba(240,147,251,0.16);
     --radius: 24px;
 }
 
@@ -67,6 +67,10 @@ body {
     color: white;
 }
 
+.btn-primary-modern{
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+}
+
 .btn-modern:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-hover);
@@ -86,12 +90,8 @@ body {
     height: 18px;
 }
 
-.btn-primary-modern {
-    background: linear-gradient(135deg, #2F53FF 0%, #7C3AED 100%);
-}
-
 .btn-secondary-modern {
-    background: linear-gradient(135deg, #4F46E5 0%, #22D3EE 100%);
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
 .btn-secondary-outline {
@@ -292,7 +292,7 @@ body {
 }
 
 .status-badge {
-    background: linear-gradient(135deg, #2F53FF 0%, #22D3EE 100%);
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     color: white;
     border-radius: 999px;
     padding: 8px 14px;

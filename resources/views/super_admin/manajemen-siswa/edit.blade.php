@@ -28,7 +28,9 @@
                 @include('super_admin.manajemen-siswa._form')
 
                 <div class="mt-4 d-flex justify-content-end">
-                    <a href="{{ route('tu.siswa.index') }}" class="btn btn-secondary me-2">Batal</a>
+                    <a href="{{ route('super_admin.manajemen-siswa.index') }}" class="btn btn-secondary me-2">
+                        Batal
+                        </a>
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save me-1"></i> Simpan Perubahan
                     </button>

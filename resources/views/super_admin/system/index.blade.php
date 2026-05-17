@@ -5,7 +5,7 @@
 @push('styles')
 <style>
 .page-header{
-    background: linear-gradient(135deg,#2F53FF 0%,#7C3AED 100%);
+    background: linear-gradient(135deg,#43E97B 0%,#38F9D7 100%);
     border-radius: 28px;
     padding: 30px 28px;
     color: white;
@@ -61,7 +61,7 @@
 
 .btn-modern:hover{
     transform: translateY(-1px);
-    box-shadow: 0 18px 40px rgba(47,83,255,0.15);
+    box-shadow: 0 18px 40px rgba(67,233,123,0.15);
     text-decoration: none;
     color: white;
 }
@@ -75,7 +75,7 @@
 }
 
 .btn-success-modern{
-    background: linear-gradient(135deg,#34D399 0%,#10B981 100%);
+    background: linear-gradient(135deg,#43E97B 0%,#38F9D7 100%);
 }
 
 .btn-danger-modern{
@@ -119,10 +119,25 @@
                 <div class="card-body">
                     <div class="section-title">System Actions</div>
                     <div class="system-actions">
-                        <button class="btn-modern btn-warning-modern" type="button">Clear Cache</button>
-                        <button class="btn-modern btn-info-modern" type="button">Optimize</button>
-                        <button class="btn-modern btn-success-modern" type="button">Backup Database</button>
-                        <button class="btn-modern btn-danger-modern" type="button">Maintenance Mode</button>
+                        <form action="{{ route('super_admin.system.clear_cache') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button class="btn-modern btn-warning-modern" type="submit">Clear Cache</button>
+                        </form>
+
+                        <form action="{{ route('super_admin.system.optimize') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button class="btn-modern btn-info-modern" type="submit">Optimize</button>
+                        </form>
+
+                        <form action="{{ route('super_admin.system.backup_database') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button class="btn-modern btn-success-modern" type="submit">Backup Database</button>
+                        </form>
+
+                        <form action="{{ route('super_admin.system.toggle_maintenance') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button class="btn-modern btn-danger-modern" type="submit">Maintenance Mode</button>
+                        </form>
                     </div>
                 </div>
             </div>

@@ -5,7 +5,7 @@
 @push('styles')
 <style>
 .page-header{
-    background: linear-gradient(135deg,#2F53FF 0%,#7C3AED 100%);
+    background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
     border-radius: 28px;
     padding: 30px 28px;
     color: white;
@@ -80,7 +80,7 @@
     justify-content: center;
     padding: 8px 14px;
     border-radius: 999px;
-    background: linear-gradient(135deg,#2F53FF 0%,#7C3AED 100%);
+    background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
     color: #fff;
     font-size: 0.78rem;
     font-weight: 700;
@@ -109,7 +109,7 @@
 }
 
 .btn-primary-modern{
-    background: linear-gradient(135deg,#2F53FF 0%,#7C3AED 100%);
+    background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
 }
 
 .btn-info-modern{
@@ -142,14 +142,14 @@
 }
 
 .page-link:hover{
-    background: rgba(47,83,255,0.08);
-    color: #2F53FF;
+    background: rgba(102,126,234,0.12);
+    color: #667eea;
 }
 
 .page-item.active .page-link{
-    background: linear-gradient(135deg,#2F53FF 0%,#7C3AED 100%);
+    background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
     color: #fff;
-    box-shadow: 0 12px 24px rgba(47,83,255,0.18);
+    box-shadow: 0 12px 24px rgba(102,126,234,0.18);
 }
 
 .table-responsive{
@@ -166,7 +166,7 @@
                 <h1 class="page-title">Daftar Users</h1>
                 <p class="page-subtitle">Kelola hak akses, profil, dan peran pengguna di sistem.</p>
             </div>
-            <a href="#" class="btn-modern btn-primary-modern">
+            <a href="{{ route('super_admin.users.create') }}" class="btn-modern btn-primary-modern">
                 <i class="fas fa-plus"></i>
                 Tambah User
             </a>
@@ -208,9 +208,9 @@
                                 </td>
                                 <td>
                                     <div class="d-flex flex-wrap gap-2">
-                                        <a href="#" class="btn-modern btn-info-modern">Lihat</a>
-                                        <a href="#" class="btn-modern btn-warning-modern">Edit</a>
-                                        <form action="#" method="POST" class="d-inline">
+                                        <a href="{{ route('super_admin.users.show', $user->id) }}" class="btn-modern btn-info-modern">Lihat</a>
+                                        <a href="{{ route('super_admin.users.edit', $user->id) }}" class="btn-modern btn-warning-modern">Edit</a>
+                                        <form action="{{ route('super_admin.users.destroy', $user->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn-modern btn-danger-modern"

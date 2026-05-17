@@ -113,8 +113,9 @@
                                         <a href="{{ route('super_admin.manajemen-kelas.edit', $rombel->id) }}" class="btn-modern btn-sm btn-action-warning" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="{{ route('super_admin.manajemen-kelas.export', $rombel->id) }}" class="btn-modern btn-sm btn-action-success" title="Cetak">
+                                        <a href="{{ route('super_admin.manajemen-kelas.export', $rombel->id) }}" class="btn-modern btn-action-success btn-sm-text" title="Cetak" target="_blank">
                                             <i class="fas fa-print"></i>
+                                            Cetak
                                         </a>
                                         <form action="{{ route('super_admin.manajemen-kelas.destroy', $rombel->id) }}" method="POST" class="d-inline">
                                             @csrf
@@ -225,6 +226,13 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+}
+
+.btn-modern.btn-sm-text {
+    min-height: 42px;
+    padding: 0 14px;
+    border-radius: 18px;
+    font-size: 14px;
 }
 
 .btn-primary-modern {

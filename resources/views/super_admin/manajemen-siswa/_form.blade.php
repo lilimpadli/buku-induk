@@ -148,4 +148,65 @@
         <label class="form-label fw-semibold">Tanggal Diterima</label>
         <input type="date" name="tanggal_diterima" class="form-control" value="{{ old('tanggal_diterima', $siswa->tanggal_diterima ?? '') }}">
     </div>
+    <!-- DATA ORANG TUA / WALI -->
+    <div class="col-12 mt-4">
+        <h5 class="border-bottom pb-2 fw-semibold">Data Orang Tua / Wali</h5>
+    </div>
+
+    <!-- AYAH -->
+    <div class="col-md-4">
+        <label class="form-label fw-semibold">Nama Ayah</label>
+        <input type="text" name="nama_ayah" class="form-control"
+            value="{{ old('nama_ayah', $siswa->ayah->nama ?? '') }}">
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold">Pekerjaan Ayah</label>
+        <input type="text" name="pekerjaan_ayah" class="form-control"
+            value="{{ old('pekerjaan_ayah', $siswa->ayah->pekerjaan ?? '') }}">
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold">Telepon Ayah</label>
+        <input type="text" name="telepon_ayah" class="form-control"
+            value="{{ old('telepon_ayah', $siswa->ayah->telepon ?? '') }}">
+    </div>
+
+    <!-- IBU -->
+    <div class="col-md-4">
+        <label class="form-label fw-semibold">Nama Ibu</label>
+        <input type="text" name="nama_ibu" class="form-control"
+            value="{{ old('nama_ibu', $siswa->ibu->nama ?? '') }}">
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold">Pekerjaan Ibu</label>
+        <input type="text" name="pekerjaan_ibu" class="form-control"
+            value="{{ old('pekerjaan_ibu', $siswa->ibu->pekerjaan ?? '') }}">
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold">Telepon Ibu</label>
+        <input type="text" name="telepon_ibu" class="form-control"
+            value="{{ old('telepon_ibu', $siswa->ibu->telepon ?? '') }}">
+    </div>
+
+    <!-- WALI -->
+    <div class="col-md-4">
+        <label class="form-label fw-semibold">Nama Wali</label>
+        <input type="text" name="nama_wali" class="form-control"
+            value="{{ old('nama_wali', $siswa->wali->nama ?? '') }}">
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold">Pekerjaan Wali</label>
+        <input type="text" name="pekerjaan_wali" class="form-control"
+            value="{{ old('pekerjaan_wali', $siswa->wali->pekerjaan ?? '') }}">
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fw-semibold">Telepon Wali</label>
+        <input type="text" name="telepon_wali" class="form-control"
+            value="{{ old('telepon_wali', $siswa->wali->telepon ?? '') }}">
+    </div>
 </div>
