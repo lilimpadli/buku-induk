@@ -11,8 +11,14 @@ class LoginController extends Controller
     /**
      * Tampilkan halaman login
      */
-    public function showLoginForm()
+    public function showLoginForm(Request $request)
     {
+        if (Auth::check()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
         return view('auth.login');
     }
 
@@ -21,6 +27,12 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
+        if (Auth::check()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
         // Validasi input
         $request->validate([
             'nomor_induk' => 'required',
