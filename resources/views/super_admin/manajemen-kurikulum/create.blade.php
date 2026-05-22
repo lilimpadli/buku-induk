@@ -42,6 +42,11 @@ body{
     box-shadow:var(--shadow-md);
 }
 
+.page-header *{
+    position:relative;
+    z-index:2;
+}
+
 .page-header::before{
     content:'';
     position:absolute;
@@ -51,11 +56,10 @@ body{
     background:rgba(255,255,255,.08);
     top:-120px;
     right:-90px;
+    pointer-events:none;
 }
 
 .page-title{
-    position:relative;
-    z-index:2;
     display:flex;
     align-items:center;
     gap:16px;
@@ -77,8 +81,6 @@ body{
 }
 
 .page-subtitle{
-    position:relative;
-    z-index:2;
     margin:0;
     opacity:.9;
     line-height:1.8;
@@ -161,6 +163,8 @@ body{
 .btn-light-modern{
     background:#EEF2FF;
     color:#4338CA;
+    position:relative;
+    z-index:5;
 }
 
 .btn-light-modern:hover{
@@ -203,105 +207,106 @@ body{
 
 <div class="container-fluid px-3 px-md-4 mt-3 mt-md-4">
 
-    <!-- HEADER -->
-    <div class="page-header">
+<!-- HEADER -->
+<div class="page-header">
 
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 
-            <div>
+        <div>
 
-                <h1 class="page-title">
-                    <i class="fas fa-plus-circle"></i>
-                    Tambah Kurikulum
-                </h1>
+            <h1 class="page-title">
+                <i class="fas fa-plus-circle"></i>
+                Tambah Kurikulum
+            </h1>
 
-                <p class="page-subtitle">
-                    Tambahkan data kurikulum baru dengan tampilan modern dan profesional.
-                </p>
+            <p class="page-subtitle">
+                Tambahkan data kurikulum baru dengan tampilan modern dan profesional.
+            </p>
+
+        </div>
+
+        <a href="{{ route('super_admin.manajemen-kurikulum.index') }}"
+           class="btn-modern btn-light-modern">
+
+            <i class="fas fa-arrow-left"></i>
+            Kembali
+
+        </a>
+
+    </div>
+
+</div>
+
+<!-- FORM -->
+<div class="row justify-content-center">
+
+    <div class="col-lg-7 col-md-9">
+
+        <div class="form-card">
+
+            <div class="card-body">
+
+                <form action="{{ route('super_admin.manajemen-kurikulum.store') }}"
+                      method="POST">
+
+                    @csrf
+
+                    <div class="mb-4">
+
+                        <label for="nama_kurikulum" class="form-label">
+                            Nama Kurikulum
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input type="text"
+                               id="nama_kurikulum"
+                               name="nama_kurikulum"
+                               class="form-control @error('nama_kurikulum') is-invalid @enderror"
+                               placeholder="Masukkan nama kurikulum"
+                               value="{{ old('nama_kurikulum') }}"
+                               required>
+
+                        @error('nama_kurikulum')
+
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+
+                        @enderror
+
+                    </div>
+
+                    <!-- BUTTON -->
+                    <div class="d-flex justify-content-end gap-3 mt-4 action-wrapper">
+
+                        <a href="{{ route('super_admin.manajemen-kurikulum.index') }}"
+                           class="btn-modern btn-light-modern">
+
+                            <i class="fas fa-times"></i>
+                            Batal
+
+                        </a>
+
+                        <button type="submit"
+                                class="btn-modern btn-primary-modern">
+
+                            <i class="fas fa-save"></i>
+                            Simpan Kurikulum
+
+                        </button>
+
+                    </div>
+
+                </form>
 
             </div>
-
-            <a href="{{ route('super_admin.manajemen-kurikulum.index') }}"
-               class="btn-modern btn-light-modern">
-
-                <i class="fas fa-arrow-left"></i>
-                Kembali
-
-            </a>
 
         </div>
 
     </div>
 
-    <!-- FORM -->
-    <div class="row justify-content-center">
+</div>
 
-        <div class="col-lg-7 col-md-9">
-
-            <div class="form-card">
-
-                <div class="card-body">
-
-                    <form action="{{ route('super_admin.manajemen-kurikulum.store') }}"
-                          method="POST">
-
-                        @csrf
-
-                        <div class="mb-4">
-
-                            <label for="nama_kurikulum" class="form-label">
-                                Nama Kurikulum
-                                <span class="text-danger">*</span>
-                            </label>
-
-                            <input type="text"
-                                   id="nama_kurikulum"
-                                   name="nama_kurikulum"
-                                   class="form-control @error('nama_kurikulum') is-invalid @enderror"
-                                   placeholder="Masukkan nama kurikulum"
-                                   value="{{ old('nama_kurikulum') }}"
-                                   required>
-
-                            @error('nama_kurikulum')
-
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-
-                            @enderror
-
-                        </div>
-
-                        <!-- BUTTON -->
-                        <div class="d-flex justify-content-end gap-3 mt-4 action-wrapper">
-
-                            <a href="{{ route('super_admin.manajemen-kurikulum.index') }}"
-                               class="btn-modern btn-light-modern">
-
-                                <i class="fas fa-times"></i>
-                                Batal
-
-                            </a>
-
-                            <button type="submit"
-                                    class="btn-modern btn-primary-modern">
-
-                                <i class="fas fa-save"></i>
-                                Simpan Kurikulum
-
-                            </button>
-
-                        </div>
-
-                    </form>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
 
 </div>
 

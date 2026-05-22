@@ -46,6 +46,13 @@ body{
     margin-bottom:28px;
     color:white;
     box-shadow:var(--shadow-md);
+    z-index:1;
+}
+
+/* FIX BUTTON CLICK */
+.page-header > *{
+    position:relative;
+    z-index:5;
 }
 
 .page-header::before{
@@ -448,222 +455,225 @@ body{
 
 <div class="container-fluid">
 
-    <!-- HEADER -->
-    <div class="page-header">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+<!-- HEADER -->
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 
-            <div>
-                <h1 class="page-title">
-                    <i class="fas fa-book"></i>
-                    Daftar Kurikulum TU Kepegawaian
-                </h1>
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-book"></i>
+                Daftar Kurikulum TU Kepegawaian
+            </h1>
 
-                <p class="page-subtitle">
-                    Kelola kurikulum dengan tampilan dashboard yang modern, rapi, dan profesional.
-                </p>
-            </div>
-
-            <div>
-                <a href="{{ route('super_admin.manajemen-kurikulum.create') }}"
-                   class="btn-modern btn-primary-modern">
-                    <i class="fas fa-plus"></i>
-                    Tambah Kurikulum
-                </a>
-            </div>
-
+            <p class="page-subtitle">
+                Kelola kurikulum dengan tampilan dashboard yang modern, rapi, dan profesional.
+            </p>
         </div>
+
+        <div>
+            <a href="{{ route('super_admin.manajemen-kurikulum.create') }}"
+               class="btn-modern btn-primary-modern">
+
+                <i class="fas fa-plus"></i>
+                Tambah Kurikulum
+
+            </a>
+        </div>
+
     </div>
+</div>
 
-    <!-- ALERT -->
-    @if(session('success'))
-        <div class="alert alert-success mb-4">
-            {{ session('success') }}
-        </div>
-    @endif
+<!-- ALERT -->
+@if(session('success'))
+    <div class="alert alert-success mb-4">
+        {{ session('success') }}
+    </div>
+@endif
 
-    @if(session('error'))
-        <div class="alert alert-danger mb-4">
-            {{ session('error') }}
-        </div>
-    @endif
+@if(session('error'))
+    <div class="alert alert-danger mb-4">
+        {{ session('error') }}
+    </div>
+@endif
 
-    <!-- FILTER -->
-    <div class="filter-card">
-        <div class="card-body">
+<!-- FILTER -->
+<div class="filter-card">
+    <div class="card-body">
 
-            <form method="GET"
-                  action="{{ route('super_admin.manajemen-kurikulum.index') }}"
-                  class="row g-4 align-items-end">
+        <form method="GET"
+              action="{{ route('super_admin.manajemen-kurikulum.index') }}"
+              class="row g-4 align-items-end">
 
-                <div class="col-lg-8 col-md-7">
+            <div class="col-lg-8 col-md-7">
 
-                    <label class="form-label">
-                        Cari Kurikulum
-                    </label>
+                <label class="form-label">
+                    Cari Kurikulum
+                </label>
 
-                    <div class="input-group">
-                        <span class="input-group-text">
-                            <i class="fas fa-search"></i>
-                        </span>
-
-                        <input type="text"
-                               name="search"
-                               class="form-control"
-                               placeholder="Cari nama kurikulum..."
-                               value="{{ $search ?? '' }}">
-                    </div>
-
-                </div>
-
-                <div class="col-lg-4 col-md-5">
-
-                    <button type="submit"
-                            class="btn-modern btn-primary-modern w-100">
-
+                <div class="input-group">
+                    <span class="input-group-text">
                         <i class="fas fa-search"></i>
-                        Cari Data
+                    </span>
 
-                    </button>
-
+                    <input type="text"
+                           name="search"
+                           class="form-control"
+                           placeholder="Cari nama kurikulum..."
+                           value="{{ $search ?? '' }}">
                 </div>
-
-            </form>
-
-        </div>
-    </div>
-
-    <!-- TABLE -->
-    <div class="data-table-card">
-
-        <div class="card-body">
-
-            <div class="table-responsive">
-
-                <table class="table table-modern align-middle">
-
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Nama Kurikulum</th>
-                            <th>Jumlah Mata Pelajaran</th>
-                            <th>Tanggal Dibuat</th>
-                            <th class="text-center">Aksi</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        @forelse($kurikulum as $k)
-
-                            <tr>
-
-                                <td data-label="#">
-                                    {{ $loop->iteration + ($kurikulum->currentPage() - 1) * $kurikulum->perPage() }}
-                                </td>
-
-                                <td data-label="Nama">
-                                    <div class="kurikulum-name">
-                                        {{ $k->nama_kurikulum }}
-                                    </div>
-                                </td>
-
-                                <td data-label="Mapel">
-                                    <span class="badge-modern">
-                                        <i class="fas fa-book-open"></i>
-                                        {{ $k->mata_pelajarans_count }} Mata Pelajaran
-                                    </span>
-                                </td>
-
-                                <td data-label="Tanggal">
-                                    <span class="date-text">
-                                        {{ $k->created_at->format('d M Y') }}
-                                    </span>
-                                </td>
-
-                                <td data-label="Aksi">
-
-                                    <div class="action-buttons">
-
-                                        <a href="{{ route('super_admin.manajemen-kurikulum.show', $k->id) }}"
-                                           class="action-btn view"
-                                           title="Detail">
-
-                                            <i class="fas fa-eye"></i>
-
-                                        </a>
-
-                                        <a href="{{ route('super_admin.manajemen-kurikulum.edit', $k->id) }}"
-                                           class="action-btn edit"
-                                           title="Edit">
-
-                                            <i class="fas fa-pen"></i>
-
-                                        </a>
-
-                                        <form method="POST"
-                                              action="{{ route('super_admin.manajemen-kurikulum.destroy', $k->id) }}"
-                                              onsubmit="return confirm('Yakin ingin menghapus kurikulum ini?')">
-
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button type="submit"
-                                                    class="action-btn delete"
-                                                    title="Hapus">
-
-                                                <i class="fas fa-trash"></i>
-
-                                            </button>
-
-                                        </form>
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                        @empty
-
-                            <tr>
-                                <td colspan="5">
-
-                                    <div class="empty-state">
-
-                                        <i class="fas fa-book-open"></i>
-
-                                        <h5>
-                                            Belum Ada Kurikulum
-                                        </h5>
-
-                                        <p>
-                                            Tambahkan data kurikulum baru untuk mulai mengelola sistem akademik.
-                                        </p>
-
-                                    </div>
-
-                                </td>
-                            </tr>
-
-                        @endforelse
-
-                    </tbody>
-
-                </table>
 
             </div>
 
-            @if($kurikulum->hasPages())
+            <div class="col-lg-4 col-md-5">
 
-                <div class="pagination-container">
-                    {{ $kurikulum->links('pagination::bootstrap-4') }}
-                </div>
+                <button type="submit"
+                        class="btn-modern btn-primary-modern w-100">
 
-            @endif
+                    <i class="fas fa-search"></i>
+                    Cari Data
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- TABLE -->
+<div class="data-table-card">
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+
+            <table class="table table-modern align-middle">
+
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nama Kurikulum</th>
+                        <th>Jumlah Mata Pelajaran</th>
+                        <th>Tanggal Dibuat</th>
+                        <th class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @forelse($kurikulum as $k)
+
+                        <tr>
+
+                            <td data-label="#">
+                                {{ $loop->iteration + ($kurikulum->currentPage() - 1) * $kurikulum->perPage() }}
+                            </td>
+
+                            <td data-label="Nama">
+                                <div class="kurikulum-name">
+                                    {{ $k->nama_kurikulum }}
+                                </div>
+                            </td>
+
+                            <td data-label="Mapel">
+                                <span class="badge-modern">
+                                    <i class="fas fa-book-open"></i>
+                                    {{ $k->mata_pelajarans_count }} Mata Pelajaran
+                                </span>
+                            </td>
+
+                            <td data-label="Tanggal">
+                                <span class="date-text">
+                                    {{ $k->created_at->format('d M Y') }}
+                                </span>
+                            </td>
+
+                            <td data-label="Aksi">
+
+                                <div class="action-buttons">
+
+                                    <a href="{{ route('super_admin.manajemen-kurikulum.show', $k->id) }}"
+                                       class="action-btn view"
+                                       title="Detail">
+
+                                        <i class="fas fa-eye"></i>
+
+                                    </a>
+
+                                    <a href="{{ route('super_admin.manajemen-kurikulum.edit', $k->id) }}"
+                                       class="action-btn edit"
+                                       title="Edit">
+
+                                        <i class="fas fa-edit"></i>
+
+                                    </a>
+
+                                    <form method="POST"
+                                          action="{{ route('super_admin.manajemen-kurikulum.destroy', $k->id) }}"
+                                          onsubmit="return confirm('Yakin ingin menghapus kurikulum ini?')">
+
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button type="submit"
+                                                class="action-btn delete"
+                                                title="Hapus">
+
+                                            <i class="fas fa-trash"></i>
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    @empty
+
+                        <tr>
+                            <td colspan="5">
+
+                                <div class="empty-state">
+
+                                    <i class="fas fa-book-open"></i>
+
+                                    <h5>
+                                        Belum Ada Kurikulum
+                                    </h5>
+
+                                    <p>
+                                        Tambahkan data kurikulum baru untuk mulai mengelola sistem akademik.
+                                    </p>
+
+                                </div>
+
+                            </td>
+                        </tr>
+
+                    @endforelse
+
+                </tbody>
+
+            </table>
 
         </div>
 
+        @if($kurikulum->hasPages())
+
+            <div class="pagination-container">
+                {{ $kurikulum->links('pagination::bootstrap-4') }}
+            </div>
+
+        @endif
+
     </div>
+
+</div>
+
 
 </div>
 

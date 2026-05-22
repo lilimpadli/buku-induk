@@ -4,48 +4,332 @@
 
 @section('content')
 
+<style>
+:root{
+    --primary-blue:#2F53FF;
+    --secondary-blue:#7C3AED;
+    --light-bg:#F4F7FE;
+    --soft-gray:#E9EEF7;
+    --text-dark:#1E293B;
+    --text-muted:#64748B;
+
+    --shadow-light:0 10px 30px rgba(15,23,42,.06);
+    --shadow-medium:0 20px 50px rgba(15,23,42,.08);
+    --shadow-hover:0 18px 40px rgba(47,83,255,.16);
+
+    --radius-xl:30px;
+    --radius-lg:22px;
+}
+
+body{
+    background:var(--light-bg);
+    font-family:'Poppins',sans-serif;
+}
+
+/* ================= HEADER ================= */
+
+.page-header{
+    background:linear-gradient(135deg,var(--primary-blue) 0%,var(--secondary-blue) 100%);
+    border-radius:32px;
+    padding:36px;
+    color:white;
+    margin-bottom:30px;
+    box-shadow:var(--shadow-medium);
+    position:relative;
+    overflow:hidden;
+}
+
+.page-header::before{
+    content:'';
+    position:absolute;
+    width:240px;
+    height:240px;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+    top:-120px;
+    right:-60px;
+}
+
+.page-title{
+    font-size:2.1rem;
+    font-weight:800;
+    margin-bottom:10px;
+    position:relative;
+    z-index:2;
+}
+
+.page-subtitle{
+    margin:0;
+    opacity:.9;
+    line-height:1.7;
+    max-width:650px;
+    position:relative;
+    z-index:2;
+}
+
+/* ================= CARD ================= */
+
+.dashboard-panel{
+    background:white;
+    border:none;
+    border-radius:32px;
+    overflow:hidden;
+    box-shadow:var(--shadow-light);
+    animation:fadeInUp .4s ease;
+}
+
+.dashboard-panel .card-header{
+    padding:32px;
+    border:none;
+    background:linear-gradient(
+        180deg,
+        rgba(226,236,255,.75),
+        rgba(255,255,255,.95)
+    );
+}
+
+.dashboard-panel .card-body{
+    padding:32px;
+}
+
+/* ================= FORM ================= */
+
+.form-label{
+    font-size:.95rem;
+    font-weight:700;
+    color:var(--text-dark);
+    margin-bottom:.7rem;
+}
+
+.form-control-modern{
+    width:100%;
+    border-radius:18px;
+    border:2px solid var(--soft-gray);
+    background:#FBFDFF;
+    min-height:58px;
+    padding:0 18px;
+    font-size:.95rem;
+    transition:all .25s ease;
+    color:var(--text-dark);
+}
+
+.form-control-modern::placeholder{
+    color:#94A3B8;
+}
+
+.form-control-modern:focus{
+    outline:none;
+    border-color:rgba(47,83,255,.45);
+    background:white;
+    box-shadow:0 0 0 .18rem rgba(47,83,255,.12);
+}
+
+.form-control-modern.is-invalid{
+    border-color:#EF4444;
+    background:#FFF5F5;
+}
+
+.invalid-feedback{
+    display:block;
+    margin-top:.45rem;
+    font-size:.85rem;
+}
+
+/* ================= ALERT ================= */
+
+.alert-modern{
+    border:none;
+    border-radius:22px;
+    padding:18px 20px;
+    background:#FEF2F2;
+    color:#991B1B;
+    box-shadow:0 10px 24px rgba(239,68,68,.08);
+}
+
+.alert-modern ul{
+    margin-bottom:0;
+    padding-left:18px;
+}
+
+/* ================= INFO BOX ================= */
+
+.info-box{
+    background:#F8FBFF;
+    border:1px solid #E0EAFF;
+    border-radius:20px;
+    padding:18px;
+    margin-bottom:28px;
+}
+
+.info-box-title{
+    font-size:.92rem;
+    font-weight:700;
+    color:var(--text-dark);
+    margin-bottom:6px;
+}
+
+.info-box p{
+    margin:0;
+    color:var(--text-muted);
+    font-size:.9rem;
+    line-height:1.6;
+}
+
+/* ================= BUTTON ================= */
+
+.btn-modern{
+    border:none;
+    border-radius:18px;
+    padding:13px 22px;
+    font-size:.92rem;
+    font-weight:700;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    transition:all .25s ease;
+    text-decoration:none;
+}
+
+.btn-modern:hover{
+    transform:translateY(-2px);
+}
+
+.btn-primary-modern{
+    background:linear-gradient(135deg,#2F53FF 0%,#7C3AED 100%);
+    color:white;
+    box-shadow:0 14px 28px rgba(47,83,255,.18);
+}
+
+.btn-primary-modern:hover{
+    color:white;
+    box-shadow:var(--shadow-hover);
+}
+
+.btn-secondary-modern{
+    background:#F8FAFC;
+    color:#334155;
+    border:1px solid rgba(148,163,184,.18);
+}
+
+.btn-secondary-modern:hover{
+    background:#EEF2F7;
+    color:#1E293B;
+}
+
+.button-group{
+    display:flex;
+    justify-content:flex-end;
+    gap:12px;
+    margin-top:10px;
+}
+
+/* ================= ANIMATION ================= */
+
+@keyframes fadeInUp{
+    from{
+        opacity:0;
+        transform:translateY(16px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:768px){
+
+    .page-header{
+        padding:26px;
+        border-radius:26px;
+    }
+
+    .page-title{
+        font-size:1.7rem;
+    }
+
+    .dashboard-panel .card-header,
+    .dashboard-panel .card-body{
+        padding:22px;
+    }
+
+    .button-group{
+        flex-direction:column;
+    }
+
+    .btn-modern{
+        width:100%;
+    }
+}
+</style>
+
 <div class="container-fluid py-4">
 
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
-    <div>
-        <h2 class="fw-bold mb-1">Tambah Jurusan</h2>
-        <p class="text-muted mb-0">
-            Tambahkan jurusan baru agar data sekolah tetap rapi dan mudah dikelola.
-        </p>
-    </div>
+<!-- HEADER -->
+<div class="page-header">
+
+    <h1 class="page-title">
+        Tambah Jurusan
+    </h1>
+
+    <p class="page-subtitle">
+        Tambahkan jurusan baru untuk melengkapi struktur akademik sekolah dengan tampilan modern dan pengelolaan data yang lebih rapi.
+    </p>
 
 </div>
 
-<div class="card dashboard-panel border-0 overflow-hidden">
+<!-- CARD -->
+<div class="card dashboard-panel">
 
-    <div class="card-header py-4 px-4">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+    <div class="card-header">
+
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
+
             <div>
-                <h3 class="mb-1 fw-bold">Form Jurusan</h3>
+                <h4 class="fw-bold mb-2 text-dark">
+                    Form Data Jurusan
+                </h4>
+
                 <p class="text-muted mb-0">
-                    Lengkapi informasi jurusan dengan benar sebelum menyimpan.
+                    Pastikan kode dan nama jurusan sesuai standar sekolah.
                 </p>
             </div>
 
-            <div class="text-muted small">
+            <div class="small text-muted">
                 Semua field wajib diisi
             </div>
+
         </div>
+
     </div>
 
-    <div class="card-body p-4">
+    <div class="card-body">
 
         @if ($errors->any())
-            <div class="alert alert-danger border-0 rounded-4 shadow-sm mb-4">
+            <div class="alert alert-modern mb-4">
                 <strong>Periksa kembali data formulir.</strong>
 
-                <ul class="mb-0 mt-2 small">
+                <ul class="mt-2">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
             </div>
         @endif
+
+        <div class="info-box">
+
+            <div class="info-box-title">
+                Tips Pengisian
+            </div>
+
+            <p>
+                Gunakan kode jurusan singkat seperti RPL, TJKT, AKL, atau MP agar mudah dikenali di seluruh sistem sekolah.
+            </p>
+
+        </div>
 
         <form action="{{ route('super_admin.manajemen-jurusan.store') }}"
               method="POST"
@@ -54,14 +338,15 @@
             @csrf
 
             <div class="col-12">
+
                 <label for="kode" class="form-label">
-                    Nama Singkat Jurusan
+                    Kode Jurusan
                 </label>
 
                 <input type="text"
-                       class="form-control form-control-modern @error('kode') is-invalid @enderror"
                        id="kode"
                        name="kode"
+                       class="form-control-modern @error('kode') is-invalid @enderror"
                        value="{{ old('kode') }}"
                        placeholder="Contoh: RPL"
                        required>
@@ -71,17 +356,19 @@
                         {{ $message }}
                     </div>
                 @enderror
+
             </div>
 
             <div class="col-12">
+
                 <label for="nama" class="form-label">
                     Nama Jurusan
                 </label>
 
                 <input type="text"
-                       class="form-control form-control-modern @error('nama') is-invalid @enderror"
                        id="nama"
                        name="nama"
+                       class="form-control-modern @error('nama') is-invalid @enderror"
                        value="{{ old('nama') }}"
                        placeholder="Contoh: Rekayasa Perangkat Lunak"
                        required>
@@ -91,131 +378,36 @@
                         {{ $message }}
                     </div>
                 @enderror
+
             </div>
 
             <div class="col-12">
-                <div class="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-2">
+
+                <div class="button-group">
 
                     <a href="{{ route('super_admin.manajemen-jurusan.index') }}"
-                       class="btn btn-secondary btn-secondary-modern">
-                        Batal
+                       class="btn-modern btn-secondary-modern">
+                        <i class="fas fa-arrow-left"></i>
+                        Kembali
                     </a>
 
                     <button type="submit"
-                            class="btn btn-primary btn-primary-modern">
-                        Simpan
+                            class="btn-modern btn-primary-modern">
+                        <i class="fas fa-save"></i>
+                        Simpan Jurusan
                     </button>
 
                 </div>
+
             </div>
 
         </form>
 
     </div>
-</div>
 
 </div>
+
+
+</div>
+
 @endsection
-
-@push('styles')
-
-<style>
-.dashboard-panel{
-    border-radius: 28px;
-    box-shadow: 0 24px 60px rgba(15,23,42,.08);
-    border: 1px solid rgba(15,23,42,.05);
-    overflow: hidden;
-}
-
-.dashboard-panel .card-header{
-    background: linear-gradient(
-        180deg,
-        rgba(221,235,255,.72),
-        rgba(255,255,255,.92)
-    );
-    border-bottom: 1px solid rgba(15,23,42,.06);
-}
-
-.form-label{
-    font-size: .95rem;
-    font-weight: 700;
-    color: #1E293B;
-    margin-bottom: .6rem;
-}
-
-.form-control-modern{
-    border-radius: 18px;
-    border: 1px solid rgba(56,118,255,.16);
-    background: #FBFDFF;
-    min-height: 54px;
-    padding: .9rem 1rem;
-    transition: all .25s ease;
-}
-
-.form-control-modern:focus{
-    border-color: rgba(56,118,255,.35);
-    box-shadow: 0 0 0 .15rem rgba(56,118,255,.15);
-    background: #fff;
-}
-
-.form-control-modern.is-invalid{
-    border-color: #dc3545;
-    background: #fff5f6;
-}
-
-.invalid-feedback{
-    display: block;
-    margin-top: .35rem;
-}
-
-.btn-primary-modern{
-    border-radius: 18px;
-    background: linear-gradient(135deg,#336df1 0%,#1f5ed0 100%);
-    border: none;
-    padding: .85rem 1.6rem;
-    font-weight: 600;
-    box-shadow: 0 14px 28px rgba(51,109,241,.18);
-    transition: all .25s ease;
-}
-
-.btn-primary-modern:hover{
-    transform: translateY(-2px);
-    background: linear-gradient(135deg,#295ed6 0%,#1c4fb8 100%);
-}
-
-.btn-secondary-modern{
-    border-radius: 18px;
-    border: 1px solid rgba(148,163,184,.25);
-    background: #F8FAFC;
-    color: #334155;
-    padding: .82rem 1.4rem;
-    font-weight: 600;
-    transition: all .25s ease;
-}
-
-.btn-secondary-modern:hover{
-    background: #EDF2F7;
-    color: #1F2937;
-    transform: translateY(-1px);
-}
-
-.alert{
-    border-radius: 20px;
-}
-
-@media (max-width: 575.98px){
-
-    .dashboard-panel .card-header,
-    .dashboard-panel .card-body{
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-    }
-
-    .btn-primary-modern,
-    .btn-secondary-modern{
-        width: 100%;
-    }
-}
-</style>
-
-@endpush

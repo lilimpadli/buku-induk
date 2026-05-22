@@ -61,61 +61,61 @@ body{
 
 .btn-modern{
     border: none;
-        border-radius: 999px;
-        padding: 12px 20px;
-        min-height: 50px;
-        font-size: 14px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        transition: transform .3s ease, box-shadow .3s ease, background .3s ease, color .3s ease;
-        text-decoration: none;
-        color: white;
-        box-shadow: 0 10px 24px rgba(47,83,255,0.12);
-    }
+    border-radius: 999px;
+    padding: 12px 20px;
+    min-height: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: transform .3s ease, box-shadow .3s ease, background .3s ease, color .3s ease;
+    text-decoration: none;
+    color: white;
+    box-shadow: 0 10px 24px rgba(47,83,255,0.12);
+}
 
-    .btn-modern i,
-    .btn-modern svg{
-        width: 18px;
-        height: 18px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
+.btn-modern i,
+.btn-modern svg{
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
 
-    .btn-modern:hover{
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-hover);
-        color: white;
-    }
+.btn-modern:hover{
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-hover);
+    color: white;
+}
 
-    .header-actions{
-        display: flex;
-        gap: 14px;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: flex-end;
-    }
+.header-actions{
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+}
 
-    .header-actions > a,
-    .header-actions > .mobile-menu-toggle,
-    .header-actions .btn-modern{
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
+.header-actions > a,
+.header-actions > .mobile-menu-toggle,
+.header-actions .btn-modern{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
 
-    .header-actions .btn-modern{
-        min-height: 50px;
-        padding: 14px 22px;
-    }
+.header-actions .btn-modern{
+    min-height: 50px;
+    padding: 14px 22px;
+}
 
-    .header-actions > .mobile-menu-toggle{
-        display: none;
-        position: relative;
-    }
+.header-actions > .mobile-menu-toggle{
+    display: none;
+    position: relative;
+}
 
 .btn-primary-modern{
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
@@ -213,13 +213,34 @@ body{
     box-shadow: 0 18px 35px rgba(47,83,255,0.08);
 }
 
+/* WIDTH */
 .table-modern td:first-child,
 .table-modern th:first-child{
-    width: 18%;
+    width: 6%;
+}
+
+.table-modern td:nth-child(2),
+.table-modern th:nth-child(2){
+    width: 24%;
 }
 
 .table-modern td:last-child{
     width: 16%;
+}
+
+/* ================= NUMBER BADGE ================= */
+
+.number-badge{
+    width: 38px;
+    height: 38px;
+    border-radius: 14px;
+    background: linear-gradient(135deg,var(--primary-blue),var(--secondary-blue));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 10px 24px rgba(79,172,254,.18);
 }
 
 /* ================= AVATAR ================= */
@@ -369,9 +390,6 @@ body{
     background: linear-gradient(135deg,#EF4444,#DC2626);
 }
 
-
-/* ================= EMPTY ================= */
-
 .empty-state{
     padding: 80px 20px;
     text-align: center;
@@ -392,8 +410,6 @@ body{
 .empty-state p{
     color: var(--text-muted);
 }
-
-/* ================= PAGINATION ================= */
 
 .pagination-container{
     padding: 24px;
@@ -422,62 +438,6 @@ body{
     100% {
         opacity: 1;
         transform: translateY(0);
-    }
-}
-
-/* ================= MOBILE ================= */
-
-.header-actions > .mobile-menu-toggle{
-    display: none;
-    position: relative;
-}
-
-.mobile-menu-toggle button{
-    width: 50px;
-    height: 50px;
-    padding: 0;
-    min-width: 50px;
-    border-radius: 18px;
-}
-
-.mobile-dropdown{
-    display: none;
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
-    left: auto;
-    background: white;
-    min-width: 220px;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: var(--shadow-medium);
-    z-index: 100;
-}
-
-.mobile-dropdown.show{
-    display: block;
-}
-
-.mobile-dropdown a{
-    display: flex;
-    align-items: center;
-    padding: 14px 18px;
-    text-decoration: none;
-    color: var(--text-dark);
-    border-bottom: 1px solid #EEF2F7;
-}
-
-.mobile-dropdown a:last-child{
-    border-bottom: none;
-}
-
-.mobile-dropdown a:hover{
-    background: #F8FAFC;
-}
-
-@media(min-width:769px){
-    .mobile-dropdown{
-        display: none !important;
     }
 }
 
@@ -516,6 +476,16 @@ body{
         padding: 14px 18px;
     }
 
+    .table-modern tbody td:first-child{
+        padding-bottom: 0;
+    }
+
+    .number-badge{
+        width: 34px;
+        height: 34px;
+        font-size: 13px;
+    }
+
     .action-buttons{
         justify-content: start;
     }
@@ -536,318 +506,180 @@ body{
 
 <div class="container-fluid">
 
-    <!-- HEADER -->
-    <div class="page-header">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-
-            <div>
-                <h1 class="page-title">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                    Manajemen Guru
-                </h1>
-
-                <p class="page-subtitle">
-                    Kelola data guru, kelas, dan informasi akademik
-                </p>
-            </div>
-
-            <div class="header-actions d-flex gap-2 align-items-center">
-
-                <a href="{{ route('super_admin.manajemen-guru.export', request()->only(['search','jurusan'])) }}"
-                   class="btn-modern btn-export-modern">
-                    <i class="fas fa-file-export"></i>
-                    Export
-                </a>
-
-                <a href="{{ route('super_admin.manajemen-guru.importForm') }}"
-                   class="btn-modern btn-secondary-modern">
-                    <i class="fas fa-file-import"></i>
-                    Import
-                </a>
-
-                <a href="{{ route('super_admin.manajemen-guru.create') }}"
-                   class="btn-modern btn-primary-modern">
-                    <i class="fas fa-plus"></i>
-                    Tambah Guru
-                </a>
-
-                <!-- MOBILE MENU -->
-                <div class="mobile-menu-toggle">
-
-                    <button class="btn-modern btn-secondary-modern"
-                            onclick="toggleMobileMenu()">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
-
-                    <div class="mobile-dropdown" id="mobileMenuDropdown">
-
-                        <a href="{{ route('super_admin.manajemen-guru.export', request()->only(['search','jurusan'])) }}">
-                            <i class="fas fa-file-export me-2"></i>
-                            Export Excel
-                        </a>
-
-                        <a href="{{ route('super_admin.manajemen-guru.importForm') }}">
-                            <i class="fas fa-file-import me-2"></i>
-                            Import Excel
-                        </a>
-
-                        <a href="{{ route('super_admin.manajemen-guru.create') }}">
-                            <i class="fas fa-plus me-2"></i>
-                            Tambah Guru
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- FILTER -->
-    <div class="filter-card">
-        <div class="card-body">
-
-            <form method="GET"
-                  action="{{ route('super_admin.manajemen-guru.index') }}"
-                  class="row g-4 align-items-end">
-
-                <div class="col-lg-4 col-md-6">
-                    <label class="form-label">Cari Guru</label>
-
-                    <div class="input-group">
-                        <span class="input-group-text">
-                            <i class="fas fa-search"></i>
-                        </span>
-
-                        <input type="text"
-                               name="search"
-                               class="form-control"
-                               placeholder="Nama, NIP, email..."
-                               value="{{ $search ?? '' }}">
-                    </div>
-                </div>
-
-                <div class="col-lg-3 col-md-6">
-                    <label class="form-label">Jurusan</label>
-
-                    <select name="jurusan" class="form-select">
-
-                        <option value="">-- Semua Jurusan --</option>
-
-                        @foreach(($allJurusans ?? collect()) as $j)
-                            <option value="{{ $j->id }}"
-                                {{ (isset($jurusan_id) && $jurusan_id == $j->id) ? 'selected' : '' }}>
-                                {{ $j->nama }}
-                            </option>
-                        @endforeach
-
-                    </select>
-                </div>
-
-                <div class="col-lg-3 col-md-6">
-                    <label class="form-label">Role</label>
-
-                    <select name="role" class="form-select">
-
-                        <option value="">-- Semua Role --</option>
-
-                        @foreach(($allRoles ?? collect()) as $r)
-                            <option value="{{ $r }}"
-                                {{ (isset($role) && $role == $r) ? 'selected' : '' }}>
-                                {{ ucfirst(str_replace('_',' ',$r)) }}
-                            </option>
-                        @endforeach
-
-                    </select>
-                </div>
-
-                <div class="col-lg-2 col-md-6">
-                    <div class="d-flex gap-2">
-
-                        <button type="submit"
-                                class="btn-modern btn-primary-modern w-100 justify-content-center">
-                            <i class="fas fa-search"></i>
-                            Cari
-                        </button>
-
-                    </div>
-                </div>
-
-            </form>
-
-        </div>
-    </div>
-
-    <!-- TABLE -->
-    <div class="data-table-card">
-
-        @if($gurus->count() > 0)
-
-            <div class="table-responsive">
-
-                <table class="table align-middle table-modern">
-
-                    <thead>
-                        <tr>
-                            <th>Guru</th>
-                            <th>Informasi</th>
-                            <th>Kelas Mengajar</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                    @foreach($gurus as $g)
-
-                        <tr>
-
-                            <td>
-                                <div class="d-flex align-items-center gap-3">
-
-                                    <div class="teacher-avatar-table">
-
-                                        @if($g->foto)
-                                            <img src="{{ asset('storage/' . $g->foto) }}"
-                                                 alt="{{ $g->nama }}">
-                                        @else
-                                            {{ strtoupper(substr($g->nama,0,1)) }}
-                                        @endif
-
-                                    </div>
-
-                                    <div>
-                                        <div class="teacher-name">
-                                            {{ $g->nama }}
-                                        </div>
-
-                                        <div class="teacher-nip">
-                                            {{ $g->nip }}
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </td>
-
-                            <td>
-
-                                @if($g->user?->role)
-                                    <div class="teacher-role">
-                                        <i class="fas fa-user-tag me-1"></i>
-                                        {{ ucfirst(str_replace('_',' ',$g->user->role)) }}
-                                    </div>
-                                @endif
-
-                            </td>
-
-                            <td>
-
-                                @if($g->rombels && $g->rombels->count())
-
-                                    @foreach($g->rombels as $r)
-
-                                        @php
-                                            $kelas = $r->kelas;
-                                        @endphp
-
-                                        <span class="class-badge jurusan-badge" data-jurusan-code="{{ $kelas?->jurusan->kode ?? '' }}">
-                                            {{ $kelas?->tingkat ? $kelas->tingkat . ' - ' . ($kelas->jurusan->nama ?? '') : '-' }}
-                                            / {{ $r->nama }}
-                                        </span>
-
-                                    @endforeach
-
-                                @else
-                                    <span class="text-muted">
-                                        Belum ada kelas
-                                    </span>
-                                @endif
-
-                            </td>
-
-                            <td>
-
-                                <div class="action-buttons">
-
-                                    <a href="{{ route('super_admin.manajemen-guru.show',$g->id) }}"
-                                       class="action-btn view">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-
-                                    <a href="{{ route('super_admin.manajemen-guru.edit',$g->id) }}"
-                                       class="action-btn edit">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-
-                                    <form action="{{ route('super_admin.manajemen-guru.destroy',$g->id) }}"
-                                          method="POST"
-                                          onsubmit="return confirm('Hapus guru ini?')">
-
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button type="submit"
-                                                class="action-btn delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-
-                                    </form>
-
-                                </div>
-
-                            </td>
-
-                        </tr>
-
-                    @endforeach
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-            <div class="pagination-container">
-                {{ $gurus->links('pagination::bootstrap-4') }}
-            </div>
-
-        @else
-
-            <div class="empty-state">
-
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+        <div>
+            <h1 class="page-title">
                 <i class="fas fa-chalkboard-teacher"></i>
+                Manajemen Guru
+            </h1>
 
-                <h5>Belum ada data guru</h5>
-
-                <p>
-                    Silakan tambahkan data guru terlebih dahulu
-                </p>
-
-            </div>
-
-        @endif
+            <p class="page-subtitle">
+                Kelola data guru, kelas, dan informasi akademik
+            </p>
+        </div>
 
     </div>
+</div>
+
+<div class="data-table-card">
+
+    @if($gurus->count() > 0)
+
+        <div class="table-responsive">
+
+            <table class="table align-middle table-modern">
+
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Guru</th>
+                        <th>Informasi</th>
+                        <th>Kelas Mengajar</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                @foreach($gurus as $g)
+
+                    <tr>
+
+                        <td>
+                            <div class="number-badge">
+                                {{ $gurus->firstItem() + $loop->index }}
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+
+                                <div class="teacher-avatar-table">
+
+                                    @if($g->foto)
+                                        <img src="{{ asset('storage/' . $g->foto) }}"
+                                             alt="{{ $g->nama }}">
+                                    @else
+                                        {{ strtoupper(substr($g->nama,0,1)) }}
+                                    @endif
+
+                                </div>
+
+                                <div>
+                                    <div class="teacher-name">
+                                        {{ $g->nama }}
+                                    </div>
+
+                                    <div class="teacher-nip">
+                                        {{ $g->nip }}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </td>
+
+                        <td>
+
+                            @if($g->user?->role)
+                                <div class="teacher-role">
+                                    <i class="fas fa-user-tag me-1"></i>
+                                    {{ ucfirst(str_replace('_',' ',$g->user->role)) }}
+                                </div>
+                            @endif
+
+                        </td>
+
+                        <td>
+
+                            @if($g->rombels && $g->rombels->count())
+
+                                @foreach($g->rombels as $r)
+
+                                    @php
+                                        $kelas = $r->kelas;
+                                    @endphp
+
+                                    <span class="class-badge jurusan-badge" data-jurusan-code="{{ $kelas?->jurusan->kode ?? '' }}">
+                                        {{ $kelas?->tingkat ? $kelas->tingkat . ' - ' . ($kelas->jurusan->nama ?? '') : '-' }}
+                                        / {{ $r->nama }}
+                                    </span>
+
+                                @endforeach
+
+                            @else
+                                <span class="text-muted">
+                                    Belum ada kelas
+                                </span>
+                            @endif
+
+                        </td>
+
+                        <td>
+
+                            <div class="action-buttons">
+
+                                <a href="{{ route('super_admin.manajemen-guru.show',$g->id) }}"
+                                   class="action-btn view">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+
+                                <a href="{{ route('super_admin.manajemen-guru.edit',$g->id) }}"
+                                   class="action-btn edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
+                                <form action="{{ route('super_admin.manajemen-guru.destroy',$g->id) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('Hapus guru ini?')">
+
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button type="submit"
+                                            class="action-btn delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                @endforeach
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="pagination-container">
+            {{ $gurus->links('pagination::bootstrap-4') }}
+        </div>
+
+    @else
+
+        <div class="empty-state">
+
+            <i class="fas fa-chalkboard-teacher"></i>
+
+            <h5>Belum ada data guru</h5>
+
+            <p>
+                Silakan tambahkan data guru terlebih dahulu
+            </p>
+
+        </div>
+
+    @endif
 
 </div>
 
-<script>
-function toggleMobileMenu() {
-    const dropdown = document.getElementById('mobileMenuDropdown');
-    dropdown.classList.toggle('show');
-}
-
-document.addEventListener('click', function(event) {
-
-    const toggle = document.querySelector('.mobile-menu-toggle');
-    const dropdown = document.getElementById('mobileMenuDropdown');
-
-    if (toggle && dropdown && !toggle.contains(event.target)) {
-        dropdown.classList.remove('show');
-    }
-
-});
-</script>
+</div>
 
 @endsection
