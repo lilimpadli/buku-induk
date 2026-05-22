@@ -122,11 +122,35 @@ class SuperAdminController extends Controller
     /**
      * Index semua users
      */
-    public function usersIndex()
-    {
-        $users = User::with(['guru', 'siswa'])->paginate(20);
-        return view('super_admin.users.index', compact('users'));
+    public function usersIndex(Request $request)
+{
+    $query = User::with(['guru', 'siswa'])->latest();
+
+    // SEARCH
+    if ($request->search) {
+
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%")
+              ->orWhere('nomor_induk', 'like', "%{$search}%");
+
+        });
     }
+
+    // FILTER ROLE
+    if ($request->role) {
+
+        $query->where('role', $request->role);
+
+    }
+
+    $users = $query->paginate(20)->withQueryString();
+
+    return view('super_admin.users.index', compact('users'));
+}
 
     /**
      * Form create user baru

@@ -5,6 +5,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\PpdbTimeline;
 
@@ -181,7 +182,13 @@ Route::middleware(['auth'])->group(function () {
 
     // Redirect dashboard sesuai role
     Route::get('/dashboard', function () {
-        return match (Auth::user()->role) {
+        $role = Str::of(Auth::user()->role)
+            ->lower()
+            ->replace(' ', '_')
+            ->replace('-', '_')
+            ->__toString();
+
+        return match ($role) {
             'siswa'         => redirect()->route('siswa.dashboard'),
             'guru'          => redirect()->route('guru.dashboard'),
             'walikelas'     => redirect()->route('walikelas.dashboard'),

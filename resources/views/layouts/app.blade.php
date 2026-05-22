@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -435,7 +435,7 @@
                         <nav class="nav flex-column">
 
                             {{-- ROLE: SISWA --}}
-                            @if(Auth::user()->role == 'siswa')
+                            @if(Auth::user()->normalized_role == 'siswa')
                                 <a href="{{ route('siswa.dashboard') }}" class="nav-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
                                     <i class="fas fa-home"></i> <span>Dashboard</span>
                                 </a>
@@ -449,7 +449,7 @@
                             @endif
 
                             {{-- ROLE: GURU --}}
-                            @if(Auth::user()->role == 'guru')
+                            @if(Auth::user()->normalized_role == 'guru')
                                 <a href="{{ route('guru.dashboard') }}" class="nav-link {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}">
                                     <i class="fas fa-home"></i> <span>Dashboard</span>
                                 </a>
@@ -462,7 +462,7 @@
                             @endif
 
                             {{-- ROLE: WALI KELAS --}}
-                            @if(Auth::user()->role == 'walikelas')
+                            @if(Auth::user()->normalized_role == 'walikelas')
                                 <a href="{{ route('walikelas.dashboard') }}" class="nav-link {{ request()->routeIs('walikelas.dashboard') ? 'active' : '' }}">
                                     <i class="fas fa-home"></i> <span>Dashboard</span>
                                 </a>
@@ -487,7 +487,7 @@
                             @endif
 
                             {{-- ROLE: KAPROG --}}
-                            @if(Auth::user()->role == 'kaprog')
+                            @if(Auth::user()->normalized_role == 'kaprog')
                                 <a href="{{ route('kaprog.dashboard') }}" class="nav-link {{ request()->routeIs('kaprog.dashboard') ? 'active' : '' }}">
                                     <i class="fas fa-home"></i> <span>Dashboard</span>
                                 </a>
@@ -512,7 +512,7 @@
                             @endif
 
                             {{-- ROLE: TU --}}
-                            @if(Auth::user()->role == 'tu')
+                            @if(Auth::user()->normalized_role == 'tu')
                                 <a href="{{ route('tu.dashboard') }}" class="nav-link {{ request()->routeIs('tu.dashboard') ? 'active' : '' }}">
                                     <i class="fas fa-home"></i> <span>Dashboard</span>
                                 </a>
@@ -552,7 +552,7 @@
                             @endif
 
                             {{-- ROLE: TU KEPEGAWAIAN --}}
-                            @if(Auth::user()->role == 'tu_kepegawaian')
+                            @if(Auth::user()->normalized_role == 'tu_kepegawaian')
                                 <a href="{{ route('tu_kepegawaian.dashboard') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.dashboard') ? 'active' : '' }}">
                                     <i class="fas fa-home"></i> <span>Dashboard</span>
                                 </a>
@@ -573,7 +573,7 @@
                             @endif
 
                             {{-- ROLE: SUPER ADMIN --}}
-                            @if(Auth::user()->role == 'super_admin')
+                            @if(Auth::user()->normalized_role == 'super_admin')
                                 <a href="{{ route('super_admin.dashboard') }}" class="nav-link {{ request()->routeIs('super_admin.dashboard') ? 'active' : '' }}">
                                     <i class="fas fa-home"></i> <span>Dashboard</span>
                                 </a>
@@ -614,7 +614,7 @@
                             @endif
 
                             {{-- ROLE: KURIKULUM --}}
-                            @if(Auth::user()->role == 'kurikulum')
+                            @if(Auth::user()->normalized_role == 'kurikulum')
                                 <a href="{{ route('kurikulum.dashboard') }}" class="nav-link {{ request()->routeIs('kurikulum.dashboard') ? 'active' : '' }}">
                                     <i class="fas fa-home"></i> <span>Dashboard</span>
                                 </a>

@@ -3,456 +3,668 @@
 @section('title', 'Daftar Kurikulum TU Kepegawaian')
 
 @section('content')
+
 <style>
-:root {
-    --primary-blue: #2F53FF;
-    --secondary-blue: #7C3AED;
-    --accent-cyan: #00D4FF;
-    --accent-pink: #FF4D6D;
-    --accent-green: #43E97B;
-    --light-bg: #F4F7FE;
-    --soft-gray: #E9EEF7;
-    --text-dark: #1E293B;
-    --text-muted: #64748B;
-    --shadow-light: 0 4px 18px rgba(15,23,42,0.06);
-    --shadow-medium: 0 12px 30px rgba(15,23,42,0.08);
-    --shadow-hover: 0 16px 40px rgba(47,83,255,0.16);
-    --radius: 24px;
+:root{
+    --primary:#3B82F6;
+    --primary-dark:#2563EB;
+    --secondary:#6366F1;
+    --success:#10B981;
+    --warning:#F59E0B;
+    --danger:#EF4444;
+    --info:#06B6D4;
+
+    --bg:#F4F7FE;
+    --card:#FFFFFF;
+    --border:#E8EEF7;
+
+    --text:#0F172A;
+    --muted:#64748B;
+
+    --shadow-sm:0 4px 20px rgba(15,23,42,.05);
+    --shadow-md:0 12px 32px rgba(15,23,42,.08);
+    --shadow-hover:0 16px 40px rgba(59,130,246,.15);
+
+    --radius-xl:28px;
+    --radius-lg:20px;
+    --radius-md:16px;
 }
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background: var(--light-bg);
+body{
+    font-family:'Poppins',sans-serif;
+    background:var(--bg);
 }
 
-.page-header {
-    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
-    border-radius: 30px;
-    padding: 32px 32px 28px;
-    margin-bottom: 28px;
-    color: white;
-    box-shadow: var(--shadow-medium);
-    animation: fadeInUp .45s ease both;
+/* ================= HEADER ================= */
+
+.page-header{
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(135deg,#3B82F6 0%, #6366F1 55%, #7C3AED 100%);
+    border-radius:32px;
+    padding:40px;
+    margin-bottom:28px;
+    color:white;
+    box-shadow:var(--shadow-md);
 }
 
-.page-title {
-    font-size: 2.25rem;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 10px;
+.page-header::before{
+    content:'';
+    position:absolute;
+    width:300px;
+    height:300px;
+    background:rgba(255,255,255,.08);
+    border-radius:50%;
+    top:-120px;
+    right:-80px;
 }
 
-.page-subtitle {
-    opacity: .88;
-    margin: 0;
-    font-size: 1rem;
-    max-width: 680px;
-    line-height: 1.7;
+.page-header::after{
+    content:'';
+    position:absolute;
+    width:220px;
+    height:220px;
+    background:rgba(255,255,255,.06);
+    border-radius:50%;
+    bottom:-120px;
+    left:-80px;
 }
 
-.btn-modern {
-    border: none;
-    border-radius: 18px;
-    padding: 12px 20px;
-    font-size: 14px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
-    text-decoration: none;
-    color: white;
+.page-title{
+    position:relative;
+    z-index:2;
+    font-size:2.2rem;
+    font-weight:800;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-bottom:12px;
 }
 
-.btn-modern:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
-    color: white;
+.page-title i{
+    width:60px;
+    height:60px;
+    border-radius:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,.16);
+    backdrop-filter:blur(10px);
+    font-size:1.4rem;
 }
 
-.btn-primary-modern {
-    background: linear-gradient(135deg, #2F53FF 0%, #7C3AED 100%);
+.page-subtitle{
+    position:relative;
+    z-index:2;
+    font-size:.98rem;
+    line-height:1.8;
+    opacity:.9;
+    max-width:680px;
+    margin:0;
 }
 
-.btn-secondary-modern {
-    background: linear-gradient(135deg, #4F46E5 0%, #22D3EE 100%);
+/* ================= BUTTON ================= */
+
+.btn-modern{
+    border:none;
+    border-radius:18px;
+    padding:13px 22px;
+    font-size:14px;
+    font-weight:600;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    text-decoration:none;
+    transition:all .3s ease;
+    color:white;
 }
+
+.btn-modern:hover{
+    transform:translateY(-2px);
+    box-shadow:var(--shadow-hover);
+    color:white;
+}
+
+.btn-primary-modern{
+    background:linear-gradient(135deg,#2563EB,#7C3AED);
+}
+
+/* ================= CARD ================= */
 
 .filter-card,
-.data-table-card {
-    background: white;
-    border-radius: 24px;
-    box-shadow: var(--shadow-light);
-    margin-bottom: 28px;
-    overflow: hidden;
+.data-table-card{
+    background:var(--card);
+    border-radius:28px;
+    box-shadow:var(--shadow-sm);
+    border:1px solid rgba(226,232,240,.7);
+    overflow:hidden;
+    margin-bottom:28px;
 }
 
 .filter-card .card-body,
-.data-table-card .card-body {
-    padding: 28px;
+.data-table-card .card-body{
+    padding:28px;
 }
 
-.form-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-dark);
-    margin-bottom: 8px;
+/* ================= FORM ================= */
+
+.form-label{
+    font-size:13px;
+    font-weight:700;
+    color:var(--text);
+    margin-bottom:10px;
 }
 
-.form-control,
-.form-select {
-    border-radius: 14px;
-    border: 2px solid var(--soft-gray);
-    padding: 12px 16px;
-    transition: .3s ease;
-    box-shadow: none;
+.form-control{
+    border:2px solid var(--border);
+    border-radius:16px;
+    padding:14px 18px;
+    font-size:14px;
+    box-shadow:none;
+    transition:all .3s ease;
 }
 
-.form-control:focus,
-.form-select:focus {
-    border-color: var(--primary-blue);
-    box-shadow: 0 0 0 4px rgba(47,83,255,.1);
+.form-control:focus{
+    border-color:#3B82F6;
+    box-shadow:0 0 0 5px rgba(59,130,246,.10);
 }
 
-.input-group {
-    border-radius: 16px;
-    overflow: hidden;
-    border: 2px solid var(--soft-gray);
-    display: flex;
-    align-items: center;
-    background: white;
+.input-group{
+    border:2px solid var(--border);
+    border-radius:18px;
+    overflow:hidden;
+    background:white;
 }
 
-.input-group .form-control {
-    border: none;
-    box-shadow: none;
+.input-group-text{
+    background:white;
+    border:none;
+    color:var(--muted);
+    padding:0 18px;
 }
 
-.input-group-text {
-    border: none;
-    background: white;
-    color: var(--text-muted);
-    padding: 0 16px;
+.input-group .form-control{
+    border:none;
 }
 
-.table-modern {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0 0.85rem;
+/* ================= ALERT ================= */
+
+.alert{
+    border:none;
+    border-radius:18px;
+    padding:16px 20px;
+    font-weight:500;
+    box-shadow:var(--shadow-sm);
 }
 
-.table-modern thead th {
-    background: #EFF6FF;
-    border: none;
-    padding: 22px 20px;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    color: var(--text-muted);
-    font-weight: 700;
+.alert-success{
+    background:#ECFDF5;
+    color:#065F46;
 }
 
-.table-modern tbody td {
-    padding: 20px;
-    vertical-align: middle;
-    border: none;
-    background: white;
+.alert-danger{
+    background:#FEF2F2;
+    color:#991B1B;
 }
 
-.table-modern tbody tr {
-    transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
-    box-shadow: 0 8px 20px rgba(15,23,42,0.04);
-    border-radius: 24px;
+/* ================= TABLE ================= */
+
+.table-modern{
+    margin:0;
+    border-collapse:separate;
+    border-spacing:0 14px;
 }
 
-.table-modern tbody tr:hover {
-    transform: translateY(-1px);
-    background: #F8FBFF;
-    box-shadow: 0 18px 35px rgba(47,83,255,0.08);
+.table-modern thead th{
+    border:none;
+    background:#EFF6FF;
+    color:var(--muted);
+    padding:18px 20px;
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.08em;
 }
 
-.table-modern th,
-.table-modern td {
-    border: none;
-    padding: 18px 20px;
+.table-modern thead th:first-child{
+    border-radius:18px 0 0 18px;
 }
 
-.action-buttons {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
+.table-modern thead th:last-child{
+    border-radius:0 18px 18px 0;
 }
 
-.action-btn {
-    width: 42px;
-    height: 42px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 16px;
-    border: none;
-    color: white;
-    transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
-    box-shadow: var(--shadow-light);
+.table-modern tbody tr{
+    transition:.3s ease;
 }
 
-.action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
+.table-modern tbody tr:hover{
+    transform:translateY(-2px);
 }
 
-.action-btn.view {
-    background: linear-gradient(135deg,#06B6D4,#3B82F6);
+.table-modern tbody td{
+    border:none;
+    background:white;
+    padding:22px 20px;
+    vertical-align:middle;
+    box-shadow:0 8px 20px rgba(15,23,42,.04);
 }
 
-.action-btn.edit {
-    background: linear-gradient(135deg,#F59E0B,#F97316);
+.table-modern tbody td:first-child{
+    border-radius:20px 0 0 20px;
 }
 
-.action-btn.delete {
-    background: linear-gradient(135deg,#EF4444,#DC2626);
+.table-modern tbody td:last-child{
+    border-radius:0 20px 20px 0;
 }
 
-.empty-state {
-    padding: 70px 20px;
-    text-align: center;
+.kurikulum-name{
+    font-weight:700;
+    color:var(--text);
+    font-size:15px;
 }
 
-.empty-state i {
-    font-size: 50px;
-    margin-bottom: 16px;
-    color: var(--primary-blue);
-    opacity: .3;
+.badge-modern{
+    background:rgba(59,130,246,.10);
+    color:#2563EB;
+    padding:10px 16px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:700;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
 }
 
-.empty-state h5 {
-    font-weight: 700;
-    margin-bottom: 8px;
+.date-text{
+    color:var(--muted);
+    font-weight:500;
 }
 
-.empty-state p {
-    color: var(--text-muted);
+/* ================= ACTION ================= */
+
+.action-buttons{
+    display:flex;
+    gap:10px;
+    justify-content:center;
 }
 
-.pagination-container {
-    padding: 24px;
+.action-btn{
+    width:44px;
+    height:44px;
+    border:none;
+    border-radius:16px;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.3s ease;
+    text-decoration:none;
 }
 
-.pagination {
-    justify-content: center;
+.action-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:var(--shadow-hover);
+    color:white;
 }
 
-.page-link {
-    border: none;
-    border-radius: 12px !important;
-    margin: 0 4px;
-    color: var(--text-dark);
-    transition: all .3s ease;
+.action-btn.view{
+    background:linear-gradient(135deg,#06B6D4,#3B82F6);
 }
 
-.page-link:hover {
-    background: rgba(47,83,255,0.08);
+.action-btn.edit{
+    background:linear-gradient(135deg,#F59E0B,#F97316);
 }
 
-.page-item.active .page-link {
-    background: linear-gradient(135deg,var(--primary-blue),var(--secondary-blue));
-    color: white;
+.action-btn.delete{
+    background:linear-gradient(135deg,#EF4444,#DC2626);
 }
 
-@keyframes fadeInUp {
-    0% {
-        opacity: 0;
-        transform: translateY(18px);
+/* ================= EMPTY ================= */
+
+.empty-state{
+    padding:90px 20px;
+    text-align:center;
+}
+
+.empty-state i{
+    width:90px;
+    height:90px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:auto auto 20px;
+    border-radius:30px;
+    background:rgba(59,130,246,.08);
+    color:#3B82F6;
+    font-size:2rem;
+}
+
+.empty-state h5{
+    font-weight:700;
+    color:var(--text);
+    margin-bottom:10px;
+}
+
+.empty-state p{
+    color:var(--muted);
+    margin:0;
+}
+
+/* ================= PAGINATION ================= */
+
+.pagination-container{
+    padding-top:18px;
+}
+
+.pagination{
+    justify-content:center;
+}
+
+.page-link{
+    border:none;
+    border-radius:14px !important;
+    margin:0 4px;
+    color:var(--text);
+    min-width:42px;
+    height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.3s ease;
+}
+
+.page-link:hover{
+    background:rgba(59,130,246,.08);
+    color:#2563EB;
+}
+
+.page-item.active .page-link{
+    background:linear-gradient(135deg,#2563EB,#7C3AED);
+    color:white;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:768px){
+
+    .page-header{
+        padding:28px 24px;
+        border-radius:26px;
     }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
-@media(max-width:768px) {
-    .page-header {
-        padding: 24px;
+    .page-title{
+        font-size:1.7rem;
     }
 
-    .page-title {
-        font-size: 24px;
+    .page-title i{
+        width:52px;
+        height:52px;
+        border-radius:16px;
     }
 
     .filter-card .card-body,
-    .data-table-card .card-body {
-        padding: 20px;
+    .data-table-card .card-body{
+        padding:20px;
     }
 
-    .table-modern thead {
-        display: none;
+    .table-modern thead{
+        display:none;
     }
 
-    .table,
-    .table tbody,
-    .table tr,
-    .table td {
-        display: block;
-        width: 100%;
+    .table-modern,
+    .table-modern tbody,
+    .table-modern tr,
+    .table-modern td{
+        display:block;
+        width:100%;
     }
 
-    .table tr {
-        margin-bottom: 16px;
-        border-bottom: 1px solid #E5E7EB;
+    .table-modern tbody tr{
+        margin-bottom:16px;
     }
 
-    .table td {
-        padding: 14px 18px;
+    .table-modern tbody td{
+        border-radius:0 !important;
+        text-align:right;
+        padding:14px 18px;
+        position:relative;
     }
 
-    .action-buttons {
-        justify-content: flex-start;
+    .table-modern tbody td::before{
+        content:attr(data-label);
+        position:absolute;
+        left:18px;
+        font-weight:700;
+        color:var(--text);
+    }
+
+    .action-buttons{
+        justify-content:flex-start;
     }
 }
 </style>
 
 <div class="container-fluid">
+
+    <!-- HEADER -->
     <div class="page-header">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
             <div>
                 <h1 class="page-title">
                     <i class="fas fa-book"></i>
                     Daftar Kurikulum TU Kepegawaian
                 </h1>
+
                 <p class="page-subtitle">
-                    Kelola kurikulum dengan tampilan dashboard yang modern, konsisten, dan profesional.
+                    Kelola kurikulum dengan tampilan dashboard yang modern, rapi, dan profesional.
                 </p>
             </div>
-            <div class="header-actions d-flex gap-2 align-items-center">
-                <a href="{{ route('super_admin.manajemen-kurikulum.create') }}" class="btn-modern btn-primary-modern">
+
+            <div>
+                <a href="{{ route('super_admin.manajemen-kurikulum.create') }}"
+                   class="btn-modern btn-primary-modern">
                     <i class="fas fa-plus"></i>
                     Tambah Kurikulum
                 </a>
             </div>
+
         </div>
     </div>
 
+    <!-- ALERT -->
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-    @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
+        <div class="alert alert-success mb-4">
+            {{ session('success') }}
+        </div>
     @endif
 
+    @if(session('error'))
+        <div class="alert alert-danger mb-4">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <!-- FILTER -->
     <div class="filter-card">
         <div class="card-body">
-            <form method="GET" action="{{ route('super_admin.manajemen-kurikulum.index') }}" class="row g-4 align-items-end">
+
+            <form method="GET"
+                  action="{{ route('super_admin.manajemen-kurikulum.index') }}"
+                  class="row g-4 align-items-end">
+
                 <div class="col-lg-8 col-md-7">
-                    <label class="form-label">Cari Kurikulum</label>
+
+                    <label class="form-label">
+                        Cari Kurikulum
+                    </label>
+
                     <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        <input type="text" name="search" class="form-control" placeholder="Nama kurikulum..." value="{{ $search ?? '' }}">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+
+                        <input type="text"
+                               name="search"
+                               class="form-control"
+                               placeholder="Cari nama kurikulum..."
+                               value="{{ $search ?? '' }}">
                     </div>
+
                 </div>
+
                 <div class="col-lg-4 col-md-5">
-                    <button class="btn-modern btn-primary-modern w-100 justify-content-center" type="submit">
+
+                    <button type="submit"
+                            class="btn-modern btn-primary-modern w-100">
+
                         <i class="fas fa-search"></i>
-                        Cari
+                        Cari Data
+
                     </button>
+
                 </div>
+
             </form>
+
         </div>
     </div>
 
+    <!-- TABLE -->
     <div class="data-table-card">
+
         <div class="card-body">
+
             <div class="table-responsive">
-                <table class="table align-middle table-modern mb-0">
+
+                <table class="table table-modern align-middle">
+
                     <thead>
                         <tr>
-                            <th style="width: 48px;">#</th>
+                            <th>#</th>
                             <th>Nama Kurikulum</th>
                             <th>Jumlah Mata Pelajaran</th>
-                            <th>Dibuat</th>
+                            <th>Tanggal Dibuat</th>
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @forelse($kurikulum as $k)
-                            <tr>
-                                <td>{{ $loop->iteration + ($kurikulum->currentPage() - 1) * $kurikulum->perPage() }}</td>
-                                <td><div class="fw-semibold text-dark">{{ $k->nama_kurikulum }}</div></td>
-                                <td><span class="status-badge">{{ $k->mata_pelajarans_count }} mata pelajaran</span></td>
-                                <td>{{ $k->created_at->format('d/m/Y') }}</td>
 
-                                <td>
-                                    <div class="action-buttons justify-content-center">
-                                        <a href="{{ route('super_admin.manajemen-kurikulum.show', $k->id) }}" class="action-btn view" title="Detail">
+                    <tbody>
+
+                        @forelse($kurikulum as $k)
+
+                            <tr>
+
+                                <td data-label="#">
+                                    {{ $loop->iteration + ($kurikulum->currentPage() - 1) * $kurikulum->perPage() }}
+                                </td>
+
+                                <td data-label="Nama">
+                                    <div class="kurikulum-name">
+                                        {{ $k->nama_kurikulum }}
+                                    </div>
+                                </td>
+
+                                <td data-label="Mapel">
+                                    <span class="badge-modern">
+                                        <i class="fas fa-book-open"></i>
+                                        {{ $k->mata_pelajarans_count }} Mata Pelajaran
+                                    </span>
+                                </td>
+
+                                <td data-label="Tanggal">
+                                    <span class="date-text">
+                                        {{ $k->created_at->format('d M Y') }}
+                                    </span>
+                                </td>
+
+                                <td data-label="Aksi">
+
+                                    <div class="action-buttons">
+
+                                        <a href="{{ route('super_admin.manajemen-kurikulum.show', $k->id) }}"
+                                           class="action-btn view"
+                                           title="Detail">
+
                                             <i class="fas fa-eye"></i>
+
                                         </a>
-                                        <a href="{{ route('super_admin.manajemen-kurikulum.edit', $k->id) }}" class="action-btn edit" title="Edit">
-                                            <i class="fas fa-edit"></i>
+
+                                        <a href="{{ route('super_admin.manajemen-kurikulum.edit', $k->id) }}"
+                                           class="action-btn edit"
+                                           title="Edit">
+
+                                            <i class="fas fa-pen"></i>
+
                                         </a>
-                                        <form method="POST" action="{{ route('super_admin.manajemen-kurikulum.destroy', $k->id) }}" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus kurikulum ini?')">
+
+                                        <form method="POST"
+                                              action="{{ route('super_admin.manajemen-kurikulum.destroy', $k->id) }}"
+                                              onsubmit="return confirm('Yakin ingin menghapus kurikulum ini?')">
+
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="action-btn delete" title="Hapus">
+
+                                            <button type="submit"
+                                                    class="action-btn delete"
+                                                    title="Hapus">
+
                                                 <i class="fas fa-trash"></i>
+
                                             </button>
+
                                         </form>
+
                                     </div>
+
                                 </td>
-                            <td class="text-center">
-                                <div class="d-inline-flex">
 
-                                    {{-- Detail --}}
-                                    <a href="{{ route('super_admin.manajemen-kurikulum.show', $k->id) }}"
-                                    class="btn btn-info text-dark rounded-start rounded-0 border-0">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-
-                                    {{-- Edit --}}
-                                    <a href="{{ route('super_admin.manajemen-kurikulum.edit', $k->id) }}"
-                                    class="btn btn-warning text-dark rounded-0 border-0">
-                                        <i class="fas fa-pen"></i>
-                                    </a>
-
-                                    {{-- Hapus --}}
-                                    <form method="POST"
-                                        action="{{ route('super_admin.manajemen-kurikulum.destroy', $k->id) }}"
-                                        class="d-inline"
-                                        onsubmit="return confirm('Yakin ingin menghapus kurikulum ini?')">
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button type="submit"
-                                                class="btn btn-danger rounded-end rounded-0 border-0">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-
-                                </div>
-                            </td>
                             </tr>
+
                         @empty
+
                             <tr>
                                 <td colspan="5">
+
                                     <div class="empty-state">
+
                                         <i class="fas fa-book-open"></i>
-                                        <h5>Tidak ada kurikulum</h5>
-                                        <p>Silakan tambahkan kurikulum baru untuk mulai mengelola data.</p>
+
+                                        <h5>
+                                            Belum Ada Kurikulum
+                                        </h5>
+
+                                        <p>
+                                            Tambahkan data kurikulum baru untuk mulai mengelola sistem akademik.
+                                        </p>
+
                                     </div>
+
                                 </td>
                             </tr>
+
                         @endforelse
+
                     </tbody>
+
                 </table>
+
             </div>
 
             @if($kurikulum->hasPages())
+
                 <div class="pagination-container">
                     {{ $kurikulum->links('pagination::bootstrap-4') }}
                 </div>
+
             @endif
+
         </div>
+
     </div>
+
 </div>
+
 @endsection

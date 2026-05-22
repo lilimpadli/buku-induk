@@ -285,10 +285,10 @@
                         Hapus
                     </button>
                 </form>
-                <a href="{{ route('super_admin.users.index') }}" class="btn-modern btn-secondary-modern">
-                    <i class="fas fa-arrow-left"></i>
-                    Kembali
-                </a>
+               <a href="{{ url()->previous() }}" class="btn-modern btn-secondary-modern">
+    <i class="fas fa-arrow-left"></i>
+    Kembali
+</a>
             </div>
         </div>
     </div>

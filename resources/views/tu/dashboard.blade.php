@@ -295,19 +295,6 @@
                 <div class="text-muted">Kelola data siswa, wali kelas, dan kelas — cepat, informatif, dan responsif</div>
             </div>
             <div class="d-flex gap-2">
-                <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-sm btn-outline-light" aria-label="Logout">Logout</button>
-                </form>
-            </div>
-
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-
-                <button type="submit" class="btn btn-outline-light">
-                    Logout
-                </button>
-            </form>
 
         </div>
 

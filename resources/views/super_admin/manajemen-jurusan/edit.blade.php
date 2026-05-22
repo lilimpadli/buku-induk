@@ -9,7 +9,6 @@
             <h2 class="fw-bold mb-1">Edit Jurusan</h2>
             <p class="text-muted mb-0">Perbarui informasi jurusan agar nama dan kode tetap konsisten di seluruh sistem.</p>
         </div>
-        <a href="{{ route('super_admin.manajemen-jurusan.index') }}" class="btn btn-outline-secondary btn-sm px-4">Kembali ke daftar</a>
     </div>
 
     <div class="card dashboard-panel border-0 overflow-hidden">

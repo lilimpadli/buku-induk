@@ -569,8 +569,8 @@
     </div>
 
     <div class="action-buttons">
-        <a href="{{ route('kurikulum.jurusan.index') }}" class="btn btn-secondary">Kembali</a>
-        <a href="{{ route('kurikulum.jurusan.edit', $jurusan->id) }}" class="btn btn-primary">Edit Jurusan</a>
+        <a href="{{ route('super_admin.manajemen-jurusan.index') }}" class="btn btn-secondary">Kembali</a>
+        <a href="{{ route('super_admin.manajemen-jurusan.edit', $jurusan->id) }}" class="btn btn-primary">Edit Jurusan</a>
     </div>
 </div>
 @endsection

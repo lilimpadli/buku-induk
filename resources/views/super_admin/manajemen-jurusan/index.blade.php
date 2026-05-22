@@ -166,15 +166,6 @@ body {
     box-shadow: 0 18px 35px rgba(47,83,255,0.08);
 }
 
-.table-modern td:first-child,
-.table-modern th:first-child {
-    width: 35%;
-}
-
-.table-modern td:last-child {
-    width: 24%;
-}
-
 .status-badge {
     background: linear-gradient(135deg, #2F53FF 0%, #22D3EE 100%);
     color: white;
@@ -189,24 +180,6 @@ body {
 }
 
 .status-badge:hover {
-    transform: translateY(-1px);
-}
-
-.jurusan-badge {
-    color: #fff;
-    border-radius: 999px;
-    padding: 8px 14px;
-    display: inline-block;
-    font-size: 12px;
-    font-weight: 700;
-    margin: 3px 0;
-    box-shadow: 0 10px 25px rgba(15,23,42,0.12);
-    transition: transform .3s ease, box-shadow .3s ease, filter .3s ease;
-    background: linear-gradient(135deg, #2563EB 0%, #38BDF8 100%);
-    text-shadow: 0 1px 4px rgba(0,0,0,0.12);
-}
-
-.jurusan-badge:hover {
     transform: translateY(-1px);
 }
 
@@ -332,42 +305,6 @@ body {
     }
 }
 
-/* ================= MOBILE ================= */
-.mobile-menu-toggle {
-    display: none;
-    position: relative;
-}
-
-.mobile-dropdown {
-    display: none;
-    position: absolute;
-    top: 55px;
-    right: 0;
-    background: white;
-    min-width: 220px;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: var(--shadow-medium);
-    z-index: 100;
-}
-
-.mobile-dropdown.show {
-    display: block;
-}
-
-.mobile-dropdown a {
-    display: block;
-    padding: 14px 18px;
-    text-decoration: none;
-    color: var(--text-dark);
-    border-bottom: 1px solid #EEF2F7;
-}
-
-.mobile-dropdown a:hover {
-    background: #F8FAFC;
-}
-
-/* ================= RESPONSIVE ================= */
 @media(max-width:768px) {
     .page-header {
         padding: 24px;
@@ -405,14 +342,6 @@ body {
     .action-buttons {
         justify-content: start;
     }
-
-    .header-actions > a {
-        display: none;
-    }
-
-    .mobile-menu-toggle {
-        display: block;
-    }
 }
 </style>
 
@@ -433,31 +362,12 @@ body {
                 </p>
             </div>
 
-            <div class="header-actions d-flex gap-2 align-items-center">
+            <a href="{{ route('super_admin.manajemen-jurusan.create') }}"
+               class="btn-modern btn-primary-modern">
+                <i class="fas fa-plus"></i>
+                Tambah Jurusan
+            </a>
 
-                <a href="{{ route('super_admin.manajemen-jurusan.create') }}"
-                   class="btn-modern btn-primary-modern">
-                    <i class="fas fa-plus"></i>
-                    Tambah Jurusan
-                </a>
-
-                <div class="mobile-menu-toggle">
-
-                    <button class="btn-modern btn-secondary-modern"
-                            onclick="toggleMobileMenu()">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
-
-                    <div class="mobile-dropdown" id="mobileMenuDropdown">
-                        <a href="{{ route('super_admin.manajemen-jurusan.create') }}">
-                            <i class="fas fa-plus me-2"></i>
-                            Tambah Jurusan
-                        </a>
-                    </div>
-
-                </div>
-
-            </div>
         </div>
     </div>
 
@@ -507,6 +417,7 @@ body {
 
                     <thead>
                         <tr>
+                            <th>No</th>
                             <th>Jurusan</th>
                             <th>Kode</th>
                             <th>Total Kelas</th>
@@ -517,7 +428,13 @@ body {
                     <tbody>
 
                         @foreach($jurusans as $jurusan)
+
                             <tr>
+
+                                <td>
+                                    {{ $jurusans->firstItem() + $loop->index }}
+                                </td>
+
                                 <td>
                                     <div class="fw-semibold text-dark">
                                         {{ $jurusan->nama }}
@@ -540,32 +457,34 @@ body {
                                     <div class="action-buttons">
 
                                         <a href="{{ route('super_admin.manajemen-jurusan.show', $jurusan->id) }}"
-                                           class="action-btn view"
-                                           title="Detail Jurusan">
+                                           class="action-btn view">
                                             <i class="fas fa-eye"></i>
                                         </a>
 
                                         <a href="{{ route('super_admin.manajemen-jurusan.edit', $jurusan->id) }}"
-                                           class="action-btn edit"
-                                           title="Edit Jurusan">
+                                           class="action-btn edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
 
                                         <form action="{{ route('super_admin.manajemen-jurusan.destroy', $jurusan->id) }}"
                                               method="POST"
                                               onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+
                                             @csrf
                                             @method('DELETE')
+
                                             <button type="submit"
-                                                    class="action-btn delete"
-                                                    title="Hapus Jurusan">
+                                                    class="action-btn delete">
                                                 <i class="fas fa-trash"></i>
                                             </button>
+
                                         </form>
 
                                     </div>
                                 </td>
+
                             </tr>
+
                         @endforeach
 
                     </tbody>
@@ -581,6 +500,7 @@ body {
         @else
 
             <div class="empty-state">
+
                 <i class="fas fa-graduation-cap"></i>
 
                 <h5>Belum ada data jurusan</h5>
@@ -588,6 +508,7 @@ body {
                 <p>
                     Silakan tambahkan jurusan terlebih dahulu untuk mulai mengelola data.
                 </p>
+
             </div>
 
         @endif
@@ -595,20 +516,5 @@ body {
     </div>
 
 </div>
-
-<script>
-function toggleMobileMenu() {
-    const dropdown = document.getElementById('mobileMenuDropdown');
-    dropdown.classList.toggle('show');
-}
-
-document.addEventListener('click', function(event) {
-    const toggle = document.querySelector('.mobile-menu-toggle');
-    const dropdown = document.getElementById('mobileMenuDropdown');
-    if (toggle && dropdown && !toggle.contains(event.target)) {
-        dropdown.classList.remove('show');
-    }
-});
-</script>
 
 @endsection
