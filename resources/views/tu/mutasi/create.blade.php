@@ -230,12 +230,24 @@
     }
 
     function updateStudentClassInfo() {
-        const siswaSelect = document.getElementById('siswa_id');
-        const selectedOption = siswaSelect.options[siswaSelect.selectedIndex];
         const infoBox = document.getElementById('studentClassInfo');
         const currentKelasText = document.getElementById('currentKelasText');
         const currentRombelText = document.getElementById('currentRombelText');
 
+        // If Select2 data is available, prefer it (AJAX results)
+        if (window.jQuery && $('#siswa_id').data('select2')) {
+            const data = $('#siswa_id').select2('data')[0];
+            if (data && data.id) {
+                currentKelasText.textContent = data.kelasName || '-';
+                currentRombelText.textContent = data.rombelName || '-';
+                infoBox.style.display = 'block';
+                return;
+            }
+        }
+
+        // Fallback to plain select option dataset
+        const siswaSelect = document.getElementById('siswa_id');
+        const selectedOption = siswaSelect.options[siswaSelect.selectedIndex];
         if (selectedOption && selectedOption.value) {
             currentKelasText.textContent = selectedOption.dataset.kelasName || '-';
             currentRombelText.textContent = selectedOption.dataset.rombelName || '-';
@@ -247,72 +259,59 @@
         }
     }
 
-    function filterStudentsByClass() {
-        const kelasId = document.getElementById('filter_kelas').value;
-        const siswaSelect = document.getElementById('siswa_id');
-        const placeholder = document.createElement('option');
-        placeholder.value = '';
-        placeholder.textContent = '-- Pilih Siswa --';
-
-        siswaSelect.innerHTML = '';
-        siswaSelect.appendChild(placeholder);
-
-        allStudentOptions.forEach(item => {
-            if (!kelasId || item.kelasId === kelasId) {
-                const option = document.createElement('option');
-                option.value = item.value;
-                option.textContent = item.text;
-                option.dataset.kelasId = item.kelasId;
-                option.dataset.kelasName = item.kelasName;
-                option.dataset.rombelName = item.rombelName;
-                if (item.value === selectedSiswaId) {
-                    option.selected = true;
-                }
-                siswaSelect.appendChild(option);
-            }
-        });
-
-        siswaSelect.value = selectedSiswaId || '';
-        $('#siswa_id').trigger('change.select2');
-        updateStudentClassInfo();
-    }
-
-    let allStudentOptions = [];
-    let selectedSiswaId = '';
-
     document.addEventListener('DOMContentLoaded', function() {
         const siswaSelect = document.getElementById('siswa_id');
         const kelasFilter = document.getElementById('filter_kelas');
 
-        allStudentOptions = Array.from(siswaSelect.options).map(option => ({
-            value: option.value,
-            text: option.textContent,
-            kelasId: option.dataset.kelasId || '',
-            kelasName: option.dataset.kelasName || '',
-            rombelName: option.dataset.rombelName || ''
-        }));
-
-        selectedSiswaId = siswaSelect.value;
-
+        // Initialize Select2 with AJAX search to avoid huge DOM for large student lists
         $('#siswa_id').select2({
             placeholder: '-- Pilih atau Ketik Nama Siswa --',
             allowClear: true,
-            width: '100%'
+            width: '100%',
+            ajax: {
+                url: '{{ route("tu.mutasi.search") }}',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        q: params.term,
+                        kelas_id: document.getElementById('filter_kelas').value
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.map(function(item) {
+                            return {
+                                id: item.id,
+                                text: item.text,
+                                kelasId: item.kelasId,
+                                kelasName: item.kelasName,
+                                rombelName: item.rombelName
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 2,
+            templateResult: function(item) { return item.text; },
+            templateSelection: function(item) { return item.text || item.id; }
         });
 
+        // When kelas filter changes, clear selection so search respects kelas filter
         kelasFilter.addEventListener('change', () => {
-            selectedSiswaId = siswaSelect.value;
-            filterStudentsByClass();
+            $('#siswa_id').val(null).trigger('change');
+            updateStudentClassInfo();
         });
 
+        // Update class info when selection changes
         $('#siswa_id').on('change', function() {
-            selectedSiswaId = this.value;
             updateStudentClassInfo();
         });
 
         updateStatusFields();
         updateStudentClassInfo();
-        
+
         // Inisialisasi form validation
         const forms = document.querySelectorAll('.needs-validation');
         Array.from(forms).forEach(form => {

@@ -57,6 +57,47 @@ class MutasiController extends Controller
         return view('tu.mutasi.index', compact('classes', 'allStudents', 'mutasis', 'statuses'));
     }
 
+    /**
+     * AJAX search for students used by Select2
+     */
+    public function searchStudents(Request $request)
+    {
+        $q = $request->get('q', '');
+        $kelasId = $request->get('kelas_id');
+
+        $query = Siswa::query()->with('rombel.kelas')
+            ->whereNotNull('rombel_id')
+            ->whereDoesntHave('mutasis', function ($sub) {
+                $sub->whereRaw('LOWER(status) = ?', ['lulus']);
+            });
+
+        if ($kelasId) {
+            $query->whereHas('rombel.kelas', function ($qq) use ($kelasId) {
+                $qq->where('id', $kelasId);
+            });
+        }
+
+        if ($q) {
+            $query->where(function ($qq) use ($q) {
+                $qq->where('nama_lengkap', 'like', "%{$q}%")
+                   ->orWhere('nis', 'like', "%{$q}%")
+                   ->orWhere('nisn', 'like', "%{$q}%");
+            });
+        }
+
+        $results = $query->orderBy('nama_lengkap')->limit(30)->get()->map(function ($s) {
+            return [
+                'id' => $s->id,
+                'text' => ($s->nis ? $s->nis . ' - ' : '') . $s->nama_lengkap . ($s->rombel ? ' (' . $s->rombel->nama . ')' : ''),
+                'kelasId' => optional(optional($s->rombel)->kelas)->id,
+                'kelasName' => optional(optional($s->rombel)->kelas)->tingkat . ' ' . optional(optional($s->rombel)->kelas->jurusan)->nama,
+                'rombelName' => $s->rombel->nama ?? '',
+            ];
+        });
+
+        return response()->json($results);
+    }
+
 
     /**
      * Show the form for creating a new resource.

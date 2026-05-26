@@ -7,6 +7,8 @@ use App\Models\Siswa;
 use App\Models\Rombel;
 use App\Models\Jurusan;
 use App\Models\MataPelajaran;
+use App\Models\KenaikanKelas;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class BukuIndukController extends Controller
@@ -36,6 +38,25 @@ class BukuIndukController extends Controller
         // Filter berdasarkan jenis kelamin
         if ($request->filled('jenis_kelamin')) {
             $query->where('jenis_kelamin', $request->jenis_kelamin);
+        }
+
+        // Only include students currently assigned to a rombel
+        $query->whereNotNull('rombel_id');
+
+        // Exclude students who have a 'lulus' mutation (moved to alumni)
+        // Use case-insensitive comparison to handle variations like 'Lulus'
+        $query->whereDoesntHave('mutasis', function($q) {
+            $q->whereRaw('LOWER(status) = ?', ['lulus']);
+        });
+
+        // Also exclude students recorded in kenaikan_kelas with status 'lulus' (case-insensitive)
+        $excludedIds = KenaikanKelas::whereRaw('LOWER(status) = ?', ['lulus'])
+            ->pluck('siswa_id')
+            ->unique()
+            ->filter()
+            ->toArray();
+        if (!empty($excludedIds)) {
+            $query->whereNotIn('id', $excludedIds);
         }
 
         $siswas = $query->paginate(15);

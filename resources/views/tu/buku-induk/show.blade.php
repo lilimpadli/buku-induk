@@ -5,252 +5,376 @@
 @section('content')
 <style>
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --light-bg: #F8FAFC;
+        --primary-color: #3b82f6;
+        --secondary-color: #6366f1;
+        --success-color: #10b981;
+        --danger-color: #ef4444;
+        --warning-color: #f59e0b;
+        --light-bg: #f8fafc;
         --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border-color: #e2e8f0;
     }
 
     body {
         background-color: var(--light-bg);
+        color: var(--text-primary);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
     .buku-induk-container {
-        font-family: 'Times New Roman', serif;
-        line-height: 1.5;
+        line-height: 1.6;
     }
-    
+
+    /* Header Styles */
     .buku-induk-header {
         text-align: center;
-        margin-bottom: 30px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #333;
+        margin-bottom: 40px;
+        padding: 30px 20px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .buku-induk-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.1); opacity: 0.3; }
     }
 
     .buku-induk-header h3 {
-        font-size: clamp(18px, 4vw, 24px);
-        font-weight: bold;
-        margin-bottom: 0.5rem;
+        font-size: clamp(24px, 5vw, 32px);
+        font-weight: 700;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
     }
 
     .buku-induk-header h4 {
-        font-size: clamp(16px, 3.5vw, 20px);
-        margin-bottom: 0.5rem;
+        font-size: clamp(18px, 4vw, 24px);
+        font-weight: 600;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
     }
 
     .buku-induk-header p {
-        font-size: clamp(12px, 2.5vw, 14px);
-    }
-    
-    .buku-induk-section {
-        margin-bottom: 25px;
-    }
-    
-    .buku-induk-section h5 {
-        font-weight: bold;
-        margin-bottom: 15px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid #ddd;
         font-size: clamp(14px, 3vw, 16px);
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Section Styles */
+    .buku-induk-section {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .buku-induk-section:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px -1px rgba(0, 0, 0, 0.1), 0 4px 8px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .buku-induk-section h5 {
+        font-weight: 700;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--border-color);
+        font-size: clamp(16px, 3.5vw, 20px);
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .buku-induk-section h5::before {
+        content: '';
+        width: 4px;
+        height: 24px;
+        background: var(--primary-color);
+        border-radius: 2px;
     }
 
     .buku-induk-section p {
-        font-size: clamp(12px, 2.5vw, 14px);
-        margin-bottom: 0.75rem;
-        word-wrap: break-word;
+        font-size: clamp(14px, 3vw, 16px);
+        margin-bottom: 12px;
+        color: var(--text-primary);
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
     }
 
     .buku-induk-section p strong {
-        display: inline-block;
         min-width: 140px;
-    }
-    
-    .buku-induk-photo {
-        width: 100%;
-        max-width: 150px;
-        height: auto;
-        aspect-ratio: 3/4;
-        border: 1px solid #ddd;
-        object-fit: cover;
-    }
-    
-    .buku-induk-table {
-        font-size: clamp(9px, 2vw, 11px);
-    }
-    
-    .buku-induk-table th {
-        font-weight: bold;
-        background-color: #f8f9fa;
-        text-align: center;
-        padding: 8px 4px;
-        white-space: nowrap;
-    }
-    
-    .buku-induk-table td {
-        vertical-align: middle;
-        padding: 8px 4px;
-    }
-    
-    .signature-section {
-        margin-top: 50px;
-        padding-top: 20px;
-        border-top: 2px solid #333;
-    }
-    
-    .signature-box {
-        text-align: center;
-    }
-    
-    .signature-line {
-        border-top: 1px solid #000;
-        margin-top: 30px;
-        padding-top: 10px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        flex-shrink: 0;
     }
 
+    /* Photo Styles */
+    .photo-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        margin-bottom: 25px;
+    }
+
+    .buku-induk-photo {
+        width: 100%;
+        max-width: 180px;
+        height: auto;
+        aspect-ratio: 3/4;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .buku-induk-photo:hover {
+        transform: scale(1.05);
+    }
+
+    /* Table Styles */
+    .nilai-table-container {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 25px;
+    }
+
+    .nilai-table-container h5 {
+        font-weight: 700;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--border-color);
+        font-size: clamp(16px, 3.5vw, 20px);
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .nilai-table-container h5::before {
+        content: '';
+        width: 4px;
+        height: 24px;
+        background: var(--primary-color);
+        border-radius: 2px;
+    }
+
+    .buku-induk-table {
+        font-size: clamp(12px, 2.5vw, 14px);
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .buku-induk-table th {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        font-weight: 600;
+        text-align: center;
+        padding: 12px 8px;
+        border: 1px solid var(--border-color);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .buku-induk-table td {
+        vertical-align: middle;
+        padding: 10px 8px;
+        border: 1px solid var(--border-color);
+        transition: background-color 0.2s ease;
+    }
+
+    .buku-induk-table tr:hover td {
+        background-color: #f8fafc;
+    }
+
+    .buku-induk-table tr.header-row {
+        background: #f8fafc;
+        font-weight: 600;
+    }
+
+    /* Badge Styles */
+    .badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Page Header */
     .page-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.5rem;
-        gap: 15px;
+        margin-bottom: 30px;
+        gap: 20px;
         flex-wrap: wrap;
     }
 
     .page-title {
-        font-size: clamp(18px, 4vw, 24px);
+        font-size: clamp(24px, 5vw, 32px);
         margin: 0;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
     .page-title i {
         color: var(--primary-color);
+        font-size: 28px;
     }
 
     .action-buttons {
         display: flex;
-        gap: 10px;
+        gap: 12px;
         flex-wrap: wrap;
     }
 
     .btn {
-        border-radius: 8px;
-        font-weight: 500;
+        border-radius: 10px;
+        font-weight: 600;
+        padding: 10px 20px;
         transition: all 0.3s ease;
-        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
     }
 
     .btn-secondary {
-        background-color: #64748B;
-        border: none;
+        background-color: var(--text-secondary);
+        color: white;
     }
 
     .btn-secondary:hover {
         background-color: #475569;
         transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
     .btn-primary {
-        background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-        border: none;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
     }
 
     .btn-primary:hover {
-        background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+        background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(47, 83, 255, 0.3);
+        box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
     }
 
+    /* Card Styles */
     .card {
         border-radius: 16px;
         border: none;
         box-shadow: var(--card-shadow);
+        overflow: hidden;
     }
 
-    .badge {
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: clamp(10px, 2vw, 12px);
-        font-weight: 600;
-    }
-
-    /* Photo container */
-    .photo-container {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        margin-bottom: 20px;
+    .card-body {
+        padding: 0;
     }
 
     /* Mobile Styles */
     @media (max-width: 767px) {
         .container-fluid {
-            padding-left: 10px;
-            padding-right: 10px;
+            padding-left: 12px;
+            padding-right: 12px;
         }
 
         .page-header {
             flex-direction: column;
             align-items: stretch;
+            gap: 16px;
         }
 
         .action-buttons {
             width: 100%;
+            justify-content: center;
         }
 
         .action-buttons .btn {
             flex: 1;
-            font-size: 13px;
-            padding: 8px 12px;
+            font-size: 14px;
+            padding: 12px 16px;
+            justify-content: center;
         }
 
         .page-title i {
             display: none;
         }
 
-        .card-body {
-            padding: 15px;
-        }
-
         .buku-induk-header {
             margin-bottom: 20px;
-            padding-bottom: 10px;
+            padding: 20px 15px;
         }
 
         .buku-induk-section {
+            padding: 20px;
             margin-bottom: 20px;
         }
 
         .buku-induk-section h5 {
-            margin-bottom: 12px;
-            padding-bottom: 6px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
         }
 
         .buku-induk-section p {
-            margin-bottom: 0.5rem;
+            margin-bottom: 10px;
+            font-size: 14px;
         }
 
         .buku-induk-section p strong {
-            display: block;
             min-width: auto;
-            margin-bottom: 2px;
-            color: #64748B;
-            font-size: 11px;
-        }
-
-        /* Stack columns on mobile */
-        .row > div[class*='col-md'] {
-            margin-bottom: 15px;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 12px;
+            color: var(--text-secondary);
         }
 
         .photo-container {
             order: -1;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .buku-induk-photo {
-            max-width: 120px;
+            max-width: 140px;
         }
 
-        /* Table scroll on mobile */
+        .nilai-table-container {
+            padding: 20px;
+        }
+
         .table-responsive {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -258,29 +382,44 @@
         }
 
         .buku-induk-table {
-            min-width: 600px;
-            font-size: 9px;
+            min-width: 700px;
+            font-size: 11px;
         }
 
         .buku-induk-table th,
         .buku-induk-table td {
-            padding: 6px 3px;
+            padding: 8px 6px;
         }
 
-        .buku-induk-table th[rowspan] {
-            min-width: 100px;
+        /* Landscape orientation */
+        @media (max-width: 767px) and (orientation: landscape) {
+            .buku-induk-photo {
+                max-width: 100px;
+            }
+
+            .buku-induk-section {
+                padding: 15px;
+            }
+
+            .buku-induk-section p {
+                margin-bottom: 8px;
+            }
         }
     }
 
     /* Tablet Styles */
     @media (min-width: 768px) and (max-width: 991px) {
         .container-fluid {
-            padding-left: 15px;
-            padding-right: 15px;
+            padding-left: 20px;
+            padding-right: 20px;
         }
 
         .card-body {
-            padding: 20px;
+            padding: 0;
+        }
+
+        .buku-induk-section {
+            padding: 25px;
         }
 
         .buku-induk-section p strong {
@@ -288,12 +427,7 @@
         }
 
         .buku-induk-table {
-            font-size: 10px;
-        }
-
-        .buku-induk-table th,
-        .buku-induk-table td {
-            padding: 7px 4px;
+            font-size: 12px;
         }
     }
 
@@ -302,9 +436,15 @@
         .container-fluid {
             max-width: 1200px;
             margin: 0 auto;
+            padding-left: 30px;
+            padding-right: 30px;
         }
 
         .card-body {
+            padding: 0;
+        }
+
+        .buku-induk-section {
             padding: 30px;
         }
 
@@ -314,7 +454,7 @@
 
         .buku-induk-table th,
         .buku-induk-table td {
-            padding: 8px 6px;
+            padding: 12px 10px;
         }
     }
 
@@ -322,21 +462,8 @@
     @media (min-width: 1400px) {
         .container-fluid {
             max-width: 1320px;
-        }
-    }
-
-    /* Landscape orientation on mobile */
-    @media (max-width: 767px) and (orientation: landscape) {
-        .buku-induk-photo {
-            max-width: 100px;
-        }
-
-        .card-body {
-            padding: 12px;
-        }
-
-        .buku-induk-section {
-            margin-bottom: 15px;
+            padding-left: 40px;
+            padding-right: 40px;
         }
     }
 
@@ -354,20 +481,45 @@
 
         .card {
             box-shadow: none;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
+        }
+
+        .buku-induk-section {
+            box-shadow: none;
+            border: 1px solid var(--border-color);
+            page-break-inside: avoid;
+        }
+
+        .nilai-table-container {
+            box-shadow: none;
+            border: 1px solid var(--border-color);
+            page-break-inside: avoid;
         }
 
         .buku-induk-table {
             font-size: 10pt;
         }
 
-        .page-break {
-            page-break-after: always;
+        .buku-induk-table th,
+        .buku-induk-table td {
+            padding: 8px;
         }
 
         @page {
             margin: 2cm;
         }
+    }
+
+    /* Loading Animation */
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    .loading {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
     }
 </style>
 
@@ -377,11 +529,11 @@
             <i class="fas fa-book"></i> Buku Induk Siswa
         </h1>
         <div class="action-buttons">
-            <a href="{{ route('tu.buku-induk.index') }}" class="btn btn-secondary btn-sm">
-                <i class="fas fa-arrow-left me-1"></i> Kembali
+            <a href="{{ route('tu.buku-induk.index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Kembali
             </a>
-            <a href="{{ route('tu.buku-induk.cetak', $siswa) }}" target="_blank" class="btn btn-primary btn-sm">
-                <i class="fas fa-print me-1"></i> Cetak
+            <a href="{{ route('tu.buku-induk.cetak', $siswa) }}" target="_blank" class="btn btn-primary">
+                <i class="fas fa-print"></i> Cetak
             </a>
         </div>
     </div>
@@ -392,27 +544,27 @@
             <div class="buku-induk-header">
                 <h3 class="mb-2">BUKU INDUK SISWA</h3>
                 <h4 class="mb-1">SMKN 1 KAWALI</h4>
-                <p class="mb-0 text-muted"></p>
-                <p class="text-muted">KONSENTRASI KEAHLIAN: {{ $siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan ? $siswa->rombel->kelas->jurusan->nama : 'REKAYASA PERANGKAT LUNAK' }}</p>
+                <p class="mb-0 text-white opacity-90"></p>
+                <p class="text-white opacity-90">KONSENTRASI KEAHLIAN: {{ $siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan ? $siswa->rombel->kelas->jurusan->nama : 'REKAYASA PERANGKAT LUNAK' }}</p>
             </div>
 
             <!-- Info Siswa -->
             <div class="row mb-4">
-                <!-- Photo - Will be reordered on mobile -->
-                <div class="col-md-3 order-md-2">
+                <!-- Photo -->
+                <div class="col-md-3">
                     <div class="photo-container">
                         @if(isset($siswa->user) && isset($siswa->user->photo))
                             <img src="{{ asset('storage/' . $siswa->user->photo) }}" alt="{{ $siswa->nama_lengkap }}" class="buku-induk-photo">
                         @else
                             <div class="buku-induk-photo d-flex align-items-center justify-content-center bg-light">
-                                <span class="text-muted" style="font-size: 12px;">Tidak ada foto</span>
+                                <i class="fas fa-user text-muted fa-3x"></i>
                             </div>
                         @endif
                     </div>
                 </div>
 
                 <!-- Data Siswa -->
-                <div class="col-md-9 order-md-1">
+                <div class="col-md-9">
                     <!-- Data Pribadi -->
                     <div class="buku-induk-section">
                         <h5>A. DATA PRIBADI SISWA</h5>
@@ -428,7 +580,7 @@
                                 <p><strong>Tanggal Lahir:</strong> {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d F Y') : '-' }}</p>
                                 <p><strong>Agama:</strong> {{ $siswa->agama ?? '-' }}</p>
                                 <p><strong>Kewarganegaraan:</strong> {{ $siswa->kewarganegaraan ?? '-' }}</p>
-                                <p><strong>Alamat:</strong> Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</p>
+                                <p><strong>Alamat:</strong> {{ $siswa->alamat ?? '-' }}</p>
                             </div>
                         </div>
                     </div>
@@ -503,10 +655,10 @@
             </div>
 
             <!-- Nilai Raport -->
-            <div class="buku-induk-section">
+            <div class="nilai-table-container">
                 <h5>E. HASIL PRESTASI PEMBELAJARAN</h5>
                 <div class="table-responsive">
-                    <table class="table table-sm table-bordered buku-induk-table">
+                    <table class="table table-bordered buku-induk-table">
                         <thead>
                             <tr>
                                 <th rowspan="3" style="vertical-align: middle; width: 30%;">MATA PELAJARAN</th>
@@ -530,7 +682,7 @@
                         <tbody>
                             @if(count($nilaiByKelompok['byKelompok']) > 0)
                                 @foreach($nilaiByKelompok['byKelompok'] as $kelompok => $mapelGroup)
-                                    <tr style="background-color: #f0f0f0; font-weight: bold;">
+                                    <tr class="header-row">
                                         <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}">
                                             @if($kelompok === 'A')
                                                 A. KELOMPOK MATA PELAJARAN UMUM
@@ -552,7 +704,7 @@
                                     @endforeach
                                 @endforeach
                             @else
-                                <tr style="background-color: #f0f0f0; font-weight: bold;">
+                                <tr class="header-row">
                                     <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}">A. KELOMPOK MATA PELAJARAN UMUM</td>
                                 </tr>
                                 <tr>
@@ -562,7 +714,7 @@
                                         <td class="text-center">-</td>
                                     @endforeach
                                 </tr>
-                                <tr style="background-color: #f0f0f0; font-weight: bold;">
+                                <tr class="header-row">
                                     <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}">B. KELOMPOK MATA PELAJARAN KEAHLIAN</td>
                                 </tr>
                                 <tr>
@@ -580,4 +732,54 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth scroll behavior
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Add print functionality
+    const printButton = document.querySelector('a[href*="cetak"]');
+    if (printButton) {
+        printButton.addEventListener('click', function(e) {
+            if (window.matchMedia('print').matches) {
+                // We're in print mode, add print-specific styles
+                document.body.classList.add('printing');
+            }
+        });
+    }
+
+    // Add table row hover effect
+    const tableRows = document.querySelectorAll('.buku-induk-table tbody tr:not(.header-row)');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#f8fafc';
+        });
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+        });
+    });
+
+    // Responsive table handling
+    if (window.innerWidth < 768) {
+        const table = document.querySelector('.buku-induk-table');
+        if (table) {
+            table.style.fontSize = '11px';
+        }
+    }
+});
+</script>
+@endpush
 @endsection

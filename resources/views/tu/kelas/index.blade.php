@@ -4,433 +4,671 @@
 
 @section('content')
 <style>
-    /* ===================== STYLE DATA KELAS ===================== */
+    /* ===================== MODERN STYLES DATA KELAS ===================== */
     
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
+        --primary-color: #4F46E5;
+        --primary-light: #6366F1;
+        --secondary-color: #7C3AED;
         --success-color: #10B981;
         --warning-color: #F59E0B;
         --danger-color: #EF4444;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --info-color: #3B82F6;
+        --light-bg: #F9FAFB;
+        --card-bg: #FFFFFF;
+        --text-primary: #111827;
+        --text-secondary: #6B7280;
+        --border-color: #E5E7EB;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
-        background-color: var(--light-bg);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        min-height: 100vh;
     }
 
-    h2.fw-bold {
-        font-size: 28px;
-        color: #1E293B;
-        position: relative;
-        padding-left: 15px;
-        margin-bottom: 25px !important;
+    /* Header Styles */
+    .page-header {
+        margin-bottom: 32px;
     }
 
-    h2.fw-bold::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 5px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 3px;
+    .page-title {
+        font-size: 36px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
-    /* Card Styles */
-    .card {
+    .page-title::after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        border-radius: 2px;
+        margin-top: 12px;
+    }
+
+    /* Search & Action Bar */
+    .action-bar {
+        background: var(--card-bg);
         border-radius: 16px;
-        border: none;
-        box-shadow: var(--card-shadow);
-        overflow: hidden;
-        transition: all 0.3s ease;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow-sm);
     }
 
-    .card:hover {
-        box-shadow: var(--hover-shadow);
-        transform: translateY(-5px);
-    }
+    .search-section {
+        display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 12px;
+            align-items: end;
+        }
 
-    /* Special Card Style for ID 5 */
-    .card.bg-primary {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
-    }
-
-    /* Button Styles */
-    .btn-primary {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        border: none;
-        border-radius: 8px;
-        padding: 8px 16px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(47, 83, 255, 0.3);
-    }
-
-    .btn-outline-primary {
-        border-color: var(--primary-color);
-        color: var(--primary-color);
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .btn-outline-primary:hover {
-        background-color: var(--primary-color);
-        transform: translateY(-2px);
-    }
-
-    .btn-outline-secondary {
-        border-color: #E2E8F0;
-        color: #64748B;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .btn-outline-secondary:hover {
-        background-color: #F1F5F9;
-        transform: translateY(-2px);
-    }
-
-    .btn-light {
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .btn-light:hover {
-        transform: translateY(-2px);
-    }
-
-    /* Input Group Styles */
-    .input-group {
-        border-radius: 8px;
-        overflow: hidden;
-    }
-
-    .form-control, .form-select {
-        border: 1px solid #E2E8F0;
-        border-radius: 8px;
-        padding: 8px 12px;
-        transition: all 0.3s ease;
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(47, 83, 255, 0.1);
-    }
-
-    .input-group-text {
-        background: white;
-        border: 1px solid #E2E8F0;
-        border-right: none;
-    }
-
-    .input-group .form-control {
-        border-left: none;
-    }
-
-    /* Badge Styles */
-    .badge.bg-secondary {
-        background-color: rgba(100, 116, 139, 0.2) !important;
-        color: #475569 !important;
-        font-weight: 600;
-        font-size: 11px;
-        padding: 4px 8px;
-        border-radius: 6px;
-    }
-
-    /* Dropdown Styles */
-    .dropdown-menu {
-        border-radius: 12px;
-        border: none;
-        box-shadow: var(--hover-shadow);
-        padding: 8px;
-    }
-
-    .dropdown-item {
-        border-radius: 8px;
-        padding: 8px 12px;
-        font-weight: 500;
-        transition: all 0.2s ease;
-    }
-
-    .dropdown-item:hover {
-        background-color: rgba(47, 83, 255, 0.1);
-        color: var(--primary-color);
-    }
-
-    .dropdown-item.text-danger:hover {
-        background-color: rgba(239, 68, 68, 0.1);
-        color: var(--danger-color);
-    }
-
-    .dropdown-divider {
-        margin: 8px 0;
-        border-color: #E2E8F0;
-    }
-
-    /* Empty State */
-    .alert-info {
-        background-color: rgba(47, 83, 255, 0.1);
-        border: none;
-        border-radius: 12px;
-        color: var(--primary-color);
-        font-weight: 500;
-        padding: 20px;
-    }
-
-    /* Pagination Styles */
-    .pagination {
-        border-radius: 8px;
-    }
-
-    .page-link {
-        border: none;
-        margin: 0 2px;
-        border-radius: 8px;
-        color: #64748B;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-
-    .page-link:hover {
-        background-color: rgba(47, 83, 255, 0.1);
-        color: var(--primary-color);
-    }
-
-    .page-item.active .page-link {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        box-shadow: 0 4px 8px rgba(47, 83, 255, 0.3);
+    @media (max-width: 768px) {
+        .search-section {
+            grid-template-columns: 1fr;
+        }
     }
 
     /* Filter Card */
     .filter-card {
-        border: 1px solid #E2E8F0;
+        background: var(--card-bg);
         border-radius: 12px;
-        background-color: white;
+        border: 1px solid var(--border-color);
+        padding: 16px;
+        transition: var(--transition);
     }
 
-    .filter-card .card-body {
-        background-color: #F8FAFC;
-        padding: 1.25rem;
+    .filter-card:hover {
+        box-shadow: var(--shadow-md);
     }
 
-    /* Animations */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+    /* Form Controls */
+    .form-control-modern {
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 14px;
+        transition: var(--transition);
+        background: var(--card-bg);
     }
 
-    .col {
-        animation: fadeIn 0.5s ease-out;
+    .form-control-modern:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+    .form-select-modern {
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 14px;
+        transition: var(--transition);
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 40px;
+        background-color: var(--card-bg);
     }
+
+    .form-select-modern:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+    /* Button Styles */
+    .btn-modern {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: var(--transition);
+        border: none;
+        display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+    .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+    .btn-primary-modern {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+        }
+
+    .btn-success-modern {
+            background: linear-gradient(135deg, var(--success-color), #34D399);
+            color: white;
+        }
+
+    .btn-info-modern {
+            background: linear-gradient(135deg, var(--info-color), #60A5FA);
+            color: white;
+        }
+
+    .btn-secondary-modern {
+            background: var(--light-bg);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+    .btn-secondary-modern:hover {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+
+    /* Class Cards */
+    .class-card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        transition: var(--transition);
+        height: 100%;
+        border: 1px solid var(--border-color);
+        position: relative;
+    }
+
+    .class-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+    .class-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+    .class-card:hover::before {
+            opacity: 1;
+        }
+
+    /* Special Card Style for ID 5 */
+    .class-card.special {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+    .class-card.special::before {
+            display: none;
+        }
+
+    .class-card.special .card-body {
+            background: transparent;
+        }
+
+    .class-card.special .card-title,
+    .class-card.special .card-text,
+    .class-card.special .badge,
+    .class-card.special .btn-light {
+            color: white;
+        }
+
+    .class-card.special .text-muted {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+    .class-card.special .btn-outline-primary,
+    .class-card.special .btn-outline-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+    .class-card.special .btn-outline-primary:hover,
+    .class-card.special .btn-outline-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+    /* Card Header */
+    .card-header-modern {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--border-color);
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(124, 58, 237, 0.05));
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-header-modern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+    }
+
+    /* Card Body */
+    .card-body-modern {
+        padding: 24px;
+    }
+
+    /* Card Title */
+    .card-title-modern {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 16px;
+    }
+
+    /* Info Items */
+    .info-item {
+        display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+    .info-item i {
+            color: var(--primary-color);
+            font-size: 16px;
+        }
+
+    /* Badge Styles */
+    .badge-modern {
+        padding: 6px 12px;
+        border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary-color);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+        }
+
+    /* Action Buttons */
+    .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+    .btn-sm-modern {
+            padding: 8px 16px;
+            font-size: 13px;
+            border-radius: 6px;
+        }
+
+    /* Dropdown */
+    .dropdown-modern {
+            position: relative;
+        }
+
+    .dropdown-toggle-modern {
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+    .dropdown-toggle-modern:hover {
+            border-color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+    .dropdown-menu-modern {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            padding: 8px;
+            min-width: 180px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: var(--transition);
+        }
+
+    .dropdown-modern.show .dropdown-menu-modern {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+    .dropdown-item-modern {
+            padding: 10px 12px;
+            border-radius: 8px;
+            transition: var(--transition);
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+    .dropdown-item-modern:hover {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary-color);
+        }
+
+    .dropdown-item-modern.danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+    /* Info Bar */
+    .info-bar {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+    .info-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(99, 102, 241, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+
+    /* Empty State */
+    .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+    .empty-icon {
+            font-size: 64px;
+            color: var(--primary-color);
+            opacity: 0.2;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+    @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+    /* Pagination */
+    .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 32px;
+        }
+
+    .pagination-modern {
+            display: flex;
+            gap: 4px;
+            background: var(--card-bg);
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+    .page-link-modern {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+    .page-link-modern:hover {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary-color);
+        }
+
+    .page-item.active .page-link-modern {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+        }
+
+    /* Modal Styles */
+    .modal-content-modern {
+            border-radius: 16px;
+            border: none;
+            overflow: hidden;
+        }
+
+    .modal-header-modern {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(124, 58, 237, 0.05));
+        }
+
+    .modal-body-modern {
+            padding: 24px;
+        }
+
+    .modal-footer-modern {
+            padding: 20px 24px;
+            border-top: 1px solid var(--border-color);
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.02), rgba(124, 58, 237, 0.02));
+        }
+
+    /* Alert Styles */
+    .alert-modern {
+            border-radius: 12px;
+            border: none;
+            padding: 16px 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+    .alert-info-modern {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(96, 165, 250, 0.1));
+            color: var(--info-color);
+        }
+
+    /* Loading Spinner */
+    .spinner-modern {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+    @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
 
     /* Responsive */
-    @media (max-width: 992px) {
-        h2.fw-bold {
-            font-size: 26px;
-        }
-    }
-
     @media (max-width: 768px) {
-        h2.fw-bold {
-            font-size: 24px;
-            padding-left: 12px;
+        .page-title {
+            font-size: 28px;
         }
 
-        h2.fw-bold::before {
-            width: 4px;
+        .action-bar {
+            padding: 16px;
         }
 
-        .filter-card .card-body {
-            padding: 1rem;
+        .card-body-modern {
+            padding: 16px;
         }
 
-        .form-label {
-            font-size: 13px !important;
-            margin-bottom: 0.4rem !important;
+        .class-card {
+            margin-bottom: 16px;
         }
 
-        .card-body {
-            padding: 1rem;
+        .action-buttons {
+            flex-direction: column;
         }
 
-        .card-title {
-            font-size: 1.1rem;
-        }
-
-        .badge {
-            font-size: 10px !important;
-        }
-    }
-
-    @media (max-width: 576px) {
-        h2.fw-bold {
-            font-size: 20px;
-            padding-left: 10px;
-        }
-
-        .filter-card .card-body {
-            padding: 0.875rem;
-        }
-
-        .form-label {
-            font-size: 12px !important;
-        }
-
-        .form-control, .form-select {
-            font-size: 0.875rem;
-            padding: 6px 10px;
-        }
-
-        .input-group-text {
-            padding: 6px 10px;
-            font-size: 0.875rem;
-        }
-
-        .btn {
-            font-size: 0.875rem;
-            padding: 6px 12px;
-        }
-
-        .card-body {
-            padding: 0.875rem;
-        }
-
-        .card-title {
-            font-size: 1rem;
-        }
-
-        .card-text, .card p {
-            font-size: 0.875rem;
-        }
-
-        .btn-sm {
-            font-size: 0.8rem;
-            padding: 0.35rem 0.65rem;
+        .btn-sm-modern {
+            width: 100%;
+            justify-content: center;
         }
     }
 </style>
 
-<div class="container-fluid px-3 px-md-4 mt-3 mt-md-4">
-    <!-- JUDUL -->
-    <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4">
-        <h2 class="fw-bold mb-0">Data Rombel</h2>
+<div class="container-fluid px-3 px-md-4 py-4">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Data Rombel</h1>
     </div>
 
     <!-- Search & Action Bar -->
-    <div class="mb-4">
-        <div class="row g-2 mb-3">
-            <div class="col-lg-4">
-                <form method="GET" class="d-flex gap-2" action="">
-                    <input type="text" name="search" value="{{ request('search', $search ?? '') }}" class="form-control" placeholder="Cari nama rombel, tingkat...">
-                    <button class="btn btn-primary" type="submit">Cari</button>
-                    <a href="{{ route('tu.kelas.index') }}" class="btn btn-outline-secondary">Reset</a>
-                </form>
+    <div class="action-bar">
+        <div class="search-section">
+            <form method="GET" class="d-flex gap-2 flex-fill">
+                <div class="input-group" style="flex: 1;">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input type="text" name="search" value="{{ request('search', $search ?? '') }}" 
+                           class="form-control border-start-0" placeholder="Cari nama rombel, tingkat...">
+                </div>
+                <button type="submit" class="btn-modern btn-primary-modern">
+                    <i class="fas fa-search"></i> Cari
+                </button>
+                <a href="{{ route('tu.kelas.index') }}" class="btn-modern btn-secondary-modern">
+                    <i class="fas fa-redo"></i> Reset
+                </a>
+            </form>
+        </div>
+        
+        <div class="row g-3 mt-3">
+            <div class="col-md-6">
+                <div class="filter-card">
+                    <label class="form-label fw-semibold">Filter Jurusan</label>
+                    <select name="jurusan" class="form-select-modern" onchange="this.form.submit()">
+                        <option value="">-- Semua Jurusan --</option>
+                        @foreach(($allJurusans ?? collect()) as $j)
+                            <option value="{{ $j->id }}" {{ (isset($jurusan_id) && $jurusan_id == $j->id) ? 'selected' : '' }}>
+                                {{ $j->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
-            <div class="col-lg-4">
-                <select name="jurusan" class="form-select" onchange="this.form.submit()">
-                    <option value="">-- Semua Jurusan --</option>
-                    @foreach(($allJurusans ?? collect()) as $j)
-                        <option value="{{ $j->id }}" {{ (isset($jurusan_id) && $jurusan_id == $j->id) ? 'selected' : '' }}>
-                            {{ $j->nama }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-lg-4 d-flex gap-2 justify-content-lg-end">
-                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#downloadTemplateModal">
+            <div class="col-md-6 d-flex gap-2 justify-content-md-end">
+                <button type="button" class="btn-modern btn-success-modern" data-bs-toggle="modal" data-bs-target="#downloadTemplateModal">
                     <i class="fas fa-download"></i> Download Template
                 </button>
-                <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#importLegerModal">
+                <button type="button" class="btn-modern btn-info-modern" data-bs-toggle="modal" data-bs-target="#importLegerModal">
                     <i class="fas fa-upload"></i> Import Leger
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- INFO PAGINATION -->
+    <!-- Info Bar -->
     @if($rombels->total() > 0)
-        <p class="text-muted mb-3 small">
-            <i class="fas fa-info-circle me-1"></i>
-            Menampilkan {{ $rombels->firstItem() }}-{{ $rombels->lastItem() }} dari {{ $rombels->total() }} rombel
-        </p>
+        <div class="info-bar">
+            <div class="info-icon">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <div>
+                <div class="fw-semibold">Informasi Data</div>
+                <div class="text-muted mb-0">
+                    Menampilkan {{ $rombels->firstItem() }}-{{ $rombels->lastItem() }} dari {{ $rombels->total() }} rombel
+                </div>
+            </div>
+        </div>
     @endif
 
-    <!-- KARTU KELAS -->
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-2 g-md-3">
+    <!-- Class Cards Grid -->
+    <div class="row g-3 g-md-4">
         @forelse($rombels as $rombel)
-            <div class="col">
-                <div class="card h-100 shadow-sm border-0 {{ $rombel->id == 5 ? 'bg-primary text-white' : '' }}">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2 mb-md-3">
-                            <h5 class="card-title fw-bold mb-0 {{ $rombel->id == 5 ? 'text-white' : '' }}">
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="class-card {{ $rombel->id == 5 ? 'special' : '' }}">
+                    <div class="card-body-modern">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title-modern mb-0">
                                 {{ $rombel->nama }}
                             </h5>
-                            <span class="badge bg-secondary ms-2">ID: {{ $rombel->id }}</span>
+                            <span class="badge-modern">ID: {{ $rombel->id }}</span>
                         </div>
                         
-                        <div class="mb-2 mb-md-3">
-                            <p class="mb-1 small {{ $rombel->id == 5 ? 'text-white-50' : 'text-muted' }}">
-                                <i class="fas fa-school me-1 me-md-2"></i> 
-                                Kelas: {{ $rombel->kelas->tingkat ?? '-' }} {{ $rombel->kelas->jurusan->nama ?? '-' }}
-                            </p>
-                            <p class="mb-0 small {{ $rombel->id == 5 ? 'text-white-50' : 'text-muted' }}">
-                                <i class="fas fa-user-tie me-1 me-md-2"></i> 
-                                Wali: {{ $rombel->guru->nama ?? '-' }}
-                            </p>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between">
-                            <div class="d-flex gap-2">
-                                <a href="{{ route('tu.kelas.show', $rombel->id) }}" 
-                                   class="btn {{ $rombel->id == 5 ? 'btn-light' : 'btn-outline-primary' }} btn-sm">
-                                    <i class="fas fa-info-circle me-1"></i> Detail
-                                </a>
-
-                                <a href="{{ route('tu.kelas.export', $rombel->id) }}" class="btn btn-success btn-sm">
-                                    <i class="fas fa-file-excel me-1"></i> Export
-                                </a>
+                        <div class="mb-4">
+                            <div class="info-item">
+                                <i class="fas fa-school"></i>
+                                <span>Kelas: {{ $rombel->kelas->tingkat ?? '-' }} {{ $rombel->kelas->jurusan->nama ?? '-' }}</span>
                             </div>
+                            <div class="info-item">
+                                <i class="fas fa-user-tie"></i>
+                                <span>Wali: {{ $rombel->guru->nama ?? '-' }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <a href="{{ route('tu.kelas.show', $rombel->id) }}" 
+                               class="btn-modern btn-secondary-modern btn-sm-modern {{ $rombel->id == 5 ? 'btn-light' : '' }}">
+                                <i class="fas fa-info-circle"></i> Detail
+                            </a>
 
-                            <div class="dropdown">
-                                <button class="btn {{ $rombel->id == 5 ? 'btn-light' : 'btn-outline-secondary' }} btn-sm dropdown-toggle" 
+                            <a href="{{ route('tu.kelas.export', $rombel->id) }}" class="btn-modern btn-success-modern btn-sm-modern">
+                                <i class="fas fa-file-excel"></i> Export
+                            </a>
+
+                            <div class="dropdown-modern">
+                                <button class="dropdown-toggle-modern btn-sm-modern {{ $rombel->id == 5 ? 'btn-light' : 'btn-secondary-modern' }}" 
                                         type="button" 
-                                        id="dropdownMenuButton{{ $rombel->id }}" 
-                                        data-bs-toggle="dropdown" 
-                                        aria-expanded="false">
+                                        id="dropdownMenuButton{{ $rombel->id }}">
                                     <i class="fas fa-ellipsis-v"></i>
                                 </button>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton{{ $rombel->id }}">
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('tu.kelas.edit', $rombel->id) }}">
-                                            <i class="fa fa-edit me-2"></i> Edit
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <form action="{{ route('tu.kelas.destroy', $rombel->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
-                                                <i class="fa fa-trash me-2"></i> Hapus
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
+                                <div class="dropdown-menu-modern" aria-labelledby="dropdownMenuButton{{ $rombel->id }}">
+                                    <a class="dropdown-item-modern" href="{{ route('tu.kelas.edit', $rombel->id) }}">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <hr class="my-2">
+                                    <form action="{{ route('tu.kelas.destroy', $rombel->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="dropdown-item-modern danger" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+                                            <i class="fas fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -438,17 +676,21 @@
             </div>
         @empty
             <div class="col-12">
-                <div class="alert alert-info text-center">
-                    <i class="fas fa-info-circle me-2"></i> Tidak ada data rombel
+                <div class="empty-state">
+                    <i class="fas fa-graduation-cap empty-icon"></i>
+                    <h3 class="fw-semibold mb-2">Tidak ada data rombel</h3>
+                    <p class="text-muted">Belum ada rombel yang terdaftar.</p>
                 </div>
             </div>
         @endforelse
     </div>
 
-    <!-- PAGINATION -->
+    <!-- Pagination -->
     @if($rombels->hasPages())
-        <div class="d-flex justify-content-center mt-3 mt-md-4">
-            {{ $rombels->links('pagination::bootstrap-4') }}
+        <div class="pagination-container">
+            <div class="pagination-modern">
+                {{ $rombels->links('pagination::bootstrap-4') }}
+            </div>
         </div>
     @endif
 </div>
@@ -456,15 +698,15 @@
 <!-- Modal Download Template -->
 <div class="modal fade" id="downloadTemplateModal" tabindex="-1" aria-labelledby="downloadTemplateLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header border-0 bg-light">
+        <div class="modal-content modal-content-modern">
+            <div class="modal-header modal-header-modern">
                 <h5 class="modal-title" id="downloadTemplateLabel">
                     <i class="fas fa-download text-success me-2"></i>Download Template Leger
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="alert alert-info mb-3">
+            <div class="modal-body modal-body-modern">
+                <div class="alert alert-info-modern">
                     <i class="fas fa-info-circle me-2"></i>
                     <strong>Panduan:</strong> Download template untuk rombel tertentu, isi data nilai siswa, kemudian import kembali.
                 </div>
@@ -472,7 +714,7 @@
                     @csrf
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Pilih Rombel</label>
-                        <select name="rombel_id" class="form-select" required>
+                        <select name="rombel_id" class="form-select-modern" required>
                             <option value="">-- Pilih Rombel --</option>
                             @foreach($allRombels as $rombel)
                                 <option value="{{ $rombel->id }}">{{ $rombel->nama }}</option>
@@ -481,20 +723,20 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Semester</label>
-                        <select name="semester" class="form-select" required>
+                        <select name="semester" class="form-select-modern" required>
                             <option value="1">Semester 1 (Ganjil)</option>
                             <option value="2">Semester 2 (Genap)</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Tahun Ajaran</label>
-                        <input type="text" name="tahun_ajaran" class="form-control" placeholder="2024/2025" required>
+                        <input type="text" name="tahun_ajaran" class="form-control-modern" placeholder="2024/2025" required>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer border-0 bg-light">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="submit" form="downloadTemplateForm" class="btn btn-success">
+            <div class="modal-footer modal-footer-modern">
+                <button type="button" class="btn-modern btn-secondary-modern" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" form="downloadTemplateForm" class="btn-modern btn-success-modern">
                     <i class="fas fa-download me-2"></i>Download Template
                 </button>
             </div>
@@ -505,15 +747,15 @@
 <!-- Modal Import Leger -->
 <div class="modal fade" id="importLegerModal" tabindex="-1" aria-labelledby="importLegerLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header border-0 bg-light">
+        <div class="modal-content modal-content-modern">
+            <div class="modal-header modal-header-modern">
                 <h5 class="modal-title" id="importLegerLabel">
                     <i class="fas fa-upload text-info me-2"></i>Import Leger Nilai
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="alert alert-info mb-3">
+            <div class="modal-body modal-body-modern">
+                <div class="alert alert-info-modern">
                     <i class="fas fa-info-circle me-2"></i>
                     <strong>Panduan:</strong> Upload file Excel (.xlsx, .xls, .csv) yang telah diisi dengan data nilai siswa. Pastikan format sesuai dengan template.
                 </div>
@@ -521,7 +763,7 @@
                     @csrf
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Pilih Rombel</label>
-                        <select name="rombel_id" class="form-select" required>
+                        <select name="rombel_id" class="form-select-modern" required>
                             <option value="">-- Pilih Rombel --</option>
                             @foreach($allRombels as $rombel)
                                 <option value="{{ $rombel->id }}">{{ $rombel->nama }}</option>
@@ -530,25 +772,25 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Semester</label>
-                        <select name="semester" class="form-select" required>
+                        <select name="semester" class="form-select-modern" required>
                             <option value="1">Semester 1 (Ganjil)</option>
                             <option value="2">Semester 2 (Genap)</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Tahun Ajaran</label>
-                        <input type="text" name="tahun_ajaran" class="form-control" placeholder="2024/2025" required>
+                        <input type="text" name="tahun_ajaran" class="form-control-modern" placeholder="2024/2025" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">File Leger</label>
-                        <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
+                        <input type="file" name="file" class="form-control-modern" accept=".xlsx,.xls,.csv" required>
                         <div class="form-text">Format yang didukung: .xlsx, .xls, .csv</div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer border-0 bg-light">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="submit" form="importLegerForm" class="btn btn-info">
+            <div class="modal-footer modal-footer-modern">
+                <button type="button" class="btn-modern btn-secondary-modern" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" form="importLegerForm" class="btn-modern btn-info-modern">
                     <i class="fas fa-upload me-2"></i>Import Leger
                 </button>
             </div>
@@ -556,4 +798,56 @@
     </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize dropdowns
+    const dropdowns = document.querySelectorAll('.dropdown-modern');
+    dropdowns.forEach(dropdown => {
+        const toggle = dropdown.querySelector('.dropdown-toggle-modern');
+        
+        toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Close other dropdowns
+            dropdowns.forEach(d => {
+                if (d !== dropdown) {
+                    d.classList.remove('show');
+                }
+            });
+            
+            // Toggle current dropdown
+            dropdown.classList.toggle('show');
+        });
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dropdown-modern')) {
+            dropdowns.forEach(dropdown => {
+                dropdown.classList.remove('show');
+            });
+        }
+    });
+
+    // Form submission handling
+    const downloadForm = document.getElementById('downloadTemplateForm');
+    const importForm = document.getElementById('importLegerForm');
+
+    if (downloadForm) {
+        downloadForm.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-modern"></span> Downloading...';
+        });
+    }
+
+    if (importForm) {
+        importForm.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-modern"></span> Importing...';
+        });
+    }
+});
+</script>
 @endsection

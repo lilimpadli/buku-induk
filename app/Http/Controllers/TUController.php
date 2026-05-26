@@ -136,8 +136,9 @@ class TUController extends Controller
         $allJurusans = Jurusan::orderBy('nama')->get();
 
         $siswas = $query->paginate(10)->withQueryString();
+        $currentTingkat = request()->query('tingkat', '');
 
-        return view('tu.siswa.index', compact('siswas', 'search', 'allRombels', 'filterRombel', 'allJurusans'));
+        return view('tu.siswa.index', compact('siswas', 'search', 'allRombels', 'filterRombel', 'allJurusans', 'currentTingkat'));
     }
 
     /**

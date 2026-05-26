@@ -546,6 +546,8 @@ Route::middleware(['auth'])->group(function () {
 
             // Mutasi Siswa (TU)
             Route::get('/mutasi/laporan', [MutasiController::class, 'laporan'])->name('mutasi.laporan');
+            // AJAX student search for mutasi create form
+            Route::get('/mutasi/search-students', [MutasiController::class, 'searchStudents'])->name('mutasi.search');
             Route::post('/mutasi/bulk', [MutasiController::class, 'bulk'])->name('mutasi.bulk');
             Route::post('/mutasi/up-all', [MutasiController::class, 'upAll'])->name('mutasi.up-all');
             Route::post('/mutasi/siswa', [MutasiController::class, 'updateSiswa'])->name('mutasi.siswa.update');
