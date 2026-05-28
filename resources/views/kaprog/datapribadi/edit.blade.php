@@ -4,85 +4,114 @@
 
 @section('content')
 <style>
-    /* ===================== STYLE EDIT PROFIL KAPROG ===================== */
-    
+    /* ===================== SAMA STYLE DENGAN DASHBOARD ===================== */
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #13B497 0%, #59D4A4 100%);
+        --danger-gradient: linear-gradient(135deg, #F093FB 0%, #F5576C 100%);
+        --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --card-hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        --text-primary: #2d3748;
+        --text-secondary: #718096;
+        --bg-light: #f7fafc;
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
-        background-color: var(--light-bg);
+        background-color: var(--bg-light);
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: var(--text-primary);
     }
 
-    .container {
-        max-width: 1000px;
+    /* Header Styles (Sama dengan dashboard) */
+    .dashboard-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 2rem 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dashboard-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(100px, -100px);
+    }
+
+    .dashboard-header h2 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .dashboard-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        position: relative;
+        z-index: 1;
     }
 
     /* Card Styles */
     .card {
-        border-radius: 16px;
+        border-radius: var(--border-radius);
         border: none;
         box-shadow: var(--card-shadow);
+        transition: var(--transition);
         overflow: hidden;
-        transition: all 0.3s ease;
+        position: relative;
     }
 
     .card:hover {
-        box-shadow: var(--hover-shadow);
+        transform: translateY(-5px);
+        box-shadow: var(--card-hover-shadow);
+    }
+
+    .card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: var(--primary-gradient);
     }
 
     .card-body {
         padding: 2rem;
     }
 
-    .card-title {
-        font-size: 22px;
-        color: #1E293B;
-        font-weight: 600;
-        margin-bottom: 1.5rem;
-        position: relative;
-        padding-left: 15px;
-    }
-
-    .card-title::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 4px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 2px;
-    }
-
     /* Form Styles */
     .form-label {
-        color: #475569;
         font-weight: 600;
+        color: var(--text-primary);
         margin-bottom: 8px;
         font-size: 14px;
     }
 
     .form-control, .form-select {
-        border-radius: 8px;
-        border: 1px solid #E2E8F0;
-        padding: 12px 15px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 12px 16px;
         font-size: 14px;
-        transition: all 0.2s ease;
+        transition: var(--transition);
     }
 
     .form-control:focus, .form-select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(47, 83, 255, 0.1);
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        outline: none;
     }
 
     textarea.form-control {
@@ -92,21 +121,21 @@
 
     /* Alert Styles */
     .alert {
-        border-radius: 8px;
+        border-radius: 12px;
         border: none;
         font-size: 14px;
         margin-bottom: 1.5rem;
-        padding: 12px 15px;
+        padding: 12px 18px;
     }
 
     .alert-success {
         background-color: rgba(16, 185, 129, 0.1);
-        color: var(--success-color);
+        color: #10b981;
     }
 
     .alert-danger {
         background-color: rgba(239, 68, 68, 0.1);
-        color: var(--danger-color);
+        color: #ef4444;
     }
 
     .alert ul {
@@ -115,131 +144,113 @@
     }
 
     /* Buttons */
-    .btn {
-        border-radius: 8px;
+    .btn-gradient {
+        background: var(--primary-gradient);
+        border: none;
+        color: white;
         font-weight: 600;
         padding: 0.6rem 1.5rem;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
+        border-radius: 12px;
+        transition: var(--transition);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
     }
 
-    .btn:hover {
+    .btn-gradient:hover {
         transform: translateY(-2px);
-    }
-
-    .btn-primary {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-    }
-
-    .btn-primary:hover {
-        background-color: var(--secondary-color);
-        border-color: var(--secondary-color);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        color: white;
     }
 
     .btn-secondary {
-        background-color: #64748B;
-        border-color: #64748B;
+        background-color: #64748b;
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.6rem 1.5rem;
+        border-radius: 12px;
+        transition: var(--transition);
     }
 
     .btn-secondary:hover {
         background-color: #475569;
-        border-color: #475569;
+        transform: translateY(-2px);
+        color: white;
     }
 
-    /* Text Styles */
-    .text-muted {
-        color: #64748B !important;
-        font-size: 13px;
+    hr {
+        border-color: #e2e8f0;
+        margin: 1.5rem 0;
     }
 
     /* Animations */
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
+        from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
-    .card {
-        animation: fadeIn 0.5s ease-out;
+    .fade-in {
+        animation: fadeIn 0.6s ease-out;
     }
 
     /* Responsive */
     @media (max-width: 768px) {
-        .container {
-            padding: 0 1rem;
+        .dashboard-header {
+            padding: 1.5rem 1rem;
+        }
+        
+        .dashboard-header h2 {
+            font-size: 1.5rem;
         }
         
         .card-body {
             padding: 1.5rem;
         }
         
-        .card-title {
-            font-size: 20px;
-        }
-        
         .form-label {
             font-size: 13px;
         }
         
-        .btn {
+        .form-control, .form-select {
+            padding: 10px 14px;
+            font-size: 13px;
+        }
+        
+        .btn-gradient, .btn-secondary {
             padding: 0.5rem 1.2rem;
             font-size: 14px;
         }
         
-        .form-control, .form-select {
-            padding: 10px 12px;
-            font-size: 13px;
-        }
-        
         .d-flex.justify-content-end {
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
         
         .d-flex.justify-content-end .btn {
             width: 100%;
-            margin-right: 0 !important;
         }
     }
     
     @media (max-width: 576px) {
         .container {
-            padding: 0 0.75rem;
+            padding: 0 1rem;
         }
         
         .card-body {
             padding: 1.25rem;
         }
         
-        .card-title {
-            font-size: 18px;
-        }
-        
         .form-label {
             font-size: 12px;
-            margin-bottom: 6px;
         }
         
         .form-control, .form-select {
-            padding: 8px 10px;
+            padding: 8px 12px;
             font-size: 12px;
         }
         
-        .btn {
+        .btn-gradient, .btn-secondary {
             padding: 0.4rem 1rem;
-            font-size: 12px;
-            width: 100%;
-        }
-        
-        .row.justify-content-center {
-            margin: 0;
-        }
-        
-        .col-md-8 {
-            flex: 0 0 100%;
-            max-width: 100%;
-            padding: 0;
+            font-size: 13px;
         }
         
         .alert {
@@ -254,25 +265,37 @@
 </style>
 
 <div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">Edit Profil</h5>
+    <!-- Header (SAMA PERSIS DENGAN DASHBOARD) -->
+    <div class="dashboard-header fade-in">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h2 class="mb-1">Edit Profil Kaprog ✏️</h2>
+                <div class="text-muted">Perbarui informasi data diri Anda</div>
+            </div>
+        </div>
+    </div>
 
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card fade-in" style="animation-delay: 0.1s;">
+                <div class="card-body">
                     @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                        </div>
                     @endif
 
                     @if(session('error'))
-                        <div class="alert alert-danger">{{ session('error') }}</div>
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i> {{ session('error') }}
+                        </div>
                     @endif
 
                     @if($errors->any())
                         <div class="alert alert-danger">
                             <ul class="mb-0">
                                 @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
+                                    <li><i class="fas fa-times-circle me-2"></i>{{ $error }}</li>
                                 @endforeach
                             </ul>
                         </div>
@@ -282,70 +305,85 @@
                         @csrf
                         @method('PUT')
 
-                        <div class="mb-3">
-                            <label class="form-label">Nama</label>
-                            <input type="text" name="nama" class="form-control" value="{{ old('nama', $guru->nama ?? '') }}" required>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                                <input type="text" name="nama" class="form-control" value="{{ old('nama', $guru->nama ?? '') }}" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">NIP</label>
+                                <input type="text" name="nip" class="form-control" value="{{ old('nip', $guru->nip ?? '') }}">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" class="form-control" value="{{ old('email', $guru->email ?? '') }}">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">No. HP / Telepon</label>
+                                <input type="text" name="no_hp" class="form-control" value="{{ old('no_hp', $guru->no_hp ?? '') }}">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tempat Lahir</label>
+                                <input type="text" name="tempat_lahir" class="form-control" value="{{ old('tempat_lahir', $guru->tempat_lahir ?? '') }}">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tanggal Lahir</label>
+                                <input type="date" name="tanggal_lahir" class="form-control" value="{{ old('tanggal_lahir', $guru->tanggal_lahir ?? '') }}">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Jenis Kelamin <span class="text-danger">*</span></label>
+                                <select name="jenis_kelamin" class="form-select" required>
+                                    <option value="">-- Pilih --</option>
+                                    <option value="L" {{ (old('jenis_kelamin', $guru->jenis_kelamin ?? '')) == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                                    <option value="P" {{ (old('jenis_kelamin', $guru->jenis_kelamin ?? '')) == 'P' ? 'selected' : '' }}>Perempuan</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Alamat</label>
+                                <textarea name="alamat" class="form-control" rows="3">{{ old('alamat', $guru->alamat ?? '') }}</textarea>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Foto Profil</label>
+                                <input type="file" name="photo" accept="image/*" class="form-control">
+                                @if(isset($user) && $user->photo)
+                                    <small class="text-muted mt-1 d-block">
+                                        <i class="fas fa-image me-1"></i> Foto saat ini: 
+                                        <a href="{{ asset('storage/' . $user->photo) }}" target="_blank" class="text-primary">Lihat</a>
+                                    </small>
+                                @endif
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Password Baru</label>
+                                <input type="password" name="password" class="form-control" autocomplete="new-password" placeholder="Kosongkan jika tidak ingin mengubah password">
+                                <small class="text-muted">Minimal 6 karakter</small>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Konfirmasi Password Baru</label>
+                                <input type="password" name="password_confirmation" class="form-control" autocomplete="new-password" placeholder="Konfirmasi password baru">
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">NIP</label>
-                            <input type="text" name="nip" class="form-control" value="{{ old('nip', $guru->nip ?? '') }}">
-                        </div>
+                        <hr>
 
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" value="{{ old('email', $guru->email ?? '') }}">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Tempat Lahir</label>
-                            <input type="text" name="tempat_lahir" class="form-control" value="{{ old('tempat_lahir', $guru->tempat_lahir ?? '') }}">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Tanggal Lahir</label>
-                            <input type="date" name="tanggal_lahir" class="form-control" value="{{ old('tanggal_lahir', $guru->tanggal_lahir ?? '') }}">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Jenis Kelamin</label>
-                            <select name="jenis_kelamin" class="form-select" required>
-                                <option value="">-- Pilih --</option>
-                                <option value="L" {{ (old('jenis_kelamin', $guru->jenis_kelamin ?? '')) == 'L' ? 'selected' : '' }}>Laki-laki</option>
-                                <option value="P" {{ (old('jenis_kelamin', $guru->jenis_kelamin ?? '')) == 'P' ? 'selected' : '' }}>Perempuan</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Alamat</label>
-                            <textarea name="alamat" class="form-control">{{ old('alamat', $guru->alamat ?? '') }}</textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Foto Profil (opsional)</label>
-                            <input type="file" name="photo" accept="image/*" class="form-control">
-                            @if(isset($user) && $user->photo)
-                                <small class="text-muted">Foto saat ini: <a href="{{ asset('storage/' . $user->photo) }}" target="_blank">Lihat</a></small>
-                            @endif
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Password Baru (opsional)</label>
-                            <input type="password" name="password" class="form-control" autocomplete="new-password" placeholder="Kosongkan jika tidak ingin mengubah password">
-                            <small class="text-muted">Biarkan kosong jika tidak ingin mengubah password.</small>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Konfirmasi Password</label>
-                            <input type="password" name="password_confirmation" class="form-control" autocomplete="new-password" placeholder="Konfirmasi password baru">
-                        </div>
-
-                        <div class="d-flex justify-content-end">
-                            <a href="{{ route('kaprog.datapribadi.index') }}" class="btn btn-secondary me-2">Batal</a>
-                            <button class="btn btn-primary" type="submit">Simpan</button>
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ route('kaprog.datapribadi.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Batal
+                            </a>
+                            <button class="btn btn-gradient" type="submit">
+                                <i class="fas fa-save me-2"></i> Simpan Perubahan
+                            </button>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
