@@ -7,247 +7,274 @@
     /* ===================== STYLE EDIT RAPOR ===================== */
     
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #13B497 0%, #59D4A4 100%);
+        --danger-gradient: linear-gradient(135deg, #F093FB 0%, #F5576C 100%);
+        --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --card-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        --card-hover-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --border-radius: 16px;
+        --transition: all 0.3s ease;
     }
 
     body {
-        background-color: var(--light-bg);
+        background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f5 100%);
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    .container {
-        max-width: 1200px;
-    }
-
-    h3 {
-        font-size: 28px;
-        color: #1E293B;
-        position: relative;
-        padding-left: 15px;
-        margin-bottom: 20px !important;
-    }
-
-    h3::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 5px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 3px;
-    }
-
-    /* Card Styles */
-    .card {
-        border-radius: 16px;
-        border: none;
-        box-shadow: var(--card-shadow);
-        overflow: hidden;
-        transition: all 0.3s ease;
+    /* Header */
+    .page-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 1.5rem 2rem;
+        border-radius: var(--border-radius);
         margin-bottom: 1.5rem;
-    }
-
-    .card:hover {
-        box-shadow: var(--hover-shadow);
-    }
-
-    .card-header {
-        background-color: #F8FAFC;
-        border-bottom: 1px solid #E2E8F0;
-        padding: 1rem 1.5rem;
-    }
-
-    .card-header h5 {
-        font-size: 18px;
-        color: #1E293B;
-        font-weight: 600;
-        margin-bottom: 0;
+        box-shadow: var(--card-shadow);
         position: relative;
-        padding-left: 15px;
-    }
-
-    .card-header h5::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 4px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 2px;
-    }
-
-    .card-body {
-        padding: 1.5rem;
-    }
-
-    /* Table Styles */
-    .table {
-        margin-bottom: 0;
-        border-radius: 8px;
         overflow: hidden;
     }
 
-    .table-bordered {
-        border: 1px solid #E2E8F0;
+    .page-header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+        pointer-events: none;
     }
 
-    .table-bordered th,
-    .table-bordered td {
-        border: 1px solid #E2E8F0;
-        padding: 12px 15px;
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        position: relative;
+        z-index: 1;
     }
 
-    .table thead th {
-        background-color: #F8FAFC;
-        color: #475569;
+    .page-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 0.85rem;
+    }
+
+    /* FIX: Tombol di header */
+    .page-header .btn,
+    .page-header a {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        position: relative;
+        z-index: 100 !important;
+    }
+
+    /* Cards */
+    .card-custom {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+
+    .card-custom:hover {
+        box-shadow: var(--card-hover-shadow);
+    }
+
+    .card-header-custom {
+        background: white;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .card-header-custom h5 {
         font-weight: 600;
-        font-size: 14px;
+        margin-bottom: 0;
+        color: #1e293b;
     }
 
-    .table tbody td {
-        color: #334155;
-        font-size: 14px;
+    .card-body-custom {
+        padding: 1.25rem 1.5rem;
     }
 
-    /* Form Styles */
+    /* Tables */
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-custom thead th {
+        background: #f8fafc;
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+        font-size: 13px;
+        color: #475569;
+        border-bottom: 2px solid #e2e8f0;
+        text-align: left;
+    }
+
+    .table-custom tbody td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+
+    .table-custom tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    /* Forms */
+    .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 0.5rem;
+    }
+
     .form-control, .form-select {
-        border-radius: 8px;
-        border: 1px solid #E2E8F0;
-        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        padding: 0.6rem 0.75rem;
         font-size: 14px;
-        transition: all 0.2s ease;
+        transition: var(--transition);
     }
 
     .form-control:focus, .form-select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(47, 83, 255, 0.1);
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        outline: none;
     }
 
-    /* Button Styles */
+    textarea.form-control {
+        resize: vertical;
+    }
+
+    /* Buttons */
     .btn {
-        border-radius: 8px;
-        font-weight: 600;
-        padding: 0.5rem 1.2rem;
-        transition: all 0.2s ease;
+        border-radius: 10px;
+        font-weight: 500;
+        padding: 0.5rem 1.25rem;
+        transition: var(--transition);
         display: inline-flex;
         align-items: center;
+        gap: 8px;
+        pointer-events: auto !important;
+        cursor: pointer !important;
     }
 
     .btn:hover {
         transform: translateY(-2px);
     }
 
-    .btn-outline-secondary {
-        color: #64748B;
-        border-color: #E2E8F0;
-    }
-
-    .btn-outline-secondary:hover {
-        background-color: #F1F5F9;
-        border-color: #CBD5E1;
-    }
-
     .btn-primary {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
+        background: var(--primary-gradient);
+        border: none;
+        color: white;
     }
 
     .btn-primary:hover {
-        background-color: var(--secondary-color);
-        border-color: var(--secondary-color);
-    }
-
-    .btn-success {
-        background-color: var(--success-color);
-        border-color: var(--success-color);
-    }
-
-    .btn-success:hover {
-        background-color: #059669;
-        border-color: #059669;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
     }
 
     .btn-danger {
-        background-color: var(--danger-color);
-        border-color: var(--danger-color);
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        border: none;
     }
 
     .btn-danger:hover {
-        background-color: #DC2626;
-        border-color: #DC2626;
+        box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #13B497, #10b981);
+        border: none;
+    }
+
+    .btn-outline-secondary {
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        background: transparent;
+        pointer-events: auto !important;
+        cursor: pointer !important;
+    }
+
+    .btn-outline-secondary:hover {
+        background: #f1f5f9;
+        border-color: #94a3b8;
     }
 
     .btn-sm {
-        padding: 0.4rem 0.8rem;
-        font-size: 14px;
+        padding: 0.3rem 0.8rem;
+        font-size: 12px;
     }
 
-    /* Label Styles */
-    label {
-        color: #475569;
+    /* Info Grid */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-label {
+        font-size: 12px;
+        color: #64748b;
+        margin-bottom: 4px;
+    }
+
+    .info-value {
         font-weight: 600;
-        margin-bottom: 8px;
+        color: #1e293b;
         font-size: 14px;
     }
 
-    /* Animations */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .card {
-        animation: fadeIn 0.5s ease-out;
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #f0f0f0;
     }
 
     /* Responsive */
     @media (max-width: 768px) {
-        h3 {
-            font-size: 24px;
-        }
-        
-        .card-body {
-            padding: 1.25rem;
-        }
-        
-        .btn {
-            padding: 0.4rem 1rem;
-            font-size: 14px;
-        }
-        
-        .form-control, .form-select {
-            padding: 8px 10px;
-        }
-        
-        .table-bordered th,
-        .table-bordered td {
-            padding: 8px 10px;
-            font-size: 13px;
-        }
+        .page-header { padding: 1.25rem; }
+        .page-header h3 { font-size: 1.25rem; }
+        .card-body-custom { padding: 1rem; }
+        .info-grid { grid-template-columns: 1fr; }
+        .table-custom thead th { font-size: 11px; padding: 0.5rem; }
+        .table-custom tbody td { padding: 0.5rem; font-size: 12px; }
+        .action-buttons { flex-direction: column; }
+        .action-buttons .btn { width: 100%; justify-content: center; }
     }
 </style>
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>Edit Rapor — {{ $siswa->nama_lengkap }}</h3>
-        <a href="{{ route('walikelas.nilai_raport.show', [
-            'siswa_id' => $siswa->id,
-            'semester' => $semester,
-            'tahun' => $tahun
-        ]) }}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Kembali
-        </a>
+<div class="container-fluid py-3">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap">
+            <div>
+                <h3>
+                    <i class="fas fa-edit me-2"></i> Edit Rapor
+                </h3>
+                <div class="text-muted">
+                    <i class="fas fa-user-graduate me-1"></i> {{ $siswa->nama_lengkap }}
+                </div>
+            </div>
+            <a href="{{ route('walikelas.nilai_raport.show', [
+                'siswa_id' => $siswa->id,
+                'semester' => $semester,
+                'tahun' => $tahun
+            ]) }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Kembali
+            </a>
+        </div>
     </div>
 
     <form action="{{ route('walikelas.nilai_raport.update', [
@@ -258,135 +285,154 @@
         @csrf
         @method('PUT')
 
-        <!-- Semester & Tahun (lihat, tidak bisa diubah di edit) -->
-        <div class="row mb-4">
+        <!-- Semester & Tahun -->
+        <div class="row g-3 mb-3">
             <div class="col-md-3">
-                <label class="fw-bold">Semester</label>
-                <input type="text" class="form-control" value="{{ $semester }}" readonly>
+                <label class="form-label">
+                    <i class="fas fa-layer-group me-1"></i> Semester
+                </label>
+                <input type="text" class="form-control bg-light" value="{{ $semester }}" readonly>
                 <input type="hidden" name="semester" value="{{ $semester }}">
             </div>
             <div class="col-md-3">
-                <label class="fw-bold">Tahun Ajaran</label>
-                <input type="text" class="form-control" value="{{ $tahun }}" readonly>
+                <label class="form-label">
+                    <i class="fas fa-calendar-alt me-1"></i> Tahun Ajaran
+                </label>
+                <input type="text" class="form-control bg-light" value="{{ $tahun }}" readonly>
                 <input type="hidden" name="tahun" value="{{ $tahun }}">
             </div>
         </div>
 
         <input type="hidden" name="siswa_id" value="{{ $siswa->id }}">
+
         <!-- Identitas Siswa -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>Identitas Siswa</h5>
+        <div class="card-custom">
+            <div class="card-header-custom">
+                <h5><i class="fas fa-id-card me-2 text-primary"></i> Identitas Siswa</h5>
             </div>
-            <div class="card-body">
-                <table class="table table-bordered">
-                    <tr>
-                        <th width="30%">Nama Peserta Didik</th>
-                        <td>{{ $siswa->nama_lengkap }}</td>
-                        <th width="30%">Kelas</th>
-                        <td>
+            <div class="card-body-custom">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Nama Peserta Didik</span>
+                        <span class="info-value">{{ $siswa->nama_lengkap }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Kelas</span>
+                        <span class="info-value">
                             @if(isset($rombelSaatLapor) && $rombelSaatLapor)
                                 {{ $rombelSaatLapor->nama }}
                             @else
                                 {{ $siswa->rombel->nama ?? '-' }}
                             @endif
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>NISN</th>
-                        <td>{{ $siswa->nisn }}</td>
-                        <th>Semester</th>
-                        <td>{{ $semester }}</td>
-                    </tr>
-                    <tr>
-                        <th>Sekolah</th>
-                        <td>SMK NEGERI 1 X</td>
-                        <th>Tahun Pelajaran</th>
-                        <td>{{ $tahun }}</td>
-                    </tr>
-                </table>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">NISN</span>
+                        <span class="info-value">{{ $siswa->nisn ?? '-' }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Semester</span>
+                        <span class="info-value">{{ $semester }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Sekolah</span>
+                        <span class="info-value">SMK Negeri 1 Kawali</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Tahun Pelajaran</span>
+                        <span class="info-value">{{ $tahun }}</span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Kelompok A -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>A. Kelompok Mata Pelajaran Umum</h5>
+        <!-- Kelompok A - Mata Pelajaran Umum -->
+        <div class="card-custom">
+            <div class="card-header-custom">
+                <h5><i class="fas fa-book me-2 text-primary"></i> A. Kelompok Mata Pelajaran Umum</h5>
             </div>
-            <div class="card-body">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Mata Pelajaran</th>
-                            <th>Nilai Akhir</th>
-                            <th>Capaian Kompetensi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($kelompokA as $mapel)
+            <div class="card-body-custom p-0">
+                <div class="table-responsive">
+                    <table class="table-custom">
+                        <thead>
+                            <tr>
+                                <th width="50">No</th>
+                                <th>Mata Pelajaran</th>
+                                <th width="120">Nilai Akhir</th>
+                                <th>Capaian Kompetensi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($kelompokA as $mapel)
                             <tr>
                                 <td>{{ $mapel->urutan }}</td>
                                 <td>{{ $mapel->nama }}</td>
                                 <td>
-                                    <input type="number" name="nilai[{{ $mapel->id }}][nilai_akhir]" class="form-control"
-                                        value="{{ $nilai[$mapel->id]->nilai_akhir ?? '' }}" min="0" max="100">
+                                    <input type="number" name="nilai[{{ $mapel->id }}][nilai_akhir]" 
+                                           class="form-control" style="max-width: 100px;"
+                                           value="{{ $nilai[$mapel->id]->nilai_akhir ?? '' }}" 
+                                           min="0" max="100" step="0.01">
                                 </td>
                                 <td>
-                                    <textarea name="nilai[{{ $mapel->id }}][deskripsi]" class="form-control"
-                                        rows="2">{{ $nilai[$mapel->id]->deskripsi ?? '' }}</textarea>
+                                    <textarea name="nilai[{{ $mapel->id }}][deskripsi]" 
+                                              class="form-control" rows="2">{{ $nilai[$mapel->id]->deskripsi ?? '' }}</textarea>
                                 </td>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- Kelompok B -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>B. Kelompok Mata Pelajaran Kejuruan</h5>
+        <!-- Kelompok B - Mata Pelajaran Kejuruan -->
+        <div class="card-custom">
+            <div class="card-header-custom">
+                <h5><i class="fas fa-laptop-code me-2 text-primary"></i> B. Kelompok Mata Pelajaran Kejuruan</h5>
             </div>
-            <div class="card-body">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Mata Pelajaran</th>
-                            <th>Nilai Akhir</th>
-                            <th>Capaian Kompetensi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($kelompokB as $mapel)
+            <div class="card-body-custom p-0">
+                <div class="table-responsive">
+                    <table class="table-custom">
+                        <thead>
+                            <tr>
+                                <th width="50">No</th>
+                                <th>Mata Pelajaran</th>
+                                <th width="120">Nilai Akhir</th>
+                                <th>Capaian Kompetensi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($kelompokB as $mapel)
                             <tr>
                                 <td>{{ $mapel->urutan }}</td>
                                 <td>{{ $mapel->nama }}</td>
                                 <td>
-                                    <input type="number" name="nilai[{{ $mapel->id }}][nilai_akhir]" class="form-control"
-                                        value="{{ $nilai[$mapel->id]->nilai_akhir ?? '' }}" min="0" max="100">
+                                    <input type="number" name="nilai[{{ $mapel->id }}][nilai_akhir]" 
+                                           class="form-control" style="max-width: 100px;"
+                                           value="{{ $nilai[$mapel->id]->nilai_akhir ?? '' }}" 
+                                           min="0" max="100" step="0.01">
                                 </td>
                                 <td>
-                                    <textarea name="nilai[{{ $mapel->id }}][deskripsi]" class="form-control"
-                                        rows="2">{{ $nilai[$mapel->id]->deskripsi ?? '' }}</textarea>
+                                    <textarea name="nilai[{{ $mapel->id }}][deskripsi]" 
+                                              class="form-control" rows="2">{{ $nilai[$mapel->id]->deskripsi ?? '' }}</textarea>
                                 </td>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
         <!-- Ekstrakurikuler -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>C. Kegiatan Ekstrakurikuler</h5>
+        <div class="card-custom">
+            <div class="card-header-custom">
+                <h5><i class="fas fa-futbol me-2 text-primary"></i> C. Kegiatan Ekstrakurikuler</h5>
             </div>
-            <div class="card-body">
+            <div class="card-body-custom">
                 <div id="ekstra-container">
                     @foreach($ekstra as $index => $e)
-                        <div class="row mb-3 ekstra-row">
+                        <div class="row g-2 mb-3 ekstra-row align-items-center">
                             <div class="col-md-4">
                                 <input type="hidden" name="ekstra[{{ $index }}][id]" value="{{ $e->id }}">
                                 <input type="text" name="ekstra[{{ $index }}][nama_ekstra]" class="form-control"
@@ -402,37 +448,43 @@
                             </div>
                             <div class="col-md-1">
                                 <button type="button" class="btn btn-danger btn-sm remove-ekstra">
-                                    <i class="fas fa-trash"></i>
+                                    <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
                         </div>
                     @endforeach
                 </div>
-                <button type="button" id="add-ekstra" class="btn btn-sm btn-success">
-                    <i class="fas fa-plus"></i> Tambah Ekstrakurikuler
+                <button type="button" id="add-ekstra" class="btn btn-success btn-sm">
+                    <i class="fas fa-plus me-2"></i> Tambah Ekstrakurikuler
                 </button>
             </div>
         </div>
 
-        <!-- Kehadiran -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>D. Ketidakhadiran</h5>
+        <!-- Ketidakhadiran -->
+        <div class="card-custom">
+            <div class="card-header-custom">
+                <h5><i class="fas fa-calendar-times me-2 text-primary"></i> D. Ketidakhadiran</h5>
             </div>
-            <div class="card-body">
-                <div class="row">
+            <div class="card-body-custom">
+                <div class="row g-3">
                     <div class="col-md-4">
-                        <label>Sakit</label>
+                        <label class="form-label">
+                            <i class="fas fa-thermometer-half text-warning me-1"></i> Sakit
+                        </label>
                         <input type="number" name="hadir[sakit]" class="form-control"
                             value="{{ $kehadiran->sakit ?? 0 }}" min="0">
                     </div>
                     <div class="col-md-4">
-                        <label>Izin</label>
-                        <input type="number" name="hadir[izin]" class="form-control" value="{{ $kehadiran->izin ?? 0 }}"
-                            min="0">
+                        <label class="form-label">
+                            <i class="fas fa-file-alt text-info me-1"></i> Izin
+                        </label>
+                        <input type="number" name="hadir[izin]" class="form-control" 
+                            value="{{ $kehadiran->izin ?? 0 }}" min="0">
                     </div>
                     <div class="col-md-4">
-                        <label>Tanpa Keterangan</label>
+                        <label class="form-label">
+                            <i class="fas fa-times-circle text-danger me-1"></i> Tanpa Keterangan
+                        </label>
                         <input type="number" name="hadir[alpa]" class="form-control"
                             value="{{ $kehadiran->tanpa_keterangan ?? 0 }}" min="0">
                     </div>
@@ -442,62 +494,58 @@
 
         <!-- Kenaikan Kelas -->
         <div id="kenaikan-card" style="{{ strtolower($semester) === 'ganjil' ? 'display:none;' : '' }}">
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>E. Kenaikan Kelas</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <label>Status</label>
-                        @php
-                            $kStatus = strtolower(str_replace([' ', '_'], '', trim($kenaikan?->status ?? '')));
-                        @endphp
-                        <select name="kenaikan[status]" class="form-control" id="statusKenaikanSelect">
-                            <option value="Naik Kelas" {{ in_array($kStatus, ['naik','naikkelas']) ? 'selected' : '' }}>Naik Kelas</option>
-                            <option value="Tidak Naik" {{ in_array($kStatus, ['tidaknaik','tidak']) ? 'selected' : '' }}>Tidak Naik</option>
-                            <option value="Lulus" {{ in_array($kStatus, ['lulus','lulusan']) ? 'selected' : '' }}>Lulus</option>
-                        </select>
+            <div class="card-custom">
+                <div class="card-header-custom">
+                    <h5><i class="fas fa-arrow-up me-2 text-primary"></i> E. Kenaikan Kelas</h5>
+                </div>
+                <div class="card-body-custom">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Status</label>
+                            @php
+                                $kStatus = strtolower(str_replace([' ', '_'], '', trim($kenaikan?->status ?? '')));
+                            @endphp
+                            <select name="kenaikan[status]" class="form-select" id="statusKenaikanSelect">
+                                <option value="Naik Kelas" {{ in_array($kStatus, ['naik','naikkelas']) ? 'selected' : '' }}>Naik Kelas</option>
+                                <option value="Tidak Naik" {{ in_array($kStatus, ['tidaknaik','tidak']) ? 'selected' : '' }}>Tidak Naik</option>
+                                <option value="Lulus" {{ in_array($kStatus, ['lulus','lulusan']) ? 'selected' : '' }}>Lulus</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Ke Kelas</label>
+                            @php
+                                $rombelSource = isset($rombelsFiltered) && $rombelsFiltered->count() > 0 ? $rombelsFiltered : $rombels;
+                                $statusNorm = strtolower(str_replace([' ', '_'], '', trim($kenaikan?->status ?? '')));
+                                $rombelDisabled = ($semester && strtolower($semester) === 'ganjil') || ($statusNorm !== 'naikkelas');
+                            @endphp
+                            <select name="kenaikan[rombel_tujuan_id]" class="form-select" id="rombelTujuanSelect" {{ $rombelDisabled ? 'disabled' : '' }}>
+                                <option value="">-- Pilih Kelas --</option>
+                                @foreach($rombelSource as $rombel)
+                                    <option value="{{ $rombel->id }}" {{ ($kenaikan && $kenaikan->rombel_tujuan_id == $rombel->id) ? 'selected' : '' }}>
+                                        {{ $rombel->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @if(isset($targetTingkat) && $targetTingkat)
+                                <small class="text-muted">Menampilkan rombel untuk tingkat: {{ $targetTingkat }}</small>
+                            @endif
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <label>Ke Kelas</label>
-                        @php
-                            $rombelSource = isset($rombelsFiltered) && $rombelsFiltered->count() > 0 ? $rombelsFiltered : $rombels;
-                            $statusNorm = strtolower(str_replace([' ', '_'], '', trim($kenaikan?->status ?? '')));
-                            $rombelDisabled = ($semester && strtolower($semester) === 'ganjil') || ($statusNorm !== 'naikkelas');
-                        @endphp
-                        <select name="kenaikan[rombel_tujuan_id]" class="form-control" id="rombelTujuanSelect" {{ $rombelDisabled ? 'disabled' : '' }}>
-                            <option value="">-- Pilih Kelas --</option>
-                            @foreach($rombelSource as $rombel)
-                                <option value="{{ $rombel->id }}" {{ ($kenaikan && $kenaikan->rombel_tujuan_id == $rombel->id) ? 'selected' : '' }}>
-                                    {{ $rombel->nama }} @if(isset($rombel->kelas)) ({{ $rombel->kelas->tingkat }} - {{ $rombel->kelas->jurusan->nama ?? '' }}) @endif
-                                </option>
-                            @endforeach
-                        </select>
-                        @if(isset($targetTingkat) && $targetTingkat)
-                            <small class="text-muted">Menampilkan rombel untuk tingkat: {{ $targetTingkat }}</small>
-                        @endif
+                    <div class="mt-3">
+                        <label class="form-label">Catatan</label>
+                        <textarea name="kenaikan[catatan]" class="form-control" rows="2">{{ $kenaikan?->catatan ?? '' }}</textarea>
                     </div>
                 </div>
             </div>
         </div>
-                <div class="mt-3">
-                    <label>Catatan</label>
-                    <textarea name="kenaikan[catatan]" class="form-control"
-                        rows="2">{{ $kenaikan?->catatan ?? '' }}</textarea>
-                </div>
-            </div>
-        </div>
 
-        
-
-        <div class="text-end">
+        <!-- Action Buttons -->
+        <div class="action-buttons">
             <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save"></i> Simpan Perubahan
+                <i class="fas fa-save me-2"></i> Simpan Perubahan
             </button>
-
-            <button type="button" id="btn-delete-rapor" class="btn btn-danger ms-2">
-                <i class="fas fa-trash"></i> Hapus Rapor
+            <button type="button" id="btn-delete-rapor" class="btn btn-danger">
+                <i class="fas fa-trash-alt me-2"></i> Hapus Rapor
             </button>
         </div>
     </form>
@@ -508,77 +556,83 @@
         <input type="hidden" name="tahun" value="{{ $tahun }}">
     </form>
 </div>
-@endsection
 
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Tambah ekstrakurikuler
-            document.getElementById('add-ekstra').addEventListener('click', function () {
-                const container = document.getElementById('ekstra-container');
-                const index = container.children.length;
-
-                const newRow = document.createElement('div');
-                newRow.className = 'row mb-3 ekstra-row';
-                newRow.innerHTML = `
-                    <div class="col-md-4">
-                        <input type="text" name="ekstra[${index}][nama_ekstra]" 
-                               class="form-control" 
-                               placeholder="Nama Ekstrakurikuler">
-                    </div>
-                    <div class="col-md-2">
-                        <input type="text" name="ekstra[${index}][predikat]" 
-                               class="form-control" 
-                               placeholder="Predikat">
-                    </div>
-                    <div class="col-md-5">
-                        <input type="text" name="ekstra[${index}][keterangan]" 
-                               class="form-control" 
-                               placeholder="Keterangan">
-                    </div>
-                    <div class="col-md-1">
-                        <button type="button" class="btn btn-danger btn-sm remove-ekstra">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `;
-
-                container.appendChild(newRow);
-            });
-
-            // Hapus ekstrakurikuler
-            document.addEventListener('click', function (e) {
-                if (e.target.closest('.remove-ekstra')) {
-                    e.target.closest('.ekstra-row').remove();
-                }
-            });
-
-                // Toggle rombel select enabled state based on status and semester
-                function updateRombelState() {
-                    const statusEl = document.getElementById('statusKenaikanSelect');
-                    const rombelEl = document.getElementById('rombelTujuanSelect');
-                    const kenaikanCard = document.getElementById('kenaikan-card');
-                    if (!statusEl || !rombelEl) return;
-                    const statusNorm = (statusEl.value || '').toString().toLowerCase().replace(/\s|_/g, '');
-                    const semester = '{{$semester}}'.toString().toLowerCase();
-                    if (semester === 'ganjil' || statusNorm !== 'naikkelas') {
-                        rombelEl.disabled = true;
-                        if (kenaikanCard) kenaikanCard.style.display = 'none';
-                    } else {
-                        rombelEl.disabled = false;
-                        if (kenaikanCard) kenaikanCard.style.display = '';
-                    }
-                }
-
-                document.getElementById('statusKenaikanSelect')?.addEventListener('change', updateRombelState);
-                // initial state
-                updateRombelState();
-
-                // Delete rapor confirmation
-                document.getElementById('btn-delete-rapor')?.addEventListener('click', function() {
-                    if (!confirm('Yakin ingin menghapus semua data raport untuk semester "' + '{{ $semester }}' + '" tahun "' + '{{ $tahun }}' + '"?')) return;
-                    document.getElementById('form-delete-rapor').submit();
-                });
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // FIX: Semua tombol bisa diklik
+        const allBtns = document.querySelectorAll('.btn, .btn-outline-secondary, .btn-primary, .btn-danger, .btn-success');
+        allBtns.forEach(btn => {
+            btn.style.pointerEvents = 'auto';
+            btn.style.cursor = 'pointer';
+            btn.style.position = 'relative';
+            btn.style.zIndex = '100';
         });
-    </script>
-@endpush
+        
+        // FIX khusus tombol kembali
+        const backBtn = document.querySelector('a[href*="nilai_raport.show"]');
+        if (backBtn) {
+            backBtn.style.pointerEvents = 'auto';
+            backBtn.style.cursor = 'pointer';
+        }
+        
+        // Tambah ekstrakurikuler
+        document.getElementById('add-ekstra')?.addEventListener('click', function () {
+            const container = document.getElementById('ekstra-container');
+            const index = container.children.length;
+            const newRow = document.createElement('div');
+            newRow.className = 'row g-2 mb-3 ekstra-row align-items-center';
+            newRow.innerHTML = `
+                <div class="col-md-4">
+                    <input type="text" name="ekstra[${index}][nama_ekstra]" class="form-control" placeholder="Nama Ekstrakurikuler">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" name="ekstra[${index}][predikat]" class="form-control" placeholder="Predikat">
+                </div>
+                <div class="col-md-5">
+                    <input type="text" name="ekstra[${index}][keterangan]" class="form-control" placeholder="Keterangan">
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-danger btn-sm remove-ekstra">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(newRow);
+        });
+
+        // Hapus ekstrakurikuler
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('.remove-ekstra')) {
+                e.target.closest('.ekstra-row').remove();
+            }
+        });
+
+        // Toggle rombel select
+        function updateRombelState() {
+            const statusEl = document.getElementById('statusKenaikanSelect');
+            const rombelEl = document.getElementById('rombelTujuanSelect');
+            const kenaikanCard = document.getElementById('kenaikan-card');
+            if (!statusEl || !rombelEl) return;
+            const statusNorm = (statusEl.value || '').toString().toLowerCase().replace(/\s|_/g, '');
+            const semester = '{{$semester}}'.toString().toLowerCase();
+            if (semester === 'ganjil' || statusNorm !== 'naikkelas') {
+                rombelEl.disabled = true;
+                if (kenaikanCard) kenaikanCard.style.display = 'none';
+            } else {
+                rombelEl.disabled = false;
+                if (kenaikanCard) kenaikanCard.style.display = '';
+            }
+        }
+
+        document.getElementById('statusKenaikanSelect')?.addEventListener('change', updateRombelState);
+        updateRombelState();
+
+        // Delete rapor confirmation
+        document.getElementById('btn-delete-rapor')?.addEventListener('click', function() {
+            if (confirm('Yakin ingin menghapus semua data raport untuk semester "' + '{{ $semester }}'" tahun "' + '{{ $tahun }}'"?')) {
+                document.getElementById('form-delete-rapor').submit();
+            }
+        });
+    });
+</script>
+@endsection

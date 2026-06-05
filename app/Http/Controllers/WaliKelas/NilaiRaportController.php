@@ -15,6 +15,7 @@ use App\Models\Jurusan;
 use App\Exports\NilaiRaportExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -23,76 +24,55 @@ class NilaiRaportController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        /** @var \App\Models\User $user */
         $search = $request->query('q');
-
-        // ambil daftar rombel yang dia pegang sebagai wali kelas
-        $rombelsIds = [];
-        if ($user) {
-            $assigns = $user->waliKelas()->get();
-            foreach ($assigns as $a) {
-                // jika kolom rombel_id ada dan terisi, gunakan itu
-                if (isset($a->rombel_id) && $a->rombel_id) {
-                    $rombelsIds[] = $a->rombel_id;
-                    continue;
-                }
-
-                // jika rombel_id tidak tersedia di tabel, gunakan kelas_id untuk ambil rombel terkait
-                if (isset($a->kelas_id) && $a->kelas_id) {
-                    $r = Rombel::where('kelas_id', $a->kelas_id)->pluck('id')->toArray();
-                    $rombelsIds = array_merge($rombelsIds, $r);
-                    continue;
-                }
-
-                // (tidak menggunakan fallback jurusan karena terlalu luas)
-            }
-
-            $rombelsIds = array_values(array_unique(array_filter($rombelsIds)));
+        
+        // CARI LANGSUNG KE TABEL GURUS
+        $guru = DB::table('gurus')->where('user_id', $user->id)->first();
+        
+        if (!$guru) {
+            return view('walikelas.nilai_raport.index', [
+                'siswas' => collect(),
+                'search' => $search,
+                'tahunAjaranList' => [],
+                'semesterList' => [],
+                'queryResults' => null
+            ]);
         }
-
-        if (!empty($rombelsIds)) {
-            // Exclude students who have been promoted or graduated
-            $excludedIds = KenaikanKelas::whereIn('status', ['lulus', 'naik'])->pluck('siswa_id')->unique()->filter()->toArray();
-
-            $query = DataSiswa::with('rombel')
-                ->whereIn('rombel_id', $rombelsIds)
-                ->when(!empty($excludedIds), function($q) use ($excludedIds) {
-                    return $q->whereNotIn('id', $excludedIds);
-                })
-                ->when($search, function($q) use ($search) {
-                    $like = '%' . $search . '%';
-                    return $q->where(function($qq) use ($like) {
-                        $qq->where('nama_lengkap', 'like', $like)
-                           ->orWhere('nis', 'like', $like)
-                           ->orWhere('nisn', 'like', $like);
-                    });
-                })
-                ->orderBy('nama_lengkap');
-
-            $queryResults = $query->paginate(15);
-            $siswas = $queryResults->getCollection()->groupBy(function($siswa) {
-                return $siswa->rombel ? $siswa->rombel->nama : 'Tidak ada rombel';
-            });
-
-            // Get available tahun ajaran and semester for the modal
-            $tahunAjaranList = NilaiRaport::whereIn('siswa_id', $query->pluck('id'))
-                ->distinct()
-                ->orderBy('tahun_ajaran', 'desc')
-                ->pluck('tahun_ajaran')
-                ->toArray();
-
-            $semesterList = NilaiRaport::whereIn('siswa_id', $query->pluck('id'))
-                ->distinct()
-                ->orderBy('semester', 'asc')
-                ->pluck('semester')
-                ->toArray();
-        } else {
-            // jika tidak ada penugasan, kembalikan kosong supaya wali tidak melihat seluruh siswa
-            $siswas = collect();
-            $tahunAjaranList = [];
-            $semesterList = [];
+        
+        // CARI ROMBEL BERDASARKAN guru_id
+        $rombel = DB::table('rombels')->where('guru_id', $guru->id)->first();
+        
+        if (!$rombel) {
+            return view('walikelas.nilai_raport.index', [
+                'siswas' => collect(),
+                'search' => $search,
+                'tahunAjaranList' => [],
+                'semesterList' => [],
+                'queryResults' => null
+            ]);
         }
-
+        
+        // AMBIL SISWA LANGSUNG DARI rombel_id
+        $query = DataSiswa::with('rombel')
+            ->where('rombel_id', $rombel->id)
+            ->when($search, function($q) use ($search) {
+                $like = '%' . $search . '%';
+                return $q->where(function($qq) use ($like) {
+                    $qq->where('nama_lengkap', 'like', $like)
+                       ->orWhere('nis', 'like', $like)
+                       ->orWhere('nisn', 'like', $like);
+                });
+            })
+            ->orderBy('nama_lengkap');
+        
+        $queryResults = $query->paginate(15);
+        $siswas = $queryResults->getCollection()->groupBy(function($siswa) {
+            return $siswa->rombel ? $siswa->rombel->nama : 'Tidak ada rombel';
+        });
+        
+        $tahunAjaranList = [];
+        $semesterList = [];
+        
         return view('walikelas.nilai_raport.index', compact('siswas', 'search', 'tahunAjaranList', 'semesterList', 'queryResults'));
     }
 
@@ -278,124 +258,136 @@ class NilaiRaportController extends Controller
     }
 
     public function show(Request $request)
-{
-    $siswa_id = $request->siswa_id;
-    $semester = $request->semester;
-    $tahun    = str_replace('-', '/', $request->tahun);
+    {
+        $siswa_id = $request->siswa_id;
+        $semester = $request->semester;
+        $tahun    = str_replace('-', '/', $request->tahun);
 
-    // ambil siswa
-    $siswa = DataSiswa::findOrFail($siswa_id);
+        // ambil siswa
+        $siswa = DataSiswa::findOrFail($siswa_id);
 
-    // ambil nilai raport
-    $nilaiRaports = NilaiRaport::with(['mapel', 'kelas', 'rombel'])
-        ->where('siswa_id', $siswa_id)
-        ->where('semester', $semester)
-        ->where('tahun_ajaran', $tahun)
-        ->get();
-
-    if ($nilaiRaports->isEmpty()) {
-        abort(404);
-    }
-
-    // Try to get kelas/tingkat from the first raport row; fallback to siswa->rombel->kelas
-    $firstRaport = $nilaiRaports->first();
-    $kelasRaport = null;
-    $rombelRaport = null;
-    if ($firstRaport) {
-        if (isset($firstRaport->kelas) && $firstRaport->kelas) {
-            $kelasRaport = $firstRaport->kelas;
-        }
-        if (isset($firstRaport->rombel) && $firstRaport->rombel) {
-            $rombelRaport = $firstRaport->rombel;
-        }
-    }
-
-    if (!$kelasRaport && $siswa->rombel && $siswa->rombel->kelas) {
-        $kelasRaport = $siswa->rombel->kelas;
-    }
-    if (!$rombelRaport && $siswa->rombel) {
-        $rombelRaport = $siswa->rombel;
-    }
-
-    $tingkat = $kelasRaport ? (string) $kelasRaport->tingkat : null;
-    $currentJurusanId = $kelasRaport->jurusan_id ?? ($siswa->rombel && $siswa->rombel->kelas ? $siswa->rombel->kelas->jurusan_id : null);
-
-    // Build kelompok lists filtered by tingkat and jurusan via relation 'tingkats' if available
-    $kelompokA = MataPelajaran::where('kelompok', 'A')->orderBy('urutan');
-    $kelompokB = MataPelajaran::where('kelompok', 'B')->orderBy('urutan');
-
-            if ($tingkat && class_exists(\App\Models\MataPelajaranTingkat::class)) {
-                try {
-                    $opts = [ (string) $tingkat ];
-                    $kelompokA = $kelompokA->whereHas('tingkats', function($q) use ($opts) {
-                        $q->whereIn('tingkat', $opts);
-                    });
-                    $kelompokB = $kelompokB->whereHas('tingkats', function($q) use ($opts) {
-                        $q->whereIn('tingkat', $opts);
-                    });
-
-                    if (!empty($currentJurusanId)) {
-                        $kelompokA = $kelompokA->where(function($q) use ($currentJurusanId) {
-                            $q->whereDoesntHave('jurusans')
-                              ->orWhereHas('jurusans', function($jq) use ($currentJurusanId) {
-                                  $jq->where('jurusan_id', $currentJurusanId);
-                              });
-                        });
-                        $kelompokB = $kelompokB->where(function($q) use ($currentJurusanId) {
-                            $q->whereDoesntHave('jurusans')
-                              ->orWhereHas('jurusans', function($jq) use ($currentJurusanId) {
-                                  $jq->where('jurusan_id', $currentJurusanId);
-                              });
-                        });
-                    }
-                } catch (\Exception $e) {
-                    // skip filtering if schema differs
+        // FIX: ambil nilai raport dengan filter semester yang fleksibel
+        $nilaiRaports = NilaiRaport::with(['mapel', 'kelas', 'rombel'])
+            ->where('siswa_id', $siswa_id)
+            ->where(function($q) use ($semester) {
+                // Match baik '1'/'2' maupun 'Ganjil'/'Genap'
+                if ($semester == '1' || $semester == 1) {
+                    $q->where('semester', '1')
+                    ->orWhere('semester', 'Ganjil')
+                    ->orWhere('semester', 'ganjil');
+                } elseif ($semester == '2' || $semester == 2) {
+                    $q->where('semester', '2')
+                    ->orWhere('semester', 'Genap')
+                    ->orWhere('semester', 'genap');
+                } else {
+                    $q->where('semester', $semester);
                 }
+            })
+            ->where('tahun_ajaran', $tahun)
+            ->get();
+
+        if ($nilaiRaports->isEmpty()) {
+            abort(404, 'Data raport tidak ditemukan untuk semester ' . $semester . ' tahun ' . $tahun);
+        }
+
+        // Try to get kelas/tingkat from the first raport row; fallback to siswa->rombel->kelas
+        $firstRaport = $nilaiRaports->first();
+        $kelasRaport = null;
+        $rombelRaport = null;
+        if ($firstRaport) {
+            if (isset($firstRaport->kelas) && $firstRaport->kelas) {
+                $kelasRaport = $firstRaport->kelas;
             }
+            if (isset($firstRaport->rombel) && $firstRaport->rombel) {
+                $rombelRaport = $firstRaport->rombel;
+            }
+        }
 
-    $kelompokA = $kelompokA->get();
-    $kelompokB = $kelompokB->get();
+        if (!$kelasRaport && $siswa->rombel && $siswa->rombel->kelas) {
+            $kelasRaport = $siswa->rombel->kelas;
+        }
+        if (!$rombelRaport && $siswa->rombel) {
+            $rombelRaport = $siswa->rombel;
+        }
 
-    // map existing nilai by mapel id for quick lookup in view
-    $nilaiMap = $nilaiRaports->keyBy('mata_pelajaran_id');
+        $tingkat = $kelasRaport ? (string) $kelasRaport->tingkat : null;
+        $currentJurusanId = $kelasRaport->jurusan_id ?? ($siswa->rombel && $siswa->rombel->kelas ? $siswa->rombel->kelas->jurusan_id : null);
 
-    $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa->id)
-        ->where('semester', $semester)
-        ->where('tahun_ajaran', $tahun)
-        ->get();
+        // Build kelompok lists filtered by tingkat and jurusan via relation 'tingkats' if available
+        $kelompokA = MataPelajaran::where('kelompok', 'A')->orderBy('urutan');
+        $kelompokB = MataPelajaran::where('kelompok', 'B')->orderBy('urutan');
 
-    $kehadiran = Kehadiran::where('siswa_id', $siswa->id)
-        ->where('semester', $semester)
-        ->where('tahun_ajaran', $tahun)
-        ->first();
+        if ($tingkat && class_exists(\App\Models\MataPelajaranTingkat::class)) {
+            try {
+                $opts = [ (string) $tingkat ];
+                $kelompokA = $kelompokA->whereHas('tingkats', function($q) use ($opts) {
+                    $q->whereIn('tingkat', $opts);
+                });
+                $kelompokB = $kelompokB->whereHas('tingkats', function($q) use ($opts) {
+                    $q->whereIn('tingkat', $opts);
+                });
 
-    $info = RaporInfo::where('siswa_id', $siswa->id)
-        ->where('semester', $semester)
-        ->where('tahun_ajaran', $tahun)
-        ->first();
+                if (!empty($currentJurusanId)) {
+                    $kelompokA = $kelompokA->where(function($q) use ($currentJurusanId) {
+                        $q->whereDoesntHave('jurusans')
+                        ->orWhereHas('jurusans', function($jq) use ($currentJurusanId) {
+                            $jq->where('jurusan_id', $currentJurusanId);
+                        });
+                    });
+                    $kelompokB = $kelompokB->where(function($q) use ($currentJurusanId) {
+                        $q->whereDoesntHave('jurusans')
+                        ->orWhereHas('jurusans', function($jq) use ($currentJurusanId) {
+                            $jq->where('jurusan_id', $currentJurusanId);
+                        });
+                    });
+                }
+            } catch (\Exception $e) {
+                // skip filtering if schema differs
+            }
+        }
 
-    $kenaikan = KenaikanKelas::where('siswa_id', $siswa->id)
-        ->where('semester', $semester)
-        ->where('tahun_ajaran', $tahun)
-        ->first();
+        $kelompokA = $kelompokA->get();
+        $kelompokB = $kelompokB->get();
 
-    return view('walikelas.nilai_raport.show', compact(
-        'siswa',
-        'semester',
-        'tahun',
-        'kelasRaport',
-        'nilaiRaports',
-        'kelompokA',
-        'kelompokB',
-        'nilaiMap',
-        'ekstra',
-        'kehadiran',
-        'info',
-        'kenaikan'
-    ));
-}
+        // map existing nilai by mapel id for quick lookup in view
+        $nilaiMap = $nilaiRaports->keyBy('mata_pelajaran_id');
 
+        $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->get();
 
+        $kehadiran = Kehadiran::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        $info = RaporInfo::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        $kenaikan = KenaikanKelas::where('siswa_id', $siswa->id)
+            ->where('semester', $semester)
+            ->where('tahun_ajaran', $tahun)
+            ->first();
+
+        return view('walikelas.nilai_raport.show', compact(
+            'siswa',
+            'semester',
+            'tahun',
+            'kelasRaport',
+            'rombelRaport',
+            'nilaiRaports',
+            'kelompokA',
+            'kelompokB',
+            'nilaiMap',
+            'ekstra',
+            'kehadiran',
+            'info',
+            'kenaikan'
+        ));
+    }
 
     public function edit(Request $request)
     {
@@ -422,10 +414,10 @@ class NilaiRaportController extends Controller
         $kelompokA = MataPelajaran::where('kelompok', 'A')->orderBy('urutan');
         $kelompokB = MataPelajaran::where('kelompok', 'B')->orderBy('urutan');
 
-          if ($siswa->rombel && $siswa->rombel->kelas) {
-              $kelasRaport = $nilaiRaports->first()->kelas;
-              $tingkat = (string) $kelasRaport->tingkat;
-              $currentJurusanId = $kelasRaport->jurusan_id ?? null;
+        if ($siswa->rombel && $siswa->rombel->kelas) {
+            $kelasRaport = $nilaiRaports->first()->kelas ?? $siswa->rombel->kelas;
+            $tingkat = (string) $kelasRaport->tingkat;
+            $currentJurusanId = $kelasRaport->jurusan_id ?? null;
 
             $toInt = function($t) {
                 $map = ['I'=>1,'II'=>2,'III'=>3,'IV'=>4,'V'=>5,'VI'=>6,'VII'=>7,'VIII'=>8,'IX'=>9,'X'=>10,'XI'=>11,'XII'=>12];

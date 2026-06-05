@@ -1,5 +1,3 @@
-                   
-           
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -25,9 +23,10 @@ use App\Http\Controllers\Auth\SiswaResetPasswordController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\RaporController;
 use App\Http\Controllers\PpdbController;
-
-// SISWA
 use App\Http\Controllers\WaliKelasSiswaController;
+use App\Http\Controllers\WaliKelasAbsensiController;  // <-- TAMBAHKAN INI
+
+// WALI KELAS
 use App\Http\Controllers\WaliKelas\InputNilaiRaportController;
 use App\Http\Controllers\WaliKelas\NilaiRaportController;
 
@@ -324,6 +323,23 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/siswa', [WaliKelasSiswaController::class, 'index'])
                 ->name('siswa.index');
 
+            // Debug route
+            Route::get('/debug-walikelas', function () {
+                $user = Auth::user();
+                $guru = DB::table('gurus')->where('user_id', $user->id)->first();
+                $rombel = DB::table('rombels')->where('guru_id', $guru->id ?? 0)->first();
+                $siswa = DB::table('data_siswa')->where('rombel_id', $rombel->id ?? 0)->get();
+                
+                return [
+                    'user_id' => $user->id,
+                    'user_name' => $user->name,
+                    'guru' => $guru,
+                    'rombel' => $rombel,
+                    'jumlah_siswa' => $siswa->count(),
+                    'siswa' => $siswa->take(5)
+                ];
+            })->name('debug');
+
             // Export data siswa (Excel)
             Route::get('/siswa/export-excel', [WaliKelasSiswaController::class, 'exportExcel'])
                 ->name('siswa.exportExcel');
@@ -393,6 +409,14 @@ Route::middleware(['auth'])->group(function () {
                 ->name('rapor.info.form');
             Route::post('/rapor/info/{siswa_id}', [RaporController::class, 'simpanInfo'])
                 ->name('rapor.info.simpan');
+
+            // ABSENSI
+            Route::get('/absensi', [WaliKelasAbsensiController::class, 'index'])->name('absensi.index');
+            Route::post('/absensi', [WaliKelasAbsensiController::class, 'store'])->name('absensi.store');
+            Route::get('/absensi/rekap', [WaliKelasAbsensiController::class, 'rekap'])->name('absensi.rekap');
+
+            // ABSENSI Export Excel
+            Route::get('/absensi/export-excel', [WaliKelasAbsensiController::class, 'exportExcel'])->name('absensi.export-excel');
         });
 
     /*
@@ -448,9 +472,6 @@ Route::middleware(['auth'])->group(function () {
         });
 
     // Raport list for kaprog (simple view)
-    // Removed duplicate
-
-    // Alternate index route (some views reference kaprog.raport.index)
     Route::get('/raport', [KaprogController::class, 'raportSiswa'])->name('raport.index');
 
     Route::get('/siswa/{id}/detail', [KaprogDashboardController::class, 'detail'])
@@ -534,7 +555,7 @@ Route::middleware(['auth'])->group(function () {
             });
 
             // Nilai Raport (TU) - mimic walikelas routes for TU role
-            Route::get('/nilai-raport', [TUController::class, 'nilaiRaportIndex'] ?? [TUController::class, 'nilaiRaportIndex'])->name('nilai_raport.index');
+            Route::get('/nilai-raport', [TUController::class, 'nilaiRaportIndex'])->name('nilai_raport.index');
             Route::get('/nilai-raport/list/{id}', [TUController::class, 'siswaRaport'])->name('nilai_raport.list');
             Route::get('/nilai-raport/show', [TUController::class, 'nilaiRaportShow'])->name('nilai_raport.show');
             Route::get('/nilai-raport/edit', [TUController::class, 'nilaiRaportEdit'])->name('nilai_raport.edit');
@@ -565,15 +586,19 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/kelulusan', [KelulusanController::class, 'index'])->name('kelulusan.index');
             Route::get('/kelulusan/rombel/{rombelId}/{tahun}', [KelulusanController::class, 'showRombel'])->name('kelulusan.rombel.show');
 
-            Route::get('/alumni', [AlumniController::class, 'index'])->name('alumni.index');
-            Route::get('/alumni/{siswa_id}/buku-induk/cetak', [AlumniController::class, 'bukuIndukCetak'])->name('alumni.buku-induk.cetak');
-            Route::get('/alumni/{siswa_id}/buku-induk', [AlumniController::class, 'bukuInduk'])->name('alumni.buku-induk.show');
-            Route::get('/alumni/{siswa_id}/raport/{semester}/{tahun}/cetak', [AlumniController::class, 'raporCetak'])->name('alumni.raport.cetak');
-            Route::get('/alumni/{siswa_id}/raport/{semester}/{tahun}', [AlumniController::class, 'raporShow'])->name('alumni.raport.show');
-            Route::get('/alumni/{siswa_id}/raport', [AlumniController::class, 'raporList'])->name('alumni.raport.list');
-            Route::get('/alumni/jurusan/{jurusanId}', [AlumniController::class, 'byJurusan'])->name('alumni.by-jurusan');
-            Route::get('/alumni/{id}', [AlumniController::class, 'show'])->where('id', '[0-9]+')->name('alumni.show');
-        });
+            // Alumni (TU)
+            Route::prefix('alumni')->name('alumni.')->group(function () {
+                Route::get('/', [App\Http\Controllers\TU\AlumniController::class, 'index'])->name('index');
+                Route::get('/by-jurusan/{jurusanId}', [App\Http\Controllers\TU\AlumniController::class, 'byJurusan'])->name('by-jurusan');
+                Route::get('/{id}', [App\Http\Controllers\TU\AlumniController::class, 'show'])->name('show');
+                Route::get('/buku-induk/{siswa_id}', [App\Http\Controllers\TU\AlumniController::class, 'bukuInduk'])->name('buku-induk.show');
+                Route::get('/buku-induk/{siswa_id}/cetak', [App\Http\Controllers\TU\AlumniController::class, 'bukuIndukCetak'])->name('buku-induk.cetak');
+                Route::get('/raport/{siswa_id}', [App\Http\Controllers\TU\AlumniController::class, 'raporList'])->name('raport.list');
+                Route::get('/raport/{siswa_id}/{semester}/{tahun}', [App\Http\Controllers\TU\AlumniController::class, 'raporShow'])->name('raport.show');
+                Route::get('/raport/{siswa_id}/{semester}/{tahun}/cetak', [App\Http\Controllers\TU\AlumniController::class, 'raporCetak'])->name('raport.cetak');
+            });
+            }); 
+
 
     /*
     |--------------------------------------------------------------------------

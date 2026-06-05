@@ -470,12 +470,26 @@
                                 <div class="nav-section-title">DATA</div>
 
                                 <a href="{{ route('walikelas.data_diri.profile') }}" class="nav-link {{ request()->routeIs('walikelas.data_diri.profile') ? 'active' : '' }}">
-                                    <i class="fas fa-user"></i> <span>Data Pribadi </span>
+                                    <i class="fas fa-user"></i> <span>Data Pribadi</span>
                                 </a>
 
                                 <a href="{{ route('walikelas.siswa.index') }}" class="nav-link {{ request()->routeIs('walikelas.siswa.*') ? 'active' : '' }}">
-                                    <i class="fas fa-calendar-check"></i> <span>Data Siswa</span>
+                                    <i class="fas fa-users"></i> <span>Data Siswa</span>
                                 </a>
+
+                                {{-- TAMBAHKAN INI: MENU ABSENSI --}}
+                                <div class="nav-section-title">ABSENSI</div>
+
+                                <a href="{{ route('walikelas.absensi.index') }}" class="nav-link {{ request()->routeIs('walikelas.absensi.index') ? 'active' : '' }}">
+                                    <i class="fas fa-calendar-check"></i> <span>Input Absensi</span>
+                                </a>
+
+                                <a href="{{ route('walikelas.absensi.rekap') }}" class="nav-link {{ request()->routeIs('walikelas.absensi.rekap') ? 'active' : '' }}">
+                                    <i class="fas fa-chart-simple"></i> <span>Rekap Absensi</span>
+                                </a>
+                                {{-- SAMPAI SINI --}}
+
+                                <div class="nav-section-title">NILAI</div>
 
                                 <a href="{{ route('walikelas.input_nilai_raport.index') }}" class="nav-link {{ request()->routeIs('walikelas.input_nilai_raport.index') ? 'active' : '' }}">
                                     <i class="fas fa-clipboard"></i> <span>Input Nilai Raport</span>

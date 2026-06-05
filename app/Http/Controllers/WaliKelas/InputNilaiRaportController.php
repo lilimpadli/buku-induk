@@ -19,64 +19,58 @@ use App\Imports\NilaiRaportImport;
 use App\Imports\LegerImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class InputNilaiRaportController extends Controller
 {
-    public function index(Request $request)
-    {
-        $user = Auth::user();
-        /** @var \App\Models\User $user */
-        $search = $request->query('q');
-
-        // ambil daftar rombel yang dia pegang sebagai wali kelas
-        $rombelsIds = [];
-        if ($user) {
-            $assigns = $user->waliKelas()->get();
-            foreach ($assigns as $a) {
-                // jika kolom rombel_id ada dan terisi, gunakan itu
-                if (isset($a->rombel_id) && $a->rombel_id) {
-                    $rombelsIds[] = $a->rombel_id;
-                    continue;
-                }
-
-                // jika rombel_id tidak tersedia di tabel, gunakan kelas_id untuk ambil rombel terkait
-                if (isset($a->kelas_id) && $a->kelas_id) {
-                    $r = Rombel::where('kelas_id', $a->kelas_id)->pluck('id')->toArray();
-                    $rombelsIds = array_merge($rombelsIds, $r);
-                    continue;
-                }
-
-                // (tidak menggunakan fallback jurusan karena terlalu luas)
-            }
-
-            $rombelsIds = array_values(array_unique(array_filter($rombelsIds)));
-        }
-
-        if (!empty($rombelsIds)) {
-            $query = DataSiswa::with('rombel')
-                ->whereIn('rombel_id', $rombelsIds)
-                ->when($search, function($q) use ($search) {
-                    $like = '%' . $search . '%';
-                    return $q->where(function($qq) use ($like) {
-                        $qq->where('nama_lengkap', 'like', $like)
-                           ->orWhere('nis', 'like', $like)
-                           ->orWhere('nisn', 'like', $like);
-                    });
-                })
-                ->orderBy('nama_lengkap');
-
-            $queryResults = $query->paginate(15);
-            $siswas = $queryResults->getCollection()->groupBy(function($siswa) {
-                return $siswa->rombel ? $siswa->rombel->nama : 'Tidak ada rombel';
-            });
-        } else {
-            // jika tidak ada penugasan, kembalikan kosong supaya wali tidak melihat seluruh siswa
-            $siswas = collect();
-        }
-
-        return view('walikelas.input_nilai_raport.index', compact('siswas', 'search', 'queryResults'));
+public function index(Request $request)
+{
+    $user = Auth::user();
+    $search = $request->query('q');
+    
+    // CARI LANGSUNG KE TABEL GURUS
+    $guru = DB::table('gurus')->where('user_id', $user->id)->first();
+    
+    if (!$guru) {
+        return view('walikelas.input_nilai_raport.index', [
+            'siswas' => collect(),
+            'search' => $search,
+            'queryResults' => null
+        ]);
     }
+    
+    // CARI ROMBEL BERDASARKAN guru_id
+    $rombel = DB::table('rombels')->where('guru_id', $guru->id)->first();
+    
+    if (!$rombel) {
+        return view('walikelas.input_nilai_raport.index', [
+            'siswas' => collect(),
+            'search' => $search,
+            'queryResults' => null
+        ]);
+    }
+    
+    // AMBIL SISWA LANGSUNG DARI rombel_id
+    $query = DataSiswa::with('rombel')
+        ->where('rombel_id', $rombel->id)
+        ->when($search, function($q) use ($search) {
+            $like = '%' . $search . '%';
+            return $q->where(function($qq) use ($like) {
+                $qq->where('nama_lengkap', 'like', $like)
+                   ->orWhere('nis', 'like', $like)
+                   ->orWhere('nisn', 'like', $like);
+            });
+        })
+        ->orderBy('nama_lengkap');
+    
+    $queryResults = $query->paginate(15);
+    $siswas = $queryResults->getCollection()->groupBy(function($siswa) {
+        return $siswa->rombel ? $siswa->rombel->nama : 'Tidak ada rombel';
+    });
+    
+    return view('walikelas.input_nilai_raport.index', compact('siswas', 'search', 'queryResults'));
+}
 
     public function create($siswa_id)
     {

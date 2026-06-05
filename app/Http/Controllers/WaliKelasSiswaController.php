@@ -15,109 +15,53 @@ use App\Exports\WaliKelasSiswaExport;
 
 class WaliKelasSiswaController extends Controller
 {
-    // List siswa
-   public function index(Request $request)
-    {
+public function index(Request $request)
+{
     $user = Auth::user();
-    /** @var \App\Models\User $user */
     $search = $request->query('q');
     $jenisKelamin = $request->query('jenis_kelamin');
-
-    // ambil daftar rombel yang dia pegang sebagai wali kelas
-    $rombelsIds = [];
-    if ($user) {
-        // Gunakan pluck untuk langsung mengambil ID dan memastikan unik
-        $rombelsIds = $user->waliKelas()
-            ->whereNotNull('rombel_id')
-            ->pluck('rombel_id')
-            ->unique()
-            ->toArray();
-            
-        // Jika perlu fallback ke kelas_id
-        $kelasIds = $user->waliKelas()
-            ->whereNull('rombel_id')
-            ->whereNotNull('kelas_id')
-            ->pluck('kelas_id')
-            ->unique()
-            ->toArray();
-            
-        if (!empty($kelasIds)) {
-            $rombelFromKelas = Rombel::whereIn('kelas_id', $kelasIds)
-                ->pluck('id')
-                ->unique()
-                ->toArray();
-            $rombelsIds = array_merge($rombelsIds, $rombelFromKelas);
-        }
-
-        // Pastikan tidak ada duplikasi di array rombelsIds
-        $rombelsIds = array_values(array_unique($rombelsIds));
-
-        if (!empty($rombelsIds)) {
-            // exclude students who have been promoted or graduated
-            $excludedIds = KenaikanKelas::whereIn('status', ['lulus', 'naik'])->pluck('siswa_id')->unique()->filter()->toArray();
-
-            $query = DataSiswa::with(['ayah', 'ibu', 'wali'])
-                ->whereIn('rombel_id', $rombelsIds)
-                ->when(!empty($excludedIds), function($q) use ($excludedIds) {
-                    return $q->whereNotIn('id', $excludedIds);
-                })
-                ->when($search, function($q) use ($search) {
-                    $like = '%' . $search . '%';
-                    return $q->where(function($qq) use ($like) {
-                        $qq->where('nama_lengkap', 'like', $like)
-                           ->orWhere('nisn', 'like', $like)
-                           ->orWhere('nis', 'like', $like);
-                    });
-                })
-                ->when(in_array($jenisKelamin, ['L', 'P']), function($q) use ($jenisKelamin) {
-                    return $q->where('jenis_kelamin', $jenisKelamin);
-                })
-                ->distinct()
-                ->orderBy('nama_lengkap');
-            // Ambil hasil dengan pagination
-            $siswa = $query->paginate(15);
-        } else {
-            // jika tidak ada penugasan, kembalikan kosong supaya wali tidak melihat seluruh siswa
-            $siswa = collect();
-        }
-
-        return view('walikelas.siswa.index', compact('siswa', 'search', 'jenisKelamin'));
+    
+    // CARI LANGSUNG KE TABEL GURUS
+    $guru = DB::table('gurus')->where('user_id', $user->id)->first();
+    
+    if (!$guru) {
+        return view('walikelas.siswa.index', [
+            'siswa' => collect(),
+            'search' => $search,
+            'jenisKelamin' => $jenisKelamin
+        ]);
     }
-
-    if (!empty($rombelsIds)) {
-        // exclude students who have been promoted or graduated
-        $excludedIds = KenaikanKelas::whereIn('status', ['lulus', 'naik'])
-            ->pluck('siswa_id')
-            ->unique()
-            ->filter()
-            ->toArray();
-
-        $query = DataSiswa::with(['ayah', 'ibu', 'wali'])
-            ->distinct() // Tambahkan distinct untuk menghindari duplikasi
-            ->whereIn('rombel_id', $rombelsIds)
-            ->when(!empty($excludedIds), function($q) use ($excludedIds) {
-                return $q->whereNotIn('id', $excludedIds);
-            })
-            ->when($search, function($q) use ($search) {
-                $like = '%' . $search . '%';
-                return $q->where(function($qq) use ($like) {
-                    $qq->where('nama_lengkap', 'like', $like)
-                       ->orWhere('nisn', 'like', $like)
-                       ->orWhere('nomor_induk', 'like', $like);
-                });
-            })
-            ->when(in_array($jenisKelamin, ['L', 'P']), function($q) use ($jenisKelamin) {
-                return $q->where('jenis_kelamin', $jenisKelamin);
-            })
-            ->orderBy('nama_lengkap');
-
-        // Return full collection (no pagination) for wali kelas view
-        $siswa = $query->get();
-    } else {
-        // jika tidak ada penugasan, kembalikan kosong supaya wali tidak melihat seluruh siswa
-        $siswa = collect();
+    
+    // CARI ROMBEL BERDASARKAN guru_id
+    $rombel = DB::table('rombels')->where('guru_id', $guru->id)->first();
+    
+    if (!$rombel) {
+        return view('walikelas.siswa.index', [
+            'siswa' => collect(),
+            'search' => $search,
+            'jenisKelamin' => $jenisKelamin
+        ]);
     }
-
+    
+    // AMBIL SISWA LANGSUNG DARI rombel_id
+    $query = DataSiswa::with(['ayah', 'ibu', 'wali', 'rombel'])
+        ->where('rombel_id', $rombel->id);
+    
+    if ($search) {
+        $like = '%' . $search . '%';
+        $query->where(function($q) use ($like) {
+            $q->where('nama_lengkap', 'like', $like)
+              ->orWhere('nisn', 'like', $like)
+              ->orWhere('nis', 'like', $like);
+        });
+    }
+    
+    if ($jenisKelamin && in_array($jenisKelamin, ['Laki-laki', 'Perempuan'])) {
+        $query->where('jenis_kelamin', $jenisKelamin);
+    }
+    
+    $siswa = $query->orderBy('nama_lengkap')->paginate(15);
+    
     return view('walikelas.siswa.index', compact('siswa', 'search', 'jenisKelamin'));
 }
 
@@ -128,76 +72,111 @@ class WaliKelasSiswaController extends Controller
         return view('walikelas.siswa.show', compact('s'));
     }
 
-    // Dashboard wali kelas
-    public function dashboard()
-    {
-        $user = Auth::user();
-        /** @var \App\Models\User $user */
-
-        // ambil daftar rombel yang dia pegang sebagai wali kelas
-        $rombelsIds = [];
-        if ($user) {
-            $assigns = $user->waliKelas()->get();
-            foreach ($assigns as $a) {
-                // jika kolom rombel_id ada dan terisi, gunakan itu
-                if (isset($a->rombel_id) && $a->rombel_id) {
-                    $rombelsIds[] = $a->rombel_id;
-                    continue;
-                }
-
-                // jika rombel_id tidak tersedia di tabel, gunakan kelas_id untuk ambil rombel terkait
-                if (isset($a->kelas_id) && $a->kelas_id) {
-                    $r = Rombel::where('kelas_id', $a->kelas_id)->pluck('id')->toArray();
-                    $rombelsIds = array_merge($rombelsIds, $r);
-                    continue;
-                }
-
-                // (tidak menggunakan fallback jurusan karena terlalu luas)
-            }
-
-            $rombelsIds = array_values(array_unique(array_filter($rombelsIds)));
-        }
-
-        if (!empty($rombelsIds)) {
-            $excludedIds = KenaikanKelas::whereIn('status', ['lulus', 'naik'])->pluck('siswa_id')->unique()->filter()->toArray();
-
-            $total = DataSiswa::whereIn('rombel_id', $rombelsIds)
-                ->when(!empty($excludedIds), function($q) use ($excludedIds) {
-                    return $q->whereNotIn('id', $excludedIds);
-                })->count();
-
-            // Ambil siswa terbaru hanya dari rombel yang dipegang wali kelas
-            $recent = DataSiswa::with(['ayah', 'ibu', 'wali', 'rombel'])
-                ->whereIn('rombel_id', $rombelsIds)
-                ->when(!empty($excludedIds), function($q) use ($excludedIds) {
-                    return $q->whereNotIn('id', $excludedIds);
-                })
-                ->orderBy('created_at', 'desc')
-                ->limit(6)
-                ->get();
-
-            $byGender = DataSiswa::whereIn('rombel_id', $rombelsIds)
-                ->when(!empty($excludedIds), function($q) use ($excludedIds) {
-                    return $q->whereNotIn('id', $excludedIds);
-                })
-                ->select('jenis_kelamin', DB::raw('count(*) as total'))
-                ->groupBy('jenis_kelamin')
-                ->pluck('total', 'jenis_kelamin')
-                ->toArray();
-
-            // Group recent by rombel
-            $recentGrouped = $recent->groupBy(function($siswa) {
-                return $siswa->rombel ? $siswa->rombel->nama : 'Tidak ada rombel';
-            });
-        } else {
-            $total = 0;
-            $recent = collect();
-            $recentGrouped = collect();
-            $byGender = [];
-        }
-
-        return view('walikelas.dashboard', compact('total', 'recent', 'recentGrouped', 'byGender'));
+public function dashboard()
+{
+    $user = Auth::user();
+    $guru = DB::table('gurus')->where('user_id', $user->id)->first();
+    
+    if (!$guru) {
+        return view('walikelas.dashboard', [
+            'total' => 0,
+            'byGender' => ['Laki-laki' => 0, 'Perempuan' => 0],
+            'recentGrouped' => collect(),
+            'kehadiran' => ['hadir' => 0, 'sakit' => 0, 'izin' => 0, 'alpha' => 0, 'persentase_kehadiran' => 0],
+            'rataNilaiPerMapel' => collect(),
+            'chartData' => (object) ['labels' => [], 'values' => []]
+        ]);
     }
+    
+    $rombel = DB::table('rombels')->where('guru_id', $guru->id)->first();
+    
+    if (!$rombel) {
+        return view('walikelas.dashboard', [
+            'total' => 0,
+            'byGender' => ['Laki-laki' => 0, 'Perempuan' => 0],
+            'recentGrouped' => collect(),
+            'kehadiran' => ['hadir' => 0, 'sakit' => 0, 'izin' => 0, 'alpha' => 0, 'persentase_kehadiran' => 0],
+            'rataNilaiPerMapel' => collect(),
+            'chartData' => (object) ['labels' => [], 'values' => []]
+        ]);
+    }
+    
+    $total = DataSiswa::where('rombel_id', $rombel->id)->count();
+    
+    $byGender = [
+        'Laki-laki' => DataSiswa::where('rombel_id', $rombel->id)->where('jenis_kelamin', 'Laki-laki')->count(),
+        'Perempuan' => DataSiswa::where('rombel_id', $rombel->id)->where('jenis_kelamin', 'Perempuan')->count()
+    ];
+    
+    $recent = DataSiswa::with('rombel')
+        ->where('rombel_id', $rombel->id)
+        ->orderBy('created_at', 'desc')
+        ->limit(10)
+        ->get();
+    
+    $recentGrouped = $recent->groupBy(function($siswa) {
+        return $siswa->rombel ? $siswa->rombel->nama : 'Tidak ada rombel';
+    });
+    
+    // === DATA KEHADIRAN BULAN INI ===
+    $startOfMonth = \Carbon\Carbon::now()->startOfMonth();
+    $endOfMonth = \Carbon\Carbon::now()->endOfMonth();
+    $siswaIds = DataSiswa::where('rombel_id', $rombel->id)->pluck('id');
+    
+    $absensis = \App\Models\Absensi::whereIn('siswa_id', $siswaIds)
+        ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
+        ->get();
+    
+    $kehadiran = [
+        'hadir' => $absensis->where('status', 'hadir')->count(),
+        'sakit' => $absensis->where('status', 'sakit')->count(),
+        'izin' => $absensis->where('status', 'izin')->count(),
+        'alpha' => $absensis->where('status', 'alpha')->count(),
+    ];
+    
+    $totalAbsensi = array_sum($kehadiran);
+    $kehadiran['persentase_kehadiran'] = $totalAbsensi > 0 ? round(($kehadiran['hadir'] / $totalAbsensi) * 100, 1) : 0;
+    
+    // === DATA NILAI RATA-RATA PER MAPEL (DENGAN TRY-CATCH) ===
+    try {
+        // Coba ambil data nilai - coba beberapa kemungkinan nama kolom
+        $columnName = 'nama_mapel';
+        
+        // Cek apakah kolom 'nama' ada
+        $columns = DB::getSchemaBuilder()->getColumnListing('mata_pelajarans');
+        if (in_array('nama', $columns)) {
+            $columnName = 'nama';
+        } elseif (in_array('mata_pelajaran', $columns)) {
+            $columnName = 'mata_pelajaran';
+        } elseif (in_array('nama_mata_pelajaran', $columns)) {
+            $columnName = 'nama_mata_pelajaran';
+        }
+        
+        $rataNilaiPerMapel = DB::table('nilai_raports')
+            ->join('mata_pelajarans', 'nilai_raports.mapel_id', '=', 'mata_pelajarans.id')
+            ->whereIn('nilai_raports.siswa_id', $siswaIds)
+            ->select("mata_pelajarans.$columnName as nama_mapel", DB::raw('AVG(nilai_raports.nilai_angka) as rata_rata'))
+            ->groupBy("mata_pelajarans.$columnName")
+            ->orderBy('rata_rata', 'desc')
+            ->limit(6)
+            ->get();
+        
+        $chartData = (object) [
+            'labels' => $rataNilaiPerMapel->pluck('nama_mapel')->toArray(),
+            'values' => $rataNilaiPerMapel->pluck('rata_rata')->map(function($val) {
+                return round($val, 2);
+            })->toArray()
+        ];
+    } catch (\Exception $e) {
+        // Jika error, set data kosong
+        $rataNilaiPerMapel = collect();
+        $chartData = (object) ['labels' => [], 'values' => []];
+    }
+    
+    return view('walikelas.dashboard', compact(
+        'total', 'byGender', 'recentGrouped', 'kehadiran', 'rataNilaiPerMapel', 'chartData'
+    ));
+}
 
     // Export data siswa ke PDF (untuk wali kelas)
     public function exportPdf($id)
@@ -214,34 +193,25 @@ class WaliKelasSiswaController extends Controller
     public function exportExcel(Request $request)
     {
         $user = Auth::user();
-        /** @var \App\Models\User $user */
-        $rombelsIds = [];
-        if ($user) {
-            $rombelsIds = $user->waliKelas()
-                ->whereNotNull('rombel_id')
-                ->pluck('rombel_id')
-                ->unique()
-                ->toArray();
-
-            $kelasIds = $user->waliKelas()
-                ->whereNull('rombel_id')
-                ->whereNotNull('kelas_id')
-                ->pluck('kelas_id')
-                ->unique()
-                ->toArray();
-
-            if (!empty($kelasIds)) {
-                $rombelFromKelas = Rombel::whereIn('kelas_id', $kelasIds)
-                    ->pluck('id')
-                    ->unique()
-                    ->toArray();
-                $rombelsIds = array_merge($rombelsIds, $rombelFromKelas);
-            }
-
-            $rombelsIds = array_values(array_unique(array_filter($rombelsIds)));
+        
+        // Cari guru berdasarkan user_id
+        $guru = DB::table('gurus')->where('user_id', $user->id)->first();
+        
+        if (!$guru) {
+            return back()->with('error', 'Data guru tidak ditemukan');
         }
-
-        $export = new WaliKelasSiswaExport($rombelsIds);
-        return Excel::download($export, 'Daftar Siswa.xlsx');
+        
+        // Cari rombel berdasarkan guru_id
+        $rombel = DB::table('rombels')->where('guru_id', $guru->id)->first();
+        
+        if (!$rombel) {
+            return back()->with('error', 'Rombel tidak ditemukan');
+        }
+        
+        // Ambil semua siswa di rombel ini
+        $siswa = DataSiswa::where('rombel_id', $rombel->id)->get();
+        
+        // Export langsung dengan parameter rombel_id
+        return Excel::download(new WaliKelasSiswaExport($rombel->id, $rombel->nama), 'Daftar_Siswa_' . $rombel->nama . '.xlsx');
     }
 }

@@ -11,12 +11,13 @@ use Maatwebsite\Excel\Events\AfterSheet;
 
 class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSize, WithEvents
 {
-    protected $rombelsIds;
+    protected $rombelId;
     protected $kelasName;
 
-    public function __construct(array $rombelsIds = [], $kelasName = 'X RPL 2')
+    // Ubah parameter pertama dari array menjadi int/string
+    public function __construct($rombelId = null, $kelasName = '')
     {
-        $this->rombelsIds = $rombelsIds;
+        $this->rombelId = $rombelId;
         $this->kelasName = $kelasName;
     }
 
@@ -27,8 +28,9 @@ class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSi
     {
         $query = DataSiswa::query()->with('rombel');
 
-        if (!empty($this->rombelsIds)) {
-            $query->whereIn('rombel_id', $this->rombelsIds);
+        // Filter berdasarkan rombel_id jika ada
+        if ($this->rombelId) {
+            $query->where('rombel_id', $this->rombelId);
         }
 
         $students = $query->orderBy('nama_lengkap')->get();
@@ -37,7 +39,7 @@ class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSi
             $tempatTanggalLahir = '';
             if ($s->tempat_lahir && $s->tanggal_lahir) {
                 $tanggal = \Carbon\Carbon::parse($s->tanggal_lahir)->format('d-m-Y');
-                $tempatTanggalLahir = $s->tempat_lahir . ',' . $tanggal;
+                $tempatTanggalLahir = $s->tempat_lahir . ', ' . $tanggal;
             } elseif ($s->tempat_lahir) {
                 $tempatTanggalLahir = $s->tempat_lahir;
             } elseif ($s->tanggal_lahir) {
@@ -47,22 +49,12 @@ class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSi
             return [
                 'No' => $k + 1,
                 'NIS' => $s->nis ?? '',
-                'NISN' => $s->nisn,
+                'NISN' => $s->nisn ?? '',
                 'Nama' => $s->nama_lengkap,
                 'JK' => $s->jenis_kelamin,
                 'TTL' => $tempatTanggalLahir,
             ];
         });
-
-        // Add total row
-        $rows->push([
-            'No' => '',
-            'NIS' => '',
-            'NISN' => '',
-            'Nama' => 'JUMLAH',
-            'JK' => '',
-            'TTL' => $students->count(),
-        ]);
 
         return $rows;
     }
@@ -70,7 +62,7 @@ class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSi
     public function headings(): array
     {
         return [
-            'No', 'NIS', 'NISN', 'Nama', 'JK', 'Tempat Lahir, Tanggal Lahir'
+            'No', 'NIS', 'NISN', 'Nama', 'Jenis Kelamin', 'Tempat, Tanggal Lahir'
         ];
     }
 
@@ -88,7 +80,8 @@ class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSi
                 
                 // Add title
                 $sheet->mergeCells('A1:F1');
-                $sheet->setCellValue('A1', 'DATA SISWA KELAS ' . $this->kelasName);
+                $title = $this->kelasName ? 'DATA SISWA KELAS ' . $this->kelasName : 'DATA SISWA';
+                $sheet->setCellValue('A1', $title);
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(12);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle('A1')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
@@ -100,11 +93,8 @@ class WaliKelasSiswaExport implements FromCollection, WithHeadings, ShouldAutoSi
                     ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                     ->getStartColor()->setARGB('FFDDDDDD');
                 
-                // Style the total row
-                $highestRow = $sheet->getHighestRow();
-                $sheet->getStyle('A' . $highestRow . ':F' . $highestRow)->getFont()->setBold(true);
-                
                 // Add borders to the table (from headers to last row)
+                $highestRow = $sheet->getHighestRow();
                 $sheet->getStyle('A2:F' . $highestRow)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
             },
         ];
