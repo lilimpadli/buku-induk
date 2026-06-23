@@ -14,191 +14,295 @@
         --danger: #ef4444;
         --danger-dark: #dc2626;
         --info: #3b82f6;
-        --gray-50: #f8fafc;
-        --gray-100: #f1f5f9;
-        --gray-200: #e2e8f0;
+        --gray-50: #f8fbff;
+        --gray-100: #eef4ff;
+        --gray-200: #dbeafe;
         --gray-300: #cbd5e1;
         --gray-400: #94a3b8;
         --gray-500: #64748b;
         --gray-600: #475569;
         --gray-700: #334155;
-        --gray-800: #1e293b;
+        --gray-800: #1f2937;
         --gray-900: #0f172a;
-        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.06);
+        --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+        --shadow-md: 0 24px 60px rgba(15, 23, 42, 0.1);
+        --shadow-lg: 0 32px 90px rgba(15, 23, 42, 0.12);
+        --shadow-xl: 0 36px 100px rgba(15, 23, 42, 0.14);
     }
 
     body {
-        background-color: var(--gray-50);
-        color: var(--gray-800);
+        background: linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
+        color: var(--gray-900);
         font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        min-height: 100vh;
     }
 
-    /* Header Styles */
+    .container-fluid {
+        padding-top: 24px;
+        padding-bottom: 32px;
+    }
+
     .page-header {
-        display: flex;
-        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+        padding: 32px 34px;
+        border-radius: 28px;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(236, 246, 255, 0.95));
+        box-shadow: 0 28px 80px rgba(59, 130, 246, 0.12);
+        margin-bottom: 36px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 24px;
         align-items: center;
-        margin-bottom: 32px;
-        gap: 20px;
-        flex-wrap: wrap;
     }
 
-    .page-title {
-        font-size: clamp(24px, 4vw, 32px);
-        font-weight: 700;
+    .page-header::before,
+    .page-header::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        opacity: 0.8;
+    }
+
+    .page-header::before {
+        width: 180px;
+        height: 180px;
+        top: -48px;
+        right: -40px;
+        background: rgba(59, 130, 246, 0.18);
+        filter: blur(20px);
+    }
+
+    .page-header::after {
+        width: 220px;
+        height: 220px;
+        bottom: -72px;
+        left: -56px;
+        background: rgba(14, 165, 233, 0.14);
+        filter: blur(30px);
+    }
+
+    .hero-copy {
+        max-width: 720px;
+    }
+
+    .hero-title {
+        font-size: clamp(32px, 5vw, 42px);
+        line-height: 1.02;
+        font-weight: 800;
         margin: 0;
-        color: var(--gray-800);
+        color: var(--gray-900);
+    }
+
+    .hero-subtitle {
+        margin-top: 12px;
+        color: var(--gray-600);
+        font-size: 15px;
+        line-height: 1.7;
+        max-width: 720px;
+    }
+
+    .hero-actions {
         display: flex;
+        justify-content: flex-end;
         align-items: center;
-        gap: 12px;
     }
 
-    .page-title i {
-        color: var(--primary);
-        font-size: 28px;
+    .hero-actions .btn {
+        min-width: 230px;
+        border-radius: 18px;
+        box-shadow: 0 18px 40px rgba(59, 130, 246, 0.18);
     }
 
-    /* Card Styles */
     .jurusan-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 24px;
         margin-bottom: 40px;
     }
 
     .jurusan-card {
-        background: white;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: var(--shadow-md);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid var(--gray-200);
         position: relative;
+        background: #ffffff;
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        box-shadow: var(--shadow);
+        transition: transform 0.32s ease, box-shadow 0.32s ease, border-color 0.32s ease;
         display: flex;
         flex-direction: column;
     }
 
     .jurusan-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-xl);
-        border-color: var(--primary);
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-lg);
+        border-color: rgba(59, 130, 246, 0.24);
     }
 
     .jurusan-card::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
-        background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        top: -30px;
+        right: -30px;
+        background: rgba(59, 130, 246, 0.12);
+        pointer-events: none;
+    }
+
+    .jurusan-card::after {
+        content: '';
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        bottom: -20px;
+        left: -20px;
+        background: rgba(14, 165, 233, 0.08);
+        pointer-events: none;
     }
 
     .jurusan-card-header {
-        padding: 24px;
-        background: linear-gradient(135deg, var(--gray-50), var(--gray-100));
-        border-bottom: 1px solid var(--gray-200);
+        position: relative;
+        padding: 28px 26px 22px;
+        background: linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
+        display: grid;
+        gap: 18px;
     }
 
-    .jurusan-card-title-wrapper {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 12px;
+    .jurusan-card-badge-top {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 9px 16px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        color: white;
+        text-transform: uppercase;
+        width: fit-content;
+        box-shadow: 0 18px 40px rgba(59, 130, 246, 0.14);
+        background: var(--primary);
+    }
+
+    .jurusan-card-header-icon {
+        width: 68px;
+        height: 68px;
+        border-radius: 22px;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        color: #ffffff;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(96, 165, 250, 0.75));
+        box-shadow: 0 18px 40px rgba(59, 130, 246, 0.16);
     }
 
     .jurusan-card-title {
         font-size: 20px;
         font-weight: 700;
         margin: 0;
-        color: var(--gray-800);
-        line-height: 1.3;
+        color: var(--gray-900);
+        line-height: 1.2;
     }
 
-    .jurusan-card-code {
+    .jurusan-card-subtitle {
         display: inline-flex;
         align-items: center;
-        background: var(--gray-100);
-        color: var(--gray-600);
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-
-    .jurusan-card-badge {
-        background: var(--primary);
-        color: white;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .jurusan-card-badge i {
+        gap: 8px;
         font-size: 14px;
+        color: var(--gray-600);
+        font-weight: 600;
+    }
+
+    .jurusan-card-headline {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .jurusan-card-headline-left {
+        display: grid;
+        gap: 14px;
+    }
+
+    .jurusan-card-stats {
+        display: grid;
+        gap: 10px;
+        justify-items: end;
+    }
+
+    .jurusan-card-siswa {
+        font-size: 32px;
+        font-weight: 800;
+        color: #1e3a8a;
+        line-height: 1;
+    }
+
+    .jurusan-card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+    .jurusan-card-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 16px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #1d4ed8;
+        background: rgba(59, 130, 246, 0.08);
     }
 
     .jurusan-card-body {
-        padding: 24px;
+        padding: 24px 26px 26px;
         flex: 1;
     }
 
     .jurusan-card-description {
         color: var(--gray-600);
         margin: 0;
-        line-height: 1.6;
-        font-size: 14px;
+        line-height: 1.75;
+        font-size: 15px;
     }
 
     .jurusan-card-footer {
-        padding: 20px 24px;
-        border-top: 1px solid var(--gray-200);
+        padding: 20px 24px 24px;
+        border-top: 1px solid rgba(148, 163, 184, 0.16);
         display: flex;
+        flex-wrap: wrap;
         gap: 12px;
+        background: #f8fbff;
     }
 
-    /* Button Styles */
     .btn {
-        border-radius: 10px;
-        font-weight: 600;
-        padding: 10px 20px;
-        transition: all 0.3s ease;
+        border-radius: 14px;
+        font-weight: 700;
+        padding: 12px 20px;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        justify-content: center;
+        gap: 10px;
         text-decoration: none;
         border: none;
         cursor: pointer;
         font-size: 14px;
         position: relative;
         overflow: hidden;
+        box-shadow: 0 16px 36px rgba(59, 130, 246, 0.12);
     }
 
-    .btn::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
-        transform: translate(-50%, -50%);
-        transition: width 0.6s, height 0.6s;
-    }
-
-    .btn:active::before {
-        width: 300px;
-        height: 300px;
+    .btn:hover {
+        transform: translateY(-2px);
     }
 
     .btn-primary {
@@ -206,67 +310,55 @@
         color: white;
     }
 
-    .btn-primary:hover {
-        background: var(--primary-dark);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    }
-
     .btn-outline-primary {
         background: transparent;
         color: var(--primary);
-        border: 2px solid var(--primary);
+        border: 2px solid rgba(59, 130, 246, 0.35);
+        box-shadow: none;
     }
 
     .btn-outline-primary:hover {
         background: var(--primary);
         color: white;
-        transform: translateY(-2px);
+        box-shadow: 0 18px 40px rgba(59, 130, 246, 0.18);
     }
 
     .btn-outline-secondary {
-        background: transparent;
-        color: var(--gray-600);
-        border: 2px solid var(--gray-300);
+        background: rgba(255, 255, 255, 0.95);
+        color: var(--gray-700);
+        border: 2px solid rgba(148, 163, 184, 0.32);
+        box-shadow: none;
     }
 
     .btn-outline-secondary:hover {
-        background: var(--gray-100);
-        border-color: var(--gray-400);
-        transform: translateY(-2px);
+        background: #f1f5f9;
+        border-color: rgba(148, 163, 184, 0.45);
     }
 
-    .btn-sm {
-        padding: 8px 16px;
-        font-size: 13px;
-    }
-
-    /* Dropdown Styles */
     .dropdown-toggle {
-        background: var(--gray-100);
+        background: rgba(255, 255, 255, 0.95);
         color: var(--gray-700);
-        border: 1px solid var(--gray-300);
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-weight: 500;
-        transition: all 0.2s ease;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        padding: 10px 18px;
+        border-radius: 14px;
+        font-weight: 600;
     }
 
     .dropdown-toggle:hover {
-        background: var(--gray-200);
-        border-color: var(--gray-400);
+        background: #eff6ff;
+        border-color: rgba(59, 130, 246, 0.4);
     }
 
     .dropdown-menu {
-        border: 1px solid var(--gray-300);
-        box-shadow: var(--shadow-lg);
-        border-radius: 12px;
-        padding: 8px;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        box-shadow: var(--shadow-sm);
+        border-radius: 16px;
+        padding: 10px;
     }
 
     .dropdown-item {
-        padding: 10px 16px;
-        border-radius: 8px;
+        padding: 12px 16px;
+        border-radius: 12px;
         transition: all 0.2s ease;
         display: flex;
         align-items: center;
@@ -275,48 +367,51 @@
     }
 
     .dropdown-item:hover {
-        background: var(--gray-100);
+        background: rgba(59, 130, 246, 0.08);
         color: var(--primary);
     }
 
     .dropdown-item i {
         font-size: 16px;
-        width: 20px;
+        width: 22px;
         text-align: center;
     }
 
-    /* Empty State */
     .empty-state {
         grid-column: 1 / -1;
-        text-align: center;
-        padding: 60px 20px;
-        background: white;
-        border-radius: 16px;
-        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 64px 28px;
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: var(--shadow-sm);
     }
 
     .empty-state i {
-        font-size: 64px;
-        margin-bottom: 20px;
-        color: var(--gray-300);
+        font-size: 82px;
+        margin-bottom: 24px;
+        color: rgba(59, 130, 246, 0.3);
     }
 
     .empty-state h3 {
-        font-size: 20px;
-        font-weight: 600;
-        color: var(--gray-700);
-        margin-bottom: 8px;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin-bottom: 10px;
     }
 
     .empty-state p {
         color: var(--gray-500);
         margin: 0;
+        max-width: 420px;
+        line-height: 1.8;
     }
 
-    /* Modal Styles */
     .modal-content {
         border: none;
-        border-radius: 16px;
+        border-radius: 18px;
         box-shadow: var(--shadow-xl);
         overflow: hidden;
     }
@@ -325,16 +420,16 @@
         background: linear-gradient(135deg, var(--primary), var(--primary-dark));
         color: white;
         border: none;
-        padding: 24px;
+        padding: 26px 28px;
         position: relative;
     }
 
     .modal-header .btn-close {
         filter: brightness(0) invert(1);
         background: rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        width: 32px;
-        height: 32px;
+        border-radius: 12px;
+        width: 38px;
+        height: 38px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -343,316 +438,354 @@
 
     .modal-header .btn-close:hover {
         background: rgba(255, 255, 255, 0.3);
-        transform: scale(1.1);
+        transform: scale(1.05);
     }
 
     .modal-title {
-        font-weight: 700;
-        font-size: 20px;
+        font-weight: 800;
+        font-size: 22px;
     }
 
     .modal-body {
-        padding: 24px;
+        padding: 30px 30px 28px;
     }
 
-    /* Siswa List Styles */
+    .form-check-input {
+        width: 22px;
+        height: 22px;
+        border-radius: 8px;
+        accent-color: var(--primary);
+    }
+
+    .form-check-label {
+        font-size: 15px;
+        color: var(--gray-800);
+        font-weight: 600;
+    }
+
     .siswa-checkbox-group {
         display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: 400px;
-            overflow-y: auto;
-            padding: 10px 0;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 420px;
+        overflow-y: auto;
+        padding: 6px 0;
+    }
+
+    .siswa-item {
+        display: flex;
+        align-items: center;
+        padding: 16px 18px;
+        background: rgba(59, 130, 246, 0.04);
+        border-radius: 18px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .siswa-item:hover {
+        background: rgba(59, 130, 246, 0.08);
+        border-color: rgba(59, 130, 246, 0.22);
+        transform: translateX(4px);
+    }
+
+    .siswa-item input[type="checkbox"] {
+        margin-right: 16px;
+        width: 22px;
+        height: 22px;
+        cursor: pointer;
+    }
+
+    .siswa-info {
+        flex: 1;
+    }
+
+    .siswa-nama {
+        font-weight: 700;
+        color: var(--gray-900);
+        font-size: 15px;
+        margin-bottom: 3px;
+    }
+
+    .siswa-nis {
+        font-size: 13px;
+        color: var(--gray-500);
+    }
+
+    .mutasi-options {
+        margin-top: 28px;
+        padding-top: 28px;
+        border-top: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    .mutasi-options label {
+        display: block;
+        margin-bottom: 18px;
+        font-weight: 700;
+        color: var(--gray-700);
+        font-size: 15px;
+    }
+
+    .mutasi-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 14px;
+    }
+
+    .btn-mutasi {
+        padding: 14px 22px;
+        border-radius: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-size: 14px;
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+    }
+
+    .btn-mutasi:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 44px rgba(15, 23, 42, 0.12);
+    }
+
+    .btn-mutasi-naik {
+        background: var(--success);
+        color: white;
+    }
+
+    .btn-mutasi-lulus {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-mutasi-do {
+        background: var(--warning);
+        color: white;
+    }
+
+    .btn-mutasi-pindah {
+        background: #8b5cf6;
+        color: white;
+    }
+
+    .btn-mutasi-meninggal {
+        background: var(--danger);
+        color: white;
+        grid-column: 1 / -1;
+    }
+
+    .class-student-item {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 18px;
+        background: rgba(59, 130, 246, 0.04);
+        border-radius: 18px;
+        border: 1px solid rgba(148, 163, 184, 0.24);
+        margin-bottom: 12px;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .class-student-item:hover {
+        background: rgba(59, 130, 246, 0.08);
+        border-color: rgba(59, 130, 246, 0.22);
+        transform: translateX(4px);
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    .loading {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+    }
+
+    @media (max-width: 767px) {
+        .container-fluid {
+            padding-left: 14px;
+            padding-right: 14px;
         }
 
-        .siswa-item {
-            display: flex;
-            align-items: center;
-            padding: 16px;
-            background: var(--gray-50);
-            border-radius: 12px;
-            border: 1px solid var(--gray-200);
-            transition: all 0.2s ease;
+        .page-header {
+            grid-template-columns: 1fr;
+            padding: 26px 20px;
         }
 
-        .siswa-item:hover {
-            background: var(--gray-100);
-            border-color: var(--gray-300);
-            transform: translateX(4px);
+        .hero-actions {
+            justify-content: stretch;
         }
 
-        .siswa-item input[type="checkbox"] {
-            margin-right: 16px;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            accent-color: var(--primary);
+        .hero-actions .btn {
+            width: 100%;
+            min-width: auto;
         }
 
-        .siswa-info {
-            flex: 1;
+        .jurusan-grid {
+            grid-template-columns: 1fr;
+            gap: 18px;
         }
 
-        .siswa-nama {
-            font-weight: 600;
-            color: var(--gray-800);
-            font-size: 15px;
-            margin-bottom: 4px;
-        }
-
-        .siswa-nis {
-            font-size: 13px;
-            color: var(--gray-500);
-        }
-
-        /* Mutasi Options */
-        .mutasi-options {
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid var(--gray-200);
-        }
-
-        .mutasi-options label {
-            display: block;
+        .jurusan-card {
             margin-bottom: 16px;
-            font-weight: 600;
-            color: var(--gray-700);
-            font-size: 15px;
+        }
+
+        .jurusan-card-header {
+            padding: 22px 20px 18px;
+        }
+
+        .jurusan-card-title {
+            font-size: 18px;
+        }
+
+        .jurusan-card-body {
+            padding: 20px 20px 22px;
+        }
+
+        .jurusan-card-footer {
+            padding: 18px 20px 20px;
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
         }
 
         .mutasi-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-        }
-
-        .btn-mutasi {
-            padding: 14px 20px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-
-        .btn-mutasi:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-mutasi-naik {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-mutasi-naik:hover {
-            background: var(--success-dark);
-        }
-
-        .btn-mutasi-lulus {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-mutasi-lulus:hover {
-            background: var(--primary-dark);
-        }
-
-        .btn-mutasi-do {
-            background: var(--warning);
-            color: white;
-        }
-
-        .btn-mutasi-do:hover {
-            background: var(--warning-dark);
-        }
-
-        .btn-mutasi-pindah {
-            background: #8b5cf6;
-            color: white;
-        }
-
-        .btn-mutasi-pindah:hover {
-            background: #7c3aed;
+            grid-template-columns: 1fr;
         }
 
         .btn-mutasi-meninggal {
-            background: var(--danger);
-            color: white;
-            grid-column: 1 / -1;
+            grid-column: 1;
+        }
+    }
+
+    @media (min-width: 768px) and (max-width: 991px) {
+        .jurusan-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        }
+    }
+
+    @media print {
+        body {
+            background-color: white;
         }
 
-        .btn-mutasi-meninggal:hover {
-            background: var(--danger-dark);
+        .page-header,
+        .jurusan-card-footer,
+        .modal {
+            display: none !important;
         }
 
-        /* Class Students Modal */
-        .class-student-item {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 16px;
-            background: var(--gray-50);
-            border-radius: 12px;
-            border: 1px solid var(--gray-200);
-            margin-bottom: 12px;
-            transition: all 0.2s ease;
+        .jurusan-card {
+            box-shadow: none;
+            border: 1px solid #cbd5e1;
+            break-inside: avoid;
         }
 
-        .class-student-item:hover {
-            background: var(--gray-100);
-            border-color: var(--gray-300);
-            transform: translateX(4px);
+        @page {
+            margin: 2cm;
         }
+    }
 
-        /* Loading Animation */
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
+    .siswa-checkbox-group::-webkit-scrollbar {
+        width: 8px;
+    }
 
-        .loading {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
+    .siswa-checkbox-group::-webkit-scrollbar-track {
+        background: var(--gray-100);
+        border-radius: 4px;
+    }
 
-        /* Responsive Design */
-        @media (max-width: 767px) {
-            .container-fluid {
-                padding-left: 12px;
-                padding-right: 12px;
-            }
+    .siswa-checkbox-group::-webkit-scrollbar-thumb {
+        background: var(--gray-300);
+        border-radius: 4px;
+    }
 
-            .page-header {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 16px;
-            }
+    .siswa-checkbox-group::-webkit-scrollbar-thumb:hover {
+        background: var(--gray-400);
+    }
 
-            .jurusan-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
+    .fade-in {
+        animation: fadeIn 0.35s ease-in;
+    }
 
-            .jurusan-card {
-                margin-bottom: 16px;
-            }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-            .jurusan-card-header {
-                padding: 16px;
-            }
+    .pulse {
+        animation: pulse 2s infinite;
+    }
 
-            .jurusan-card-title {
-                font-size: 18px;
-            }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
 
-            .jurusan-card-body {
-                padding: 16px;
-            }
+    .jurusan-rpl,
+    .jurusan-pplg {
+        --jurusan-gradient: linear-gradient(135deg,#F59E0B,#FCD34D);
+    }
 
-            .jurusan-card-footer {
-                padding: 16px;
-                flex-direction: column;
-                gap: 8px;
-            }
+    .jurusan-mp {
+        --jurusan-gradient: linear-gradient(135deg,#7F1D1D,#991B1B);
+    }
 
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
+    .jurusan-ak,
+    .jurusan-akl {
+        --jurusan-gradient: linear-gradient(135deg,#F97316,#FB923C);
+    }
 
-            .mutasi-buttons {
-                grid-template-columns: 1fr;
-            }
+    .jurusan-tjkt {
+        --jurusan-gradient: linear-gradient(135deg,#38BDF8,#7DD3FC);
+    }
 
-            .btn-mutasi-meninggal {
-                grid-column: 1;
-            }
-        }
+    .jurusan-tkro,
+    .jurusan-to {
+        --jurusan-gradient: linear-gradient(135deg,#1D4ED8,#3B82F6);
+    }
 
-        @media (min-width: 768px) and (max-width: 991px) {
-            .jurusan-grid {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            }
-        }
+    .jurusan-dpib {
+        --jurusan-gradient: linear-gradient(135deg,#6B7280,#9CA3AF);
+    }
 
-        /* Print Styles */
-        @media print {
-            body {
-                background-color: white;
-            }
+    .jurusan-sp,
+    .jurusan-sk {
+        --jurusan-gradient: linear-gradient(135deg,#0F172A,#374151);
+    }
 
-            .page-header,
-            .jurusan-card-footer,
-            .modal {
-                display: none !important;
-            }
+    .jurusan-umum {
+        --jurusan-gradient: linear-gradient(135deg,#3b82f6,#60a5fa);
+    }
 
-            .jurusan-card {
-                box-shadow: none;
-                border: 1px solid var(--gray-300);
-                break-inside: avoid;
-            }
+    .jurusan-card-badge-top {
+        background: var(--jurusan-gradient);
+    }
 
-            @page {
-                margin: 2cm;
-            }
-        }
+    .jurusan-card-header-icon {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(96, 165, 250, 0.65));
+    }
+</style>
 
-        /* Custom Scrollbar */
-        .siswa-checkbox-group::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .siswa-checkbox-group::-webkit-scrollbar-track {
-            background: var(--gray-100);
-            border-radius: 4px;
-        }
-
-        .siswa-checkbox-group::-webkit-scrollbar-thumb {
-            background: var(--gray-300);
-            border-radius: 4px;
-        }
-
-        .siswa-checkbox-group::-webkit-scrollbar-thumb:hover {
-            background: var(--gray-400);
-        }
-
-        /* Animation Classes */
-        .fade-in {
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-    </style>
-
-    <div class="container-fluid mt-4">
+    <div class="container-fluid">
         <div class="page-header">
-            <h1 class="page-title">
-                <i class="fas fa-exchange-alt"></i> Mutasi Siswa
-            </h1>
-            <a href="{{ route('tu.mutasi.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Tambah Mutasi Individual
-            </a>
+            <div class="hero-copy">
+                <h1 class="hero-title">Mutasi Siswa</h1>
+                <p class="hero-subtitle">Kelola mutasi siswa berdasarkan jurusan dan status akademik</p>
+            </div>
+            <div class="hero-actions">
+                <a href="{{ route('tu.mutasi.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Tambah Mutasi Individual
+                </a>
+            </div>
         </div>
 
         @php
@@ -667,16 +800,26 @@
                     $totalRombel = $jurusanClasses->sum(fn($kelas) => $kelas->rombels->count());
                     $totalSiswa = $jurusanClasses->flatMap(fn($kelas) => $kelas->rombels)->sum(fn($rombel) => $rombel->siswas->count());
                 @endphp
-                <div class="jurusan-card fade-in">
+                <div class="jurusan-card fade-in jurusan-{{ strtolower(optional($jurusan)->kode ?? 'umum') }}">
                     <div class="jurusan-card-header">
-                        <div class="jurusan-card-title-wrapper">
-                            <div>
-                                <h3 class="jurusan-card-title">{{ optional($jurusan)->nama ?? 'Umum' }}</h3>
-                                <span class="jurusan-card-code">Kode: {{ optional($jurusan)->kode ?? '-' }}</span>
+                        <span class="jurusan-card-badge-top">{{ optional($jurusan)->kode ?? 'Umum' }}</span>
+                        <div class="jurusan-card-headline">
+                            <div class="jurusan-card-headline-left">
+                                <div class="jurusan-card-header-icon">
+                                    <i class="fas fa-school"></i>
+                                </div>
+                                <div>
+                                    <h3 class="jurusan-card-title">{{ optional($jurusan)->nama ?? 'Umum' }}</h3>
+                                    <span class="jurusan-card-subtitle">Kode: {{ optional($jurusan)->kode ?? '-' }}</span>
+                                </div>
                             </div>
-                            <span class="jurusan-card-badge">
-                                <i class="fas fa-users"></i> {{ $totalSiswa }} siswa
-                            </span>
+                            <div class="jurusan-card-stats">
+                                <div class="jurusan-card-siswa">{{ $totalSiswa }} siswa</div>
+                                <div class="jurusan-card-meta">
+                                    <span><i class="fas fa-layer-group"></i> {{ $jurusanClasses->count() }} kelas</span>
+                                    <span><i class="fas fa-chalkboard-teacher"></i> {{ $totalRombel }} rombel</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="jurusan-card-body">

@@ -14,18 +14,29 @@ use App\Models\Guru;
 use App\Models\Ibu;
 use App\Models\Wali;
 use App\Models\Rombel;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\LegerImport;
-use App\Exports\LegerTemplate;
-use App\Exports\KaprogSiswaByRombelExport;
+use App\Models\MutasiSiswa;
+use App\Models\KenaikanKelas;
 use App\Exports\KaprogSiswaByJurusanExport;
 use App\Exports\KaprogSiswaByAngkatanExport;
+use App\Exports\KaprogSiswaByRombelExport;
 use App\Exports\GuruExportMultiSheet;
+use App\Exports\SiswaExport;
+use App\Exports\SiswaAktifExport;
+use App\Exports\SiswaImportTemplate;
+use App\Exports\LegerTemplate;
+use App\Exports\KelasExport;
+use App\Exports\KelasImportTemplate;
+use App\Imports\SiswaImport;
+use App\Imports\LegerImport;
+use App\Imports\KelasImport;
+
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class TUController extends Controller
 {
@@ -34,79 +45,27 @@ class TUController extends Controller
      */
     public function dashboard()
     {
-        // Statistik dasar
         $totalSiswa = DataSiswa::count();
-        $totalGuru = User::where('role', 'guru')->count();
-        $totalWaliKelas = User::where('role', 'walikelas')->count();
-        $totalKelas = Kelas::count();
-        
-        // Inisialisasi variabel jurusan untuk menghindari error
-        $jurusan = null;
-        
-        // Data aktivitas terbaru
-        $aktivitas = [
-            [
-                'nama' => 'Ahmad Rizki',
-                'kelas' => 'XII RPL 1',
-                'aktivitas' => 'Penambahan data nilai',
-                'waktu' => '2 jam yang lalu'
-            ],
-            [
-                'nama' => 'Siti Nurhaliza',
-                'kelas' => 'XI TKJ 2',
-                'aktivitas' => 'Update profil siswa',
-                'waktu' => '5 jam yang lalu'
-            ],
-            [
-                'nama' => 'Budi Santoso',
-                'kelas' => 'X MM 1',
-                'aktivitas' => 'Pengajuan pindah kelas',
-                'waktu' => '1 hari yang lalu'
-            ]
-        ];
-        
-        // Data siswa terbaru
-        $siswaBaru = DataSiswa::with(['user', 'ayah', 'ibu', 'wali'])->latest()->take(5)->get();
-        
-        // Data wali kelas (untuk ditampilkan semua di bagian bawah)
-        $waliKelas = User::where('role', 'walikelas')->get();
-        
-        // Data wali kelas dengan limit (untuk ringkasan)
-        $waliKelasLimit = User::where('role', 'walikelas')->take(5)->get();
-        
-        // Data kelas dengan limit (untuk ringkasan)
-        $kelasLimit = Kelas::with('jurusan')->take(5)->get();
-        
-        // Statistik nilai raport
-        $totalNilai = NilaiRaport::count();
-        $nilaiTerbaru = NilaiRaport::with('siswa')->latest()->take(5)->get();
+        $totalAdministrasi = DataSiswa::whereNotNull('nis')->whereNotNull('nisn')->count();
+        $totalMutasi = MutasiSiswa::count();
+        $totalAlumni = KenaikanKelas::where('status', 'lulus')->count();
+        $siswaBaru = DataSiswa::latest()->take(5)->get();
 
-        // Recent PPDB submissions (for dashboard) - eager load relations
-        $ppdbTerbaru = Ppdb::with(['jalur', 'sesi', 'jurusan'])->latest()->take(5)->get();
-        
         return view('tu.dashboard', compact(
-            'totalSiswa', 
-            'totalGuru',
-            'totalWaliKelas',
-            'totalKelas',
-            'jurusan',
-            'aktivitas',
-            'siswaBaru',
-            'waliKelas',
-            'waliKelasLimit',
-            'kelasLimit',
-            'totalNilai',
-            'nilaiTerbaru',
-            'ppdbTerbaru'
+            'totalSiswa',
+            'totalAdministrasi',
+            'totalMutasi',
+            'totalAlumni',
+            'siswaBaru'
         ));
     }
-    
+
     /**
-     * Halaman daftar siswa
+     * Daftar Siswa (sudah diurutkan A-Z)
      */
     public function siswa()
     {
-        $query = DataSiswa::with(['user', 'ayah', 'ibu', 'wali'])->latest();
+        $query = DataSiswa::with(['user', 'ayah', 'ibu', 'wali'])->orderBy('nama_lengkap', 'asc');
 
         $tingkat = request()->query('tingkat', null);
         if ($tingkat) {
@@ -115,7 +74,6 @@ class TUController extends Controller
             });
         }
 
-        // Search and rombel filters
         $search = request()->query('search', null);
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -131,10 +89,7 @@ class TUController extends Controller
         }
 
         $allRombels = Rombel::with('kelas')->orderBy('nama')->get();
-
-        // List of jurusans for export options
         $allJurusans = Jurusan::orderBy('nama')->get();
-
         $siswas = $query->paginate(10)->withQueryString();
         $currentTingkat = request()->query('tingkat', '');
 
@@ -142,251 +97,18 @@ class TUController extends Controller
     }
 
     /**
-     * Export siswa per jurusan (TU)
-     */
-    public function exportSiswaByJurusan($jurusanId)
-    {
-        $jurusan = Jurusan::findOrFail($jurusanId);
-
-        $filename = 'Data Siswa - Jurusan ' . $jurusan->nama . '.xlsx';
-
-        return Excel::download(
-            new KaprogSiswaByJurusanExport($jurusanId, $jurusan->nama),
-            $filename
-        );
-    }
-
-    /**
-     * Export siswa per angkatan (multiple sheets) for a jurusan (TU)
-     */
-    public function exportSiswaByAngkatan($jurusanId)
-    {
-        $jurusan = Jurusan::findOrFail($jurusanId);
-
-        $filename = 'Data Siswa Per Angkatan - ' . $jurusan->nama . '.xlsx';
-
-        return Excel::download(
-            new KaprogSiswaByAngkatanExport($jurusanId, $jurusan->nama),
-            $filename
-        );
-    }
-
-    /**
-     * Daftar guru untuk TU
-     */
-    /**
-     * Export siswa per rombel (TU)
-     */
-    public function exportSiswaByRombel($rombelId)
-    {
-        $rombel = Rombel::findOrFail($rombelId);
-        $filename = 'Data Siswa Rombel ' . $rombel->nama . '.xlsx';
-
-        return Excel::download(
-            new KaprogSiswaByRombelExport($rombelId, $rombel->nama),
-            $filename
-        );
-    }
-
-    /**
-     * Export guru dengan 2 sheet: TU dan Staff Lainnya (guru, walikelas, kurikulum, kaprog)
-     */
-    public function exportGuru()
-    {
-        $filename = 'Pengguna_Guru.xlsx';
-        return Excel::download(new GuruExportMultiSheet(), $filename);
-    }
-    public function guruIndex()
-    {
-        // Fetch all users (tu, guru, walikelas, kurikulum, kaprog) with optional role and search filters
-        $search = request('search');
-        $role_filter = request('role');
-        $jurusan_id = request('jurusan');
-        
-        $roles = ['tu', 'guru', 'walikelas', 'kurikulum', 'kaprog'];
-        
-        $query = User::query()
-            ->with(['guru' => function($q) {
-                $q->with(['rombels.kelas.jurusan', 'jurusan']);
-            }])
-            ->whereIn('role', $roles);
-        
-        // Role filter
-        if ($role_filter && in_array($role_filter, $roles)) {
-            $query->where('role', $role_filter);
-        }
-        
-        // Search filter
-        if ($search) {
-            $query->where(function($q) use($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('nomor_induk', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhereHas('guru', function($gq) use($search) {
-                      $gq->where('nip', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                  });
-            });
-        }
-        
-        // Jurusan filter (only for guru)
-        if ($jurusan_id) {
-            $query->where(function($q) use($jurusan_id) {
-                $q->whereHas('guru', function($gq) use($jurusan_id) {
-                    $gq->where('jurusan_id', $jurusan_id);
-                });
-            });
-        }
-        
-        $gurus = $query->orderBy('name')->paginate(10)->withQueryString();
-
-        $allJurusans = Jurusan::orderBy('nama')->get();
-        $roleOptions = ['tu' => 'TU', 'guru' => 'Guru', 'walikelas' => 'Wali Kelas', 'kurikulum' => 'Kurikulum', 'kaprog' => 'Kaprog'];
-
-        return view('tu.guru.index', compact('gurus', 'search', 'jurusan_id', 'role_filter', 'allJurusans', 'roleOptions'));
-    }
-
-    /**
-     * Form tambah guru
-     */
-    public function guruCreate()
-    {
-        $jurusans = Jurusan::orderBy('nama')->get();
-
-        $kelas = Kelas::with('jurusan')
-            ->orderBy('tingkat')
-            ->get();
-
-        $rombels = Rombel::with(['kelas.jurusan'])
-            ->orderBy('nama')
-            ->get();
-
-        $kelasArr = $kelas->map(function($k){
-            return [
-                'value' => (string) $k->id,
-                'text' => $k->tingkat . ' - ' . ($k->jurusan->nama ?? ''),
-                'jurusan' => (string) ($k->jurusan_id ?? ''),
-            ];
-        });
-
-        $rombelArr = $rombels->map(function($r){
-            return [
-                'value' => (string) $r->id,
-                'text' => $r->nama,
-                'kelas' => (string) ($r->kelas_id ?? ''),
-            ];
-        });
-
-        $roles = [
-            'walikelas' => 'Guru',
-            'kaprog'    => 'Kaprog',
-            'tu'        => 'TU',
-            'kurikulum' => 'Kurikulum',
-        ];
-
-        return view('tu.guru.create', compact(
-            'jurusans',
-            'kelas',
-            'rombels',
-            'roles',
-            'kelasArr',
-            'rombelArr'
-        ));
-    }
-
-    /**
-     * Simpan guru (user + guru)
-     */
-    public function guruStore(Request $request)
-    {
-        $request->validate([
-            'nama' => 'required|string|max:100',
-            'nik' => 'required|string|max:50|unique:users,nomor_induk',
-            'nip' => 'required|string|max:30|unique:gurus,nip',
-            'tempat_lahir' => 'nullable|string|max:100',
-            'tanggal_lahir' => 'nullable|date',
-            'jenis_kelamin' => 'required|in:L,P',
-            'alamat' => 'nullable|string',
-            'jurusan_id' => 'nullable|exists:jurusans,id',
-            'email' => 'nullable|email|unique:users,email',
-            'telepon' => 'nullable|string|max:30',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        DB::beginTransaction();
-        try {
-            // create user (use NIK as nomor_induk)
-            $user = User::create([
-                'name' => $request->nama,
-                'nomor_induk' => $request->nik,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'role' => 'guru',
-            ]);
-
-            // create guru record
-            $guru = Guru::create([
-                'nama' => $request->nama,
-                'nip' => $request->nip,
-                'email' => $request->email,
-                'telepon' => $request->telepon ?? null,
-                'tempat_lahir' => $request->tempat_lahir,
-                'tanggal_lahir' => $request->tanggal_lahir,
-                'jenis_kelamin' => $request->jenis_kelamin,
-                'alamat' => $request->alamat,
-                'jurusan_id' => $request->jurusan_id,
-                'user_id' => $user->id,
-            ]);
-
-            DB::commit();
-            return redirect()->route('tu.guru.index')->with('success', 'Guru berhasil ditambahkan.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Tampilkan detail guru
-     */
-    public function guruShow($id)
-    {
-        $guru = Guru::with(['user', 'rombels.kelas.jurusan'])->findOrFail($id);
-        return view('tu.guru.show', compact('guru'));
-    }
-    
-    /**
-     * Halaman tambah siswa
+     * Form Tambah Siswa
      */
     public function siswaCreate()
     {
         $jurusans = Jurusan::all();
         $rombels = Rombel::all();
         $kelas = Kelas::with('jurusan')->get();
-        return view('tu.siswa.create', compact('jurusans','rombels','kelas'));
-    }
-    
-    /**
-     * Simpan data siswa baru
-     */
-    public function nilaiRaportDestroy(Request $request)
-    {
-        // Minimal safe destroy: try to delete a NilaiRaport by id if provided.
-        $id = $request->input('id') ?? $request->route('id') ?? null;
-        if ($id) {
-            try {
-                NilaiRaport::find($id)?->delete();
-            } catch (\Throwable $e) {
-                // ignore errors to avoid breaking UI; log if needed
-                Log::error('Failed to delete NilaiRaport: ' . $e->getMessage());
-            }
-        }
-
-        return redirect()->back()->with('success', 'Data nilai raport berhasil dihapus');
+        return view('tu.siswa.create', compact('jurusans', 'rombels', 'kelas'));
     }
 
     /**
-     * Simpan data siswa baru (minimal implementation)
+     * Simpan Data Siswa Baru
      */
     public function siswaStore(Request $request)
     {
@@ -421,29 +143,460 @@ class TUController extends Controller
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-    
+
     /**
-     * Halaman detail siswa
+     * Detail Siswa
      */
     public function siswaDetail($id)
     {
-        $siswa = DataSiswa::with(['user', 'nilaiRaports', 'ayah', 'ibu', 'wali'])->findOrFail($id);
+        $siswa = DataSiswa::with(['user', 'nilaiRaports', 'ayah', 'ibu', 'wali', 'rombel.kelas'])->findOrFail($id);
         return view('tu.siswa.data-diri.show', compact('siswa'));
     }
 
     /**
-     * Export data diri siswa (TU) to PDF
+     * Form Edit Siswa
+     */
+    public function siswaEdit($id)
+    {
+        $siswa = DataSiswa::with(['rombel.kelas', 'ayah', 'ibu', 'wali'])->findOrFail($id);
+        $jurusans = Jurusan::all();
+        $rombels = Rombel::all();
+        $kelas = Kelas::with('jurusan')->get();
+        return view('tu.siswa.edit', compact('siswa', 'jurusans', 'rombels', 'kelas'));
+    }
+
+    /**
+     * Update Data Siswa
+     */
+    public function siswaUpdate(Request $request, $id)
+    {
+        $siswa = DataSiswa::findOrFail($id);
+
+        $request->validate([
+            'nama_lengkap' => 'required|string|max:255',
+            'nis' => 'required|string|max:20|unique:data_siswa,nis,' . $id,
+            'nisn' => 'nullable|string|max:20|unique:data_siswa,nisn,' . $id,
+            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
+            'tempat_lahir' => 'nullable|string|max:255',
+            'tanggal_lahir' => 'nullable|date',
+            'agama' => 'nullable|string|max:50',
+            'no_hp' => 'nullable|string|max:30',
+            'rombel_id' => 'nullable|exists:rombels,id',
+            'password' => 'nullable|string|min:6|confirmed',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $siswa->update([
+                'nama_lengkap' => $request->nama_lengkap,
+                'nis' => $request->nis,
+                'nisn' => $request->nisn,
+                'jenis_kelamin' => $request->jenis_kelamin,
+                'tempat_lahir' => $request->tempat_lahir,
+                'tanggal_lahir' => $request->tanggal_lahir,
+                'agama' => $request->agama,
+                'no_hp' => $request->no_hp,
+                'rombel_id' => $request->rombel_id,
+            ]);
+
+            if ($siswa->user) {
+                $siswa->user->name = $request->nama_lengkap;
+                $siswa->user->nomor_induk = $request->nis;
+                if ($request->filled('password')) {
+                    $siswa->user->password = Hash::make($request->password);
+                }
+                $siswa->user->save();
+            }
+
+            DB::commit();
+            return redirect()->route('tu.siswa.detail', $siswa->id)->with('success', 'Data siswa berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Hapus Data Siswa
+     */
+    public function siswaDestroy($id)
+    {
+        $siswa = DataSiswa::findOrFail($id);
+
+        DB::beginTransaction();
+        try {
+            if ($siswa->user) {
+                $siswa->user->delete();
+            }
+            $siswa->delete();
+            DB::commit();
+            return redirect()->route('tu.siswa.index')->with('success', 'Data siswa berhasil dihapus.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Export PDF Data Siswa (per individu)
      */
     public function siswaExportPdf($id)
     {
-        $siswa = DataSiswa::with(['ayah', 'ibu', 'wali', 'rombel'])->findOrFail($id);
+        $siswa = DataSiswa::with(['ayah', 'ibu', 'wali', 'rombel.kelas'])->findOrFail($id);
 
         $pdf = Pdf::loadView('tu.siswa.data-diri.pdf', compact('siswa'))
             ->setPaper('A4', 'portrait');
 
-        $filename = 'Data Diri - ' . ($siswa->nama_lengkap ?? $siswa->nis ?? $siswa->id) . '.pdf';
+        $filename = 'Data_Diri_' . ($siswa->nama_lengkap ?? $siswa->nis ?? $siswa->id) . '.pdf';
 
         return $pdf->stream($filename);
+    }
+
+    /**
+     * Export Excel - Semua Data Siswa
+     */
+    public function exportSiswaExcel(Request $request)
+    {
+        $filters = $request->except('page');
+        $filename = $this->buildSiswaExportFilename($filters);
+
+        return Excel::download(new SiswaExport($filters), $filename);
+    }
+
+    public function exportSiswaByKelas(Request $request)
+    {
+        $rombelId = $request->query('rombel');
+        $rombel = Rombel::findOrFail($rombelId);
+        $filename = 'siswa_kelas_' . $this->sanitizeFilename($rombel->nama) . '.xlsx';
+
+        return Excel::download(new KaprogSiswaByRombelExport($rombelId, $rombel->nama), $filename);
+    }
+
+    public function exportSiswaByJurusan(Request $request)
+    {
+        $jurusanId = $request->query('jurusan');
+        $jurusan = Jurusan::findOrFail($jurusanId);
+        $filename = 'siswa_jurusan_' . $this->sanitizeFilename($jurusan->nama) . '.xlsx';
+
+        return Excel::download(new KaprogSiswaByJurusanExport($jurusanId, $jurusan->nama), $filename);
+    }
+
+    public function exportSiswaAktif()
+    {
+        $filename = 'siswa_aktif.xlsx';
+        return Excel::download(new SiswaAktifExport(), $filename);
+    }
+
+    protected function buildSiswaExportFilename(array $filters): string
+    {
+        $parts = [];
+
+        if (!empty($filters['search'])) {
+            $parts[] = 'pencarian_' . $filters['search'];
+        }
+
+        if (!empty($filters['rombel'])) {
+            $rombel = Rombel::find($filters['rombel']);
+            $parts[] = 'kelas_' . ($rombel?->nama ?? $filters['rombel']);
+        }
+
+        if (!empty($filters['tingkat'])) {
+            $parts[] = 'kelas_' . $filters['tingkat'];
+        }
+
+        if (!empty($filters['jurusan'])) {
+            $parts[] = 'jurusan_' . $filters['jurusan'];
+        }
+
+        if (!empty($filters['status'])) {
+            $parts[] = $filters['status'];
+        }
+
+        if (empty($parts)) {
+            return 'siswa_semua.xlsx';
+        }
+
+        $filename = 'siswa_' . implode('_', $parts);
+        return $this->sanitizeFilename($filename) . '.xlsx';
+    }
+
+    protected function sanitizeFilename(string $filename): string
+    {
+        $filename = preg_replace('/[^A-Za-z0-9 _-]/', '', $filename);
+        $filename = preg_replace('/[\s]+/', '_', trim($filename));
+        $filename = preg_replace('/_+/', '_', $filename);
+
+        return strtolower($filename);
+    }
+
+    /**
+     * Export Excel - Siswa per Angkatan
+     */
+    public function exportSiswaByAngkatan($jurusanId)
+    {
+        $jurusan = Jurusan::findOrFail($jurusanId);
+        $filename = 'Data_Siswa_Per_Angkatan_' . $jurusan->nama . '.xlsx';
+        return Excel::download(new KaprogSiswaByAngkatanExport($jurusanId, $jurusan->nama), $filename);
+    }
+
+    /**
+     * Export Excel - Siswa per Rombel
+     */
+    public function exportSiswaByRombel($rombelId)
+    {
+        $rombel = Rombel::findOrFail($rombelId);
+        $filename = 'Data_Siswa_Rombel_' . $rombel->nama . '.xlsx';
+        return Excel::download(new KaprogSiswaByRombelExport($rombelId, $rombel->nama), $filename);
+    }
+
+    /**
+     * Export Guru ke Excel
+     */
+    public function exportGuru()
+    {
+        $filename = 'Pengguna_Guru.xlsx';
+        return Excel::download(new GuruExportMultiSheet(), $filename);
+    }
+
+    /**
+     * Daftar Guru
+     */
+    public function guruIndex()
+    {
+        $search = request('search');
+        $role_filter = request('role');
+        $jurusan_id = request('jurusan');
+        
+        $roles = ['tu', 'guru', 'walikelas', 'kurikulum', 'kaprog'];
+        
+        $query = User::query()
+            ->with(['guru' => function($q) {
+                $q->with(['rombels.kelas.jurusan', 'jurusan']);
+            }])
+            ->whereIn('role', $roles);
+        
+        if ($role_filter && in_array($role_filter, $roles)) {
+            $query->where('role', $role_filter);
+        }
+        
+        if ($search) {
+            $query->where(function($q) use($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('nomor_induk', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhereHas('guru', function($gq) use($search) {
+                      $gq->where('nip', 'like', "%{$search}%");
+                  });
+            });
+        }
+        
+        if ($jurusan_id) {
+            $query->whereHas('guru', function($gq) use($jurusan_id) {
+                $gq->where('jurusan_id', $jurusan_id);
+            });
+        }
+        
+        $gurus = $query->orderBy('name')->paginate(10)->withQueryString();
+        $allJurusans = Jurusan::orderBy('nama')->get();
+        $roleOptions = ['tu' => 'TU', 'guru' => 'Guru', 'walikelas' => 'Wali Kelas', 'kurikulum' => 'Kurikulum', 'kaprog' => 'Kaprog'];
+
+        return view('tu.guru.index', compact('gurus', 'search', 'jurusan_id', 'role_filter', 'allJurusans', 'roleOptions'));
+    }
+
+    /**
+     * Form Tambah Guru
+     */
+    public function guruCreate()
+    {
+        $jurusans = Jurusan::orderBy('nama')->get();
+        $kelas = Kelas::with('jurusan')->orderBy('tingkat')->get();
+        $rombels = Rombel::with(['kelas.jurusan'])->orderBy('nama')->get();
+
+        $kelasArr = $kelas->map(function($k){
+            return [
+                'value' => (string) $k->id,
+                'text' => $k->tingkat . ' - ' . ($k->jurusan->nama ?? ''),
+                'jurusan' => (string) ($k->jurusan_id ?? ''),
+            ];
+        });
+
+        $rombelArr = $rombels->map(function($r){
+            return [
+                'value' => (string) $r->id,
+                'text' => $r->nama,
+                'kelas' => (string) ($r->kelas_id ?? ''),
+            ];
+        });
+
+        $roles = [
+            'walikelas' => 'Guru',
+            'kaprog'    => 'Kaprog',
+            'tu'        => 'TU',
+            'kurikulum' => 'Kurikulum',
+        ];
+
+        return view('tu.guru.create', compact('jurusans', 'kelas', 'rombels', 'roles', 'kelasArr', 'rombelArr'));
+    }
+
+    /**
+     * Simpan Guru
+     */
+    public function guruStore(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required|string|max:100',
+            'nik' => 'required|string|max:50|unique:users,nomor_induk',
+            'nip' => 'required|string|max:30|unique:gurus,nip',
+            'tempat_lahir' => 'nullable|string|max:100',
+            'tanggal_lahir' => 'nullable|date',
+            'jenis_kelamin' => 'required|in:L,P',
+            'alamat' => 'nullable|string',
+            'jurusan_id' => 'nullable|exists:jurusans,id',
+            'email' => 'nullable|email|unique:users,email',
+            'telepon' => 'nullable|string|max:30',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $user = User::create([
+                'name' => $request->nama,
+                'nomor_induk' => $request->nik,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'guru',
+            ]);
+
+            $guru = Guru::create([
+                'nama' => $request->nama,
+                'nip' => $request->nip,
+                'email' => $request->email,
+                'telepon' => $request->telepon ?? null,
+                'tempat_lahir' => $request->tempat_lahir,
+                'tanggal_lahir' => $request->tanggal_lahir,
+                'jenis_kelamin' => $request->jenis_kelamin,
+                'alamat' => $request->alamat,
+                'jurusan_id' => $request->jurusan_id,
+                'user_id' => $user->id,
+            ]);
+
+            DB::commit();
+            return redirect()->route('tu.guru.index')->with('success', 'Guru berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Detail Guru
+     */
+    public function guruShow($id)
+    {
+        $guru = Guru::with(['user', 'rombels.kelas.jurusan'])->findOrFail($id);
+        return view('tu.guru.show', compact('guru'));
+    }
+
+    /**
+     * Form Edit Guru
+     */
+    public function guruEdit($id)
+    {
+        $guru = Guru::with('user')->findOrFail($id);
+        $jurusans = Jurusan::orderBy('nama')->get();
+        $kelas = Kelas::with('jurusan')->orderBy('tingkat')->get();
+        $rombels = Rombel::with(['kelas.jurusan'])->orderBy('nama')->get();
+
+        $kelasArr = $kelas->map(function ($k) {
+            return [
+                'value'   => (string) $k->id,
+                'text'    => $k->tingkat . ' - ' . ($k->jurusan->nama ?? ''),
+                'jurusan' => (string) ($k->jurusan_id ?? ''),
+            ];
+        });
+
+        $rombelArr = $rombels->map(function ($r) {
+            return [
+                'value' => (string) $r->id,
+                'text'  => $r->nama,
+                'kelas' => (string) ($r->kelas_id ?? ''),
+            ];
+        });
+
+        $roles = [
+            'walikelas' => 'Guru',
+            'kaprog'    => 'Kaprog',
+            'tu'        => 'TU',
+            'kurikulum' => 'Kurikulum',
+        ];
+
+        return view('tu.guru.edit', compact('guru', 'jurusans', 'kelas', 'rombels', 'roles', 'kelasArr', 'rombelArr'));
+    }
+
+    /**
+     * Update Guru
+     */
+    public function guruUpdate(Request $request, $id)
+    {
+        $guru = Guru::with('user')->findOrFail($id);
+
+        $data = $request->validate([
+            'nama' => 'required|string|max:255',
+            'nomor_induk' => 'required|string|max:50|unique:users,nomor_induk,' . $guru->user_id,
+            'email' => 'nullable|email',
+            'password' => 'nullable|string|min:6',
+            'role' => 'required|string',
+            'jurusan_id' => 'nullable|exists:jurusans,id',
+            'kelas_id' => 'nullable|exists:kelas,id',
+            'rombel_id' => 'nullable|exists:rombels,id',
+        ]);
+
+        $user = $guru->user;
+        $user->name = $data['nama'];
+        $user->nomor_induk = $data['nomor_induk'];
+        $user->email = $data['email'] ?? null;
+        $user->role = $data['role'];
+
+        if (!empty($data['password'])) {
+            $user->password = bcrypt($data['password']);
+        }
+        $user->save();
+
+        $guru->update([
+            'nama' => $data['nama'],
+            'nip' => $data['nomor_induk'],
+            'email' => $data['email'] ?? ($data['nomor_induk'] . '@no-reply.local'),
+            'jurusan_id' => $data['jurusan_id'] ?? null,
+            'kelas_id' => $data['kelas_id'] ?? null,
+        ]);
+
+        Rombel::where('guru_id', $guru->id)->update(['guru_id' => null]);
+
+        if (!empty($data['rombel_id'])) {
+            $rombel = Rombel::find($data['rombel_id']);
+            $rombel->guru_id = $guru->id;
+            $rombel->save();
+            $guru->rombel_id = $rombel->id;
+        } else {
+            $guru->rombel_id = null;
+        }
+        $guru->save();
+
+        return redirect()->route('tu.guru.index')->with('success', 'Guru berhasil diperbarui');
+    }
+
+    /**
+     * Hapus Guru
+     */
+    public function guruDestroy($id)
+    {
+        $guru = Guru::findOrFail($id);
+        if ($guru->user) {
+            $guru->user->delete();
+        }
+        $guru->delete();
+
+        return redirect()->route('tu.guru.index')->with('success', 'Guru berhasil dihapus');
     }
 
     /**
@@ -452,8 +605,6 @@ class TUController extends Controller
     public function siswaRaport($id)
     {
         $siswa = DataSiswa::findOrFail($id);
-
-        // list available raport semester/tahun for this siswa
         $raports = NilaiRaport::select('semester', 'tahun_ajaran')
             ->where('siswa_id', $id)
             ->groupBy('semester', 'tahun_ajaran')
@@ -465,26 +616,19 @@ class TUController extends Controller
     }
 
     /**
-     * Cetak raport (TU) — use TU-specific raport PDF view
+     * Cetak raport (TU)
      */
     public function cetakRaport($siswa_id, $semester, $tahun)
     {
-        // normalize tahun parameter like RaporController
         $tahun = str_replace('-', '/', $tahun);
-
         $siswa = DataSiswa::findOrFail($siswa_id);
 
         $nilaiRaports = NilaiRaport::with('mapel', 'rombel')
             ->where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
-            ->orderBy(
-                MataPelajaran::select('urutan')
-                    ->whereColumn('mata_pelajarans.id', 'nilai_raports.mata_pelajaran_id')
-            )
             ->get();
 
-        // Dapatkan rombel dari data raport (sesuai dengan raport yang sedang dicetak)
         $rombelRaport = $nilaiRaports->first()?->rombel;
 
         $ekstra = \App\Models\EkstrakurikulerSiswa::where('siswa_id', $siswa_id)
@@ -530,7 +674,6 @@ class TUController extends Controller
         }
 
         $siswa = DataSiswa::findOrFail($siswa_id);
-
         $nilaiRaports = NilaiRaport::with(['mapel','kelas','rombel'])
             ->where('siswa_id', $siswa_id)
             ->where('semester', $semester)
@@ -542,8 +685,6 @@ class TUController extends Controller
             return redirect()->back()->with('error', 'Data raport tidak ditemukan');
         }
 
-        // Derive historical kelas/rombel from NilaiRaport so the TU view
-        // can display the class context as it was when the raport was recorded.
         $firstNilai = $nilaiRaports->first();
         $kelasRaport = $firstNilai->kelas ?? ($siswa->rombel->kelas ?? null);
         $rombelRaport = $firstNilai->rombel ?? ($siswa->rombel ?? null);
@@ -552,24 +693,20 @@ class TUController extends Controller
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->get();
-
         $kehadiran = \App\Models\Kehadiran::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->first();
-
         $info = \App\Models\RaporInfo::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->first();
-
         $kenaikan = \App\Models\KenaikanKelas::with('rombelTujuan')
             ->where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->first();
 
-        // keep original route param formatting for route links
         return view('tu.siswa.raport.show', compact('siswa', 'semester', 'tahunParam', 'tahun', 'nilaiRaports', 'ekstra', 'kehadiran', 'info', 'kenaikan', 'kelasRaport', 'rombelRaport'));
     }
 
@@ -588,8 +725,6 @@ class TUController extends Controller
         }
 
         $siswa = DataSiswa::findOrFail($siswa_id);
-
-        // Ambil nilai raport (koleksi) dan mapping berdasarkan mapel ID
         $nilaiRaports = NilaiRaport::with(['kelas', 'mapel'])
             ->where('siswa_id', $siswa->id)
             ->where('semester', $semester)
@@ -597,13 +732,10 @@ class TUController extends Controller
             ->get();
 
         $nilai = $nilaiRaports->keyBy('mata_pelajaran_id');
-
-        // default: all mapel by kelompok, but prefer filtering by siswa rombel->kelas->tingkat
         $kelompokA = MataPelajaran::where('kelompok', 'A')->orderBy('urutan');
         $kelompokB = MataPelajaran::where('kelompok', 'B')->orderBy('urutan');
 
         if ($siswa->rombel && $siswa->rombel->kelas) {
-            // try derive kelas from existing raport rows; fallback to siswa->rombel->kelas
             $kelasRaport = $nilaiRaports->first()?->kelas ?? $siswa->rombel->kelas;
             $rombelRaport = $nilaiRaports->first()?->rombel ?? ($siswa->rombel ?? null);
             $tingkat = $kelasRaport ? (string) $kelasRaport->tingkat : null;
@@ -613,8 +745,7 @@ class TUController extends Controller
                 $map = ['I'=>1,'II'=>2,'III'=>3,'IV'=>4,'V'=>5,'VI'=>6,'VII'=>7,'VIII'=>8,'IX'=>9,'X'=>10,'XI'=>11,'XII'=>12];
                 $tUp = strtoupper(trim($t));
                 if (is_numeric($tUp)) return (int)$tUp;
-                if (isset($map[$tUp])) return $map[$tUp];
-                return null;
+                return $map[$tUp] ?? null;
             };
             $fromInt = function($n) {
                 $map = [1=>'I',2=>'II',3=>'III',4=>'IV',5=>'V',6=>'VI',7=>'VII',8=>'VIII',9=>'IX',10=>'X',11=>'XI',12=>'XII'];
@@ -652,9 +783,7 @@ class TUController extends Controller
                               });
                         });
                     }
-                } catch (\Exception $e) {
-                    // skip filtering if Tingkat model/schema unavailable
-                }
+                } catch (\Exception $e) {}
             }
         }
 
@@ -665,27 +794,26 @@ class TUController extends Controller
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->get();
-
         $kehadiran = \App\Models\Kehadiran::where('siswa_id', $siswa->id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->first();
-
         $info = \App\Models\RaporInfo::where('siswa_id', $siswa->id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->first();
-
         $kenaikan = \App\Models\KenaikanKelas::where('siswa_id', $siswa->id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->first();
-
         $rombels = Rombel::orderBy('nama')->get();
 
         return view('tu.siswa.raport.edit', compact('siswa','semester','tahunParam','tahun','nilai','kelompokA','kelompokB','ekstra','kehadiran','info','kenaikan','rombels','kelasRaport','rombelRaport'));
     }
 
+    /**
+     * Update raport
+     */
     public function nilaiRaportUpdate(Request $request)
     {
         $siswa_id = $request->siswa_id;
@@ -710,7 +838,6 @@ class TUController extends Controller
                 ];
 
                 $existing = NilaiRaport::where($where)->first();
-
                 $hasNilai = isset($value['nilai_akhir']) && $value['nilai_akhir'] !== '';
                 $hasDeskripsi = isset($value['deskripsi']) && $value['deskripsi'] !== '';
 
@@ -746,28 +873,14 @@ class TUController extends Controller
         if ($request->ekstra) {
             foreach ($request->ekstra as $data) {
                 if (empty($data['nama_ekstra'])) continue;
-
                 \App\Models\EkstrakurikulerSiswa::updateOrCreate(
-                    [
-                        'siswa_id' => $siswa->id,
-                        'nama_ekstra' => $data['nama_ekstra'],
-                        'semester' => $semester,
-                        'tahun_ajaran' => $tahun,
-                    ],
-                    [
-                        'predikat' => $data['predikat'] ?? null,
-                        'keterangan' => $data['keterangan'] ?? null,
-                    ]
+                    ['siswa_id' => $siswa->id, 'nama_ekstra' => $data['nama_ekstra'], 'semester' => $semester, 'tahun_ajaran' => $tahun],
+                    ['predikat' => $data['predikat'] ?? null, 'keterangan' => $data['keterangan'] ?? null]
                 );
             }
         }
 
-        $whereKehadiran = [
-            'siswa_id' => $siswa->id,
-            'semester' => $semester,
-            'tahun_ajaran' => $tahun,
-        ];
-
+        $whereKehadiran = ['siswa_id' => $siswa->id, 'semester' => $semester, 'tahun_ajaran' => $tahun];
         $existingKehadiran = \App\Models\Kehadiran::where($whereKehadiran)->first();
         $hadir = $request->hadir ?? [];
 
@@ -776,17 +889,10 @@ class TUController extends Controller
         $alpa  = isset($hadir['alpa']) && $hadir['alpa'] !== '' ? $hadir['alpa'] : ($existingKehadiran->tanpa_keterangan ?? 0);
 
         \App\Models\Kehadiran::updateOrCreate($whereKehadiran, [
-            'sakit' => $sakit,
-            'izin'  => $izin,
-            'tanpa_keterangan' => $alpa,
+            'sakit' => $sakit, 'izin' => $izin, 'tanpa_keterangan' => $alpa,
         ]);
 
-        $whereInfo = [
-            'siswa_id' => $siswa->id,
-            'semester' => $semester,
-            'tahun_ajaran' => $tahun,
-        ];
-
+        $whereInfo = ['siswa_id' => $siswa->id, 'semester' => $semester, 'tahun_ajaran' => $tahun];
         $existingInfo = \App\Models\RaporInfo::where($whereInfo)->first();
         $infoIn = $request->info ?? [];
 
@@ -797,19 +903,10 @@ class TUController extends Controller
         $tanggal = isset($infoIn['tanggal_rapor']) && $infoIn['tanggal_rapor'] !== '' ? $infoIn['tanggal_rapor'] : ($existingInfo->tanggal_rapor ?? date('Y-m-d'));
 
         \App\Models\RaporInfo::updateOrCreate($whereInfo, [
-            'wali_kelas' => $wali_kelas,
-            'nip_wali' => $nip_wali,
-            'kepala_sekolah' => $kepala,
-            'nip_kepsek' => $nip_kepsek,
-            'tanggal_rapor' => $tanggal,
+            'wali_kelas' => $wali_kelas, 'nip_wali' => $nip_wali, 'kepala_sekolah' => $kepala, 'nip_kepsek' => $nip_kepsek, 'tanggal_rapor' => $tanggal,
         ]);
 
-        $whereKenaikan = [
-            'siswa_id' => $siswa->id,
-            'semester' => $semester,
-            'tahun_ajaran' => $tahun,
-        ];
-
+        $whereKenaikan = ['siswa_id' => $siswa->id, 'semester' => $semester, 'tahun_ajaran' => $tahun];
         $existingKenaikan = \App\Models\KenaikanKelas::where($whereKenaikan)->first();
         $kenaikanIn = $request->kenaikan ?? [];
 
@@ -818,374 +915,29 @@ class TUController extends Controller
         $catatan = isset($kenaikanIn['catatan']) && $kenaikanIn['catatan'] !== '' ? $kenaikanIn['catatan'] : ($existingKenaikan->catatan ?? '');
 
         \App\Models\KenaikanKelas::updateOrCreate($whereKenaikan, [
-            'status' => $status,
-            'rombel_tujuan_id' => $rombel_tujuan,
-            'catatan' => $catatan,
+            'status' => $status, 'rombel_tujuan_id' => $rombel_tujuan, 'catatan' => $catatan,
         ]);
 
         return redirect()->route('tu.nilai_raport.show', [
-            'siswa_id' => $siswa->id,
-            'semester' => $semester,
-            'tahun' => $tahunParam
+            'siswa_id' => $siswa->id, 'semester' => $semester, 'tahun' => $tahunParam
         ])->with('success', 'Rapor berhasil diperbarui!');
-    }
-
-    
-
-    public function guruEdit($id)
-    {
-        $guru = Guru::with('user')->findOrFail($id);
-
-        $jurusans = Jurusan::orderBy('nama')->get();
-
-        $kelas = Kelas::with('jurusan')
-            ->orderBy('tingkat')
-            ->get();
-
-        $rombels = Rombel::with(['kelas.jurusan'])
-            ->orderBy('nama')
-            ->get();
-
-        $kelasArr = $kelas->map(function ($k) {
-            return [
-                'value'   => (string) $k->id,
-                'text'    => $k->tingkat . ' - ' . ($k->jurusan->nama ?? ''),
-                'jurusan' => (string) ($k->jurusan_id ?? ''),
-            ];
-        });
-
-        $rombelArr = $rombels->map(function ($r) {
-            return [
-                'value' => (string) $r->id,
-                'text'  => $r->nama,
-                'kelas' => (string) ($r->kelas_id ?? ''),
-            ];
-        });
-
-        $roles = [
-            'walikelas' => 'Guru',
-            'kaprog'    => 'Kaprog',
-            'tu'        => 'TU',
-            'kurikulum' => 'Kurikulum',
-        ];
-
-        return view(
-            'tu.guru.edit',
-            compact(
-                'guru',
-                'jurusans',
-                'kelas',
-                'rombels',
-                'roles',
-                'kelasArr',
-                'rombelArr'
-            )
-        );
-    }
-
-    public function guruUpdate(Request $request, $id)
-    {
-        $guru = Guru::with('user')->findOrFail($id);
-
-        $data = $request->validate([
-            'nama'        => 'required|string|max:255',
-            'nomor_induk' => 'required|string|max:50|unique:users,nomor_induk,' . $guru->user_id,
-            'email'       => 'nullable|email',
-            'password'    => 'nullable|string|min:6',
-            'role'        => 'required|string',
-            'jurusan_id'  => 'nullable|exists:jurusans,id',
-            'kelas_id'    => 'nullable|exists:kelas,id',
-            'rombel_id'   => 'nullable|exists:rombels,id',
-        ]);
-
-        $user = $guru->user;
-        $user->name        = $data['nama'];
-        $user->nomor_induk = $data['nomor_induk'];
-        $user->email       = $data['email'] ?? null;
-        $user->role        = $data['role'];
-
-        if (!empty($data['password'])) {
-            $user->password = bcrypt($data['password']);
-        }
-        $user->save();
-
-        $guru->update([
-            'nama'       => $data['nama'],
-            'nip'        => $data['nomor_induk'],
-            'email'      => $data['email'] ?? ($data['nomor_induk'] . '@no-reply.local'),
-            'jurusan_id' => $data['jurusan_id'] ?? null,
-            'kelas_id'   => $data['kelas_id'] ?? null,
-        ]);
-
-        Rombel::where('guru_id', $guru->id)
-            ->update(['guru_id' => null]);
-
-        if (!empty($data['rombel_id'])) {
-            $rombel = Rombel::find($data['rombel_id']);
-            $rombel->guru_id = $guru->id;
-            $rombel->save();
-
-            $guru->rombel_id = $rombel->id;
-        } else {
-            $guru->rombel_id = null;
-        }
-
-        $guru->save();
-
-        return redirect()
-            ->route('tu.guru.index')
-            ->with('success', 'Guru berhasil diperbarui');
-    }
-
-    public function guruDestroy($id)
-    {
-        $guru = Guru::findOrFail($id);
-        if ($guru->user) {
-            $guru->user->delete();
-        }
-        $guru->delete();
-
-        return redirect()
-            ->route('tu.guru.index')
-            ->with('success', 'Guru berhasil dihapus');
-    }
-    public function siswaEdit($id)
-    {
-        $siswa = DataSiswa::with(['rombel.kelas', 'ayah', 'ibu', 'wali'])->findOrFail($id);
-        $jurusans = Jurusan::all();
-        $rombels = Rombel::all();
-        $kelas = Kelas::with('jurusan')->get();
-        // Return the TU siswa edit view (use the tu.siswa edit form)
-        return view('tu.siswa.edit', compact('siswa','jurusans','rombels','kelas'));
-    }
-    
-    /**
-     * Update data siswa
-     */
-    public function siswaUpdate(Request $request, $id)
-    {
-        $siswa = DataSiswa::findOrFail($id);
-        Log::info('TU: siswaUpdate called', [
-            'id' => $id,
-            'user_id' => optional($request->user())->id ?? null,
-            'fields' => $request->only(['nama_lengkap','nis','nisn','jenis_kelamin','sekolah_asal','kelas_id','rombel_id'])
-        ]);
-
-        $request->validate([
-            'nama_lengkap'     => 'required|string|max:255',
-            'nis'              => 'required|string|max:20|unique:data_siswa,nis,' . $id,
-            'nisn'             => 'nullable|string|max:20|unique:data_siswa,nisn,' . $id,
-            'jenis_kelamin'    => 'required|in:Laki-laki,Perempuan',
-            'sekolah_asal'     => 'nullable|string|max:255',
-            'jurusan_id'       => 'nullable|exists:jurusans,id',
-            'kelas_id'         => 'nullable|exists:kelas,id',
-            'rombel_id'        => 'nullable|exists:rombels,id',
-            'tempat_lahir'     => 'nullable|string|max:255',
-            'tanggal_lahir'    => 'nullable|date',
-            'agama'            => 'nullable|string|max:50',
-            'kewarganegaraan'  => 'nullable|string|max:100',
-            'dusun'            => 'nullable|string|max:255',
-            'rt'               => 'nullable|string|max:10',
-            'rw'               => 'nullable|string|max:10',
-            'kelurahan'        => 'nullable|string|max:255',
-            'kecamatan'        => 'nullable|string|max:255',
-            'kode_pos'         => 'nullable|string|max:10',
-            'no_hp'            => 'nullable|string|max:30',
-            'tanggal_diterima' => 'nullable|date',
-            'kelas'            => 'nullable|string|max:50',
-            'password'         => 'nullable|string|min:6|confirmed',
-
-            // Orang tua / wali
-            'ayah_nama'        => 'nullable|string|max:255',
-            'ayah_pekerjaan'   => 'nullable|string|max:255',
-            'ayah_telepon'     => 'nullable|string|max:50',
-            'ayah_alamat'      => 'nullable|string|max:1000',
-
-            'ibu_nama'         => 'nullable|string|max:255',
-            'ibu_pekerjaan'    => 'nullable|string|max:255',
-            'ibu_telepon'      => 'nullable|string|max:50',
-            'ibu_alamat'       => 'nullable|string|max:1000',
-
-            'wali_nama'        => 'nullable|string|max:255',
-            'wali_pekerjaan'   => 'nullable|string|max:255',
-            'wali_telepon'     => 'nullable|string|max:50',
-            'wali_alamat'      => 'nullable|string|max:1000',
-        ]);
-
-        DB::beginTransaction();
-        try {
-            // basic siswa fields (account-like)
-            $siswa->nama_lengkap = $request->nama_lengkap;
-            $siswa->nis = $request->nis;
-            $siswa->nisn = $request->nisn;
-            $siswa->jenis_kelamin = $request->jenis_kelamin;
-            $siswa->sekolah_asal = $request->sekolah_asal;
-
-            // additional personal fields
-            $siswa->tempat_lahir = $request->input('tempat_lahir');
-            if ($request->filled('tanggal_lahir')) {
-                $siswa->tanggal_lahir = $request->input('tanggal_lahir');
-            }
-            $siswa->agama = $request->input('agama');
-            $siswa->kewarganegaraan = $request->input('kewarganegaraan');
-            $siswa->dusun = $request->input('dusun');
-            $siswa->rt = $request->input('rt');
-            $siswa->rw = $request->input('rw');
-            $siswa->kelurahan = $request->input('kelurahan');
-            $siswa->kecamatan = $request->input('kecamatan');
-            $siswa->kode_pos = $request->input('kode_pos');
-            $siswa->no_hp = $request->input('no_hp');
-            if ($request->filled('tanggal_diterima')) {
-                $siswa->tanggal_diterima = $request->input('tanggal_diterima');
-            }
-
-            // only set rombel_id (the DB doesn't have a 'kelas' column)
-            if ($request->filled('rombel_id')) {
-                $siswa->rombel_id = $request->rombel_id;
-            }
-
-            // handle Ayah
-            if ($request->filled('ayah_nama') || $request->filled('ayah_pekerjaan') || $request->filled('ayah_telepon') || $request->filled('ayah_alamat')) {
-                if ($siswa->ayah) {
-                    $ayah = $siswa->ayah;
-                    $ayah->nama = $request->input('ayah_nama');
-                    $ayah->pekerjaan = $request->input('ayah_pekerjaan');
-                    $ayah->telepon = $request->input('ayah_telepon');
-                    $ayah->alamat = $request->input('ayah_alamat');
-                    $ayah->save();
-                } else {
-                    $ayah = Ayah::create([
-                        'nama' => $request->input('ayah_nama'),
-                        'pekerjaan' => $request->input('ayah_pekerjaan'),
-                        'telepon' => $request->input('ayah_telepon'),
-                        'alamat' => $request->input('ayah_alamat'),
-                    ]);
-                    $siswa->ayah_id = $ayah->id;
-                }
-            }
-
-            // handle Ibu
-            if ($request->filled('ibu_nama') || $request->filled('ibu_pekerjaan') || $request->filled('ibu_telepon') || $request->filled('ibu_alamat')) {
-                if ($siswa->ibu) {
-                    $ibu = $siswa->ibu;
-                    $ibu->nama = $request->input('ibu_nama');
-                    $ibu->pekerjaan = $request->input('ibu_pekerjaan');
-                    $ibu->telepon = $request->input('ibu_telepon');
-                    $ibu->alamat = $request->input('ibu_alamat');
-                    $ibu->save();
-                } else {
-                    $ibu = Ibu::create([
-                        'nama' => $request->input('ibu_nama'),
-                        'pekerjaan' => $request->input('ibu_pekerjaan'),
-                        'telepon' => $request->input('ibu_telepon'),
-                        'alamat' => $request->input('ibu_alamat'),
-                    ]);
-                    $siswa->ibu_id = $ibu->id;
-                }
-            }
-
-            // handle Wali
-            if ($request->filled('wali_nama') || $request->filled('wali_pekerjaan') || $request->filled('wali_telepon') || $request->filled('wali_alamat')) {
-                if ($siswa->wali) {
-                    $wali = $siswa->wali;
-                    $wali->nama = $request->input('wali_nama');
-                    $wali->pekerjaan = $request->input('wali_pekerjaan');
-                    $wali->telepon = $request->input('wali_telepon');
-                    $wali->alamat = $request->input('wali_alamat');
-                    $wali->save();
-                } else {
-                    $wali = Wali::create([
-                        'nama' => $request->input('wali_nama'),
-                        'pekerjaan' => $request->input('wali_pekerjaan'),
-                        'telepon' => $request->input('wali_telepon'),
-                        'alamat' => $request->input('wali_alamat'),
-                    ]);
-                    $siswa->wali_id = $wali->id;
-                }
-            }
-
-            // update related user (nomor_induk + name + optional password)
-            if ($siswa->user) {
-                $siswa->user->name = $request->nama_lengkap;
-                $siswa->user->nomor_induk = $request->nis;
-                if ($request->filled('password')) {
-                    $siswa->user->password = Hash::make($request->password);
-                }
-                $siswa->user->save();
-            }
-
-            Log::info('TU: siswaUpdate about to save', ['siswa_id' => $siswa->id ?? null]);
-            $saved = $siswa->save();
-            Log::info('TU: siswaUpdate save result', ['siswa_id' => $siswa->id, 'saved' => (bool)$saved]);
-            DB::commit();
-
-            return redirect()->route('tu.siswa.detail', $siswa->id)
-                ->with('success', 'Data akun siswa berhasil diperbarui.');
-        } catch (\Exception $e) {
-            Log::error('TU: siswaUpdate exception', ['id' => $id, 'error' => $e->getMessage()]);
-            DB::rollBack();
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
-    }
-    
-    /**
-     * Hapus data siswa
-     */
-    public function siswaDestroy($id)
-    {
-        $siswa = DataSiswa::findOrFail($id);
-        
-        DB::beginTransaction();
-        try {
-            // Hapus data orang tua jika tidak terkait dengan siswa lain
-            if ($siswa->ayah_id) {
-                $ayahCount = DataSiswa::where('ayah_id', $siswa->ayah_id)->count();
-                if ($ayahCount <= 1) {
-                    Ayah::destroy($siswa->ayah_id);
-                }
-            }
-            
-            if ($siswa->ibu_id) {
-                $ibuCount = DataSiswa::where('ibu_id', $siswa->ibu_id)->count();
-                if ($ibuCount <= 1) {
-                    Ibu::destroy($siswa->ibu_id);
-                }
-            }
-            
-            if ($siswa->wali_id) {
-                $waliCount = DataSiswa::where('wali_id', $siswa->wali_id)->count();
-                if ($waliCount <= 1) {
-                    Wali::destroy($siswa->wali_id);
-                }
-            }
-            
-            // Hapus user terkait
-            if ($siswa->user) {
-                $siswa->user->delete();
-            }
-            
-            // Hapus data siswa
-            $siswa->delete();
-            
-            DB::commit();
-            return redirect()->route('tu.siswa.index')
-                ->with('success', 'Data siswa berhasil dihapus.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
     }
 
     /**
      * Download template import data diri siswa
      */
+    public function downloadTemplate()
+    {
+        $filename = 'template-siswa.xlsx';
+        return Excel::download(new \App\Exports\SiswaImportTemplate(), $filename);
+    }
+
+    /**
+     * Legacy alias for backward compatibility.
+     */
     public function downloadSiswaTemplate()
     {
-        $filename = 'Template_Import_Data_Diri_Siswa_' . date('Y-m-d') . '.xlsx';
-        return Excel::download(new \App\Exports\SiswaImportTemplate(), $filename);
+        return $this->downloadTemplate();
     }
 
     /**
@@ -1202,125 +954,124 @@ class TUController extends Controller
         ]);
 
         try {
-            Log::info('Starting siswa import', [
-                'filename' => $request->file('file')->getClientOriginalName(),
-                'size' => $request->file('file')->getSize(),
-            ]);
-
             $import = new \App\Imports\SiswaImport();
             Excel::import($import, $request->file('file'));
 
             $successCount = $import->getSuccessCount();
             $errors = $import->getErrors();
-            $processedRows = $import->getProcessedRows();
-            $skippedEmptyRows = $import->getSkippedEmptyRows();
-            $totalRows = $import->getRowCount();
-
-            Log::info('Siswa import completed', [
-                'success' => $successCount,
-                'errors_count' => count($errors),
-                'processed_rows' => $processedRows,
-                'skipped_empty' => $skippedEmptyRows,
-                'total_rows' => $totalRows,
-            ]);
 
             if ($successCount > 0) {
                 $message = "Import berhasil: {$successCount} data siswa berhasil diimport";
-                
                 if (count($errors) > 0) {
-                    // Return with partial success and warnings
-                    return response()->json([
-                        'success' => true,
-                        'message' => $message,
-                        'warnings' => $errors,
-                        'warning_count' => count($errors),
-                    ]);
+                    $warningMessage = " Import selesai dengan " . count($errors) . " peringatan.";
+                    return redirect()->route('tu.siswa.index')
+                        ->with('success', $message . $warningMessage)
+                        ->with('import_warnings', $errors);
                 }
 
-                return response()->json([
-                    'success' => true,
-                    'message' => $message,
-                ]);
-            } else {
-                // No success, provide detailed diagnostic message
-                $diagnostics = [];
-                $diagnostics[] = "Total baris di file: {$totalRows}";
-                $diagnostics[] = "Baris dengan data: {$processedRows}";
-                $diagnostics[] = "Baris kosong: {$skippedEmptyRows}";
-                
-                $errorMessage = "Tidak ada data yang berhasil diimport.\n\n";
-                
-                if ($totalRows <= 1) {
-                    $errorMessage .= "⚠️ File Anda hanya memiliki " . $totalRows . " baris (kemungkinan hanya HEADER).\n";
-                    $errorMessage .= "Pastikan data siswa sudah diisi di baris kedua dan seterusnya.\n";
-                } elseif ($processedRows === 0 && $skippedEmptyRows > 0) {
-                    $errorMessage .= "⚠️ Semua baris data kosong atau hanya header.\n";
-                    $errorMessage .= "Pastikan ada isi di kolom: NIS, NISN, atau Nama Lengkap.\n";
-                } elseif (count($errors) > 0) {
-                    $errorMessage .= "Terdapat " . count($errors) . " error:\n";
-                    $errorMessage .= implode("\n", array_slice($errors, 0, 10));
-                    if (count($errors) > 10) {
-                        $errorMessage .= "\n... dan " . (count($errors) - 10) . " error lainnya";
-                    }
-                }
-                
-                $errorMessage .= "\n\nDiagnostik:\n" . implode("\n", $diagnostics);
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Import gagal: ' . $errorMessage,
-                    'errors' => $errors,
-                    'diagnostics' => $diagnostics,
-                ], 422);
+                return redirect()->route('tu.siswa.index')
+                    ->with('success', 'Import berhasil');
             }
-        } catch (\Exception $e) {
-            Log::error('Siswa import error', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat mengimport file: ' . $e->getMessage(),
-            ], 500);
+            $message = 'Import tidak berhasil. Pastikan file template dan data sudah benar.';
+            return redirect()->route('tu.siswa.index')
+                ->with('error', $message);
+        } catch (\Exception $e) {
+            Log::error('Siswa import error', ['error' => $e->getMessage()]);
+            return redirect()->route('tu.siswa.index')
+                ->with('error', 'Terjadi kesalahan saat mengimport file: ' . $e->getMessage());
         }
     }
-    
+
     /**
      * Halaman daftar kelas
      */
-   public function kelas()
-{
-    // 获取 Rombel 数据而不是 Kelas
-    $search = request('search');
-    $jurusan_id = request('jurusan');
-    
-    $rombels = Rombel::with(['kelas.jurusan', 'guru'])
-        ->when($search, function($query) use($search) {
-            $query->where('nama', 'like', "%{$search}%")
-                  ->orWhereHas('kelas', function($q) use($search) {
-                      $q->where('tingkat', 'like', "%{$search}%")
-                        ->orWhereHas('jurusan', function($j) use($search) {
-                            $j->where('nama', 'like', "%{$search}%");
-                        });
-                  });
-        })
-        ->when($jurusan_id, function($query) use($jurusan_id) {
-            $query->whereHas('kelas', function($q) use($jurusan_id) {
-                $q->where('jurusan_id', $jurusan_id);
-            });
-        })
-        ->orderBy('nama')
-        ->paginate(12)
-        ->withQueryString();
+    public function kelas()
+    {
+        $search = request('search');
+        $jurusan_id = request('jurusan');
+        
+        $rombels = Rombel::with(['kelas.jurusan', 'guru'])
+            ->when($search, function($query) use($search) {
+                $query->where('nama', 'like', "%{$search}%")
+                      ->orWhereHas('kelas', function($q) use($search) {
+                          $q->where('tingkat', 'like', "%{$search}%")
+                            ->orWhereHas('jurusan', function($j) use($search) {
+                                $j->where('nama', 'like', "%{$search}%");
+                            });
+                      });
+            })
+            ->when($jurusan_id, function($query) use($jurusan_id) {
+                $query->whereHas('kelas', function($q) use($jurusan_id) {
+                    $q->where('jurusan_id', $jurusan_id);
+                });
+            })
+            ->orderBy('nama')
+            ->paginate(12)
+            ->withQueryString();
 
-    $allJurusans = Jurusan::orderBy('nama')->get();
+        $allJurusans = Jurusan::orderBy('nama')->get();
+        $allRombels = Rombel::with(['kelas.jurusan', 'guru'])->orderBy('nama')->get();
 
-    // Get all rombels for modal dropdowns (unpaginated)
-    $allRombels = Rombel::with(['kelas.jurusan', 'guru'])->orderBy('nama')->get();
+        return view('tu.kelas.index', compact('rombels', 'allJurusans', 'search', 'jurusan_id', 'allRombels'));
+    }
 
-    return view('tu.kelas.index', compact('rombels', 'allJurusans', 'search', 'jurusan_id', 'allRombels'));
-}
+    /**
+     * Export all kelas data to Excel
+     */
+    public function exportKelasAll()
+    {
+        $filename = 'kelas_all.xlsx';
+        return Excel::download(new KelasExport(), $filename);
+    }
+
+    /**
+     * Download kelas import template
+     */
+    public function downloadKelasTemplate()
+    {
+        $filename = 'template-kelas.xlsx';
+        return Excel::download(new KelasImportTemplate(), $filename);
+    }
+
+    /**
+     * Import kelas data from Excel
+     */
+    public function importKelas(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:5120',
+        ], [
+            'file.required' => 'File tidak boleh kosong',
+            'file.mimes' => 'Format file harus .xlsx, .xls, atau .csv',
+            'file.max' => 'Ukuran file maksimal 5MB',
+        ]);
+
+        try {
+            $import = new KelasImport();
+            Excel::import($import, $request->file('file'));
+
+            $successCount = $import->getSuccessCount();
+            $errors = $import->getErrors();
+
+            $message = 'Import berhasil';
+            if ($successCount > 0) {
+                $message = "Import berhasil: {$successCount} data kelas berhasil diproses";
+            }
+
+            if (count($errors) > 0) {
+                return redirect()->route('tu.kelas.index')
+                    ->with('success', $message)
+                    ->with('import_warnings', $errors);
+            }
+
+            return redirect()->route('tu.kelas.index')->with('success', $message);
+        } catch (\Exception $e) {
+            Log::error('Kelas import error', ['error' => $e->getMessage()]);
+            return redirect()->route('tu.kelas.index')
+                ->with('error', 'Terjadi kesalahan saat mengimport file: ' . $e->getMessage());
+        }
+    }
 
     /**
      * Halaman tambah kelas
@@ -1342,11 +1093,8 @@ class TUController extends Controller
             'tingkat' => 'required|in:X,XI,XII',
             'jurusan_id' => 'required|exists:jurusans,id'
         ]);
-
         Kelas::create($request->only(['tingkat','jurusan_id','nama']));
-
-        return redirect()->route('tu.kelas.index')
-            ->with('success', 'Data kelas berhasil ditambahkan.');
+        return redirect()->route('tu.kelas.index')->with('success', 'Data kelas berhasil ditambahkan.');
     }
 
     /**
@@ -1354,23 +1102,16 @@ class TUController extends Controller
      */
     public function kelasDetail(Request $request, $id)
     {
-        // If $id corresponds to a Rombel, show rombel detail.
-        $rombel = Rombel::with([
-            'kelas.jurusan',
-            'guru',
-            'siswa' => function($query) {
-                $query->with(['ayah', 'ibu', 'wali']);
-            }
-        ])->find($id);
+        $rombel = Rombel::with(['kelas.jurusan', 'guru', 'siswa' => function($query) {
+            $query->with(['ayah', 'ibu', 'wali']);
+        }])->find($id);
 
         if ($rombel) {
             return view('tu.kelas.show', compact('rombel'));
         }
 
-        // Otherwise, if it's a Kelas id, show list of rombels for that kelas
         $kelas = Kelas::with(['jurusan', 'rombels.guru'])->findOrFail($id);
         $rombels = $kelas->rombels ?? collect();
-
         return view('tu.kelas.detail_kelas', compact('kelas', 'rombels'));
     }
 
@@ -1379,28 +1120,33 @@ class TUController extends Controller
      */
     public function kelasEdit($id)
     {
-        $kelas = Kelas::findOrFail($id);
+        $rombel = Rombel::findOrFail($id);
         $jurusans = Jurusan::all();
+        $gurus = Guru::all();
         $tingkats = ['X','XI','XII'];
-        return view('tu.kelas.edit', compact('kelas', 'jurusans','tingkats'));
+        return view('tu.kelas.edit', compact('rombel', 'jurusans', 'gurus', 'tingkats'));
     }
 
     /**
-     * Update data kelas
+     * Update data rombel
      */
     public function kelasUpdate(Request $request, $id)
     {
-        $kelas = Kelas::findOrFail($id);
-        
+        $rombel = Rombel::findOrFail($id);
         $request->validate([
+            'nama' => 'required|string|max:255',
+            'guru_id' => 'required|exists:gurus,id',
             'tingkat' => 'required|in:X,XI,XII',
             'jurusan_id' => 'required|exists:jurusans,id'
         ]);
-
-        $kelas->update($request->only(['tingkat','jurusan_id','nama']));
-
-        return redirect()->route('tu.kelas.show', $id)
-            ->with('success', 'Data kelas berhasil diperbarui.');
+        
+        // Update Rombel
+        $rombel->update($request->only(['nama', 'guru_id']));
+        
+        // Update Kelas (tingkat & jurusan)
+        $rombel->kelas->update($request->only(['tingkat', 'jurusan_id']));
+        
+        return redirect()->route('tu.kelas.show', $id)->with('success', 'Data rombel berhasil diperbarui.');
     }
 
     /**
@@ -1410,11 +1156,13 @@ class TUController extends Controller
     {
         $kelas = Kelas::findOrFail($id);
         $kelas->delete();
-        return redirect()->route('tu.kelas.index')
-            ->with('success', 'Data kelas berhasil dihapus.');
+        return redirect()->route('tu.kelas.index')->with('success', 'Data kelas berhasil dihapus.');
     }
 
-    public function downloadTemplate(Request $request)
+    /**
+     * Download template leger
+     */
+    public function downloadLegerTemplate(Request $request)
     {
         $request->validate([
             'rombel_id' => 'required|exists:rombels,id',
@@ -1424,20 +1172,18 @@ class TUController extends Controller
 
         $rombelId = $request->rombel_id;
         $rombel = Rombel::findOrFail($rombelId);
-
-        $semester = $request->semester;
-        $tahunAjaran = $request->tahun_ajaran;
-
-        // Sanitize filename - remove "/" and "\" characters
         $rombelName = str_replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], '-', $rombel->nama);
-        $tahunAjaranClean = str_replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], '-', $tahunAjaran);
+        $tahunAjaranClean = str_replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], '-', $request->tahun_ajaran);
 
-        $export = new LegerTemplate($rombelId, $semester, $tahunAjaran);
-        $filename = "Leger_{$rombelName}_Sem{$semester}_{$tahunAjaranClean}.xlsx";
+        $export = new LegerTemplate($rombelId, $request->semester, $request->tahun_ajaran);
+        $filename = "Leger_{$rombelName}_Sem{$request->semester}_{$tahunAjaranClean}.xlsx";
 
         return Excel::download($export, $filename);
     }
 
+    /**
+     * Import leger
+     */
     public function importLedger(Request $request)
     {
         $request->validate([
@@ -1447,162 +1193,46 @@ class TUController extends Controller
             'file' => 'required|file|mimes:xlsx,xls,csv',
         ]);
 
-        $rombelId = $request->rombel_id;
-        $rombel = Rombel::findOrFail($rombelId);
+        $rombel = Rombel::findOrFail($request->rombel_id);
 
         try {
-            $semester = $request->semester;
-            $tahunAjaran = $request->tahun_ajaran;
-
-            $import = new LegerImport($rombelId, $semester, $tahunAjaran);
+            $import = new LegerImport($request->rombel_id, $request->semester, $request->tahun_ajaran);
             Excel::import($import, $request->file('file'));
 
-            // Ambil data laporan import
             $errors = $import->getErrors();
             $successCount = $import->getSuccessCount();
 
             if (count($errors) > 0) {
-                // Ada error - tampilkan warning dengan detail error
-                $errorDisplay = array_slice($errors, 0, 5); // Tampilkan max 5 error
-                $errorMsg = "Import selesai dengan " . count($errors) . " warning. Siswa berhasil diproses: {$successCount}. Error: " . implode(' | ', $errorDisplay);
-                if (count($errors) > 5) {
-                    $errorMsg .= " ... dan " . (count($errors) - 5) . " error lainnya";
-                }
-                return redirect()->route('tu.kelas.index')
-                    ->with('warning', $errorMsg);
+                $errorDisplay = array_slice($errors, 0, 5);
+                $errorMsg = "Import selesai dengan " . count($errors) . " warning. Berhasil: {$successCount}. Error: " . implode(' | ', $errorDisplay);
+                return redirect()->route('tu.kelas.index')->with('warning', $errorMsg);
             }
 
-            if ($successCount > 0) {
-                return redirect()->route('tu.kelas.index')
-                    ->with('success', "Import berhasil! {$successCount} siswa telah diproses untuk rombel " . $rombel->nama);
-            } else {
-                return redirect()->route('tu.kelas.index')
-                    ->with('warning', 'Import selesai tetapi tidak ada data siswa yang berhasil diproses. Cek format file atau NIS/NISN siswa.');
-            }
-
+            return redirect()->route('tu.kelas.index')->with('success', "Import berhasil! {$successCount} siswa diproses.");
         } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-    
+
     /**
      * Halaman daftar wali kelas
      */
     public function waliKelas()
     {
-        $waliKelas = Guru::with([
-            'user',
-            'kelas',
-            'jurusan',
-            'rombels'
-        ])
-        ->latest()
-        ->paginate(10);
-
+        $waliKelas = Guru::with(['user', 'kelas', 'jurusan', 'rombels'])->latest()->paginate(10);
         $jurusans = Jurusan::with(['gurus.user', 'gurus.kelas'])->get();
-
         return view('tu.wali-kelas.index', compact('waliKelas', 'jurusans'));
     }
 
-    /**
-     * Halaman tambah wali kelas
-     */
-    public function waliKelasCreate()
-    {
-        $users = User::where('role', 'walikelas')->get();
-        $kelas = Kelas::all();
-        $jurusans = Jurusan::all();
-        $rombels = Rombel::all();
-        
-        return view('tu.wali-kelas.create', compact('users', 'kelas', 'jurusans', 'rombels'));
-    }
-
-    /**
-     * Simpan data wali kelas baru
-     */
-    public function waliKelasStore(Request $request)
-    {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'kelas_id' => 'required|exists:kelas,id',
-            'jurusan_id' => 'required|exists:jurusans,id',
-            'rombel_id' => 'required|exists:rombels,id',
-            'tahun_ajaran' => 'required|string|size:9',
-            'semester' => 'required|in:Ganjil,Genap',
-            'status' => 'required|in:Aktif,Tidak Aktif',
-        ]);
-
-        Guru::create($request->all());
-        
-        return redirect()->route('tu.wali-kelas')
-            ->with('success', 'Data wali kelas berhasil ditambahkan.');
-    }
-
-    /**
-     * Halaman edit wali kelas
-     */
-    public function waliKelasEdit($id)
-    {
-        $waliKelas = Guru::findOrFail($id);
-        $users = User::where('role', 'walikelas')->get();
-        $kelas = Kelas::all();
-        $jurusans = Jurusan::all();
-        $rombels = Rombel::all();
-        
-        return view('tu.wali-kelas.edit', compact('waliKelas', 'users', 'kelas', 'jurusans', 'rombels'));
-    }
-
-    /**
-     * Update data wali kelas
-     */
-    public function waliKelasUpdate(Request $request, $id)
-    {
-        $waliKelas = Guru::findOrFail($id);
-        
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'kelas_id' => 'required|exists:kelas,id',
-            'jurusan_id' => 'required|exists:jurusans,id',
-            'rombel_id' => 'required|exists:rombels,id',
-            'tahun_ajaran' => 'required|string|size:9',
-            'semester' => 'required|in:Ganjil,Genap',
-            'status' => 'required|in:Aktif,Tidak Aktif',
-        ]);
-
-        $waliKelas->update($request->all());
-
-        return redirect()->route('tu.wali-kelas.detail', $id)
-            ->with('success', 'Data wali kelas berhasil diperbarui.');
-    }
-
-    /**
-     * Hapus data wali kelas
-     */
-    public function waliKelasDestroy($id)
-    {
-        $waliKelas = Guru::findOrFail($id);
-        $waliKelas->delete();
-
-        return redirect()->route('tu.wali-kelas')
-            ->with('success', 'Data wali kelas berhasil dihapus.');
-    }
-    
     /**
      * Halaman detail wali kelas
      */
     public function waliKelasDetail($id)
     {
-        $waliKelas = Guru::with([
-            'user',
-            'kelas',
-            'jurusan',
-            'rombels'
-        ])->findOrFail($id);
-
+        $waliKelas = Guru::with(['user', 'kelas', 'jurusan', 'rombels'])->findOrFail($id);
         return view('tu.wali-kelas.show', compact('waliKelas'));
     }
-    
+
     /**
      * Halaman laporan nilai raport
      */
@@ -1610,10 +1240,7 @@ class TUController extends Controller
     {
         $nilaiRaports = NilaiRaport::with(['siswa' => function($query) {
             $query->with(['ayah', 'ibu', 'wali']);
-        }])
-            ->orderBy('tahun_ajaran', 'desc')
-            ->orderBy('semester', 'desc')
-            ->paginate(20);
+        }])->orderBy('tahun_ajaran', 'desc')->orderBy('semester', 'desc')->paginate(20);
             
         return view('tu.laporan-nilai', compact('nilaiRaports'));
     }

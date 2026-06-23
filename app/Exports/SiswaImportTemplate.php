@@ -16,8 +16,13 @@ class SiswaImportTemplate implements FromArray, WithHeadings, ShouldAutoSize, Wi
      */
     public function array(): array
     {
-        // Get sample data - 3 example rows
-        $rombelList = Rombel::select('id', 'nama')->limit(3)->get();
+        // Get sample data - fetch rombel names from database for valid examples
+        $rombelList = Rombel::select('nama')->limit(3)->get();
+        
+        // Provide fallback names if no rombels exist in database
+        $rombelNames = $rombelList->isNotEmpty() 
+            ? $rombelList->pluck('nama')->toArray()
+            : ['10 IPA 1', '10 IPA 2', '10 IPS 1'];
         
         $rows = [
             [
@@ -44,6 +49,7 @@ class SiswaImportTemplate implements FromArray, WithHeadings, ShouldAutoSize, Wi
                 'Alamat Wali' => '-',
                 'Mulai Tanggal Diterima' => '2023-07-01',
                 'Asal Sekolah' => 'SMP Negeri 1 Jakarta',
+                'Nama Rombel' => $rombelNames[0] ?? '10 IPA 1',
             ],
             [
                 'NIS' => '002',
@@ -69,6 +75,7 @@ class SiswaImportTemplate implements FromArray, WithHeadings, ShouldAutoSize, Wi
                 'Alamat Wali' => '-',
                 'Mulai Tanggal Diterima' => '2023-07-01',
                 'Asal Sekolah' => 'SMP Negeri 2 Bandung',
+                'Nama Rombel' => $rombelNames[1] ?? '10 IPA 2',
             ],
             [
                 'NIS' => '003',
@@ -94,6 +101,7 @@ class SiswaImportTemplate implements FromArray, WithHeadings, ShouldAutoSize, Wi
                 'Alamat Wali' => '-',
                 'Mulai Tanggal Diterima' => '2023-07-01',
                 'Asal Sekolah' => 'SMP Negeri 3 Surabaya',
+                'Nama Rombel' => $rombelNames[2] ?? '10 IPS 1',
             ],
         ];
 
@@ -126,6 +134,7 @@ class SiswaImportTemplate implements FromArray, WithHeadings, ShouldAutoSize, Wi
             'Alamat Wali',
             'Mulai Tanggal Diterima',
             'Asal Sekolah',
+            'Nama Rombel',
         ];
     }
 
@@ -136,15 +145,15 @@ class SiswaImportTemplate implements FromArray, WithHeadings, ShouldAutoSize, Wi
                 $sheet = $event->sheet->getDelegate();
                 
                 // Style header row (row 1)
-                $sheet->getStyle('A1:W1')->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFFFF'));
-                $sheet->getStyle('A1:W1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                $sheet->getStyle('A1:X1')->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFFFF'));
+                $sheet->getStyle('A1:X1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                     ->getStartColor()->setARGB('FF2F53FF');
-                $sheet->getStyle('A1:W1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('A1:X1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->getRowDimension(1)->setRowHeight(20);
 
                 // Add borders
                 $highestRow = $sheet->getHighestRow();
-                $sheet->getStyle('A1:W' . $highestRow)->getBorders()->getAllBorders()
+                $sheet->getStyle('A1:X' . $highestRow)->getBorders()->getAllBorders()
                     ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)
                     ->getColor()->setARGB('FFD3D3D3');
 

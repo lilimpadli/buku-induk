@@ -1,3 +1,5 @@
+{{-- resources/views/tu/dashboard.blade.php --}}
+
 @extends('layouts.app')
 
 @section('title', 'Dashboard Tata Usaha')
@@ -5,570 +7,532 @@
 @section('content')
 
 <style>
-    /* ===================== DASHBOARD STYLES ===================== */
-    :root {
-        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --success-gradient: linear-gradient(135deg, #13B497 0%, #59D4A4 100%);
-        --danger-gradient: linear-gradient(135deg, #F093FB 0%, #F5576C 100%);
-        --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        --text-primary: #283046;
-        --text-secondary: #67748a;
-        --bg-light: #f8fafc;
-        --bg-card: #ffffff;
-        --border-radius: 16px;
-        --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+:root{
+    --primary:#3B82F6;
+    --secondary:#6366F1;
+    --success:#10B981;
+    --warning:#F59E0B;
+    --danger:#EF4444;
+
+    --bg:#F4F7FE;
+    --card:#FFFFFF;
+
+    --text:#0F172A;
+    --muted:#64748B;
+
+    --shadow-sm:0 8px 25px rgba(15,23,42,.05);
+    --shadow-md:0 15px 40px rgba(15,23,42,.08);
+    --shadow-lg:0 25px 60px rgba(59,130,246,.15);
+
+    --radius-xl:30px;
+    --radius-lg:24px;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(
+        180deg,
+        #F8FAFF 0%,
+        #F4F7FE 100%
+    );
+}
+
+/* ================= HEADER ================= */
+
+.page-header{
+    position:relative;
+    overflow:hidden;
+
+    background:linear-gradient(
+        135deg,
+        #2563EB 0%,
+        #4F46E5 55%,
+        #7C3AED 100%
+    );
+
+    border-radius:32px;
+    padding:40px;
+    margin-bottom:32px;
+
+    color:white;
+    box-shadow:var(--shadow-md);
+}
+
+.page-header::before{
+    content:'';
+    position:absolute;
+
+    width:320px;
+    height:320px;
+
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+
+    top:-120px;
+    right:-90px;
+}
+
+.page-header::after{
+    content:'';
+    position:absolute;
+
+    width:250px;
+    height:250px;
+
+    border-radius:50%;
+    background:rgba(255,255,255,.05);
+
+    bottom:-130px;
+    left:-80px;
+}
+
+.page-title{
+    position:relative;
+    z-index:2;
+
+    font-size:2.2rem;
+    font-weight:800;
+
+    display:flex;
+    align-items:center;
+    gap:18px;
+
+    margin-bottom:10px;
+}
+
+.page-title i{
+    width:62px;
+    height:62px;
+
+    border-radius:20px;
+
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(10px);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.page-subtitle{
+    position:relative;
+    z-index:2;
+
+    margin:0;
+    opacity:.92;
+    font-size:15px;
+}
+
+/* ================= STATS ================= */
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:22px;
+    margin-bottom:32px;
+}
+
+.stat-card{
+    position:relative;
+    overflow:hidden;
+
+    border-radius:28px;
+    padding:26px;
+
+    color:white;
+
+    transition:.35s ease;
+    box-shadow:var(--shadow-sm);
+
+    animation:floating 4s ease-in-out infinite;
+}
+
+.stat-card:hover{
+    transform:translateY(-8px);
+    box-shadow:var(--shadow-lg);
+}
+
+.stat-card::before{
+    content:'';
+
+    position:absolute;
+
+    width:180px;
+    height:180px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.12);
+
+    top:-70px;
+    right:-50px;
+}
+
+.stat-card::after{
+    content:'';
+
+    position:absolute;
+
+    width:120px;
+    height:120px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.08);
+
+    bottom:-40px;
+    right:20px;
+}
+
+.stat-card.primary{
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #60A5FA
+    );
+}
+
+.stat-card.success{
+    background:linear-gradient(
+        135deg,
+        #059669,
+        #34D399
+    );
+}
+
+.stat-card.warning{
+    background:linear-gradient(
+        135deg,
+        #D97706,
+        #FBBF24
+    );
+}
+
+.stat-card.danger{
+    background:linear-gradient(
+        135deg,
+        #DC2626,
+        #F87171
+    );
+}
+
+.stat-icon{
+    position:relative;
+    z-index:2;
+
+    width:65px;
+    height:65px;
+
+    border-radius:22px;
+
+    background:rgba(255,255,255,.18);
+
+    backdrop-filter:blur(8px);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:1.5rem;
+
+    margin-bottom:18px;
+}
+
+.stat-number{
+    position:relative;
+    z-index:2;
+
+    font-size:2.3rem;
+    font-weight:800;
+}
+
+.stat-label{
+    position:relative;
+    z-index:2;
+
+    margin-top:8px;
+    opacity:.95;
+}
+
+/* ================= DASHBOARD CARD ================= */
+
+.dashboard-card{
+    background:white;
+    border-radius:32px;
+    padding:32px;
+
+    box-shadow:var(--shadow-sm);
+    border:1px solid rgba(226,232,240,.6);
+}
+
+.card-header-modern{
+    margin-bottom:26px;
+}
+
+.card-header-modern h3{
+    font-size:1.4rem;
+    font-weight:700;
+    color:var(--text);
+}
+
+.card-header-modern p{
+    margin-top:6px;
+    color:var(--muted);
+}
+
+/* ================= MENU ================= */
+
+.menu-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:20px;
+}
+
+.menu-item{
+    position:relative;
+    overflow:hidden;
+
+    text-decoration:none;
+
+    background:white;
+
+    border:1px solid #E8EEF7;
+    border-radius:24px;
+
+    padding:24px;
+
+    transition:.35s ease;
+
+    color:var(--text);
+}
+
+.menu-item::before{
+    content:'';
+
+    position:absolute;
+
+    inset:0;
+
+    opacity:0;
+
+    transition:.35s ease;
+
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #7C3AED
+    );
+}
+
+.menu-item:hover::before{
+    opacity:1;
+}
+
+.menu-item>*{
+    position:relative;
+    z-index:2;
+}
+
+.menu-item i{
+    width:60px;
+    height:60px;
+
+    border-radius:18px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#EFF6FF;
+    color:#2563EB;
+
+    font-size:1.4rem;
+
+    margin-bottom:15px;
+}
+
+.menu-item h6{
+    font-size:1rem;
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+.menu-item span{
+    color:var(--muted);
+    font-size:.88rem;
+    line-height:1.6;
+}
+
+.menu-item:hover{
+    transform:translateY(-8px);
+    box-shadow:var(--shadow-lg);
+}
+
+.menu-item:hover h6,
+.menu-item:hover span,
+.menu-item:hover i{
+    color:white;
+}
+
+.menu-item:hover i{
+    background:rgba(255,255,255,.15);
+}
+
+/* ================= FLOATING ================= */
+
+@keyframes floating{
+
+    0%{
+        transform:translateY(0);
     }
 
-    body {
-        background-color: var(--bg-light);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        color: var(--text-primary);
+    50%{
+        transform:translateY(-4px);
     }
 
-    /* Header */
-    .dashboard-header {
-        background: var(--primary-gradient);
-        color: white;
-        padding: 2.5rem 2rem;
-        border-radius: var(--border-radius);
-        margin-bottom: 2rem;
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.25);
-        position: relative;
-        overflow: hidden;
+    100%{
+        transform:translateY(0);
     }
 
-    .dashboard-header::before {
-        content: "";
-        position: absolute;
-        top: -50px;
-        right: -50px;
-        width: 250px;
-        height: 250px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:768px){
+
+    .page-header{
+        padding:28px;
     }
 
-    .dashboard-header::after {
-        content: "";
-        position: absolute;
-        bottom: -30px;
-        left: -30px;
-        width: 200px;
-        height: 200px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 50%;
+    .page-title{
+        font-size:1.7rem;
     }
 
-    .dashboard-header h2 {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        position: relative;
-        z-index: 2;
+    .dashboard-card{
+        padding:22px;
     }
 
-    .dashboard-header .text-muted {
-        color: rgba(255, 255, 255, 0.9) !important;
-        font-size: 1rem;
-        position: relative;
-        z-index: 1;
+    .menu-grid{
+        grid-template-columns:1fr;
     }
 
-    /* Stat Cards */
-    .stat-card {
-        border-radius: var(--border-radius);
-        border: none;
-        box-shadow: var(--card-shadow);
-        transition: var(--transition);
-        overflow: hidden;
-        background: var(--bg-card);
-        height: 100%;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
-    }
-
-    .stat-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 5px;
-    }
-
-    .stat-card.primary::before { background: var(--primary-gradient); }
-    .stat-card.success::before { background: var(--success-gradient); }
-    .stat-card.info::before { background: var(--info-gradient); }
-    .stat-card.warning::before { background: var(--warning-gradient); }
-
-    .stat-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 24px;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        transition: var(--transition);
-    }
-
-    .stat-card:hover .stat-icon {
-        transform: scale(1.1) rotate(5deg);
-    }
-
-    .stat-icon.primary { background: var(--primary-gradient); }
-    .stat-icon.success { background: var(--success-gradient); }
-    .stat-icon.info { background: var(--info-gradient); }
-    .stat-icon.warning { background: var(--warning-gradient); }
-
-    .stat-title {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-        font-weight: 500;
-        margin-bottom: 0.25rem;
-    }
-
-    .stat-value {
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        line-height: 1;
-    }
-
-    /* Student Items */
-    .student-item {
-        border: none;
-        border-radius: 12px;
-        margin-bottom: 1rem;
-        padding: 1.25rem;
-        transition: var(--transition);
-        background: var(--bg-card);
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .student-item:hover {
-        transform: translateX(5px);
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        background: #f8fafc;
-    }
-
-    .student-left {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        flex: 1;
-    }
-
-    .student-avatar {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        object-fit: cover;
-        border: 2px solid #e2e8f0;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .student-avatar-placeholder {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        color: white;
-        font-size: 18px;
-        background: var(--primary-gradient);
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-    }
-
-    .student-name {
-        font-weight: 600;
-        color: var(--text-primary);
-        font-size: 1rem;
-        margin-bottom: 0.25rem;
-    }
-
-    .student-info {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-    }
-
-    /* Buttons */
-    .btn-gradient {
-        background: var(--primary-gradient);
-        border: none;
-        color: white;
-        font-weight: 600;
-        padding: 0.625rem 1.25rem;
-        border-radius: 10px;
-        transition: var(--transition);
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-    }
-
-    .btn-gradient:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        color: white;
-    }
-
-    .btn-outline-custom {
-        background: transparent;
-        border: 2px solid #e2e8f0;
-        color: var(--text-primary);
-        font-weight: 600;
-        padding: 0.625rem 1.25rem;
-        border-radius: 10px;
-        transition: var(--transition);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.875rem;
-    }
-
-    .btn-outline-custom:hover {
-        background: #f1f5f9;
-        color: var(--text-primary);
-        text-decoration: none;
-        transform: translateY(-2px);
-    }
-
-    /* Section Title */
-    .section-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .section-title::before {
-        content: "";
-        width: 4px;
-        height: 24px;
-        background: var(--primary-gradient);
-        border-radius: 2px;
-    }
-
-    /* Tables */
-    .custom-table {
-        border-radius: var(--border-radius);
-        overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        background: var(--bg-card);
-    }
-
-    .custom-table thead {
-        background-color: #f8fafc;
-    }
-
-    .custom-table th {
-        font-weight: 600;
-        color: var(--text-primary);
-        border-bottom: 2px solid #e2e8f0;
-        padding: 1rem;
-        font-size: 0.875rem;
-    }
-
-    .custom-table td {
-        vertical-align: middle;
-        padding: 1rem;
-        font-size: 0.875rem;
-    }
-
-    .custom-table tbody tr {
-        transition: var(--transition);
-    }
-
-    .custom-table tbody tr:hover {
-        background-color: #f8fafc;
-    }
-
-    /* Quick Actions */
-    .quick-actions-card {
-        border-radius: var(--border-radius);
-        border: none;
-        box-shadow: var(--card-shadow);
-        overflow: hidden;
-        background: var(--bg-card);
-    }
-
-    .action-btn {
-        border-radius: 12px;
-        padding: 1.25rem;
-        margin-bottom: 1rem;
-        font-weight: 600;
-        transition: var(--transition);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.75rem;
-        min-height: 80px;
-        text-decoration: none;
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        border: 1px solid #e2e8f0;
-    }
-
-    .action-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-    }
-
-    .action-btn i {
-        font-size: 1.5rem;
-    }
-
-    .action-btn.primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-    .action-btn.info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
-    .action-btn.success { background: linear-gradient(135deg, #13B497 0%, #59D4A4 100%); color: white; }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 3rem 1.5rem;
-    }
-
-    .empty-state i {
-        font-size: 3rem;
-        color: #cbd5e1;
-        margin-bottom: 1rem;
-        display: block;
-    }
-
-    .empty-state p {
-        color: var(--text-secondary);
-        font-weight: 500;
-        margin: 0;
-        font-size: 1rem;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .dashboard-header {
-            padding: 1.5rem 1rem;
-        }
-
-        .dashboard-header h2 {
-            font-size: 1.5rem;
-        }
-
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-        }
-
-        .student-item {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 1rem;
-        }
-
-        .student-left {
-            width: 100%;
-        }
-
-        .action-btn {
-            min-height: 70px;
-            padding: 1rem;
-        }
-    }
+}
 </style>
 
 <div class="container-fluid py-4">
 
     <!-- HEADER -->
-    <div class="dashboard-header">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div>
-                <h2 class="mb-1">Dashboard TU KESISWAAN 👋</h2>
-                <div class="text-muted">Kelola data siswa, wali kelas, dan kelas — cepat, informatif, dan responsif</div>
-            </div>
-            <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                @csrf
-                <button type="submit" class="btn btn-light btn-sm" style="border-radius: 8px; font-weight: 500;">
-                    <i class="fas fa-sign-out-alt me-2"></i>Logout
-                </button>
-            </form>
-        </div>
+    <div class="page-header">
+
+        <h1 class="page-title">
+            <i class="fas fa-building"></i>
+            Dashboard Tata Usaha
+        </h1>
+
+        <p class="page-subtitle">
+            Selamat datang, <strong>{{ Auth::user()->name }}</strong>
+        </p>
+
     </div>
 
     <!-- STATISTIK -->
-    <div class="row g-4 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="card stat-card primary">
-                <div class="card-body">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon primary">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div>
-                            <div class="stat-title">Total Siswa</div>
-                            <div class="stat-value">{{ number_format($totalSiswa ?? 0) }}</div>
-                        </div>
-                    </div>
-                </div>
+    <div class="stats-grid">
+
+        <div class="stat-card primary">
+            <div class="stat-icon">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+
+            <div class="stat-number">
+                {{ $totalSiswa ?? 0 }}
+            </div>
+
+            <div class="stat-label">
+                Total Siswa
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
-            <div class="card stat-card success">
-                <div class="card-body">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon success">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                        </div>
-                        <div>
-                            <div class="stat-title">Wali Kelas</div>
-                            <div class="stat-value">{{ number_format($totalWaliKelas ?? 0) }}</div>
-                        </div>
-                    </div>
-                </div>
+        <div class="stat-card success">
+            <div class="stat-icon">
+                <i class="fas fa-book"></i>
+            </div>
+
+            <div class="stat-number">
+                {{ $totalAdministrasi ?? 0 }}
+            </div>
+
+            <div class="stat-label">
+                Administrasi
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
-            <div class="card stat-card info">
-                <div class="card-body">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon info">
-                            <i class="fas fa-school"></i>
-                        </div>
-                        <div>
-                            <div class="stat-title">Total Kelas</div>
-                            <div class="stat-value">{{ number_format($totalKelas ?? 0) }}</div>
-                        </div>
-                    </div>
-                </div>
+        <div class="stat-card warning">
+            <div class="stat-icon">
+                <i class="fas fa-random"></i>
+            </div>
+
+            <div class="stat-number">
+                {{ $totalMutasi ?? 0 }}
+            </div>
+
+            <div class="stat-label">
+                Mutasi
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
-            <div class="card stat-card warning">
-                <div class="card-body">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon warning">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div>
-                            <div class="stat-title">Nilai Terinput</div>
-                            <div class="stat-value">{{ number_format($totalNilai ?? 0) }}</div>
-                        </div>
-                    </div>
-                </div>
+        <div class="stat-card danger">
+            <div class="stat-icon">
+                <i class="fas fa-user-check"></i>
+            </div>
+
+            <div class="stat-number">
+                {{ $totalAlumni ?? 0 }}
+            </div>
+
+            <div class="stat-label">
+                Alumni
             </div>
         </div>
+
     </div>
 
-    <!-- CONTENT -->
-    <div class="row g-4">
-        <!-- SISWA TERBARU -->
-        <div class="col-xl-6">
-            <div class="card stat-card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div class="section-title">Siswa Terbaru</div>
-                        <a href="{{ route('tu.siswa.index') }}" class="btn-outline-custom">
-                            Lihat Semua <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
+    <!-- MENU -->
+    <div class="dashboard-card">
 
-                    @if(!empty($siswaBaru) && $siswaBaru->count() > 0)
-                        @foreach($siswaBaru as $siswa)
-                            <div class="student-item">
-                                <div class="student-left">
-                                    @if($siswa->foto)
-                                        <div class="student-avatar">
-                                            <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}">
-                                        </div>
-                                    @else
-                                        <div class="student-avatar-placeholder">
-                                            {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
-                                        </div>
-                                    @endif
-                                    <div>
-                                        <div class="student-name">{{ $siswa->nama_lengkap }}</div>
-                                        <div class="student-info">
-                                            NIS: {{ $siswa->nis ?? '-' }} • {{ $siswa->kelas ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <a href="{{ route('tu.siswa.detail', $siswa->id) }}" class="btn-gradient">
-                                    Detail
-                                </a>
-                            </div>
-                        @endforeach
-                    @else
-                        <div class="empty-state">
-                            <i class="fas fa-user-graduate"></i>
-                            <p>Belum ada siswa terbaru.</p>
-                        </div>
-                    @endif
-                </div>
-            </div>
+        <div class="card-header-modern">
+            <h3>Menu Tata Usaha</h3>
+            <p>Akses cepat ke seluruh fitur utama Tata Usaha</p>
         </div>
 
-        <!-- RINGKASAN KELAS -->
-        <div class="col-xl-6">
-            <div class="card stat-card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div class="section-title">Ringkasan Kelas</div>
-                        <a href="{{ route('tu.kelas.index') }}" class="btn-outline-custom">
-                            Lihat Semua <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
+        <div class="menu-grid">
 
-                    @if(!empty($kelasLimit) && $kelasLimit->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table custom-table">
-                                <thead>
-                                    <tr>
-                                        <th>Tingkat</th>
-                                        <th>Jurusan</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($kelasLimit as $k)
-                                        <tr>
-                                            <td>{{ $k->tingkat }}</td>
-                                            <td>{{ $k->jurusan->nama ?? '-' }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="empty-state">
-                            <i class="fas fa-school"></i>
-                            <p>Belum ada data kelas.</p>
-                        </div>
-                    @endif
-                </div>
-            </div>
+            <a href="{{ route('tu.siswa.index') }}" class="menu-item">
+                <i class="fas fa-user-graduate"></i>
+                <h6>Data Siswa</h6>
+                <span>Kelola seluruh data siswa sekolah</span>
+            </a>
+
+            <a href="{{ route('tu.buku-induk.index') }}" class="menu-item">
+                <i class="fas fa-book"></i>
+                <h6>Administrasi</h6>
+                <span>Kelola buku induk dan administrasi siswa</span>
+            </a>
+
+            <a href="{{ route('tu.mutasi.index') }}" class="menu-item">
+                <i class="fas fa-random"></i>
+                <h6>Mutasi</h6>
+                <span>Kelola data mutasi masuk dan keluar</span>
+            </a>
+
+            <a href="{{ route('tu.alumni.index') }}" class="menu-item">
+                <i class="fas fa-user-check"></i>
+                <h6>Alumni</h6>
+                <span>Kelola data alumni sekolah</span>
+            </a>
+
         </div>
-    </div>   
 
-       
-    
+    </div>
 
 </div>
 

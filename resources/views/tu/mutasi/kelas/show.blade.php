@@ -305,7 +305,7 @@
             <p class="page-subtitle">{{ $rombel->nama }} - {{ $rombel->kelas->tingkat ?? '-' }} {{ $rombel->kelas->jurusan->nama ?? 'Umum' }}</p>
         </div>
         <div class="action-buttons">
-            <a href="{{ route('tu.mutasi.kelas', ['jurusan' => $rombel->kelas->jurusan->id]) }}" class="btn btn-secondary">
+            <a href="{{ route('tu.mutasi.kelas', $rombel->kelas->jurusan->id) }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
         </div>

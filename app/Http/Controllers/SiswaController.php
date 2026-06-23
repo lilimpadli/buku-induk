@@ -91,7 +91,10 @@ class SiswaController extends Controller
 
         return view('siswa.dashboard', compact('siswa','raportYears','missing'));
     }
-
+    public function index()
+{
+    return redirect()->route('siswa.dashboard');
+}
     public function create()
     {
         return view('siswa.data-diri-create');

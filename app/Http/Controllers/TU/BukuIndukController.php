@@ -8,7 +8,12 @@ use App\Models\Rombel;
 use App\Models\Jurusan;
 use App\Models\MataPelajaran;
 use App\Models\KenaikanKelas;
+use App\Models\Ayah;
+use App\Models\Ibu;
+use App\Models\Wali;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 
 class BukuIndukController extends Controller
@@ -141,6 +146,98 @@ class BukuIndukController extends Controller
         // This would require a PDF library like DomPDF
         // For now, we'll return the print view
         return $this->cetak($siswa);
+    }
+
+    /**
+     * Show edit form for Buku Induk (edit siswa data)
+     */
+    public function edit(Siswa $siswa)
+    {
+        $siswa->load(['user','ayah','ibu','wali','rombel.kelas.jurusan','mutasiTerakhir']);
+        return view('tu.buku-induk.edit', compact('siswa'));
+    }
+
+    /**
+     * Update siswa data from Buku Induk edit form
+     */
+    public function update(Request $request, Siswa $siswa)
+    {
+        $validated = $request->validate([
+            'nis' => 'required|string',
+            'nama_lengkap' => 'required|string',
+            'nisn' => 'nullable|string',
+            'jenis_kelamin' => 'nullable|string',
+            'tempat_lahir' => 'nullable|string',
+            'tanggal_lahir' => 'nullable|date',
+            'agama' => 'nullable|string',
+            'kewarganegaraan' => 'nullable|string',
+            'dusun' => 'nullable|string',
+            'kelurahan' => 'nullable|string',
+            'kecamatan' => 'nullable|string',
+            'rt' => 'nullable|string',
+            'rw' => 'nullable|string',
+            'kode_pos' => 'nullable|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            // other fields may be added as needed
+        ]);
+
+        // Update main siswa fields
+        $siswa->update($validated);
+
+        // Handle ayah/ibu/wali relations if provided
+        $ayahData = $request->input('ayah', []);
+        if (!empty(array_filter($ayahData))) {
+            if ($siswa->ayah) {
+                $siswa->ayah->update($ayahData);
+            } else {
+                $created = Ayah::create($ayahData);
+                $siswa->ayah_id = $created->id;
+            }
+        }
+
+        $ibuData = $request->input('ibu', []);
+        if (!empty(array_filter($ibuData))) {
+            if ($siswa->ibu) {
+                $siswa->ibu->update($ibuData);
+            } else {
+                $created = Ibu::create($ibuData);
+                $siswa->ibu_id = $created->id;
+            }
+        }
+
+        $waliData = $request->input('wali', []);
+        if (!empty(array_filter($waliData))) {
+            if ($siswa->wali) {
+                $siswa->wali->update($waliData);
+            } else {
+                $created = Wali::create($waliData);
+                $siswa->wali_id = $created->id;
+            }
+        }
+
+        // Handle photo upload / removal for related user
+        $removeFoto = $request->input('remove_foto', '0');
+        if ($removeFoto === '1' && $siswa->user && $siswa->user->photo) {
+            Storage::disk('public')->delete($siswa->user->photo);
+            $siswa->user->photo = null;
+            $siswa->user->save();
+        }
+
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $path = $file->store('foto-siswa', 'public');
+            if ($siswa->user) {
+                if ($siswa->user->photo) {
+                    Storage::disk('public')->delete($siswa->user->photo);
+                }
+                $siswa->user->photo = $path;
+                $siswa->user->save();
+            }
+        }
+
+        $siswa->save();
+
+        return redirect()->route('tu.buku-induk.show', $siswa->id)->with('success', 'Data siswa berhasil diperbarui.');
     }
 
     /**

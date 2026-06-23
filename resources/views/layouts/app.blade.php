@@ -525,46 +525,92 @@
                                 </a>
                             @endif
 
-                            {{-- ROLE: TU --}}
-                            @if(Auth::user()->normalized_role == 'tu')
-                                <a href="{{ route('tu.dashboard') }}" class="nav-link {{ request()->routeIs('tu.dashboard') ? 'active' : '' }}">
-                                    <i class="fas fa-home"></i> <span>Dashboard</span>
-                                </a>
+{{-- ROLE: TU --}}
+@if(Auth::user()->normalized_role == 'tu')
 
-                                <div class="nav-section-title">DATA</div>
+    <a href="{{ route('tu.dashboard') }}"
+       class="nav-link {{ request()->routeIs('tu.dashboard') ? 'active' : '' }}">
+        <i class="fas fa-home"></i>
+        <span>Dashboard</span>
+    </a>
 
-                                <a href="{{ route('tu.data-pribadi.index') }}" class="nav-link {{ request()->routeIs('tu.data-pribadi*') ? 'active' : '' }}">
-                                    <i class="fas fa-id-card"></i> <span>Data Pribadi</span>
-                                </a>
+    <div class="nav-section-title">KESISWAAN</div>
 
-                                <a href="{{ route('tu.siswa.index') }}" class="nav-link {{ request()->routeIs('tu.siswa*') ? 'active' : '' }}">
-                                    <i class="fas fa-users"></i> <span>Data Siswa</span>
-                                </a>
+    {{-- DATA PRIBADI (AMAN) --}}
+    @if(Route::has('tu.data-pribadi.index'))
+    <a href="{{ route('tu.data-pribadi.index') }}"
+       class="nav-link {{ request()->routeIs('tu.data-pribadi*') ? 'active' : '' }}">
+        <i class="fas fa-id-card"></i>
+        <span>Data Pribadi</span>
+    </a>
+    @endif
 
-                               
-                                <a href="{{ route('tu.kelas.index') }}" class="nav-link {{ request()->routeIs('tu.kelas*') ? 'active' : '' }}">
-                                    <i class="fas fa-school"></i> <span>Manajemen Kelas</span>
-                                </a>
+    {{-- SISWA --}}
+    <a href="{{ route('tu.siswa.index') }}"
+       class="nav-link {{ request()->routeIs('tu.siswa*') ? 'active' : '' }}">
+        <i class="fas fa-user-graduate"></i>
+        <span>Data Siswa</span>
+    </a>
 
-                               
+    {{-- KELAS (TAMBAHKAN INI) --}}
+    @if(Route::has('tu.kelas.index'))
+    <a href="{{ route('tu.kelas.index') }}"
+       class="nav-link {{ request()->routeIs('tu.kelas*') ? 'active' : '' }}">
+        <i class="fas fa-school"></i>
+        <span>Kelas</span>
+    </a>
+    @endif
 
-                                <div class="nav-section-title">BUKU INDUK</div>
+    {{-- BUKU INDUK / ADMINISTRASI --}}
+    @if(Route::has('tu.buku-induk.index'))
+    <a href="{{ route('tu.buku-induk.index') }}"
+       class="nav-link {{ request()->routeIs('tu.buku-induk*') ? 'active' : '' }}">
+        <i class="fas fa-book"></i>
+        <span>Buku Induk</span>
+    </a>
+    @else
+    {{-- Fallback: arahkan ke halaman yang sama dengan filter --}}
+    <a href="{{ route('tu.siswa.index', ['tingkat' => 'X']) }}"
+       class="nav-link">
+        <i class="fas fa-folder-open"></i>
+        <span>Administrasi</span>
+    </a>
+    @endif
 
-                                <a href="{{ route('tu.buku-induk.index') }}" class="nav-link {{ request()->routeIs('tu.buku-induk*') ? 'active' : '' }}">
-                                    <i class="fas fa-book"></i> <span>Buku Induk</span>
-                                </a>
+    {{-- MUTASI --}}
+    @if(Route::has('tu.mutasi.index'))
+    <a href="{{ route('tu.mutasi.index') }}"
+       class="nav-link {{ request()->routeIs('tu.mutasi*') ? 'active' : '' }}">
+        <i class="fas fa-exchange-alt"></i>
+        <span>Mutasi Siswa</span>
+    </a>
+    @endif
 
-                                <a href="{{ route('tu.mutasi.index') }}" class="nav-link {{ request()->routeIs('tu.mutasi*') ? 'active' : '' }}">
-                                    <i class="fas fa-exchange-alt"></i> <span>Mutasi Siswa</span>
-                                </a>
+    {{-- PKL (sementara nonaktif biar gak error) --}}
+    <a href="javascript:void(0)" class="nav-link">
+        <i class="fas fa-building"></i>
+        <span>Data PKL</span>
+    </a>
 
-                                <div class="nav-section-title">MANAJEMEN LULUSAN</div>
+    {{-- IJAZAH / KELULUSAN --}}
+    @if(Route::has('tu.kelulusan.index'))
+    <a href="{{ route('tu.kelulusan.index') }}"
+       class="nav-link {{ request()->routeIs('tu.kelulusan*') ? 'active' : '' }}">
+        <i class="fas fa-scroll"></i>
+        <span>Ijazah</span>
+    </a>
+    @endif
 
-                                <a href="{{ route('tu.alumni.index') }}" class="nav-link {{ request()->routeIs('tu.alumni*') ? 'active' : '' }}">
-                                    <i class="fas fa-user-graduate"></i> <span>Data Alumni</span>
-                                </a>
-                            @endif
+    {{-- ALUMNI --}}
+    @if(Route::has('tu.alumni.index'))
+    <a href="{{ route('tu.alumni.index') }}"
+       class="nav-link {{ request()->routeIs('tu.alumni*') ? 'active' : '' }}">
+        <i class="fas fa-user-graduate"></i>
+        <span>Data Alumni</span>
+    </a>
+    @endif
 
+@endif  
                             {{-- ROLE: TU KEPEGAWAIAN --}}
                             @if(Auth::user()->normalized_role == 'tu_kepegawaian')
                                 <a href="{{ route('tu_kepegawaian.dashboard') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.dashboard') ? 'active' : '' }}">

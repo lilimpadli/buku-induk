@@ -5,123 +5,185 @@
 @section('content')
 <style>
     :root {
-        --primary: #3B82F6;
-        --primary-dark: #2563EB;
-        --secondary: #8B5CF6;
+        --primary: #4F46E5;
+        --primary-light: #6366F1;
+        --secondary: #7C3AED;
         --success: #10B981;
-        --info: #06B6D4;
         --warning: #F59E0B;
         --danger: #EF4444;
-        --dark: #1E293B;
-        --gray: #64748B;
-        --light: #F8FAFC;
-        --white: #FFFFFF;
-        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        --transition: all 0.3s ease;
+        --info: #3B82F6;
+        --bg: #F4F7FE;
+        --card: #FFFFFF;
+        --border: #E5E7EB;
+        --text: #111827;
+        --text-light: #6B7280;
+        --shadow-sm: 0 2px 8px rgba(15,23,42,.05);
+        --shadow-md: 0 10px 25px rgba(15,23,42,.08);
+        --shadow-lg: 0 18px 35px rgba(15,23,42,.12);
+        --radius: 20px;
+        --transition: all .25s ease;
     }
 
     body {
-        background-color: var(--light);
+        background: linear-gradient(180deg, #f8faff 0%, #eef2ff 100%);
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    /* Header Section */
+    /* ================= HEADER ================= */
+
     .page-header {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        border-radius: 20px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        color: white;
-        box-shadow: var(--shadow-lg);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 28px;
+        padding: 32px;
+        margin-bottom: 24px;
         position: relative;
         overflow: hidden;
+        box-shadow: var(--shadow-lg);
     }
 
     .page-header::before {
         content: '';
         position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        transform: rotate(45deg);
+        width: 240px;
+        height: 240px;
+        background: rgba(255, 255, 255, .08);
+        border-radius: 50%;
+        top: -80px;
+        right: -70px;
     }
 
-    .page-header h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
+    .page-header::after {
+        content: '';
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        background: rgba(255, 255, 255, .05);
+        border-radius: 50%;
+        bottom: -60px;
+        left: -40px;
+    }
+
+    .header-content {
         position: relative;
-        z-index: 1;
-    }
-
-    .page-header .subtitle {
-        font-size: 1.1rem;
-        opacity: 0.9;
-        position: relative;
-        z-index: 1;
-    }
-
-    /* Action Buttons */
-    .action-buttons {
+        z-index: 2;
         display: flex;
-        gap: 1rem;
-        margin-top: 1.5rem;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
         flex-wrap: wrap;
     }
 
-    .btn {
-        padding: 0.75rem 1.5rem;
-        border-radius: 10px;
+    .header-left {
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .page-header h1 {
+        font-size: 34px;
+        font-weight: 800;
+        color: white;
+        margin: 0 0 8px 0;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+    }
+
+    .page-header .subtitle {
+        font-size: 14px;
+        color: rgba(255, 255, 255, .85);
+        margin: 0;
+    }
+
+    .page-header .meta {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+    }
+
+    .meta-badge {
+        background: rgba(255, 255, 255, .14);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, .15);
+        border-radius: 12px;
+        padding: 8px 14px;
+        color: white;
+        font-size: 12px;
         font-weight: 600;
-        transition: var(--transition);
-        border: none;
+    }
+
+    /* ================= ACTION BUTTONS ================= */
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-modern {
+        border: 1px solid rgba(148, 163, 184, .18);
+        border-radius: 16px;
+        padding: 12px 20px;
+        font-weight: 700;
+        color: var(--text);
+        background: #ffffff;
+        box-shadow: var(--shadow-sm);
+        transition: transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
+        justify-content: center;
+        gap: 10px;
+        text-decoration: none;
+        white-space: nowrap;
+        font-size: 14px;
+        cursor: pointer;
+        border: none;
     }
 
-    .btn-primary {
+    .btn-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        background: #f8fafc;
+    }
+
+    .btn-modern:active,
+    .btn-modern:focus-visible {
+        transform: scale(.98);
+        box-shadow: 0 8px 16px rgba(15, 23, 42, .12);
+    }
+
+    .btn-modern-white {
         background: white;
         color: var(--primary);
-        box-shadow: var(--shadow);
     }
 
-    .btn-primary:hover {
-        background: var(--white);
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-lg);
-    }
-
-    .btn-secondary {
-        background: rgba(255,255,255,0.2);
+    .btn-modern-outline {
+        background: transparent;
         color: white;
-        border: 1px solid rgba(255,255,255,0.3);
+        border: 1.5px solid rgba(255, 255, 255, .3);
     }
 
-    .btn-secondary:hover {
-        background: rgba(255,255,255,0.3);
-        transform: translateY(-2px);
+    .btn-modern-outline:hover {
+        background: rgba(255, 255, 255, .1);
+        border-color: rgba(255, 255, 255, .5);
     }
 
-    /* Info Cards */
+    /* ================= INFO CARDS ================= */
+
     .info-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
     }
 
     .info-card {
         background: white;
         border-radius: 16px;
-        padding: 1.5rem;
-        box-shadow: var(--shadow);
-        transition: var(--transition);
+        padding: 20px;
+        box-shadow: var(--shadow-sm);
+        transition: transform .2s ease, box-shadow .2s ease;
         position: relative;
         overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, .05);
     }
 
     .info-card::before {
@@ -135,117 +197,66 @@
     }
 
     .info-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow-lg);
-    }
-
-    .info-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .info-card:nth-child(1) .info-icon {
-        background: rgba(59, 130, 246, 0.1);
-        color: var(--primary);
-    }
-
-    .info-card:nth-child(2) .info-icon {
-        background: rgba(139, 92, 246, 0.1);
-        color: var(--secondary);
-    }
-
-    .info-card:nth-child(3) .info-icon {
-        background: rgba(16, 185, 129, 0.1);
-        color: var(--success);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
     }
 
     .info-label {
-        font-size: 0.875rem;
-        color: var(--gray);
+        font-size: 12px;
+        color: var(--text-light);
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-bottom: 0.5rem;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        font-weight: 600;
     }
 
     .info-value {
-        font-size: 1.25rem;
+        font-size: 18px;
         font-weight: 700;
-        color: var(--dark);
+        color: var(--text);
+        word-break: break-word;
     }
 
-    /* Student Table */
+    /* ================= STUDENT TABLE ================= */
+
     .table-container {
         background: white;
         border-radius: 16px;
-        box-shadow: var(--shadow);
+        box-shadow: var(--shadow-sm);
         overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, .05);
     }
 
     .table-header {
-        padding: 1.5rem;
-        border-bottom: 1px solid #E2E8F0;
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
-        gap: 1rem;
+        gap: 16px;
     }
 
     .table-title {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: 12px;
     }
 
     .table-title h3 {
-        font-size: 1.25rem;
+        font-size: 18px;
         font-weight: 700;
-        color: var(--dark);
+        color: var(--text);
         margin: 0;
     }
 
     .student-count {
         background: var(--primary);
         color: white;
-        padding: 0.25rem 0.75rem;
+        padding: 4px 12px;
         border-radius: 20px;
-        font-size: 0.875rem;
+        font-size: 12px;
         font-weight: 600;
-    }
-
-    .search-box {
-        position: relative;
-        width: 100%;
-        max-width: 300px;
-    }
-
-    .search-box input {
-        width: 100%;
-        padding: 0.5rem 2.5rem 0.5rem 1rem;
-        border: 1px solid #E2E8F0;
-        border-radius: 8px;
-        font-size: 0.875rem;
-        transition: var(--transition);
-    }
-
-    .search-box input:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    .search-box i {
-        position: absolute;
-        right: 0.75rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--gray);
     }
 
     .table-wrapper {
@@ -258,31 +269,37 @@
     }
 
     thead {
-        background: #F8FAFC;
+        background: var(--bg);
     }
 
     th {
-        padding: 1rem;
+        padding: 12px 16px;
         text-align: left;
-        font-weight: 600;
-        color: var(--gray);
-        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--text-light);
+        font-size: 12px;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        border-bottom: 1px solid #E2E8F0;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid var(--border);
     }
 
     td {
-        padding: 1rem;
-        border-bottom: 1px solid #F1F5F9;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
     }
 
     tbody tr {
-        transition: var(--transition);
+        transition: background .2s ease;
     }
 
     tbody tr:hover {
-        background: #F8FAFC;
+        background: #f9fafb;
+    }
+
+    .student-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
     .student-avatar {
@@ -291,205 +308,210 @@
         border-radius: 50%;
         display: flex;
         align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: white;
-            margin-right: 0.75rem;
+        justify-content: center;
+        font-weight: 700;
+        color: white;
+        font-size: 14px;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+
+    .student-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .student-name {
+        font-weight: 600;
+        color: var(--text);
+        font-size: 14px;
+    }
+
+    .badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .badge-laki {
+        background: rgba(59, 130, 246, .1);
+        color: #3B82F6;
+    }
+
+    .badge-perempuan {
+        background: rgba(236, 72, 153, .1);
+        color: #EC4899;
+    }
+
+    /* ================= EMPTY STATE ================= */
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-light);
+    }
+
+    .empty-state i {
+        font-size: 48px;
+        color: #CBD5E1;
+        margin-bottom: 16px;
+    }
+
+    .empty-state h4 {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0 0 8px 0;
+    }
+
+    .empty-state p {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    /* ================= RESPONSIVE ================= */
+
+    @media (max-width: 768px) {
+        .header-content {
+            flex-direction: column;
+            align-items: flex-start;
         }
 
-        .student-avatar img {
+        .action-buttons {
             width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
+        }
+
+        .btn-modern {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .table-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .student-avatar {
+            width: 36px;
+            height: 36px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .page-header {
+            padding: 20px;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+        }
+
+        .page-header .subtitle {
+            font-size: 12px;
+        }
+
+        .action-buttons {
+            gap: 8px;
+        }
+
+        .btn-modern {
+            padding: 10px 16px;
+            font-size: 13px;
+        }
+
+        .info-value {
+            font-size: 16px;
+        }
+
+        th, td {
+            padding: 8px 10px;
+            font-size: 12px;
         }
 
         .student-info {
-            display: flex;
-            align-items: center;
+            gap: 8px;
         }
 
-        .student-name {
-            font-weight: 600;
-            color: var(--dark);
+        .student-avatar {
+            width: 32px;
+            height: 32px;
         }
-
-        .badge {
-            padding: 0.375rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .badge-laki {
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--primary);
-        }
-
-        .badge-perempuan {
-            background: rgba(236, 72, 153, 0.1);
-            color: #EC4899;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--gray);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            color: #CBD5E1;
-            margin-bottom: 1rem;
-        }
-
-        .empty-state h4 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 0.5rem;
-        }
-
-        /* Loading State */
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .loading.active {
-            display: block;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .page-header {
-                padding: 1.5rem;
-            }
-
-            .page-header h1 {
-                font-size: 2rem;
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .table-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .search-box {
-                max-width: 100%;
-            }
-
-            th, td {
-                padding: 0.75rem 0.5rem;
-                font-size: 0.875rem;
-            }
-
-            .student-avatar {
-                width: 32px;
-                height: 32px;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .page-header h1 {
-                font-size: 1.5rem;
-            }
-
-            .page-header .subtitle {
-                font-size: 1rem;
-            }
-
-            .info-card {
-                padding: 1rem;
-            }
-
-            .info-value {
-                font-size: 1.125rem;
-            }
-
-            th, td {
-                padding: 0.5rem;
-            }
-
-            .table-header {
-                padding: 1rem;
-            }
-        }
+    }
 </style>
 
 <div class="container-fluid px-3 px-md-4 py-4">
     <!-- Page Header -->
     <div class="page-header">
-        <h1>Detail Rombel</h1>
-        <p class="subtitle">{{ $rombel->nama }}</p>
-        <div class="action-buttons">
-            <a href="{{ route('tu.kelas.export', $rombel->id) }}" class="btn btn-primary">
-                <i class="fas fa-file-excel"></i>
-                Export Excel
-            </a>
-            <a href="{{ request()->header('referer') ?: route('tu.kelas.index') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i>
-                Kembali
-            </a>
+        <div class="header-content">
+            <div class="header-left">
+                <h1>{{ $rombel->nama }}</h1>
+                <p class="subtitle">Detail Rombel / Kelas</p>
+                <div class="meta">
+                    @if($rombel->kelas)
+                        <span class="meta-badge">
+                            <i class="fas fa-layer-group"></i> Tingkat {{ $rombel->kelas->tingkat }}
+                        </span>
+                    @endif
+                    @if($rombel->kelas && $rombel->kelas->jurusan)
+                        <span class="meta-badge">
+                            <i class="fas fa-briefcase"></i> {{ $rombel->kelas->jurusan->nama }}
+                        </span>
+                    @endif
+                </div>
+            </div>
+            <div class="action-buttons">
+                <a href="{{ route('tu.kelas.export', $rombel->id) }}" class="btn-modern btn-modern-white">
+                    <i class="fas fa-file-excel"></i>
+                    Export
+                </a>
+                <a href="{{ route('tu.kelas.edit', $rombel->id) }}" class="btn-modern btn-modern-outline">
+                    <i class="fas fa-edit"></i>
+                    Edit
+                </a>
+                <a href="{{ request()->header('referer') ?: route('tu.kelas.index') }}" class="btn-modern btn-modern-outline">
+                    <i class="fas fa-arrow-left"></i>
+                    Kembali
+                </a>
+            </div>
         </div>
     </div>
 
     <!-- Info Cards -->
     <div class="info-grid">
         <div class="info-card">
-            <div class="info-icon">
-                <i class="fas fa-layer-group"></i>
-            </div>
-            <p class="info-label">Tingkat Kelas</p>
-            <p class="info-value">{{ $rombel->kelas->tingkat ?? '-' }}</p>
+            <p class="info-label">Nama Kelas</p>
+            <p class="info-value">{{ $rombel->nama }}</p>
         </div>
         <div class="info-card">
-            <div class="info-icon">
-                <i class="fas fa-graduation-cap"></i>
-            </div>
             <p class="info-label">Jurusan</p>
             <p class="info-value">{{ $rombel->kelas->jurusan->nama ?? '-' }}</p>
         </div>
         <div class="info-card">
-            <div class="info-icon">
-                <i class="fas fa-user-tie"></i>
-            </div>
             <p class="info-label">Wali Kelas</p>
             <p class="info-value">{{ $rombel->guru->nama ?? '-' }}</p>
+        </div>
+        <div class="info-card">
+            <p class="info-label">Jumlah Siswa</p>
+            <p class="info-value">{{ $rombel->siswa->count() }}</p>
         </div>
     </div>
 
@@ -500,16 +522,12 @@
                 <h3>Daftar Siswa</h3>
                 <span class="student-count">{{ $rombel->siswa->count() }} Siswa</span>
             </div>
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Cari siswa...">
-                <i class="fas fa-search"></i>
-            </div>
         </div>
         <div class="table-wrapper">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>No</th>
+                        <th>#</th>
                         <th>Nama Siswa</th>
                         <th>NIS</th>
                         <th>Jenis Kelamin</th>
@@ -525,9 +543,7 @@
                                         @if($siswa->foto)
                                             <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}">
                                         @else
-                                            <div style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
-                                                {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
-                                            </div>
+                                            {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
                                         @endif
                                     </div>
                                     <span class="student-name">{{ $siswa->nama_lengkap }}</span>
@@ -543,102 +559,75 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="empty-state">
-                                <i class="fas fa-user-graduate"></i>
-                                <h4>Belum ada siswa</h4>
-                                <p>Belum ada data siswa untuk rombel ini.</p>
+                            <td colspan="4">
+                                <div class="empty-state">
+                                    <i class="fas fa-user-graduate"></i>
+                                    <h4>Belum ada siswa</h4>
+                                    <p>Belum ada data siswa untuk rombel ini.</p>
+                                </div>
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-        <div class="loading" id="loadingState">
-            <div class="spinner"></div>
-        </div>
     </div>
 </div>
 
 <script>
-    // Search functionality
-    document.getElementById('searchInput').addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        const rows = document.querySelectorAll('#studentTableBody tr');
-        
-        rows.forEach(row => {
-            const name = row.dataset.name;
-            const nis = row.dataset.nis;
-            
-            if (name.includes(searchTerm) || nis.includes(searchTerm)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add smooth interaction effects to cards
+        document.querySelectorAll('.info-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transition = 'transform .3s ease, box-shadow .3s ease';
+            });
         });
-    });
 
-    // Add smooth scroll behavior
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
+        // Add ripple effect to modern buttons
+        document.querySelectorAll('.btn-modern').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
 
-    // Add click animation to buttons
-    document.querySelectorAll('.btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-            const ripple = document.createElement('span');
-            const rect = this.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
-            
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = x + 'px';
-            ripple.style.top = y + 'px';
-            ripple.classList.add('ripple');
-            
-            this.appendChild(ripple);
-            
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('btn-ripple');
+
+                this.appendChild(ripple);
+
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
         });
     });
 </script>
 
 <style>
-    /* Ripple effect for buttons */
-    .btn {
+    /* Button ripple effect */
+    .btn-modern {
         position: relative;
         overflow: hidden;
     }
 
-    .ripple {
+    .btn-ripple {
         position: absolute;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, .5);
         transform: scale(0);
-        animation: ripple-animation 0.6s ease-out;
+        animation: ripple-effect .6s ease-out;
+        pointer-events: none;
     }
 
-    @keyframes ripple-animation {
+    @keyframes ripple-effect {
         to {
             transform: scale(4);
             opacity: 0;
         }
-    }
-
-    /* Loading spinner animation */
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
     }
 </style>
 @endsection
