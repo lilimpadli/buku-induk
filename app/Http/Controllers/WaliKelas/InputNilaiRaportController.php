@@ -14,6 +14,8 @@ use App\Models\MutasiSiswa;
 use App\Models\Rombel;
 use App\Models\Jurusan;
 use App\Exports\NilaiRaportTemplate;
+use App\Helpers\KkmHelper;
+use App\Models\TahunAjaran;
 use App\Exports\LegerTemplate;
 use App\Imports\NilaiRaportImport;
 use App\Imports\LegerImport;
@@ -183,232 +185,237 @@ public function index(Request $request)
     }
 
 
-    public function store(Request $req, $siswa_id)
-    {
-        $req->validate([
-            'semester'      => 'required',
-            'tahun_ajaran'  => 'required',
-            'nilai'         => 'required|array'
+public function store(Request $req, $siswa_id)
+{
+    $req->validate([
+        'semester'      => 'required',
+        'tahun_ajaran'  => 'required',
+        'nilai'         => 'required|array'
+    ]);
+
+    // Ambil data siswa
+    $siswa = DataSiswa::findOrFail($siswa_id);
+    
+    // Validasi setiap nilai harus diisi
+    foreach ($req->nilai as $mapel_id => $row) {
+        if (empty($row['nilai_akhir'])) {
+            return back()->withInput()->withErrors([
+                'nilai' => 'Semua nilai mata pelajaran harus diisi.'
+            ]);
+        }
+        if (empty($row['deskripsi'])) {
+            return back()->withInput()->withErrors([
+                'nilai' => 'Capaian Kompetensi untuk semua mata pelajaran harus diisi.'
+            ]);
+        }
+    }
+
+    // 🔥🔥🔥 VALIDASI KKM - PALING SIMPLE 🔥🔥🔥
+    $kelasId = $siswa->rombel->kelas_id ?? null;
+    
+    foreach ($req->nilai as $mapel_id => $row) {
+        $nilai = (float) $row['nilai_akhir'];
+        
+        // Cari KKM di database
+        $kkm = DB::table('kkm')
+            ->where('mata_pelajaran_id', $mapel_id)
+            ->where('kelas_id', $kelasId)
+            ->value('nilai_kkm');
+        
+        // Jika ada KKM dan nilai di bawah KKM -> TOLAK!
+        if ($kkm !== null && $nilai < $kkm) {
+            $mapelNama = DB::table('mata_pelajarans')->where('id', $mapel_id)->value('nama');
+            return back()->withInput()->with('error', "❌ Nilai untuk <strong>{$mapelNama}</strong> adalah {$nilai}, di bawah KKM ({$kkm}). Silakan perbaiki.");
+        }
+    }
+
+    // Validasi ekstrakurikuler minimal 1 harus diisi
+    $ekstraCount = 0;
+    if ($req->has('ekstra')) {
+        foreach ($req->ekstra as $item) {
+            if (!empty($item['nama_ekstra'])) {
+                $ekstraCount++;
+            }
+        }
+    }
+    if ($ekstraCount == 0) {
+        return back()->withInput()->withErrors([
+            'ekstra' => 'Minimal 1 ekstrakurikuler harus diisi.'
         ]);
+    }
 
-        // Validasi setiap nilai harus diisi (nilai_akhir dan deskripsi wajib)
-        foreach ($req->nilai as $mapel_id => $row) {
-            if (empty($row['nilai_akhir'])) {
-                return back()->withInput()->withErrors([
-                    'nilai' => 'Semua nilai mata pelajaran harus diisi. Mata pelajaran ID: ' . $mapel_id . ' masih kosong.'
-                ]);
+    // Validasi kehadiran
+    if (!$req->has('hadir') || empty($req->hadir)) {
+        return back()->withInput()->withErrors([
+            'hadir' => 'Data ketidakhadiran harus diisi.'
+        ]);
+    }
+
+    $semester = $req->semester;
+    $tahun    = $req->tahun_ajaran;
+
+    // ==========================================
+    // SIMPAN DATA
+    // ==========================================
+    
+    // SIMPAN NILAI MAPEL
+    foreach ($req->nilai as $mapel_id => $row) {
+        $where = [
+            'siswa_id' => $siswa_id,
+            'mata_pelajaran_id' => $mapel_id,
+            'semester' => $semester,
+            'tahun_ajaran' => $tahun,
+        ];
+
+        $existing = NilaiRaport::where($where)->first();
+        if ($existing) {
+            $existing->nilai_akhir = $row['nilai_akhir'];
+            $existing->deskripsi = $row['deskripsi'];
+            if (empty($existing->rombel_id)) {
+                $existing->rombel_id = $siswa->rombel_id ?? null;
             }
-            if (empty($row['deskripsi'])) {
-                return back()->withInput()->withErrors([
-                    'nilai' => 'Capaian Kompetensi untuk semua mata pelajaran harus diisi. Mata pelajaran ID: ' . $mapel_id . ' masih kosong.'
-                ]);
+            if (empty($existing->kelas_id)) {
+                $existing->kelas_id = $siswa->rombel && $siswa->rombel->kelas ? $siswa->rombel->kelas->id : null;
             }
-        }
-
-        // Validasi ekstrakurikuler minimal 1 harus diisi
-        $ekstraCount = 0;
-        if ($req->has('ekstra')) {
-            foreach ($req->ekstra as $item) {
-                if (!empty($item['nama_ekstra'])) {
-                    $ekstraCount++;
-                }
-            }
-        }
-        if ($ekstraCount == 0) {
-            return back()->withInput()->withErrors([
-                'ekstra' => 'Minimal 1 ekstrakurikuler harus diisi.'
-            ]);
-        }
-
-        // Validasi kehadiran harus diisi
-        if (!$req->has('hadir') || empty($req->hadir)) {
-            return back()->withInput()->withErrors([
-                'hadir' => 'Data ketidakhadiran harus diisi (minimal isi 0 untuk semua).'
-            ]);
-        }
-
-        $semester = $req->semester;
-        $tahun    = $req->tahun_ajaran;
-
-        $siswa = DataSiswa::findOrFail($siswa_id);
-
-        // --------------------------
-        // SIMPAN NILAI MAPEL
-        // --------------------------
-        foreach ($req->nilai as $mapel_id => $row) {
-            $where = [
+            $existing->save();
+        } else {
+            NilaiRaport::create([
                 'siswa_id' => $siswa_id,
                 'mata_pelajaran_id' => $mapel_id,
                 'semester' => $semester,
                 'tahun_ajaran' => $tahun,
-            ];
+                'nilai_akhir' => $row['nilai_akhir'],
+                'deskripsi' => $row['deskripsi'],
+                'rombel_id' => $siswa->rombel_id ?? null,
+                'kelas_id' => $siswa->rombel && $siswa->rombel->kelas ? $siswa->rombel->kelas->id : null,
+            ]);
+        }
+    }
 
-            $existing = NilaiRaport::where($where)->first();
-            if ($existing) {
-                $existing->nilai_akhir = $row['nilai_akhir'] ?? $existing->nilai_akhir;
-                $existing->deskripsi = $row['deskripsi'] ?? $existing->deskripsi;
-                if (empty($existing->rombel_id)) {
-                    $existing->rombel_id = $siswa->rombel_id ?? null;
-                }
-                if (empty($existing->kelas_id)) {
-                    $existing->kelas_id = $siswa->rombel && $siswa->rombel->kelas ? $siswa->rombel->kelas->id : null;
-                }
-                $existing->save();
-            } else {
-                NilaiRaport::create([
+    // SIMPAN EKSTRA
+    if ($req->has('ekstra')) {
+        foreach ($req->ekstra as $item) {
+            if (empty($item['nama_ekstra'])) continue;
+            EkstrakurikulerSiswa::updateOrCreate(
+                ['id' => $item['id'] ?? null],
+                [
                     'siswa_id' => $siswa_id,
-                    'mata_pelajaran_id' => $mapel_id,
                     'semester' => $semester,
                     'tahun_ajaran' => $tahun,
-                    'nilai_akhir' => $row['nilai_akhir'] ?? null,
-                    'deskripsi' => $row['deskripsi'] ?? null,
-                    'rombel_id' => $siswa->rombel_id ?? null,
-                    'kelas_id' => $siswa->rombel && $siswa->rombel->kelas ? $siswa->rombel->kelas->id : null,
-                ]);
-            }
+                    'nama_ekstra' => $item['nama_ekstra'],
+                    'predikat' => $item['predikat'] ?? null,
+                    'keterangan' => $item['keterangan'] ?? null,
+                ]
+            );
         }
+    }
 
-        // --------------------------
-        // SIMPAN EKSTRA — FIXED
-        // --------------------------
-        if ($req->has('ekstra')) {
-            foreach ($req->ekstra as $i => $item) {
+    // KEHADIRAN
+    Kehadiran::updateOrCreate(
+        [
+            'siswa_id' => $siswa_id,
+            'semester' => $semester,
+            'tahun_ajaran' => $tahun,
+        ],
+        [
+            'sakit' => $req->hadir['sakit'] ?? 0,
+            'izin' => $req->hadir['izin'] ?? 0,
+            'tanpa_keterangan' => $req->hadir['alpa'] ?? 0,
+        ]
+    );
 
-                if (empty($item['nama_ekstra'])) continue;
-
-                EkstrakurikulerSiswa::updateOrCreate(
-                    [
-                        'id'           => $item['id'] ?? null, // aman saat edit
-                    ],
-                    [
-                        'siswa_id'     => $siswa_id,
-                        'semester'     => $semester,
-                        'tahun_ajaran' => $tahun,
-                        'nama_ekstra'  => $item['nama_ekstra'],
-                        'predikat'     => $item['predikat'] ?? null,
-                        'keterangan'   => $item['keterangan'] ?? null,
-                    ]
-                );
-            }
-        }
-
-        // --------------------------
-        // KEHADIRAN
-        // --------------------------
-        Kehadiran::updateOrCreate(
-            [
-                'siswa_id'     => $siswa_id,
-                'semester'     => $semester,
-                'tahun_ajaran' => $tahun,
-            ],
-            [
-                'sakit'             => $req->hadir['sakit'] ?? 0,
-                'izin'              => $req->hadir['izin'] ?? 0,
-                'tanpa_keterangan'  => $req->hadir['alpa'] ?? 0,
-            ]
-        );
-
-        // --------------------------
-        // INFO RAPOR
-        // --------------------------
+    // INFO RAPOR
+    if ($req->has('info')) {
         RaporInfo::updateOrCreate(
             [
-                'siswa_id'     => $siswa_id,
-                'semester'     => $semester,
+                'siswa_id' => $siswa_id,
+                'semester' => $semester,
                 'tahun_ajaran' => $tahun,
             ],
             [
-                'wali_kelas'     => $req->info['wali_kelas'] ?? null,
-                'nip_wali'       => $req->info['nip_wali'] ?? null,
+                'wali_kelas' => $req->info['wali_kelas'] ?? null,
+                'nip_wali' => $req->info['nip_wali'] ?? null,
                 'kepala_sekolah' => $req->info['kepsek'] ?? null,
-                'nip_kepsek'     => $req->info['nip_kepsek'] ?? null,
-                'tanggal_rapor'  => $req->info['tanggal_rapor'] ?? null,
+                'nip_kepsek' => $req->info['nip_kepsek'] ?? null,
+                'tanggal_rapor' => $req->info['tanggal_rapor'] ?? null,
             ]
         );
+    }
 
-        // --------------------------
-        // KENAIKAN KELAS (Rules)
-        // - Jika semester Ganjil -> siswa tetap di kelas (tidak dipromosikan)
-        // - Jika semester Genap  -> default dipromosikan (Naik Kelas) dan rombel tujuan dapat diset
-        // --------------------------
-        if ($req->has('kenaikan')) {
-            if (strtolower($semester) === 'ganjil') {
-                // enforce no promotion on ganjil: clear rombel tujuan
-                KenaikanKelas::updateOrCreate(
-                    [
-                        'siswa_id'     => $siswa_id,
-                        'semester'     => $semester,
-                        'tahun_ajaran' => $tahun,
-                    ],
-                    [
-                        'status'           => 'Tidak Naik',
-                        'catatan'          => $req->kenaikan['catatan'] ?? null,
-                        'rombel_tujuan_id' => null,
-                    ]
-                );
+    // KENAIKAN KELAS
+    if ($req->has('kenaikan')) {
+        if (strtolower($semester) === 'ganjil') {
+            KenaikanKelas::updateOrCreate(
+                [
+                    'siswa_id' => $siswa_id,
+                    'semester' => $semester,
+                    'tahun_ajaran' => $tahun,
+                ],
+                [
+                    'status' => 'Tidak Naik',
+                    'catatan' => $req->kenaikan['catatan'] ?? null,
+                    'rombel_tujuan_id' => null,
+                ]
+            );
+        } else {
+            $raw = $req->kenaikan['status'] ?? 'Naik Kelas';
+            $sNorm = strtolower(str_replace([' ', '_'], '', trim($raw)));
+            if (in_array($sNorm, ['naik', 'naikkelas'])) {
+                $status = 'Naik Kelas';
+            } elseif (in_array($sNorm, ['tidaknaik', 'tidak'])) {
+                $status = 'Tidak Naik';
+            } elseif (in_array($sNorm, ['lulus', 'lulusan'])) {
+                $status = 'Lulus';
             } else {
-                // Genap or other semesters: normalize status and persist; move student only on non-ganjil when status==Naik Kelas
-                $raw = $req->kenaikan['status'] ?? 'Naik Kelas';
-                $sNorm = strtolower(str_replace([' ', '_'], '', trim($raw)));
-                if (in_array($sNorm, ['naik', 'naikkelas'])) {
-                    $status = 'Naik Kelas';
-                } elseif (in_array($sNorm, ['tidaknaik', 'tidak'])) {
-                    $status = 'Tidak Naik';
-                } elseif (in_array($sNorm, ['lulus', 'lulusan'])) {
-                    $status = 'Lulus';
-                } else {
-                    $status = 'Naik Kelas';
+                $status = 'Naik Kelas';
+            }
+
+            $kenaikan = KenaikanKelas::updateOrCreate(
+                [
+                    'siswa_id' => $siswa_id,
+                    'semester' => $semester,
+                    'tahun_ajaran' => $tahun,
+                ],
+                [
+                    'status' => $status,
+                    'catatan' => $req->kenaikan['catatan'] ?? null,
+                    'rombel_tujuan_id' => $req->kenaikan['rombel_tujuan_id'] ?? null,
+                ]
+            );
+
+            if (strtolower($semester) !== 'ganjil' && in_array($status, ['Naik Kelas', 'Lulus'])) {
+                $target = $req->kenaikan['rombel_tujuan_id'] ?? ($kenaikan->rombel_tujuan_id ?? null);
+                if ($target) {
+                    $s = DataSiswa::find($siswa_id);
+                    if ($s) {
+                        $s->rombel_id = $target;
+                        $s->save();
+                    }
                 }
 
-                $kenaikan = KenaikanKelas::updateOrCreate(
+                $mutasiStatus = $status === 'Lulus' ? 'lulus' : 'naik_kelas';
+                $keterangan = $status === 'Lulus' 
+                    ? 'Lulus dari rapor ' . $tahun . ' semester ' . $semester
+                    : 'Naik kelas dari rapor ' . $tahun . ' semester ' . $semester;
+
+                MutasiSiswa::updateOrCreate(
                     [
-                        'siswa_id'     => $siswa_id,
-                        'semester'     => $semester,
-                        'tahun_ajaran' => $tahun,
+                        'siswa_id' => $siswa_id,
+                        'status' => $mutasiStatus
                     ],
                     [
-                        'status'           => $status,
-                        'catatan'          => $req->kenaikan['catatan'] ?? null,
-                        'rombel_tujuan_id' => $req->kenaikan['rombel_tujuan_id'] ?? null,
+                        'tanggal_mutasi' => now()->format('Y-m-d'),
+                        'keterangan' => $keterangan,
                     ]
                 );
-
-                // Apply actual move only when not Ganjil and status indicates promotion/lulus
-                    if (strtolower($semester) !== 'ganjil' && in_array($status, ['Naik Kelas', 'Lulus'])) {
-                        // prefer submitted target, fallback to saved kenaikan record
-                        $target = $req->kenaikan['rombel_tujuan_id'] ?? ($kenaikan->rombel_tujuan_id ?? null);
-                        if ($target) {
-                            $s = DataSiswa::find($siswa_id);
-                            if ($s) {
-                                $s->rombel_id = $target;
-                                $s->save();
-                            }
-                        }
-
-                        // Buat/update record mutasi dengan status sesuai kenaikan
-                        $mutasiStatus = $status === 'Lulus' ? 'lulus' : 'naik_kelas';
-                        $keterangan = $status === 'Lulus' 
-                            ? 'Lulus dari rapor ' . $tahun . ' semester ' . $semester
-                            : 'Naik kelas dari rapor ' . $tahun . ' semester ' . $semester;
-
-                        MutasiSiswa::updateOrCreate(
-                            [
-                                'siswa_id' => $siswa_id,
-                                'status' => $mutasiStatus
-                            ],
-                            [
-                                'tanggal_mutasi' => now()->format('Y-m-d'),
-                                'keterangan' => $keterangan,
-                            ]
-                        );
-                    }
             }
         }
-
-        return redirect()
-            ->route('walikelas.input_nilai_raport.index')
-            ->with('success', 'Rapor berhasil disimpan!');
     }
+
+    return redirect()
+        ->route('walikelas.input_nilai_raport.index')
+        ->with('success', '✅ Rapor berhasil disimpan!');
+}
 
     public function list($id)
     {
@@ -512,11 +519,9 @@ public function index(Request $request)
         $kelompokA = $kelompokA->get();
         $kelompokB = $kelompokB->get();
 
-        // juga kirim jurusan + rombels + rombelsFiltered untuk edit
         $jurusans = Jurusan::orderBy('nama')->get();
         $rombels   = Rombel::with('kelas')->orderBy('nama')->get();
 
-        // hitung rombelsFiltered sama seperti di create
         $rombelsFiltered = collect();
         $currentJurusanId = null;
         $targetTingkat = null;
@@ -555,47 +560,50 @@ public function index(Request $request)
         ));
     }
 
-    public function destroy(Request $req, $siswa_id)
+    public function destroy(Request $request, $siswa_id)
     {
-        $semester = $req->semester ?? $req->input('semester');
-        $tahun = $req->tahun_ajaran ?? $req->input('tahun_ajaran') ?? $req->input('tahun');
+        $semester = $request->input('semester');
+        $tahun = $request->input('tahun');
 
-        if (!$semester || !$tahun) {
-            return redirect()->back()->with('error', 'Parameter semester atau tahun ajaran diperlukan untuk menghapus.');
+        if (!$siswa_id || !$semester || !$tahun) {
+            return redirect()->back()->with('error', 'Parameter tidak lengkap.');
         }
 
-        // delete nilai mapel
-        NilaiRaport::where('siswa_id', $siswa_id)
+        // Hapus semua data terkait
+        $deleted = 0;
+
+        $deleted += NilaiRaport::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->delete();
 
-        // delete ekstra
-        EkstrakurikulerSiswa::where('siswa_id', $siswa_id)
+        $deleted += EkstrakurikulerSiswa::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->delete();
 
-        // delete kehadiran
-        Kehadiran::where('siswa_id', $siswa_id)
+        $deleted += Kehadiran::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->delete();
 
-        // delete rapor info
-        RaporInfo::where('siswa_id', $siswa_id)
+        $deleted += RaporInfo::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->delete();
 
-        // delete kenaikan record for that semester/tahun
-        KenaikanKelas::where('siswa_id', $siswa_id)
+        $deleted += KenaikanKelas::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->delete();
 
-        return redirect()->route('walikelas.input_nilai_raport.index')
-            ->with('success', 'Data raport berhasil dihapus untuk semester ' . $semester . ' tahun ' . $tahun);
+        if ($deleted > 0) {
+            return redirect()->route('walikelas.nilai_raport.list', $siswa_id)
+                ->with('success', 'Data raport semester ' . $semester . ' tahun ' . $tahun . ' berhasil dihapus (' . $deleted . ' record).');
+        } else {
+            return redirect()->route('walikelas.nilai_raport.list', $siswa_id)
+                ->with('info', 'Tidak ada data raport yang ditemukan untuk semester ' . $semester . ' tahun ' . $tahun . '.');
+        }
     }
 
     /**
@@ -689,6 +697,17 @@ public function index(Request $request)
             }
 
         } catch (\Exception $e) {
+            if (session()->has('kkm_warnings')) {
+                $warnings = session('kkm_warnings');
+                $warningMessage = '⚠️ Terdapat ' . count($warnings) . ' nilai di bawah KKM:<br>';
+                foreach ($warnings as $w) {
+                    $warningMessage .= "- {$w['mapel_nama']}: {$w['nilai']} (KKM: {$w['kkm']})<br>";
+                }
+                return redirect()
+                    ->route('walikelas.input_nilai_raport.index')
+                    ->with('warning', $warningMessage)
+                    ->with('kkm_warnings', $warnings);
+            }
             return redirect()->back()
                 ->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
         }

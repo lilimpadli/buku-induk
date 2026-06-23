@@ -1,11 +1,9 @@
 @extends('layouts.app')
 
-@section('title','Dashboard Kurikulum')
+@section('title', 'Dashboard Kurikulum')
 
 @section('content')
-
 <style>
-    /* ===================== DASHBOARD KURIKULUM STYLES ===================== */
     :root {
         --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         --success-gradient: linear-gradient(135deg, #13B497 0%, #59D4A4 100%);
@@ -13,17 +11,27 @@
         --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
         --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         --card-hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        --bg-light: #f7fafc;
         --border-radius: 16px;
         --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    body {
-        background-color: var(--bg-light);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    body { background-color: #f7fafc; font-family: 'Inter', sans-serif; }
+
+    main {
+        padding: 20px 15px !important;
+        overflow-x: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
-    /* ===== HEADER ===== */
+    .container-fluid {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 10px !important;
+        overflow-x: auto !important;
+    }
+
+    /* HEADER */
     .dashboard-header {
         background: var(--primary-gradient);
         color: white;
@@ -33,6 +41,7 @@
         box-shadow: var(--card-shadow);
         position: relative;
         overflow: hidden;
+        width: 100%;
     }
 
     .dashboard-header::before {
@@ -50,33 +59,40 @@
     .dashboard-header h1 {
         font-weight: 700;
         margin-bottom: 0.25rem;
+        font-size: clamp(1.3rem, 3vw, 1.8rem);
         position: relative;
         z-index: 1;
-        font-size: 1.75rem;
     }
 
     .dashboard-header .text-muted {
         color: rgba(255, 255, 255, 0.8) !important;
+        font-size: clamp(0.8rem, 1.5vw, 1rem);
         position: relative;
         z-index: 1;
         margin-bottom: 0;
     }
 
-    /* ===== STAT CARDS ===== */
+    /* STATS */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
     .stat-card {
-        border-radius: 20px;
+        border-radius: var(--border-radius);
         border: none;
         box-shadow: var(--card-shadow);
         transition: var(--transition);
         overflow: hidden;
         position: relative;
-        height: 100%;
         background: white;
-        padding: 1.5rem;
+        padding: 1.2rem 1.2rem;
     }
 
     .stat-card:hover {
-        transform: translateY(-8px);
+        transform: translateY(-5px);
         box-shadow: var(--card-hover-shadow);
     }
 
@@ -86,437 +102,448 @@
         top: 0;
         left: 0;
         right: 0;
-        height: 5px;
+        height: 4px;
     }
 
     .stat-card:nth-child(1)::before { background: var(--primary-gradient); }
     .stat-card:nth-child(2)::before { background: var(--success-gradient); }
-    .stat-card:nth-child(3)::before { background: var(--warning-gradient); }
+    .stat-card:nth-child(3)::before { background: var(--info-gradient); }
+    .stat-card:nth-child(4)::before { background: var(--warning-gradient); }
+    .stat-card:nth-child(5)::before { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .stat-card:nth-child(6)::before { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
 
     .stat-card-header {
         display: flex;
         align-items: center;
-        margin-bottom: 1.5rem;
+        gap: 10px;
+        margin-bottom: 0.3rem;
     }
 
     .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 24px;
-        margin-right: 1rem;
+        font-size: 16px;
         flex-shrink: 0;
-        transition: var(--transition);
     }
-
-    .stat-card:hover .stat-icon { transform: scale(1.15); }
 
     .stat-card:nth-child(1) .stat-icon { background: var(--primary-gradient); }
     .stat-card:nth-child(2) .stat-icon { background: var(--success-gradient); }
-    .stat-card:nth-child(3) .stat-icon { background: var(--warning-gradient); }
+    .stat-card:nth-child(3) .stat-icon { background: var(--info-gradient); }
+    .stat-card:nth-child(4) .stat-icon { background: var(--warning-gradient); }
+    .stat-card:nth-child(5) .stat-icon { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .stat-card:nth-child(6) .stat-icon { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
 
     .stat-title {
         color: #64748B;
-        font-size: 14px;
+        font-size: 0.7rem;
         font-weight: 600;
-        margin-bottom: 0.1rem;
-    }
-
-    .stat-label {
-        color: #94A3B8;
-        font-size: 12px;
-        margin-bottom: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0;
     }
 
     .stat-value {
-        font-size: 2.5rem;
+        font-size: 1.8rem;
         font-weight: 800;
-        background: var(--primary-gradient);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin-top: 0.5rem;
-        margin-bottom: 0;
+        color: #1E293B;
+        margin: 0;
+        line-height: 1.2;
     }
 
-    /* ===== ACTIVITY CARD (DESKTOP TABLE) ===== */
-    .activity-card {
+    /* CHART CARD */
+    .chart-card {
         border-radius: var(--border-radius);
         border: none;
         box-shadow: var(--card-shadow);
         overflow: hidden;
-        margin-bottom: 2rem;
+        background: white;
+        margin-bottom: 1.5rem;
+        width: 100%;
     }
 
-    .activity-card .card-body {
-        padding: 0 !important;
-    }
-
-    .activity-card .table {
-        margin-bottom: 0;
-    }
-
-    .activity-card thead {
-        background-color: #F8FAFC;
-    }
-
-    .activity-card th {
-        color: #94A3B8;
-        font-weight: 600;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border: none;
-        padding: 1.2rem;
-    }
-
-    .activity-card td {
-        padding: 1.2rem;
-        border-color: #E2E8F0;
-    }
-
-    .activity-card tbody tr:hover {
-        background-color: rgba(102, 126, 234, 0.02);
-    }
-
-    .card-header-custom {
-        padding: 1.5rem;
+    .chart-card .card-header {
+        padding: 0.8rem 1.2rem;
         border-bottom: 1px solid #E2E8F0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .card-header-custom h5 {
-        margin: 0;
         font-weight: 700;
         color: #1E293B;
-        font-size: 1.1rem;
+        font-size: 0.95rem;
+        background: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
     }
 
-    .card-header-custom a {
+    .chart-card .card-header i {
         color: #667eea;
-        font-weight: 600;
-        text-decoration: none;
-        font-size: 14px;
+        margin-right: 6px;
     }
 
-    /* ===== STATUS BADGES ===== */
-    .badge-status {
-        font-size: 12px;
-        font-weight: 600;
-        padding: 0.4rem 0.8rem;
-        border-radius: 6px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        display: inline-block;
+    .chart-card .card-body {
+        padding: 1rem 1.2rem;
     }
 
-    .badge-processed {
-        background-color: rgba(102, 126, 234, 0.1);
-        color: #667eea;
-    }
-
-    .badge-accepted {
-        background-color: rgba(19, 180, 151, 0.1);
-        color: #13B497;
-    }
-
-    .badge-rejected {
-        background-color: rgba(245, 87, 108, 0.1);
-        color: #F5576C;
-    }
-
-    /* ===== MOBILE CARD LIST ===== */
-    .mobile-ppdb-card {
-        padding: 14px 16px;
-        border-bottom: 1px solid #E2E8F0;
-        transition: background 0.2s ease;
-    }
-
-    .mobile-ppdb-card:last-child {
-        border-bottom: none;
-    }
-
-    .mobile-ppdb-card:active {
-        background-color: rgba(102, 126, 234, 0.04);
-    }
-
-    .mobile-ppdb-card .mobile-top-row {
+    .chart-bar {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        gap: 10px;
+        gap: 8px;
+        margin-bottom: 6px;
     }
 
-    .mobile-ppdb-card .mobile-name {
-        font-weight: 600;
-        color: #1E293B;
-        font-size: 15px;
+    .chart-bar .bar-label {
+        width: 90px;
+        font-size: 0.75rem;
+        color: #475569;
+        font-weight: 500;
+        flex-shrink: 0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        min-width: 0;
     }
 
-    .mobile-ppdb-card .mobile-meta {
-        margin-top: 8px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        font-size: 13px;
-        color: #64748B;
+    .chart-bar .bar-track {
+        flex: 1;
+        height: 22px;
+        background: #F1F5F9;
+        border-radius: 6px;
+        overflow: hidden;
+        position: relative;
     }
 
-    .mobile-ppdb-card .mobile-meta span {
+    .chart-bar .bar-fill {
+        height: 100%;
+        border-radius: 6px;
+        transition: width 0.8s ease;
         display: flex;
         align-items: center;
-        gap: 5px;
-    }
-
-    .mobile-ppdb-card .mobile-meta .meta-label {
-        color: #94A3B8;
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
+        justify-content: flex-end;
+        padding-right: 6px;
+        font-size: 10px;
         font-weight: 600;
+        color: white;
+        min-width: 28px;
     }
 
-    .mobile-ppdb-empty {
-        padding: 2.5rem 1rem;
-        text-align: center;
-        color: #94A3B8;
-    }
-
-    .mobile-ppdb-empty i {
-        font-size: 1.8rem;
-        display: block;
-        margin-bottom: 0.5rem;
-    }
-
-    /* ===== FOOTER LINK ===== */
-    .activity-footer {
-        text-align: center;
-        padding: 0.85rem 1rem;
-        border-top: 1px solid #E2E8F0;
-    }
-
-    .activity-footer a {
-        color: #667eea;
+    /* BADGE */
+    .badge-gender {
+        padding: 3px 14px;
+        border-radius: 20px;
+        font-size: 0.7rem;
         font-weight: 600;
-        text-decoration: none;
-        font-size: 14px;
+        display: inline-block;
+        white-space: nowrap;
     }
 
-    .activity-footer a:hover {
-        text-decoration: underline;
+    .badge-gender.laki {
+        background: #DBEAFE;
+        color: #2563EB;
     }
 
-    /* ===== ANIMATIONS ===== */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to   { opacity: 1; transform: translateY(0); }
+    .badge-gender.perempuan {
+        background: #FCE7F3;
+        color: #DB2777;
     }
 
-    .fade-in {
-        animation: fadeIn 0.6s ease-out;
+    /* LIST ROMBEL */
+    .list-rombels {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
     }
 
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 767.98px) {
+    .list-rombels .item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6px 12px;
+        background: #F8FAFC;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        transition: var(--transition);
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .list-rombels .item:hover {
+        background: #F1F5F9;
+    }
+
+    .list-rombels .item .nama {
+        font-weight: 600;
+        color: #1E293B;
+        font-size: 0.8rem;
+    }
+
+    .list-rombels .item .detail {
+        color: #64748B;
+        font-size: 0.7rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 1.5rem 1rem;
+        color: #94A3B8;
+        font-size: 0.85rem;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
         .dashboard-header {
-            padding: 1.25rem 1rem;
+            padding: 1.2rem 1rem;
         }
-
         .dashboard-header h1 {
-            font-size: 1.35rem;
+            font-size: 1.2rem;
         }
 
-        .dashboard-header .text-muted {
-            font-size: 13px;
+        .stats-row {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.7rem;
         }
-
         .stat-card {
-            padding: 1.1rem 1rem;
+            padding: 0.8rem;
         }
-
-        .stat-card-header {
-            margin-bottom: 0.75rem;
-        }
-
-        .stat-icon {
-            width: 42px;
-            height: 42px;
-            font-size: 20px;
-            margin-right: 0.75rem;
-        }
-
         .stat-value {
-            font-size: 2rem;
-            margin-top: 0.25rem;
+            font-size: 1.3rem;
+        }
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            font-size: 14px;
+        }
+        .stat-title {
+            font-size: 0.6rem;
         }
 
-        .card-header-custom {
-            padding: 1rem 1rem;
+        .chart-bar .bar-label {
+            width: 65px;
+            font-size: 0.65rem;
+        }
+        .chart-bar .bar-fill {
+            font-size: 9px;
+            min-width: 22px;
+        }
+        .chart-card .card-header {
+            font-size: 0.85rem;
+            padding: 0.6rem 1rem;
+        }
+        .chart-card .card-body {
+            padding: 0.8rem 1rem;
         }
 
-        .activity-card {
-            margin-bottom: 1.5rem;
+        .list-rombels .item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+        }
+        .list-rombels .item .detail {
+            font-size: 0.65rem;
+        }
+
+        .badge-gender {
+            font-size: 0.6rem;
+            padding: 2px 10px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .stats-row {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        .stat-value {
+            font-size: 1.1rem;
+        }
+        .stat-icon {
+            width: 28px;
+            height: 28px;
+            font-size: 12px;
+        }
+        .chart-bar .bar-label {
+            width: 55px;
+            font-size: 0.6rem;
+        }
+        .chart-bar .bar-fill {
+            font-size: 8px;
+            min-width: 18px;
+        }
+    }
+
+    @media (max-width: 450px) {
+        .stats-row {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .stat-card {
+            padding: 0.6rem;
+        }
+        .stat-value {
+            font-size: 1rem;
         }
     }
 </style>
 
-{{-- HEADER --}}
-<div class="dashboard-header fade-in">
-    <h1>Selamat Datang, Kurikulum! 👋</h1>
-    <p class="text-muted">Monitoring pembelajaran calon siswa baru tahun ajaran 2024/2025</p>
-</div>
+<div class="container-fluid px-4">
+    <div class="dashboard-header">
+        <h1>Selamat Datang, Kurikulum! 👋</h1>
+        <p class="text-muted">Dashboard monitoring akademik SMKN 1 Kawali</p>
+    </div>
 
-{{-- STATISTIK --}}
-<div class="stats-row mb-4 d-grid gap-3 gap-md-4" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); animation: fadeIn 0.6s ease-out 0.1s both;">
-
-    <div class="stat-card">
-        <div class="stat-card-header">
-            <div class="stat-icon">
-                <i class="fas fa-chalkboard-user"></i>
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div><p class="stat-title">Siswa</p></div>
             </div>
-            <div>
-                <p class="stat-title">Total Guru</p>
-                <p class="stat-label">Staff Pengajar Aktif</p>
-            </div>
+            <h2 class="stat-value">{{ number_format($totalSiswa ?? 0) }}</h2>
         </div>
-        <h2 class="stat-value">{{ $totalGuru ?? 0 }}</h2>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-card-header">
-            <div class="stat-icon">
-                <i class="fas fa-users"></i>
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                <div><p class="stat-title">Guru</p></div>
             </div>
-            <div>
-                <p class="stat-title">Total Siswa</p>
-                <p class="stat-label">Siswa Terdaftar</p>
-            </div>
+            <h2 class="stat-value">{{ number_format($totalGuru ?? 0) }}</h2>
         </div>
-        <h2 class="stat-value">{{ $totalSiswa ?? 0 }}</h2>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-card-header">
-            <div class="stat-icon">
-                <i class="fas fa-check-circle"></i>
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon"><i class="fas fa-school"></i></div>
+                <div><p class="stat-title">Kelas</p></div>
             </div>
-            <div>
-                <p class="stat-title">Status PPDB</p>
-                <p class="stat-label">Data Terverifikasi</p>
-            </div>
+            <h2 class="stat-value">{{ number_format($totalKelas ?? 0) }}</h2>
         </div>
-        <h2 class="stat-value">{{ $totalKelas ?? 0 }}</h2>
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
+                <div><p class="stat-title">Rombel</p></div>
+            </div>
+            <h2 class="stat-value">{{ number_format($totalRombel ?? 0) }}</h2>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon"><i class="fas fa-book-open"></i></div>
+                <div><p class="stat-title">Mapel</p></div>
+            </div>
+            <h2 class="stat-value">{{ number_format($totalMapel ?? 0) }}</h2>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon"><i class="fas fa-building"></i></div>
+                <div><p class="stat-title">Jurusan</p></div>
+            </div>
+            <h2 class="stat-value">{{ number_format($totalJurusan ?? 0) }}</h2>
+        </div>
     </div>
 
-</div>
-
-{{-- AKTIVITAS TERBARU --}}
-<div class="activity-card card fade-in" style="animation-delay: 0.2s;">
-    <div class="card-header-custom">
-        <h5>Peserta PPDB Terbaru</h5>
-    </div>
-
-    {{-- DESKTOP TABLE --}}
-    <div class="table-responsive d-none d-md-block">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-                <tr>
-                    <th>Calon Siswa</th>
-                    <th>Status</th>
-                    <th>Jurusan Pilihan</th>
-                    <th>Tgl Daftar</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($aktivitas as $a)
-                <tr>
-                    <td>
-                        <div class="fw-medium">{{ $a['nama'] ?? 'Data tidak tersedia' }}</div>
-                    </td>
-                    <td>
-                        @php
-                            $status = strtoupper($a['aktivitas'] ?? 'PROCESSED');
-                            $badgeClass = match($status) {
-                                'PROCESSED' => 'badge-processed',
-                                'ACCEPTED'  => 'badge-accepted',
-                                'REJECTED'  => 'badge-rejected',
-                                default     => 'badge-processed'
-                            };
-                        @endphp
-                        <span class="badge-status {{ $badgeClass }}">{{ $status }}</span>
-                    </td>
-                    <td>{{ $a['kelas'] ?? '-' }}</td>
-                    <td class="text-muted">{{ $a['waktu'] ?? '-' }}</td>
-                    <td><a href="#" class="link-primary"><i class="fas fa-eye"></i></a></td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="text-center text-muted py-4">
-                        <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
-                        Tidak ada data peserta PPDB.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    {{-- MOBILE CARD LIST --}}
-    <div class="d-md-none">
-        @forelse ($aktivitas as $a)
-            @php
-                $status = strtoupper($a['aktivitas'] ?? 'PROCESSED');
-                $badgeClass = match($status) {
-                    'PROCESSED' => 'badge-processed',
-                    'ACCEPTED'  => 'badge-accepted',
-                    'REJECTED'  => 'badge-rejected',
-                    default     => 'badge-processed'
-                };
-            @endphp
-
-            <div class="mobile-ppdb-card">
-                <div class="mobile-top-row">
-                    <div class="mobile-name">{{ $a['nama'] ?? 'Data tidak tersedia' }}</div>
-                    <span class="badge-status {{ $badgeClass }} flex-shrink-0">{{ $status }}</span>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="chart-card">
+                <div class="card-header">
+                    <span><i class="fas fa-chart-pie"></i> Siswa per Tingkat</span>
                 </div>
-                <div class="mobile-meta">
-                    <span>
-                        <span class="meta-label">Jurusan</span>
-                        {{ $a['kelas'] ?? '-' }}
-                    </span>
-                    <span>
-                        <span class="meta-label">Daftar</span>
-                        {{ $a['waktu'] ?? '-' }}
-                    </span>
-                    <a href="#" class="link-primary ms-auto" style="font-size: 15px;">
-                        <i class="fas fa-eye"></i>
-                    </a>
+                <div class="card-body">
+                    <div class="chart-bar">
+                        <span class="bar-label">Kelas X</span>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: {{ $totalSiswa > 0 ? ($siswaX / $totalSiswa * 100) : 0 }}%; background: #667eea;">
+                                {{ $siswaX }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-bar">
+                        <span class="bar-label">Kelas XI</span>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: {{ $totalSiswa > 0 ? ($siswaXI / $totalSiswa * 100) : 0 }}%; background: #13B497;">
+                                {{ $siswaXI }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-bar">
+                        <span class="bar-label">Kelas XII</span>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: {{ $totalSiswa > 0 ? ($siswaXII / $totalSiswa * 100) : 0 }}%; background: #F59E0B;">
+                                {{ $siswaXII }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        @empty
-            <div class="mobile-ppdb-empty">
-                <i class="fas fa-inbox"></i>
-                Tidak ada data peserta PPDB.
-            </div>
-        @endforelse
-    </div>
+        </div>
 
-    <div class="activity-footer">
-        <a href="{{ route('kurikulum.siswa.index') }}">Lihat Semua Pendaftar</a>
+        <div class="col-md-6">
+            <div class="chart-card">
+                <div class="card-header">
+                    <span><i class="fas fa-venus-mars"></i> Jenis Kelamin</span>
+                </div>
+                <div class="card-body text-center">
+                    <div style="display: flex; justify-content: center; gap: 1.5rem; padding: 0.5rem 0;">
+                        <div>
+                            <span class="badge-gender laki"><i class="fas fa-male me-1"></i> Laki-laki</span>
+                            <h3 class="mt-2" style="font-weight:800; font-size:1.8rem;">{{ number_format($siswaLaki ?? 0) }}</h3>
+                        </div>
+                        <div>
+                            <span class="badge-gender perempuan"><i class="fas fa-female me-1"></i> Perempuan</span>
+                            <h3 class="mt-2" style="font-weight:800; font-size:1.8rem;">{{ number_format($siswaPerempuan ?? 0) }}</h3>
+                        </div>
+                    </div>
+                    <div style="width:100%; height:6px; background:#F1F5F9; border-radius:4px; overflow:hidden; display:flex;">
+                        <div style="height:100%; width:{{ $totalSiswa > 0 ? ($siswaLaki / $totalSiswa * 100) : 0 }}%; background:#2563EB;"></div>
+                        <div style="height:100%; width:{{ $totalSiswa > 0 ? ($siswaPerempuan / $totalSiswa * 100) : 0 }}%; background:#DB2777;"></div>
+                    </div>
+                    <small class="text-muted mt-2 d-block">Total: {{ number_format($totalSiswa ?? 0) }} siswa</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="chart-card">
+                <div class="card-header">
+                    <span><i class="fas fa-chart-bar"></i> Siswa per Jurusan</span>
+                </div>
+                <div class="card-body">
+                    @foreach($jurusanData as $j)
+                        <div class="chart-bar">
+                            <span class="bar-label">{{ $j['nama'] }}</span>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: {{ $totalSiswa > 0 ? ($j['total'] / $totalSiswa * 100) : 0 }}%; background: {{ $loop->index % 2 == 0 ? '#667eea' : '#764ba2' }};">
+                                    {{ $j['total'] }}
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="chart-card">
+                <div class="card-header">
+                    <span><i class="fas fa-clock"></i> Rombel Terbaru</span>
+                </div>
+                <div class="card-body">
+                    <div class="list-rombels">
+                        @forelse($rombels as $r)
+                            <div class="item">
+                                <span class="nama">{{ $r->nama }}</span>
+                                <span class="detail">
+                                    {{ optional($r->kelas)->tingkat ?? '-' }}
+                                    {{ optional(optional($r->kelas)->jurusan)->nama ?? '' }}
+                                    <br><small>Wali: {{ optional($r->guru)->nama ?? '-' }}</small>
+                                </span>
+                            </div>
+                        @empty
+                            <div class="empty-state">
+                                <i class="fas fa-inbox mb-2 d-block"></i>
+                                Belum ada rombel
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
-{{-- INFORMASI SEKOLAH --}}
-
 @endsection

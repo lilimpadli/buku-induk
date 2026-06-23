@@ -4,13 +4,8 @@
 
 @section('content')
 <style>
-    /* ===================== STYLE EDIT RAPOR ===================== */
-    
     :root {
         --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --success-gradient: linear-gradient(135deg, #13B497 0%, #59D4A4 100%);
-        --danger-gradient: linear-gradient(135deg, #F093FB 0%, #F5576C 100%);
-        --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         --card-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
         --card-hover-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         --border-radius: 16px;
@@ -19,10 +14,9 @@
 
     body {
         background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f5 100%);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-family: 'Inter', sans-serif;
     }
 
-    /* Header */
     .page-header {
         background: var(--primary-gradient);
         color: white;
@@ -58,7 +52,6 @@
         font-size: 0.85rem;
     }
 
-    /* FIX: Tombol di header */
     .page-header .btn,
     .page-header a {
         pointer-events: auto !important;
@@ -67,7 +60,6 @@
         z-index: 100 !important;
     }
 
-    /* Cards */
     .card-custom {
         background: white;
         border-radius: var(--border-radius);
@@ -97,7 +89,6 @@
         padding: 1.25rem 1.5rem;
     }
 
-    /* Tables */
     .table-custom {
         width: 100%;
         border-collapse: collapse;
@@ -123,7 +114,6 @@
         background-color: #f8fafc;
     }
 
-    /* Forms */
     .form-label {
         font-size: 13px;
         font-weight: 600;
@@ -131,7 +121,8 @@
         margin-bottom: 0.5rem;
     }
 
-    .form-control, .form-select {
+    .form-control,
+    .form-select {
         border-radius: 10px;
         border: 1px solid #e2e8f0;
         padding: 0.6rem 0.75rem;
@@ -139,7 +130,8 @@
         transition: var(--transition);
     }
 
-    .form-control:focus, .form-select:focus {
+    .form-control:focus,
+    .form-select:focus {
         border-color: #667eea;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         outline: none;
@@ -149,7 +141,6 @@
         resize: vertical;
     }
 
-    /* Buttons */
     .btn {
         border-radius: 10px;
         font-weight: 500;
@@ -179,15 +170,11 @@
     .btn-danger {
         background: linear-gradient(135deg, #ef4444, #dc2626);
         border: none;
+        color: white;
     }
 
     .btn-danger:hover {
         box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
-    }
-
-    .btn-success {
-        background: linear-gradient(135deg, #13B497, #10b981);
-        border: none;
     }
 
     .btn-outline-secondary {
@@ -203,12 +190,6 @@
         border-color: #94a3b8;
     }
 
-    .btn-sm {
-        padding: 0.3rem 0.8rem;
-        font-size: 12px;
-    }
-
-    /* Info Grid */
     .info-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -232,7 +213,6 @@
         font-size: 14px;
     }
 
-    /* Action Buttons */
     .action-buttons {
         display: flex;
         justify-content: flex-end;
@@ -242,7 +222,6 @@
         border-top: 1px solid #f0f0f0;
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
         .page-header { padding: 1.25rem; }
         .page-header h3 { font-size: 1.25rem; }
@@ -346,7 +325,7 @@
             </div>
         </div>
 
-        <!-- Kelompok A - Mata Pelajaran Umum -->
+        <!-- Kelompok A -->
         <div class="card-custom">
             <div class="card-header-custom">
                 <h5><i class="fas fa-book me-2 text-primary"></i> A. Kelompok Mata Pelajaran Umum</h5>
@@ -385,7 +364,7 @@
             </div>
         </div>
 
-        <!-- Kelompok B - Mata Pelajaran Kejuruan -->
+        <!-- Kelompok B -->
         <div class="card-custom">
             <div class="card-header-custom">
                 <h5><i class="fas fa-laptop-code me-2 text-primary"></i> B. Kelompok Mata Pelajaran Kejuruan</h5>
@@ -539,44 +518,40 @@
             </div>
         </div>
 
-        <!-- Action Buttons -->
+        <!-- ========================================================== -->
+        <!-- ACTION BUTTONS - PAKAI POST BUKAN DELETE -->
+        <!-- ========================================================== -->
         <div class="action-buttons">
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-save me-2"></i> Simpan Perubahan
             </button>
-            <button type="button" id="btn-delete-rapor" class="btn btn-danger">
-                <i class="fas fa-trash-alt me-2"></i> Hapus Rapor
-            </button>
+            
+            <!-- FORM DELETE - PASTIKAN ACTION NYA BENAR -->
+            <form action="{{ route('walikelas.input_nilai_raport.delete', $siswa->id) }}" method="POST" style="display:inline-block; margin:0; padding:0;" id="form-delete-rapor">
+                @csrf
+                <input type="hidden" name="semester" value="{{ $semester }}">
+                <input type="hidden" name="tahun" value="{{ $tahun }}">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Yakin ingin menghapus semua data raport untuk semester &quot;{{ $semester }}&quot; tahun &quot;{{ $tahun }}&quot;?')">
+                    <i class="fas fa-trash-alt me-2"></i> Hapus Rapor
+                </button>
+            </form>
         </div>
-    </form>
-
-    <form id="form-delete-rapor" action="{{ route('walikelas.input_nilai_raport.delete', $siswa->id) }}" method="POST" style="display:none;">
-        @csrf
-        <input type="hidden" name="semester" value="{{ $semester }}">
-        <input type="hidden" name="tahun" value="{{ $tahun }}">
     </form>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // FIX: Semua tombol bisa diklik
-        const allBtns = document.querySelectorAll('.btn, .btn-outline-secondary, .btn-primary, .btn-danger, .btn-success');
+        // Fix semua tombol
+        const allBtns = document.querySelectorAll('.btn, .btn-outline-secondary, .btn-primary, .btn-danger');
         allBtns.forEach(btn => {
             btn.style.pointerEvents = 'auto';
             btn.style.cursor = 'pointer';
             btn.style.position = 'relative';
-            btn.style.zIndex = '100';
+            btn.style.zIndex = '999';
         });
         
-        // FIX khusus tombol kembali
-        const backBtn = document.querySelector('a[href*="nilai_raport.show"]');
-        if (backBtn) {
-            backBtn.style.pointerEvents = 'auto';
-            backBtn.style.cursor = 'pointer';
-        }
-        
         // Tambah ekstrakurikuler
-        document.getElementById('add-ekstra')?.addEventListener('click', function () {
+        document.getElementById('add-ekstra')?.addEventListener('click', function() {
             const container = document.getElementById('ekstra-container');
             const index = container.children.length;
             const newRow = document.createElement('div');
@@ -601,7 +576,7 @@
         });
 
         // Hapus ekstrakurikuler
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', function(e) {
             if (e.target.closest('.remove-ekstra')) {
                 e.target.closest('.ekstra-row').remove();
             }
@@ -626,13 +601,6 @@
 
         document.getElementById('statusKenaikanSelect')?.addEventListener('change', updateRombelState);
         updateRombelState();
-
-        // Delete rapor confirmation
-        document.getElementById('btn-delete-rapor')?.addEventListener('click', function() {
-            if (confirm('Yakin ingin menghapus semua data raport untuk semester "' + '{{ $semester }}'" tahun "' + '{{ $tahun }}'"?')) {
-                document.getElementById('form-delete-rapor').submit();
-            }
-        });
     });
 </script>
 @endsection

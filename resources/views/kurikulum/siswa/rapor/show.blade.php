@@ -5,253 +5,298 @@
 @section('content')
 <style>
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    body {
-        background-color: var(--light-bg);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    body { background-color: #f7fafc; font-family: 'Inter', sans-serif; }
+
+    main {
+        padding: 20px 15px !important;
+        overflow-x: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
-    h3 {
-        font-size: 28px;
-        color: #1E293B;
+    .container-fluid {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 10px !important;
+        overflow-x: auto !important;
+    }
+
+    .page-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 1.5rem 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
         position: relative;
-        padding-left: 15px;
-        margin-bottom: 10px !important;
+        overflow: hidden;
+        width: 100%;
     }
 
-    h3::before {
+    .page-header::before {
         content: "";
         position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 5px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 3px;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(100px, -100px);
+        pointer-events: none;
     }
 
-    p.text-muted {
-        color: #64748B !important;
-        margin-left: 20px;
-        margin-bottom: 25px;
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        font-size: 1.3rem;
+        position: relative;
+        z-index: 1;
     }
 
-    .card {
-        border-radius: 16px;
+    .page-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 0.9rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-header .badge-student {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-back {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.4rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .list-group-card {
+        border-radius: var(--border-radius);
         border: none;
         box-shadow: var(--card-shadow);
         overflow: hidden;
-        transition: all 0.3s ease;
+        background: white;
     }
 
-    .card:hover {
-        box-shadow: var(--hover-shadow);
-    }
-
-    .list-group {
-        border-radius: 16px;
-    }
-
-    .list-group-flush > .list-group-item {
-        border-width: 0 0 1px;
-        border-color: #E2E8F0;
-        padding: 20px;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .list-group-flush > .list-group-item:last-child {
-        border-bottom: none;
-    }
-
-    .list-group-flush > .list-group-item::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 4px;
-        height: 100%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        transform: scaleY(0);
-        transition: transform 0.3s ease;
-        border-radius: 0 4px 4px 0;
-    }
-
-    .list-group-flush > .list-group-item:hover {
-        background-color: rgba(47, 83, 255, 0.03);
-        padding-left: 25px;
-    }
-
-    .list-group-flush > .list-group-item:hover::before {
-        transform: scaleY(1);
-    }
-
-    .list-group-item-action {
-        cursor: pointer;
+    .list-group-card .list-group-item {
+        border: none;
+        border-bottom: 1px solid #E2E8F0;
+        padding: 1rem 1.5rem;
+        transition: var(--transition);
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         text-decoration: none;
         color: inherit;
     }
 
-    .list-group-item-action:hover {
-        color: var(--primary-color);
+    .list-group-card .list-group-item:last-child {
+        border-bottom: none;
     }
 
-    .report-info {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        flex: 1;
+    .list-group-card .list-group-item:hover {
+        background: rgba(102, 126, 234, 0.04);
+        transform: translateX(5px);
     }
 
-    .report-icon {
-        width: 50px;
-        height: 50px;
+    .list-group-card .list-group-item .icon-wrapper {
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        background: var(--primary-gradient);
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;
+        font-size: 18px;
         flex-shrink: 0;
-        border: 3px solid white;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
     }
 
-    .list-group-item:hover .report-icon {
-        transform: scale(1.1);
-    }
-
-    .report-details {
+    .list-group-card .list-group-item .content {
         flex: 1;
+        margin-left: 15px;
     }
 
-    .report-details strong {
-        font-size: 16px;
+    .list-group-card .list-group-item .content h6 {
         font-weight: 600;
         color: #1E293B;
-        display: block;
-        margin-bottom: 4px;
+        margin: 0;
+        font-size: 0.95rem;
     }
 
-    .report-details small {
+    .list-group-card .list-group-item .content small {
         color: #64748B;
-        font-size: 14px;
-        display: block;
+        font-size: 0.8rem;
     }
 
-    .badge {
-        padding: 8px 12px;
-        font-size: 12px;
-        font-weight: 600;
+    .badge-arrow {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 5px 14px;
         border-radius: 20px;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        transition: all 0.3s ease;
+        font-size: 0.7rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: var(--transition);
+        white-space: nowrap;
     }
 
-    .list-group-item:hover .badge {
+    .list-group-card .list-group-item:hover .badge-arrow {
         transform: scale(1.05);
-        box-shadow: 0 4px 8px rgba(47, 83, 255, 0.3);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .badge-semester {
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .badge-semester.ganjil {
+        background: #FEF3C7;
+        color: #D97706;
+    }
+
+    .badge-semester.genap {
+        background: #D1FAE5;
+        color: #059669;
     }
 
     .empty-state {
         text-align: center;
-        padding: 60px 20px;
-        color: #64748B;
+        padding: 3rem 1rem;
+        color: #94A3B8;
     }
 
     .empty-state i {
-        font-size: 48px;
-        margin-bottom: 15px;
-        opacity: 0.5;
+        font-size: 3rem;
+        color: #CBD5E1;
+        display: block;
+        margin-bottom: 0.5rem;
     }
 
     .empty-state h5 {
-        font-weight: 600;
-        margin-bottom: 10px;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .list-group-item {
-        animation: fadeIn 0.5s ease-out;
+        font-size: 1rem;
     }
 
     @media (max-width: 768px) {
-        h3 {
-            font-size: 24px;
+        .page-header {
+            padding: 1rem 1rem;
         }
-        
-        p.text-muted {
-            margin-left: 0;
-            margin-bottom: 20px;
+        .page-header h3 {
+            font-size: 1.1rem;
         }
-        
-        .list-group-flush > .list-group-item {
-            padding: 15px;
+        .page-header .text-muted {
+            font-size: 0.75rem;
         }
-        
-        .report-info {
+        .page-header .badge-student {
+            font-size: 0.75rem;
+            padding: 4px 12px;
+        }
+
+        .list-group-card .list-group-item {
             flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
+            align-items: flex-start !important;
+            gap: 12px;
+            padding: 1rem;
         }
-        
-        .badge {
+
+        .list-group-card .list-group-item .badge-arrow {
             align-self: flex-start;
-            margin-top: 10px;
+        }
+
+        .list-group-card .list-group-item .icon-wrapper {
+            width: 36px;
+            height: 36px;
+            font-size: 14px;
+        }
+
+        .list-group-card .list-group-item .content h6 {
+            font-size: 0.85rem;
+        }
+
+        .btn-back {
+            width: 100%;
+            justify-content: center;
         }
     }
 </style>
 
-<div class="container mt-4">
-    <h3>Riwayat Rapor — {{ $siswa->nama_lengkap }}</h3>
-    <p class="text-muted">Pilih raport berdasarkan semester dan tahun ajaran</p>
-
-    <div class="card shadow">
-        @forelse ($raports as $r)
-            <div class="list-group list-group-flush">
-                <a href="{{ route('kurikulum.rapor.detail', [
-                        $siswa->id,
-                        $r->semester,
-                        str_replace('/', '-', $r->tahun_ajaran)
-                    ]) }}"
-                   class="list-group-item list-group-item-action d-flex justify-content-between">
-
-                    <div class="report-info">
-                        <div class="report-icon">
-                            <i class="fas fa-file-alt"></i>
-                        </div>
-                        <div class="report-details">
-                            <strong>Semester: {{ $r->semester ?? '-' }}</strong>
-                            <small>Tahun Ajaran: {{ $r->tahun_ajaran ?? '-' }}</small>
-                        </div>
-                    </div>
-
-                    <span class="badge bg-primary">Lihat Rapor</span>
-
-                </a>
+<div class="container-fluid px-4">
+    <div class="page-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap">
+            <div>
+                <h3><i class="fas fa-history me-2"></i> Riwayat Rapor</h3>
+                <div class="text-muted">Pilih rapor berdasarkan semester dan tahun ajaran</div>
             </div>
+            <span class="badge-student">
+                <i class="fas fa-user me-1"></i> {{ $siswa->nama_lengkap }}
+            </span>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <a href="{{ route('kurikulum.rapor.index') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Kembali ke Daftar Siswa
+        </a>
+    </div>
+
+    <div class="list-group-card">
+        @forelse ($raports as $r)
+            <a href="{{ route('kurikulum.rapor.detail', [$siswa->id, $r->semester, str_replace('/', '-', $r->tahun_ajaran)]) }}" 
+               class="list-group-item">
+                <div class="d-flex align-items-center flex-wrap" style="flex:1;">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="content">
+                        <h6>Semester <span class="badge-semester {{ strtolower($r->semester) }}">{{ $r->semester }}</span></h6>
+                        <small><i class="fas fa-calendar-alt me-1"></i> {{ $r->tahun_ajaran }}</small>
+                    </div>
+                </div>
+                <span class="badge-arrow">
+                    Lihat Rapor <i class="fas fa-chevron-right" style="font-size:10px;"></i>
+                </span>
+            </a>
         @empty
             <div class="empty-state">
                 <i class="fas fa-file-alt"></i>
-                <h5>Belum ada raport</h5>
-                <p>Belum ada raport tersimpan untuk siswa ini.</p>
+                <h5>Belum ada rapor</h5>
+                <p>Belum ada rapor tersimpan untuk siswa ini.</p>
             </div>
         @endforelse
     </div>

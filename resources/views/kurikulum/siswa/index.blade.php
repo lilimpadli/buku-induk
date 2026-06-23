@@ -1,668 +1,570 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar Siswa')
+@section('title', 'Manajemen Siswa')
 
 @section('content')
 <style>
-    /* ===================== STYLE DAFTAR SISWA - RESPONSIVE ===================== */
-    
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    body {
-        background-color: var(--light-bg);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    body { background-color: #f7fafc; font-family: 'Inter', sans-serif; }
+
+    main {
+        padding: 20px 15px !important;
+        overflow-x: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
-    /* Header Styles */
-    h3.page-title {
-        font-size: 28px;
-        color: #1E293B;
-        position: relative;
-        padding-left: 15px;
-        margin-bottom: 0 !important;
+    .container-fluid {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 10px !important;
+        overflow-x: auto !important;
     }
 
-    h3.page-title::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 5px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 3px;
-    }
-
-    /* Card Styles */
-    .card {
-        border-radius: 16px;
-        border: none;
-        box-shadow: var(--card-shadow);
-        overflow: hidden;
-        transition: all 0.3s ease;
-    }
-
-    .card:hover {
-        box-shadow: var(--hover-shadow);
-    }
-
-    /* Filter Button Styles */
-    .filter-buttons {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-
-    .filter-buttons .btn {
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        font-size: 14px;
-        padding: 8px 16px;
-    }
-
-    .filter-buttons .btn:hover {
-        transform: translateY(-2px);
-    }
-
-    /* Search Form Styles */
-    .search-card {
-        border-radius: 16px;
-        border: none;
-        box-shadow: var(--card-shadow);
-    }
-
-    .search-card .card-body {
-        background-color: #F8FAFC;
-        padding: 20px;
-    }
-
-    .input-group-text {
-        background: white;
-        border: 1px solid #E2E8F0;
-        border-right: none;
-    }
-
-    .form-control, .form-select {
-        border: 1px solid #E2E8F0;
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 0.2rem rgba(47, 83, 255, 0.1);
-    }
-
-    /* List Group Styles */
-    .list-group {
-        border-radius: 16px;
-    }
-
-    .list-group-flush > .list-group-item {
-        border-width: 0 0 1px;
-        border-color: #E2E8F0;
-        padding: 20px;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .list-group-flush > .list-group-item:last-child {
-        border-bottom: none;
-    }
-
-    .list-group-flush > .list-group-item::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 4px;
-        height: 100%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        transform: scaleY(0);
-        transition: transform 0.3s ease;
-        border-radius: 0 4px 4px 0;
-    }
-
-    .list-group-flush > .list-group-item:hover {
-        background-color: rgba(47, 83, 255, 0.03);
-        padding-left: 25px;
-    }
-
-    .list-group-flush > .list-group-item:hover::before {
-        transform: scaleY(1);
-    }
-
-    /* Student Info */
-    .student-info {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        flex-wrap: wrap;
-    }
-
-    .student-avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    .page-header {
+        background: var(--primary-gradient);
         color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 20px;
-        flex-shrink: 0;
-        border: 3px solid white;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
-    }
-
-    .list-group-item:hover .student-avatar {
-        transform: scale(1.1);
-    }
-
-    .student-avatar img {
+        padding: 1.5rem 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
         width: 100%;
-        height: 100%;
+    }
+
+    .page-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
         border-radius: 50%;
-        object-fit: cover;
+        transform: translate(100px, -100px);
+        pointer-events: none;
     }
 
-    .student-details {
-        flex: 1;
-        min-width: 150px;
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        font-size: 1.3rem;
+        position: relative;
+        z-index: 1;
     }
 
-    .student-details strong {
-        font-size: 16px;
+    .page-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 0.9rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-gradient {
+        background: var(--primary-gradient);
+        border: none;
+        color: white;
         font-weight: 600;
-        color: #1E293B;
-        display: block;
-        margin-bottom: 4px;
-    }
-
-    .student-details small {
-        color: #64748B;
-        font-size: 14px;
-    }
-
-    .student-class {
-        background-color: rgba(47, 83, 255, 0.1);
-        color: var(--primary-color);
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
+        padding: 0.4rem 1rem;
+        border-radius: 8px;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
         white-space: nowrap;
     }
 
-    /* Action Buttons */
-    .student-actions {
-        display: flex;
-        gap: 5px;
-        flex-wrap: wrap;
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        color: white;
     }
 
-    .student-actions .btn {
-        min-width: 36px;
-        height: 36px;
+    .btn-outline-gradient {
+        background: transparent;
+        border: 1px solid #667eea;
+        color: #667eea;
+        font-weight: 600;
+        padding: 0.3rem 0.8rem;
+        border-radius: 8px;
+        transition: var(--transition);
+        text-decoration: none;
         display: inline-flex;
         align-items: center;
-        justify-content: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        white-space: nowrap;
     }
 
-    /* Empty State */
+    .btn-outline-gradient:hover {
+        background: var(--primary-gradient);
+        color: white;
+        border-color: transparent;
+    }
+
+    .btn-edit {
+        background: #F59E0B;
+        border: none;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 0.65rem;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        white-space: nowrap;
+    }
+
+    .btn-edit:hover {
+        background: #D97706;
+        color: white;
+    }
+
+    .btn-delete {
+        background: #EF4444;
+        border: none;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 0.65rem;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
+    .btn-delete:hover {
+        background: #DC2626;
+        color: white;
+    }
+
+    .btn-detail {
+        background: #667eea;
+        border: none;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 0.65rem;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        white-space: nowrap;
+    }
+
+    .btn-detail:hover {
+        background: #5a67d8;
+        color: white;
+    }
+
+    .filter-card {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        transition: var(--transition);
+        width: 100%;
+    }
+
+    .filter-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .filter-card .card-body {
+        padding: 1rem 1.5rem;
+    }
+
+    .filter-card .form-label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #64748B;
+        margin-bottom: 2px;
+    }
+
+    .filter-card .form-control,
+    .filter-card .form-select {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.7rem;
+        border-radius: 8px;
+        border: 1px solid #E2E8F0;
+        height: 36px;
+    }
+
+    .filter-card .input-group-text {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.7rem;
+        background: white;
+        border: 1px solid #E2E8F0;
+    }
+
+    .table-card {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .table-card .card-header {
+        background: white;
+        border-bottom: 1px solid #E2E8F0;
+        padding: 0.7rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .table-card .card-header h5 {
+        margin: 0;
+        font-weight: 700;
+        color: #1E293B;
+        font-size: 0.95rem;
+    }
+
+    .table-card .card-header h5 i {
+        color: #667eea;
+        margin-right: 6px;
+    }
+
+    .table-card .card-header .badge {
+        font-size: 0.7rem;
+        padding: 3px 10px;
+        white-space: nowrap;
+    }
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        width: 100%;
+        min-width: 650px;
+        margin-bottom: 0;
+        font-size: 0.85rem;
+    }
+
+    .table th {
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: #64748B;
+        padding: 0.6rem 0.8rem;
+        white-space: nowrap;
+        background-color: #F8FAFC;
+        border-bottom: none;
+    }
+
+    .table td {
+        padding: 0.6rem 0.8rem;
+        vertical-align: middle;
+        border-color: #E2E8F0;
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(102, 126, 234, 0.03);
+    }
+
+    .badge-gender {
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 0.6rem;
+        font-weight: 500;
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    .badge-gender.laki {
+        background: #DBEAFE;
+        color: #2563EB;
+    }
+
+    .badge-gender.perempuan {
+        background: #FCE7F3;
+        color: #DB2777;
+    }
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+    }
+
+    .action-buttons form {
+        margin: 0;
+        padding: 0;
+        display: inline;
+    }
+
     .empty-state {
         text-align: center;
-        padding: 60px 20px;
-        color: #64748B;
+        padding: 3rem 1rem;
     }
 
     .empty-state i {
-        font-size: 48px;
-        margin-bottom: 15px;
-        opacity: 0.5;
+        font-size: 3rem;
+        color: #CBD5E1;
+        display: block;
+        margin-bottom: 0.5rem;
     }
 
-    .empty-state h5 {
-        font-weight: 600;
-        margin-bottom: 10px;
+    .pagination-wrapper {
+        padding: 0.6rem 1.5rem;
+        border-top: 1px solid #E2E8F0;
     }
 
-    /* Animations */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .list-group-item {
-        animation: fadeIn 0.5s ease-out;
-    }
-
-    /* Alert Styles */
-    .alert {
-        border-radius: 12px;
-        border: none;
-    }
-
-    /* ===================== RESPONSIVE STYLES ===================== */
-
-    /* Tablet (768px - 991px) */
-    @media (max-width: 991px) {
-        h3.page-title {
-            font-size: 24px;
-        }
-
-        .filter-buttons .btn {
-            font-size: 13px;
-            padding: 7px 14px;
-        }
-    }
-
-    /* Mobile (max-width: 767px) */
-    @media (max-width: 767px) {
-        /* Container padding */
-        .container {
-            padding-left: 15px;
-            padding-right: 15px;
-        }
-
-        /* Header */
-        h3.page-title {
-            font-size: 22px;
-            padding-left: 12px;
-        }
-
-        h3.page-title::before {
-            width: 4px;
-        }
-
-        /* Header buttons */
-        .header-section {
-            flex-direction: column;
-            align-items: stretch !important;
-            gap: 12px;
-        }
-
-        .header-buttons {
-            display: flex;
-            flex-direction: column;
+    @media (max-width: 992px) {
+        .filter-card .row {
             gap: 8px;
         }
+        .filter-card .col-md-3,
+        .filter-card .col-md-4,
+        .filter-card .col-md-2 {
+            width: 100%;
+        }
+        .filter-card .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
 
-        .header-buttons .btn {
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1rem 1rem;
+        }
+        .page-header h3 {
+            font-size: 1.05rem;
+        }
+        .page-header .text-muted {
+            font-size: 0.75rem;
+        }
+
+        .table-card .card-header {
+            flex-wrap: wrap;
+        }
+        .table-card .card-header .btn-gradient {
             width: 100%;
             justify-content: center;
         }
 
-        /* Filter buttons */
-        .filter-buttons {
-            gap: 6px;
+        .table {
+            min-width: 550px;
+            font-size: 0.75rem;
         }
-
-        .filter-buttons .btn {
-            flex: 1;
-            min-width: calc(50% - 3px);
-            font-size: 12px;
-            padding: 8px 10px;
+        .table th,
+        .table td {
+            padding: 0.4rem 0.5rem;
         }
-
-        /* Search form */
-        .search-card .card-body {
-            padding: 15px;
+        .btn-edit,
+        .btn-delete,
+        .btn-detail {
+            padding: 2px 6px;
+            font-size: 0.55rem;
         }
-
-        .search-form .col-md-6,
-        .search-form .col-md-4,
-        .search-form .col-md-2 {
-            margin-bottom: 10px;
-        }
-
-        .search-form .d-flex {
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .search-form .btn {
-            width: 100%;
-        }
-
-        /* Student list item */
-        .list-group-flush > .list-group-item {
-            padding: 15px;
-        }
-
-        .list-group-flush > .list-group-item:hover {
-            padding-left: 20px;
-        }
-
-        .student-info {
-            gap: 12px;
-        }
-
-        .student-avatar {
-            width: 45px;
-            height: 45px;
-            font-size: 18px;
-        }
-
-        .student-details {
-            flex: 1 1 100%;
-            min-width: auto;
-        }
-
-        .student-details strong {
-            font-size: 15px;
-        }
-
-        .student-details small {
-            font-size: 13px;
-        }
-
-        .student-class {
-            order: 3;
-            margin-top: -8px;
-            font-size: 11px;
-            padding: 5px 10px;
-        }
-
-        .student-actions {
-            order: 4;
-            width: 100%;
-            justify-content: flex-start;
-            margin-top: 8px;
-            gap: 6px;
-        }
-
-        .student-actions .btn {
-            min-width: 40px;
-            height: 34px;
-            font-size: 14px;
-        }
-
-        /* Pagination */
-        .pagination {
-            font-size: 14px;
-        }
-
-        .pagination .page-link {
-            padding: 6px 12px;
-        }
-
-        /* Empty state */
-        .empty-state {
-            padding: 40px 15px;
-        }
-
-        .empty-state i {
-            font-size: 40px;
-        }
-
-        .empty-state h5 {
-            font-size: 16px;
-        }
-
-        .empty-state p {
-            font-size: 14px;
+        .action-buttons {
+            flex-wrap: wrap;
+            gap: 3px;
         }
     }
 
-    /* Small Mobile (max-width: 480px) */
-    @media (max-width: 480px) {
-        h3.page-title {
-            font-size: 20px;
+    @media (max-width: 576px) {
+        .table {
+            min-width: 450px;
+            font-size: 0.65rem;
         }
-
-        .filter-buttons .btn {
-            font-size: 11px;
-            padding: 7px 8px;
+        .table th,
+        .table td {
+            padding: 0.3rem 0.4rem;
         }
-
-        .student-avatar {
-            width: 40px;
-            height: 40px;
-            font-size: 16px;
-            border: 2px solid white;
+        .btn-edit,
+        .btn-delete,
+        .btn-detail {
+            padding: 1px 5px;
+            font-size: 0.5rem;
         }
-
-        .student-details strong {
-            font-size: 14px;
-        }
-
-        .student-details small {
-            font-size: 12px;
-        }
-
-        .student-class {
-            font-size: 10px;
-            padding: 4px 8px;
-        }
-
-        .student-actions .btn {
-            min-width: 36px;
-            height: 32px;
-            font-size: 13px;
-        }
-    }
-
-    /* Desktop (min-width: 1200px) */
-    @media (min-width: 1200px) {
-        .container {
-            max-width: 1140px;
-        }
-
-        h3.page-title {
-            font-size: 30px;
-        }
-
-        .student-info {
-            gap: 20px;
-        }
-
-        .student-avatar {
-            width: 55px;
-            height: 55px;
-            font-size: 22px;
-        }
-
-        .student-details strong {
-            font-size: 17px;
-        }
-    }
-
-    /* Print Styles */
-    @media print {
-        .header-buttons,
-        .filter-buttons,
-        .search-card,
-        .student-actions,
-        .pagination {
-            display: none !important;
-        }
-
-        .card {
-            box-shadow: none;
-            border: 1px solid #ddd;
-        }
-
-        .list-group-item {
-            page-break-inside: avoid;
+        .badge-gender {
+            font-size: 0.5rem;
+            padding: 1px 6px;
         }
     }
 </style>
 
-<div class="container mt-4">
-    <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4 header-section">
-        <h3 class="page-title">Daftar Siswa</h3>
-        <div class="header-buttons">
-            <a href="{{ route('kurikulum.data-siswa.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus me-1"></i> Tambah Siswa
-            </a>
-            <a href="{{ route('kurikulum.siswa.import.form') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-file-import me-1"></i> Import Excel
-            </a>
+<div class="container-fluid px-4">
+    <div class="page-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap">
+            <div>
+                <h3><i class="fas fa-user-graduate me-2"></i> Manajemen Siswa</h3>
+                <div class="text-muted">Kelola data siswa</div>
+            </div>
+            <div class="mt-2 mt-sm-0 d-flex gap-2 flex-wrap">
+                <a href="{{ route('kurikulum.siswa.import.form') }}" class="btn-outline-gradient" style="padding:0.3rem 0.8rem; font-size:0.75rem;">
+                    <i class="fas fa-file-import"></i> Import
+                </a>
+                <a href="#" class="btn-outline-gradient" style="padding:0.3rem 0.8rem; font-size:0.75rem;">
+                    <i class="fas fa-file-export"></i> Export
+                </a>
+                <a href="{{ route('kurikulum.siswa.create') }}" class="btn-gradient">
+                    <i class="fas fa-plus"></i> Tambah
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- Filter Buttons -->
-    <div class="mb-3">
-        @php $currentTingkat = request()->query('tingkat', ''); @endphp
-        <div class="filter-buttons">
-            <a href="{{ request()->fullUrlWithQuery(['tingkat' => 'X', 'page' => 1]) }}" 
-               class="btn btn-sm {{ $currentTingkat == 'X' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                Kelas X
-            </a>
-            <a href="{{ request()->fullUrlWithQuery(['tingkat' => 'XI', 'page' => 1]) }}" 
-               class="btn btn-sm {{ $currentTingkat == 'XI' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                Kelas XI
-            </a>
-            <a href="{{ request()->fullUrlWithQuery(['tingkat' => 'XII', 'page' => 1]) }}" 
-               class="btn btn-sm {{ $currentTingkat == 'XII' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                Kelas XII
-            </a>
-            <a href="{{ route('kurikulum.siswa.index') }}" 
-               class="btn btn-sm btn-outline-secondary">
-                Semua
-            </a>
-        </div>
-    </div>
-
-    <!-- Search Form -->
-    <div class="card mb-3 search-card">
+    <div class="card filter-card">
         <div class="card-body">
-            <form method="GET" action="{{ route('kurikulum.siswa.index') }}" class="row g-2 search-form">
-                <div class="col-md-6">
+            <form method="GET" action="{{ route('kurikulum.siswa.index') }}" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label"><i class="fas fa-search me-1"></i> Cari</label>
                     <div class="input-group">
-                        <span class="input-group-text">
-                            <i class="bi bi-search"></i>
-                        </span>
-                        <input type="text" 
-                               name="search" 
-                               class="form-control" 
-                               placeholder="Cari nama, NIS, atau NISN..." 
-                               value="{{ $search ?? '' }}">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" name="search" class="form-control" placeholder="Nama / NIS / NISN" value="{{ $search ?? '' }}">
                     </div>
                 </div>
-
+                <div class="col-md-3">
+                    <label class="form-label"><i class="fas fa-layer-group me-1"></i> Tingkat</label>
+                    <select name="tingkat" class="form-select">
+                        <option value="">Semua</option>
+                        @foreach($allTingkat ?? ['X', 'XI', 'XII'] as $t)
+                            <option value="{{ $t }}" {{ $tingkat == $t ? 'selected' : '' }}>Kelas {{ $t }}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <div class="col-md-4">
+                    <label class="form-label"><i class="fas fa-users me-1"></i> Rombel</label>
                     <select name="rombel" class="form-select">
-                        <option value="">-- Semua Rombel --</option>
-                        @foreach(($allRombels ?? collect()) as $r)
-                            @php
-                                $rombelNama = $r->nama ?? null;
-                                $tingkatVal = optional($r->kelas)->tingkat ?? null;
-                                $rombelWithoutTingkat = $rombelNama ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama) : null;
-                                $rombelWithoutTingkat = $rombelWithoutTingkat ? trim($rombelWithoutTingkat) : null;
-                                $formattedRombel = $rombelWithoutTingkat ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat) : ($rombelNama ?? '');
-                            @endphp
-                            <option value="{{ $r->id }}" {{ (isset($filterRombel) && $filterRombel == $r->id) ? 'selected' : '' }}>
-                                {{ $tingkatVal ? $tingkatVal . ' ' . $formattedRombel : $formattedRombel }}
+                        <option value="">Semua Rombel</option>
+                        @foreach($allRombels ?? [] as $r)
+                            <option value="{{ $r->id }}" {{ $filterRombel == $r->id ? 'selected' : '' }}>
+                                {{ $r->nama }}
                             </option>
                         @endforeach
                     </select>
                 </div>
-
-                <div class="col-md-2 d-flex">
-                    <button type="submit" class="btn btn-primary me-2">Cari</button>
-                    <a href="{{ route('kurikulum.siswa.index') }}" class="btn btn-outline-secondary">Reset</a>
+                <div class="col-md-2">
+                    <div class="d-flex gap-1">
+                        <button type="submit" class="btn-gradient" style="flex:1; justify-content:center; padding:0.3rem 0.8rem; font-size:0.75rem;">
+                            <i class="fas fa-search me-1"></i> Cari
+                        </button>
+                        <a href="{{ route('kurikulum.siswa.index') }}" class="btn-outline-gradient" style="flex:1; justify-content:center; padding:0.3rem 0.8rem; font-size:0.75rem;">
+                            <i class="fas fa-undo-alt"></i>
+                        </a>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Success Alert -->
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="card table-card">
+        <div class="card-header">
+            <h5><i class="fas fa-list"></i> Daftar Siswa</h5>
+            <span class="badge bg-primary">{{ $siswas->total() }}</span>
         </div>
-    @endif
+        <div class="card-body p-0">
+            @if(session('success'))
+                <div class="alert alert-success m-3" id="successAlert" style="font-size:0.8rem; padding:0.5rem 1rem;">
+                    <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                </div>
+            @endif
 
-    <!-- Student List -->
-    <div class="card shadow">
-        @if($siswas->count() > 0)
-            <div class="list-group list-group-flush">
-                @foreach ($siswas as $siswa)
-                    <div class="list-group-item">
-                        <div class="student-info">
-                            <div class="student-avatar">
-                                @if($siswa->foto)
-                                    <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}">
-                                @else
-                                    {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
-                                @endif
-                            </div>
-                            <div class="student-details">
-                                <strong>{{ $siswa->nama_lengkap }}</strong>
-                                <small>NIS: {{ $siswa->nis }}</small>
-                                @if(config('app.debug'))
-                                    <br><small class="text-muted">ID: {{ $siswa->id }}</small>
-                                @endif
-                            </div>
-                         
-                            @php
-                                $rombel = $siswa->rombel ?? null;
-                                $rombelNama = optional($rombel)->nama ?? null;
-                                $tingkatVal = optional($rombel)->kelas ? optional($rombel->kelas)->tingkat : null;
-                                $rombelWithoutTingkat = $rombelNama ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama) : null;
-                                $rombelWithoutTingkat = $rombelWithoutTingkat ? trim($rombelWithoutTingkat) : null;
-                                $formatted = $rombelWithoutTingkat ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat) : null;
-                            @endphp
-                            @if($rombel)
-                                <div class="student-class">
-                                    @if($tingkatVal)
-                                        {{ $tingkatVal }} {{ $formatted }}
-                                    @else
-                                        {{ $formatted }}
-                                    @endif
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th width="5%">No</th>
+                            <th>NIS</th>
+                            <th>Nama</th>
+                            <th>Jenis Kelamin</th>
+                            <th>Rombel</th>
+                            <th width="18%">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($siswas as $key => $s)
+                        <tr>
+                            <td>{{ $siswas->firstItem() + $key }}</td>
+                            <td>{{ $s->nis ?? '-' }}</td>
+                            <td><span class="fw-semibold">{{ $s->nama_lengkap }}</span></td>
+                            <td>
+                                <span class="badge-gender {{ strtolower($s->jenis_kelamin) == 'laki-laki' ? 'laki' : 'perempuan' }}">
+                                    {{ $s->jenis_kelamin ?? '-' }}
+                                </span>
+                            </td>
+                            <td>{{ optional($s->rombel)->nama ?? '-' }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ route('kurikulum.siswa.show', $s->id) }}" class="btn-detail">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ route('kurikulum.siswa.data-diri.edit', $s->id) }}" class="btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ route('kurikulum.siswa.edit-password', $s->id) }}" class="btn-edit" style="background:#6B7280;">
+                                        <i class="fas fa-key"></i>
+                                    </a>
+                                    <form action="{{ route('kurikulum.siswa.destroy', $s->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus siswa ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
-                            @endif
-                            <div class="student-actions">
-                                <a href="{{ route('kurikulum.data-siswa.show', $siswa->id) }}" 
-                                   class="btn btn-sm btn-info" 
-                                   title="Detail">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="{{ route('kurikulum.data-siswa.edit', $siswa->id) }}" class="btn btn-sm btn-warning" title="Edit Data Diri">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="{{ route('kurikulum.siswa.edit', $siswa->id) }}" class="btn btn-sm btn-secondary" title="Ubah Password">
-                                    <i class="fas fa-key"></i>
-                                </a>
-                                <form action="{{ route('kurikulum.data-siswa.destroy', $siswa->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data siswa ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <i class="fas fa-user-graduate"></i>
+                                    <h5 class="fw-bold text-muted">Belum ada data siswa</h5>
+                                    <p class="text-muted">Silakan tambah data baru melalui tombol di atas.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-            
-            <!-- Pagination -->
-            <div class="d-flex justify-content-center mt-3 p-3">
-                {{ $siswas->links('pagination::bootstrap-4') }}
+
+            @if($siswas->hasPages())
+            <div class="pagination-wrapper">
+                {{ $siswas->appends(request()->query())->links('pagination::bootstrap-4') }}
             </div>
-        @else
-            <div class="empty-state">
-                <i class="fas fa-user-graduate"></i>
-                <h5>Tidak ada data siswa</h5>
-                <p>Belum ada siswa yang terdaftar.</p>
-            </div>
-        @endif
+            @endif
+        </div>
     </div>
 </div>
+
+<script>
+    setTimeout(function() {
+        let alert = document.getElementById('successAlert');
+        if(alert) {
+            alert.style.transition = 'opacity 0.5s';
+            alert.style.opacity = '0';
+            setTimeout(function() { alert.remove(); }, 500);
+        }
+    }, 3000);
+</script>
 @endsection

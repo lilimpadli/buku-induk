@@ -3,134 +3,240 @@
 @section('title', 'Edit Jurusan')
 
 @section('content')
-<div class="container-fluid py-4">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
-        <div>
-            <h2 class="fw-bold mb-1">Edit Jurusan</h2>
-            <p class="text-muted mb-0">Perbarui detail jurusan sehingga data tetap selaras dengan kebutuhan kurikulum.</p>
-        </div>
-        <a href="{{ route('kurikulum.jurusan.index') }}" class="btn btn-outline-secondary btn-sm px-4">Kembali ke daftar</a>
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --warning-gradient: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    main {
+        padding: 20px 15px !important;
+        overflow-x: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .container-fluid {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 10px !important;
+        overflow-x: auto !important;
+    }
+
+    .page-header {
+        background: var(--warning-gradient);
+        color: white;
+        padding: 1.5rem 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .page-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(100px, -100px);
+        pointer-events: none;
+    }
+
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        font-size: 1.3rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 0.9rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-card {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .form-card .card-header {
+        background: white;
+        border-bottom: 1px solid #E2E8F0;
+        padding: 0.8rem 1.5rem;
+    }
+
+    .form-card .card-header h5 {
+        margin: 0;
+        font-weight: 700;
+        color: #1E293B;
+        font-size: 1rem;
+    }
+
+    .form-card .card-header h5 i {
+        color: #F59E0B;
+        margin-right: 6px;
+    }
+
+    .form-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .form-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #1E293B;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #E2E8F0;
+        padding: 0.5rem 0.9rem;
+        transition: var(--transition);
+        font-size: 0.9rem;
+    }
+
+    .form-control:focus {
+        border-color: #F59E0B;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    }
+
+    .btn-update {
+        background: var(--warning-gradient);
+        border: none;
+        padding: 0.5rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: var(--transition);
+        color: white;
+    }
+
+    .btn-update:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+        color: white;
+    }
+
+    .btn-cancel {
+        background: #64748B;
+        border: none;
+        padding: 0.5rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: var(--transition);
+        color: white;
+    }
+
+    .btn-cancel:hover {
+        background: #475569;
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1rem 1rem;
+        }
+        .page-header h3 {
+            font-size: 1.1rem;
+        }
+        .page-header .text-muted {
+            font-size: 0.75rem;
+        }
+
+        .form-card .card-body {
+            padding: 1rem;
+        }
+
+        .btn-update,
+        .btn-cancel {
+            width: 100%;
+            margin-bottom: 8px;
+            justify-content: center;
+        }
+
+        .border-top {
+            text-align: center;
+        }
+
+        .row {
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .col-md-6 {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+    }
+</style>
+
+<div class="container-fluid px-4">
+    <div class="page-header">
+        <h3><i class="fas fa-edit me-2"></i> Edit Jurusan</h3>
+        <div class="text-muted">Perbarui data jurusan</div>
     </div>
 
-    <div class="card dashboard-panel border-0 overflow-hidden">
-        <div class="card-header py-4 px-4">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-                <div>
-                    <h3 class="mb-1">Ubah Detail Jurusan</h3>
-                    <p class="text-muted mb-0">Sunting kode dan nama jurusan untuk menjaga konsistensi data.</p>
-                </div>
-                <div class="text-muted small">Perubahan akan langsung di terapkan setelah submit.</div>
-            </div>
+    <div class="card form-card">
+        <div class="card-header">
+            <h5><i class="fas fa-pen"></i> Form Edit Jurusan — {{ $jurusan->nama }}</h5>
         </div>
-
-        <div class="card-body p-4">
-            @if ($errors->any())
-                <div class="alert alert-danger border-0 rounded-4 shadow-sm mb-4">
-                    <strong>Periksa kembali data formulir.</strong>
-                    <ul class="mb-0 mt-2 small">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
+        <div class="card-body">
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $e)
+                            <li>{{ $e }}</li>
                         @endforeach
                     </ul>
                 </div>
             @endif
 
-            <form action="{{ route('kurikulum.jurusan.update', $jurusan->id) }}" method="POST" class="row g-3">
+            <form action="{{ route('kurikulum.jurusan.update', $jurusan->id) }}" method="POST">
                 @csrf
                 @method('PUT')
 
-                <div class="col-12">
-                    <label for="kode" class="form-label">Kode Jurusan</label>
-                    <input type="text" class="form-control form-control-modern @error('kode') is-invalid @enderror" id="kode" name="kode" value="{{ old('kode', $jurusan->kode) }}" required>
-                    @error('kode')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="col-12">
-                    <label for="nama" class="form-label">Nama Jurusan</label>
-                    <input type="text" class="form-control form-control-modern @error('nama') is-invalid @enderror" id="nama" name="nama" value="{{ old('nama', $jurusan->nama) }}" required>
-                    @error('nama')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="col-12">
-                    <div class="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-2">
-                        <a href="{{ route('kurikulum.jurusan.index') }}" class="btn btn-secondary btn-secondary-modern">Batal</a>
-                        <button type="submit" class="btn btn-primary btn-primary-modern">Update</button>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-tag text-primary me-1"></i> Kode Jurusan <span class="text-danger">*</span></label>
+                        <input type="text" name="kode" class="form-control @error('kode') is-invalid @enderror" value="{{ old('kode', $jurusan->kode) }}" required>
+                        @error('kode')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-building text-primary me-1"></i> Nama Jurusan <span class="text-danger">*</span></label>
+                        <input type="text" name="nama" class="form-control @error('nama') is-invalid @enderror" value="{{ old('nama', $jurusan->nama) }}" required>
+                        @error('nama')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top">
+                    <button type="submit" class="btn btn-update">
+                        <i class="fas fa-save me-2"></i> Update
+                    </button>
+                    <a href="{{ route('kurikulum.jurusan.index') }}" class="btn btn-cancel">
+                        <i class="fas fa-arrow-left me-2"></i> Batal
+                    </a>
                 </div>
             </form>
         </div>
     </div>
 </div>
 @endsection
-
-@push('styles')
-<style>
-.dashboard-panel {
-    border-radius: 24px;
-    box-shadow: 0 22px 60px rgba(15, 23, 42, 0.08);
-    border: 1px solid rgba(15, 23, 42, 0.06);
-    overflow: hidden;
-}
-.dashboard-panel .card-header {
-    background: linear-gradient(180deg, rgba(221, 235, 255, 0.72), rgba(255, 255, 255, 0.72));
-    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
-}
-.form-label {
-    font-size: .95rem;
-    font-weight: 600;
-    color: #1f2937;
-}
-.form-control-modern {
-    border-radius: 18px;
-    border: 1px solid rgba(56, 118, 255, 0.16);
-    background: #fbfdff;
-    min-height: 50px;
-    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
-}
-.form-control-modern:focus {
-    border-color: rgba(56, 118, 255, 0.35);
-    box-shadow: 0 0 0 0.13rem rgba(56, 118, 255, 0.18);
-    background: #ffffff;
-}
-.form-control-modern.is-invalid {
-    border-color: #dc3545;
-    background: #fff5f6;
-}
-.invalid-feedback {
-    display: block;
-    margin-top: .35rem;
-}
-.btn-primary-modern {
-    border-radius: 18px;
-    background: linear-gradient(135deg, #336df1 0%, #1f5ed0 100%);
-    border: none;
-    box-shadow: 0 14px 30px rgba(51, 109, 241, 0.18);
-    padding: .85rem 1.5rem;
-}
-.btn-primary-modern:hover, .btn-primary-modern:focus {
-    background: linear-gradient(135deg, #2756cc 0%, #164eb3 100%);
-}
-.btn-secondary-modern {
-    border-radius: 18px;
-    border: 1px solid rgba(148, 163, 184, 0.25);
-    background: #f8fafc;
-    color: #334155;
-    padding: .82rem 1.4rem;
-}
-.btn-secondary-modern:hover, .btn-secondary-modern:focus {
-    background: #edf2f7;
-    color: #1f2937;
-}
-@media (max-width: 575.98px) {
-    .dashboard-panel .card-header,
-    .dashboard-panel .card-body {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-}
-</style>
-@endpush

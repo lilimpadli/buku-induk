@@ -49,6 +49,8 @@ use App\Http\Controllers\Kurikulum\JurusanController;
 use App\Http\Controllers\Kurikulum\ProgramKeahlianController;
 use App\Http\Controllers\Kurikulum\KonsentrasiKeahlianController;
 use App\Http\Controllers\Kurikulum\BidangKeahlianController;
+use App\Http\Controllers\Kurikulum\KkmController;
+use App\Http\Controllers\Kurikulum\KenaikanKelasController;
 
 // KELAS KAPROG
 use App\Http\Controllers\KelaskaprogController;
@@ -387,9 +389,8 @@ Route::middleware(['auth'])->group(function () {
                 ->name('input_nilai_raport.update');
 
             // delete raport for a siswa/semester/tahun
-            Route::post('input-nilai-raport/{siswa_id}/delete', [InputNilaiRaportController::class, 'destroy'])
+            Route::delete('input-nilai-raport/{siswa_id}/delete', [InputNilaiRaportController::class, 'destroy'])
                 ->name('input_nilai_raport.delete');
-
             // Download template and import leger
             Route::post('/input-nilai-raport/download-template', [InputNilaiRaportController::class, 'downloadTemplate'])
                 ->name('input_nilai_raport.download_template');
@@ -743,6 +744,26 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/edit', [ManajemenKurikulumController::class, 'edit'])->name('edit');
         Route::put('/{id}', [ManajemenKurikulumController::class, 'update'])->name('update');
         Route::delete('/{id}', [ManajemenKurikulumController::class, 'destroy'])->name('destroy');
+
+    // Dashboard Kurikulum
+    Route::get('/kurikulum/dashboard', [App\Http\Controllers\Kurikulum\KurikulumDashboardController::class, 'index'])->name('kurikulum.dashboard');
+    Route::get('/kurikulum', [App\Http\Controllers\Kurikulum\KurikulumDashboardController::class, 'index'])->name('kurikulum.index');
+
+    Route::prefix('kurikulum')->name('kurikulum.')->group(function () {
+        Route::resource('kkm', KkmController::class);
+    });
+
+    Route::prefix('kurikulum')->name('kurikulum.')->middleware('role:kurikulum')->group(function () {
+        // ... route lain ...
+        
+        Route::get('/kenaikan-kelas', [KenaikanKelasController::class, 'index'])->name('kenaikan-kelas.index');
+        Route::post('/kenaikan-kelas/preview', [KenaikanKelasController::class, 'preview'])->name('kenaikan-kelas.preview');
+        Route::post('/kenaikan-kelas/process', [KenaikanKelasController::class, 'process'])->name('kenaikan-kelas.process');
+    });
+    // Kenaikan Kelas
+    Route::get('/kenaikan-kelas', [App\Http\Controllers\Kurikulum\KenaikanKelasController::class, 'index'])->name('kenaikan-kelas.index');
+    Route::post('/kenaikan-kelas/preview', [App\Http\Controllers\Kurikulum\KenaikanKelasController::class, 'preview'])->name('kenaikan-kelas.preview');
+    Route::post('/kenaikan-kelas/process', [App\Http\Controllers\Kurikulum\KenaikanKelasController::class, 'process'])->name('kenaikan-kelas.process');
     });
 
     /*
@@ -769,262 +790,307 @@ Route::middleware(['auth'])->group(function () {
 
 });
 
-    /*
-    |--------------------------------------------------------------------------
-    | KURIKULUM
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('kurikulum')
-        ->name('kurikulum.')
-        ->middleware('role:kurikulum')
-        ->group(function () {
+/*
+|--------------------------------------------------------------------------
+| KURIKULUM
+|--------------------------------------------------------------------------
+*/
+Route::prefix('kurikulum')
+    ->name('kurikulum.')
+    ->middleware('role:kurikulum')
+    ->group(function () {
 
-            // PPDB (Kurikulum) - allow Kurikulum users to manage PPDB
-            Route::get('/ppdb', [PpdbController::class, 'index'])->name('ppdb.index');
-            // Kurikulum: edit PPDB timeline
-            Route::get('/ppdb/timeline', [App\Http\Controllers\Kurikulum\PpdbTimelineController::class, 'edit'])->name('ppdb.timeline');
-            Route::get('/ppdb/timeline/edit', [App\Http\Controllers\Kurikulum\PpdbTimelineController::class, 'edit'])->name('ppdb.timeline.edit');
-            Route::post('/ppdb/timeline', [App\Http\Controllers\Kurikulum\PpdbTimelineController::class, 'update'])->name('ppdb.timeline.update');
+        // PPDB (Kurikulum) - allow Kurikulum users to manage PPDB
+        Route::get('/ppdb', [PpdbController::class, 'index'])->name('ppdb.index');
+        // Kurikulum: edit PPDB timeline
+        Route::get('/ppdb/timeline', [App\Http\Controllers\Kurikulum\PpdbTimelineController::class, 'edit'])->name('ppdb.timeline');
+        Route::get('/ppdb/timeline/edit', [App\Http\Controllers\Kurikulum\PpdbTimelineController::class, 'edit'])->name('ppdb.timeline.edit');
+        Route::post('/ppdb/timeline', [App\Http\Controllers\Kurikulum\PpdbTimelineController::class, 'update'])->name('ppdb.timeline.update');
 
-            Route::get('/dashboard', [KurikulumDashboardController::class, 'index'])
-                ->name('dashboard');
+        Route::get('/dashboard', [KurikulumDashboardController::class, 'index'])
+            ->name('dashboard');
 
-            // Data Pribadi (Kurikulum)
-            Route::get('/data-pribadi', [App\Http\Controllers\Kurikulum\DataPribadiController::class, 'index'])
-                ->name('data-pribadi.index');
-            Route::get('/data-pribadi/edit', [App\Http\Controllers\Kurikulum\DataPribadiController::class, 'edit'])
-                ->name('data-pribadi.edit');
-            Route::put('/data-pribadi', [App\Http\Controllers\Kurikulum\DataPribadiController::class, 'update'])
-                ->name('data-pribadi.update');
+        // Data Pribadi (Kurikulum)
+        Route::get('/data-pribadi', [App\Http\Controllers\Kurikulum\DataPribadiController::class, 'index'])
+            ->name('data-pribadi.index');
+        Route::get('/data-pribadi/edit', [App\Http\Controllers\Kurikulum\DataPribadiController::class, 'edit'])
+            ->name('data-pribadi.edit');
+        Route::put('/data-pribadi', [App\Http\Controllers\Kurikulum\DataPribadiController::class, 'update'])
+            ->name('data-pribadi.update');
 
+        // Guru management (Kurikulum)
+        Route::get('/guru', [App\Http\Controllers\Kurikulum\GuruController::class, 'index'])
+            ->name('guru.index');
 
-            // Guru management (Kurikulum)
-            Route::get('/guru', [App\Http\Controllers\Kurikulum\GuruController::class, 'index'])
-                ->name('guru.index');
-
-            // Bidang Keahlian (Kurikulum)
-            Route::prefix('bidang-keahlian')->name('bidang-keahlian.')->group(function () {
-                Route::get('/', [BidangKeahlianController::class, 'index'])->name('index');
-                Route::get('/create', [BidangKeahlianController::class, 'create'])->name('create');
-                Route::post('/', [BidangKeahlianController::class, 'store'])->name('store');
-                Route::get('/{id}', [BidangKeahlianController::class, 'show'])->name('show');
-                Route::get('/{id}/edit', [BidangKeahlianController::class, 'edit'])->name('edit');
-                Route::put('/{id}', [BidangKeahlianController::class, 'update'])->name('update');
-                Route::delete('/{id}', [BidangKeahlianController::class, 'destroy'])->name('destroy');
-            });
-
-             // Konsentrasi Keahlian (Kurikulum)
-            Route::prefix('konsentrasi-keahlian')->name('konsentrasi-keahlian.')->group(function () {
-                Route::get('/', [KonsentrasiKeahlianController::class, 'index'])->name('index');
-                Route::get('/create', [KonsentrasiKeahlianController::class, 'create'])->name('create');
-                Route::post('/', [KonsentrasiKeahlianController::class, 'store'])->name('store');
-                Route::get('/{id}', [KonsentrasiKeahlianController::class, 'show'])->name('show');
-                Route::get('/{id}/edit', [KonsentrasiKeahlianController::class, 'edit'])->name('edit');
-                Route::put('/{id}', [KonsentrasiKeahlianController::class, 'update'])->name('update');
-                Route::delete('/{id}', [KonsentrasiKeahlianController::class, 'destroy'])->name('destroy');
-            });
-
-             // Program Keahlian (Kurikulum)
-                    Route::prefix('program-keahlian')->name('program-keahlian.')->group(function () {
-                        Route::get('/', [ProgramKeahlianController::class, 'index'])->name('index');
-                        Route::get('/create', [ProgramKeahlianController::class, 'create'])->name('create');
-                        Route::post('/', [ProgramKeahlianController::class, 'store'])->name('store');
-                        Route::get('/{id}', [ProgramKeahlianController::class, 'show'])->name('show');
-                        Route::get('/{id}/edit', [ProgramKeahlianController::class, 'edit'])->name('edit');
-                        Route::put('/{id}', [ProgramKeahlianController::class, 'update'])->name('update');
-                        Route::delete('/{id}', [ProgramKeahlianController::class, 'destroy'])->name('destroy');
-                    });
-
-            // Guru import
-            Route::get('/guru/import', [App\Http\Controllers\Kurikulum\GuruController::class, 'importForm'])
-                ->name('guru.importForm');
-            Route::get('/guru/import/template', [App\Http\Controllers\Kurikulum\GuruController::class, 'downloadTemplate'])
-                ->name('guru.import.template');
-            Route::post('/guru/import', [App\Http\Controllers\Kurikulum\GuruController::class, 'import'])
-                ->name('guru.import');
-            // Guru export (Excel)
-            Route::get('/guru/export', [App\Http\Controllers\Kurikulum\GuruController::class, 'exportExcel'])
-                ->name('guru.export');
-
-            // Backwards-compatible "manage" routes used by views/controllers
-            Route::prefix('guru/manage')->name('guru.manage.')->group(function () {
-                Route::get('/', [App\Http\Controllers\Kurikulum\GuruController::class, 'index'])->name('index');
-                Route::get('/create', [App\Http\Controllers\Kurikulum\GuruController::class, 'create'])->name('create');
-                Route::post('/', [App\Http\Controllers\Kurikulum\GuruController::class, 'store'])->name('store');
-                Route::get('/{id}', [App\Http\Controllers\Kurikulum\GuruController::class, 'show'])->name('show');
-                Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\GuruController::class, 'edit'])->name('edit');
-                Route::put('/{id}', [App\Http\Controllers\Kurikulum\GuruController::class, 'update'])->name('update');
-                Route::delete('/{id}', [App\Http\Controllers\Kurikulum\GuruController::class, 'destroy'])->name('destroy');
-            });
-
-            // Kurikulum Management (Kurikulum)
-            Route::prefix('kurikulum')->name('kurikulum.')->group(function () {
-                Route::get('/', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'index'])->name('index');
-                Route::get('/create', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'create'])->name('create');
-                Route::post('/', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'store'])->name('store');
-                Route::get('/{id}', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'show'])->name('show');
-                Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'edit'])->name('edit');
-                Route::put('/{id}', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'update'])->name('update');
-                Route::delete('/{id}', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'destroy'])->name('destroy');
-            });
-
-            // Mata Pelajaran (Kurikulum)
-            Route::prefix('mata-pelajaran')->name('mata-pelajaran.')->group(function () {
-                Route::get('/', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'index'])->name('index');
-                Route::get('/create', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'create'])->name('create');
-                Route::post('/', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'store'])->name('store');
-                Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'edit'])->name('edit');
-                Route::put('/{id}', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'update'])->name('update');
-                Route::delete('/{id}', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'destroy'])->name('destroy');
-            });
-
-            // PPDB (Kurikulum) - jurusan and assign routes
-            Route::get('/ppdb', [PpdbController::class, 'index'])->name('ppdb.index');
-            Route::get('/ppdb/jurusan/{id}', [PpdbController::class, 'showJurusan'])->name('ppdb.jurusan.show');
-            Route::get('/ppdb/jurusan/{id}/pendaftar', [PpdbController::class, 'showPendaftarJurusan'])->name('ppdb.jurusan.pendaftar');
-            Route::get('/ppdb/jurusan/{jurusanId}/sesi/{sesiId}', [PpdbController::class, 'showPendaftarSesi'])->name('ppdb.jurusan.sesi.pendaftar');
-            Route::get('/ppdb/sesi/{sesiId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarSesiJalur'])->name('ppdb.sesi.jalur.pendaftar');
-            Route::get('/ppdb/jurusan/{jurusanId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarJalur'])->name('ppdb.jurusan.jalur.pendaftar');
-            Route::get('/ppdb/{id}/assign', [PpdbController::class, 'showAssignForm'])->name('ppdb.assign.form');
-            Route::post('/ppdb/{id}/assign', [PpdbController::class, 'assign'])->name('ppdb.assign');
-
-            // Buku Induk (Kurikulum)
-            Route::get('/buku-induk', [App\Http\Controllers\Kurikulum\BukuIndukController::class, 'index'])->name('buku-induk.index');
-            Route::get('/buku-induk/{siswa}', [App\Http\Controllers\Kurikulum\BukuIndukController::class, 'show'])->name('buku-induk.show');
-            Route::get('/buku-induk/{siswa}/cetak', [App\Http\Controllers\Kurikulum\BukuIndukController::class, 'cetak'])->name('buku-induk.cetak');
-
-            // Mutasi Siswa (Kurikulum)
-            Route::get('/mutasi/laporan', [App\Http\Controllers\Kurikulum\MutasiController::class, 'laporan'])->name('mutasi.laporan');
-            Route::resource('/mutasi', App\Http\Controllers\Kurikulum\MutasiController::class)->names('mutasi');
-
-            // Alumni (Kurikulum)
-            Route::get('/alumni', [App\Http\Controllers\Kurikulum\AlumniController::class, 'index'])->name('alumni.index');
-            
-            // Buku Induk Alumni (lebih spesifik, harus di atas)
-            Route::get('/alumni/{siswa_id}/buku-induk/cetak', [App\Http\Controllers\Kurikulum\AlumniController::class, 'bukuIndukCetak'])->name('alumni.buku-induk.cetak');
-            Route::get('/alumni/{siswa_id}/buku-induk', [App\Http\Controllers\Kurikulum\AlumniController::class, 'bukuInduk'])->name('alumni.buku-induk.show');
-            
-            // Raport Alumni (lebih spesifik, harus di atas)
-            Route::get('/alumni/{siswa_id}/raport/{semester}/{tahun}/cetak', [App\Http\Controllers\Kurikulum\AlumniController::class, 'raporCetak'])->name('alumni.raport.cetak');
-            Route::get('/alumni/{siswa_id}/raport/{semester}/{tahun}', [App\Http\Controllers\Kurikulum\AlumniController::class, 'raporShow'])->name('alumni.raport.show');
-            Route::get('/alumni/{siswa_id}/raport', [App\Http\Controllers\Kurikulum\AlumniController::class, 'raporList'])->name('alumni.raport.list');
-            
-            // Alumni by Jurusan
-            Route::get('/alumni/jurusan/{jurusanId}', [App\Http\Controllers\Kurikulum\AlumniController::class, 'byJurusan'])->name('alumni.by-jurusan');
-            
-            // Alumni Show (paling umum, harus di bawah)
-            Route::get('/alumni/{id}', [App\Http\Controllers\Kurikulum\AlumniController::class, 'show'])->where('id', '[0-9]+')->name('alumni.show');
-
-            Route::get('/siswa', [KurikulumSiswaController::class, 'index'])
-                ->name('siswa.index');
-
-            // Import siswa (Excel) - show form and process
-            Route::get('/siswa/import', [KurikulumSiswaController::class, 'importForm'])
-                ->name('siswa.import.form');
-            Route::post('/siswa/import', [KurikulumSiswaController::class, 'import'])
-                ->name('siswa.import');
-
-            // Data Siswa
-            Route::get('/siswa/create', [KurikulumSiswaController::class, 'create'])
-                ->name('data-siswa.create');
-
-            Route::post('/siswa', [KurikulumSiswaController::class, 'store'])
-                ->name('data-siswa.store');
-
-            Route::get('/siswa/{id}', [KurikulumSiswaController::class, 'show'])
-                ->name('data-siswa.show');
-
-            Route::get('/siswa/{id}/edit', [KurikulumSiswaController::class, 'editDataDiri'])
-                ->name('data-siswa.edit');
-
-            Route::put('/siswa/{id}', [KurikulumSiswaController::class, 'update'])
-                ->name('data-siswa.update');
-
-            Route::delete('/siswa/{id}', [KurikulumSiswaController::class, 'destroy'])
-                ->name('data-siswa.destroy');
-
-            Route::get('/siswa/{id}/edit-password', [KurikulumSiswaController::class, 'edit'])
-                ->name('siswa.edit');
-
-            Route::get('/siswa/{id}/cetak', [KurikulumSiswaController::class, 'cetak'])
-                ->name('siswa.cetak');
-
-            // KELAS
-            Route::get('/kelas/create', [KelasController::class, 'create'])
-                ->name('kelas.create');
-
-            Route::post('/kelas', [KelasController::class, 'store'])
-                ->name('kelas.store');
-
-            Route::delete('/kelas/{id}', [KelasController::class, 'destroy'])
-                ->name('kelas.destroy');
-
-            Route::get('/kelas/{rombel}', [KelasController::class, 'show'])->name('kelas.show');
-
-            // RAPOR SISWA
-            Route::get('/rapor', [App\Http\Controllers\Kurikulum\KurikulumRaportController::class, 'index'])
-                ->name('rapor.index');
-
-            Route::get('/rapor/{id}', [App\Http\Controllers\Kurikulum\KurikulumRaportController::class, 'show'])
-                ->name('rapor.show');
-
-            Route::get('/rapor/{id}/{semester}/{tahun}', [App\Http\Controllers\Kurikulum\KurikulumRaportController::class, 'detail'])
-                ->name('rapor.detail');
-
-            Route::get('/rapor/{id}/{semester}/{tahun}/cetak', [App\Http\Controllers\Kurikulum\KurikulumRaportController::class, 'exportPdf'])
-                ->name('rapor.cetak');
-
-            Route::get('/rapor/{id}/{semester}/{tahun}/show', [App\Http\Controllers\Kurikulum\KurikulumRaportController::class, 'show_html'])
-                ->name('rapor.show_html');
-
-            Route::get('/kurikulum/manajemen-kelas', [KelasController::class, 'index'])
-                ->name('kurikulum.kelas.index');
-
-            // Halaman utama manajemen kelas
-            Route::get('/manajemen-kelas', [KelasController::class, 'index'])
-                ->name('kelas.index');
-
-            // ============================
-            //  MANAGEMEN KELAS — EDIT
-            // ============================
-
-            Route::get('/manajemen-kelas/{id}/edit', [KelasController::class, 'edit'])
-                ->name('kelas.edit');
-
-            Route::put('/manajemen-kelas/{id}', [KelasController::class, 'update'])
-                ->name('kelas.update');
-
-            Route::get('/manajemen-kelas/{id}/export', [KelasController::class, 'export'])
-                ->name('kelas.export');
-
-            // JURUSAN
-            Route::get('/jurusan', [JurusanController::class, 'index'])
-                ->name('jurusan.index');
-
-            Route::get('/jurusan/create', [JurusanController::class, 'create'])
-                ->name('jurusan.create');
-
-            Route::post('/jurusan', [JurusanController::class, 'store'])
-                ->name('jurusan.store');
-
-            Route::get('/jurusan/{id}', [JurusanController::class, 'show'])
-                ->name('jurusan.show');
-
-            Route::get('/jurusan/{id}/edit', [JurusanController::class, 'edit'])
-                ->name('jurusan.edit');
-
-            Route::put('/jurusan/{id}', [JurusanController::class, 'update'])
-                ->name('jurusan.update');
-
-            Route::delete('/jurusan/{id}', [JurusanController::class, 'destroy'])
-                ->name('jurusan.destroy');
-
-            // Kelulusan & Alumni (reuse TU controllers for data views)
-            Route::get('/kelulusan', [KelulusanController::class, 'index'])
-                ->name('kelulusan.index');
-            Route::get('/kelulusan/rombel/{rombelId}/{tahun}', [KelulusanController::class, 'showRombel'])
-                ->name('kelulusan.rombel.show');
+        // Bidang Keahlian (Kurikulum)
+        Route::prefix('bidang-keahlian')->name('bidang-keahlian.')->group(function () {
+            Route::get('/', [BidangKeahlianController::class, 'index'])->name('index');
+            Route::get('/create', [BidangKeahlianController::class, 'create'])->name('create');
+            Route::post('/', [BidangKeahlianController::class, 'store'])->name('store');
+            Route::get('/{id}', [BidangKeahlianController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [BidangKeahlianController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [BidangKeahlianController::class, 'update'])->name('update');
+            Route::delete('/{id}', [BidangKeahlianController::class, 'destroy'])->name('destroy');
         });
+
+        // Konsentrasi Keahlian (Kurikulum)
+        Route::prefix('konsentrasi-keahlian')->name('konsentrasi-keahlian.')->group(function () {
+            Route::get('/', [KonsentrasiKeahlianController::class, 'index'])->name('index');
+            Route::get('/create', [KonsentrasiKeahlianController::class, 'create'])->name('create');
+            Route::post('/', [KonsentrasiKeahlianController::class, 'store'])->name('store');
+            Route::get('/{id}', [KonsentrasiKeahlianController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [KonsentrasiKeahlianController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [KonsentrasiKeahlianController::class, 'update'])->name('update');
+            Route::delete('/{id}', [KonsentrasiKeahlianController::class, 'destroy'])->name('destroy');
+        });
+
+        // Program Keahlian (Kurikulum)
+        Route::prefix('program-keahlian')->name('program-keahlian.')->group(function () {
+            Route::get('/', [ProgramKeahlianController::class, 'index'])->name('index');
+            Route::get('/create', [ProgramKeahlianController::class, 'create'])->name('create');
+            Route::post('/', [ProgramKeahlianController::class, 'store'])->name('store');
+            Route::get('/{id}', [ProgramKeahlianController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [ProgramKeahlianController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [ProgramKeahlianController::class, 'update'])->name('update');
+            Route::delete('/{id}', [ProgramKeahlianController::class, 'destroy'])->name('destroy');
+        });
+
+        // 🔥 MANAJEMEN KKM (Kriteria Ketuntasan Minimal)
+        Route::resource('kkm', KkmController::class);
+
+        // 🔥 KENAIKAN KELAS
+        Route::get('/kenaikan-kelas', [App\Http\Controllers\Kurikulum\KenaikanKelasController::class, 'index'])->name('kenaikan-kelas.index');
+        Route::post('/kenaikan-kelas/preview', [App\Http\Controllers\Kurikulum\KenaikanKelasController::class, 'preview'])->name('kenaikan-kelas.preview');
+        Route::post('/kenaikan-kelas/process', [App\Http\Controllers\Kurikulum\KenaikanKelasController::class, 'process'])->name('kenaikan-kelas.process');
+
+        // Guru import
+        Route::get('/guru/import', [App\Http\Controllers\Kurikulum\GuruController::class, 'importForm'])
+            ->name('guru.importForm');
+        Route::get('/guru/import/template', [App\Http\Controllers\Kurikulum\GuruController::class, 'downloadTemplate'])
+            ->name('guru.import.template');
+        Route::post('/guru/import', [App\Http\Controllers\Kurikulum\GuruController::class, 'import'])
+            ->name('guru.import');
+        // Guru export (Excel)
+        Route::get('/guru/export', [App\Http\Controllers\Kurikulum\GuruController::class, 'exportExcel'])
+            ->name('guru.export');
+
+        // Backwards-compatible "manage" routes used by views/controllers
+        Route::prefix('guru/manage')->name('guru.manage.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Kurikulum\GuruController::class, 'index'])->name('index');
+            Route::get('/create', [App\Http\Controllers\Kurikulum\GuruController::class, 'create'])->name('create');
+            Route::post('/', [App\Http\Controllers\Kurikulum\GuruController::class, 'store'])->name('store');
+            Route::get('/{id}', [App\Http\Controllers\Kurikulum\GuruController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\GuruController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [App\Http\Controllers\Kurikulum\GuruController::class, 'update'])->name('update');
+            Route::delete('/{id}', [App\Http\Controllers\Kurikulum\GuruController::class, 'destroy'])->name('destroy');
+        });
+
+        // Kurikulum Management (Kurikulum)
+        Route::prefix('kurikulum')->name('kurikulum.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'index'])->name('index');
+            Route::get('/create', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'create'])->name('create');
+            Route::post('/', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'store'])->name('store');
+            Route::get('/{id}', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'update'])->name('update');
+            Route::delete('/{id}', [App\Http\Controllers\Kurikulum\KurikulumController::class, 'destroy'])->name('destroy');
+        });
+
+        // Mata Pelajaran (Kurikulum)
+        Route::prefix('mata-pelajaran')->name('mata-pelajaran.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'index'])->name('index');
+            Route::get('/create', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'create'])->name('create');
+            Route::post('/', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'update'])->name('update');
+            Route::delete('/{id}', [App\Http\Controllers\Kurikulum\MataPelajaranController::class, 'destroy'])->name('destroy');
+        });
+
+        // PPDB (Kurikulum) - jurusan and assign routes
+        Route::get('/ppdb', [PpdbController::class, 'index'])->name('ppdb.index');
+        Route::get('/ppdb/jurusan/{id}', [PpdbController::class, 'showJurusan'])->name('ppdb.jurusan.show');
+        Route::get('/ppdb/jurusan/{id}/pendaftar', [PpdbController::class, 'showPendaftarJurusan'])->name('ppdb.jurusan.pendaftar');
+        Route::get('/ppdb/jurusan/{jurusanId}/sesi/{sesiId}', [PpdbController::class, 'showPendaftarSesi'])->name('ppdb.jurusan.sesi.pendaftar');
+        Route::get('/ppdb/sesi/{sesiId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarSesiJalur'])->name('ppdb.sesi.jalur.pendaftar');
+        Route::get('/ppdb/jurusan/{jurusanId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarJalur'])->name('ppdb.jurusan.jalur.pendaftar');
+        Route::get('/ppdb/{id}/assign', [PpdbController::class, 'showAssignForm'])->name('ppdb.assign.form');
+        Route::post('/ppdb/{id}/assign', [PpdbController::class, 'assign'])->name('ppdb.assign');
+
+        // Buku Induk (Kurikulum)
+        Route::get('/buku-induk', [App\Http\Controllers\Kurikulum\BukuIndukController::class, 'index'])->name('buku-induk.index');
+        Route::get('/buku-induk/{siswa}', [App\Http\Controllers\Kurikulum\BukuIndukController::class, 'show'])->name('buku-induk.show');
+        Route::get('/buku-induk/{siswa}/cetak', [App\Http\Controllers\Kurikulum\BukuIndukController::class, 'cetak'])->name('buku-induk.cetak');
+
+        // Mutasi Siswa (Kurikulum)
+        Route::get('/mutasi/laporan', [App\Http\Controllers\Kurikulum\MutasiController::class, 'laporan'])->name('mutasi.laporan');
+        Route::resource('/mutasi', App\Http\Controllers\Kurikulum\MutasiController::class)->names('mutasi');
+
+        // Alumni (Kurikulum)
+        Route::get('/alumni', [App\Http\Controllers\Kurikulum\AlumniController::class, 'index'])->name('alumni.index');
+        
+        // Buku Induk Alumni (lebih spesifik, harus di atas)
+        Route::get('/alumni/{siswa_id}/buku-induk/cetak', [App\Http\Controllers\Kurikulum\AlumniController::class, 'bukuIndukCetak'])->name('alumni.buku-induk.cetak');
+        Route::get('/alumni/{siswa_id}/buku-induk', [App\Http\Controllers\Kurikulum\AlumniController::class, 'bukuInduk'])->name('alumni.buku-induk.show');
+        
+        // Raport Alumni (lebih spesifik, harus di atas)
+        Route::get('/alumni/{siswa_id}/raport/{semester}/{tahun}/cetak', [App\Http\Controllers\Kurikulum\AlumniController::class, 'raporCetak'])->name('alumni.raport.cetak');
+        Route::get('/alumni/{siswa_id}/raport/{semester}/{tahun}', [App\Http\Controllers\Kurikulum\AlumniController::class, 'raporShow'])->name('alumni.raport.show');
+        Route::get('/alumni/{siswa_id}/raport', [App\Http\Controllers\Kurikulum\AlumniController::class, 'raporList'])->name('alumni.raport.list');
+        
+        // Alumni by Jurusan
+        Route::get('/alumni/jurusan/{jurusanId}', [App\Http\Controllers\Kurikulum\AlumniController::class, 'byJurusan'])->name('alumni.by-jurusan');
+        
+        // Alumni Show (paling umum, harus di bawah)
+        Route::get('/alumni/{id}', [App\Http\Controllers\Kurikulum\AlumniController::class, 'show'])->where('id', '[0-9]+')->name('alumni.show');
+
+        Route::get('/siswa', [KurikulumSiswaController::class, 'index'])
+            ->name('siswa.index');
+
+        // Import siswa (Excel) - show form and process
+        Route::get('/siswa/import', [KurikulumSiswaController::class, 'importForm'])
+            ->name('siswa.import.form');
+        Route::post('/siswa/import', [KurikulumSiswaController::class, 'import'])
+            ->name('siswa.import');
+
+        // Data Siswa
+        Route::get('/siswa/create', [KurikulumSiswaController::class, 'create'])
+            ->name('data-siswa.create');
+
+        Route::post('/siswa', [KurikulumSiswaController::class, 'store'])
+            ->name('data-siswa.store');
+
+        Route::get('/siswa/{id}', [KurikulumSiswaController::class, 'show'])
+            ->name('data-siswa.show');
+
+        Route::get('/siswa/{id}/edit', [KurikulumSiswaController::class, 'editDataDiri'])
+            ->name('data-siswa.edit');
+
+        Route::put('/siswa/{id}', [KurikulumSiswaController::class, 'update'])
+            ->name('data-siswa.update');
+
+        Route::delete('/siswa/{id}', [KurikulumSiswaController::class, 'destroy'])
+            ->name('data-siswa.destroy');
+
+        Route::get('/siswa/{id}/edit-password', [KurikulumSiswaController::class, 'edit'])
+            ->name('siswa.edit');
+
+        Route::get('/siswa/{id}/cetak', [KurikulumSiswaController::class, 'cetak'])
+            ->name('siswa.cetak');
+
+        // ============================================================
+        // MANAJEMEN USER (Kurikulum)
+        // ============================================================
+        Route::prefix('user')->name('user.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Kurikulum\UserController::class, 'index'])->name('index');
+            Route::get('/create', [App\Http\Controllers\Kurikulum\UserController::class, 'create'])->name('create');
+            Route::post('/', [App\Http\Controllers\Kurikulum\UserController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\UserController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [App\Http\Controllers\Kurikulum\UserController::class, 'update'])->name('update');
+            Route::delete('/{id}', [App\Http\Controllers\Kurikulum\UserController::class, 'destroy'])->name('destroy');
+            Route::post('/{id}/reset-password', [App\Http\Controllers\Kurikulum\UserController::class, 'resetPassword'])->name('reset-password');
+        });
+
+        // ============================================================
+        // MANAJEMEN SISWA - ROUTE TAMBAHAN (Konsisten)
+        // ============================================================
+        Route::prefix('siswa')->name('siswa.')->group(function () {
+            Route::get('/', [KurikulumSiswaController::class, 'index'])->name('index');
+            Route::get('/create', [KurikulumSiswaController::class, 'create'])->name('create');
+            Route::post('/', [KurikulumSiswaController::class, 'store'])->name('store');
+            Route::get('/{id}', [KurikulumSiswaController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [KurikulumSiswaController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [KurikulumSiswaController::class, 'update'])->name('update');
+            Route::delete('/{id}', [KurikulumSiswaController::class, 'destroy'])->name('destroy');
+            Route::get('/{id}/cetak', [KurikulumSiswaController::class, 'cetak'])->name('cetak');
+            Route::get('/{id}/data-diri', [KurikulumSiswaController::class, 'show'])->name('data-diri.show');
+            Route::get('/{id}/data-diri/edit', [KurikulumSiswaController::class, 'editDataDiri'])->name('data-diri.edit');
+            Route::put('/{id}/data-diri', [KurikulumSiswaController::class, 'update'])->name('data-diri.update');
+            Route::get('/{id}/edit-password', [KurikulumSiswaController::class, 'edit'])->name('edit-password');
+            Route::get('/import', [KurikulumSiswaController::class, 'importForm'])->name('import.form');
+            Route::post('/import', [KurikulumSiswaController::class, 'import'])->name('import');
+        });
+
+        // KELAS
+        Route::get('/kelas/create', [KelasController::class, 'create'])
+            ->name('kelas.create');
+
+        Route::post('/kelas', [KelasController::class, 'store'])
+            ->name('kelas.store');
+
+        Route::delete('/kelas/{id}', [KelasController::class, 'destroy'])
+            ->name('kelas.destroy');
+
+        Route::get('/kelas/{rombel}', [KelasController::class, 'show'])->name('kelas.show');
+
+        // RAPOR SISWA
+        Route::get('/rapor', [App\Http\Controllers\Kurikulum\KurikulumRaportController::class, 'index'])
+            ->name('rapor.index');
+
+        Route::get('/rapor/{id}', [App\Http\Controllers\Kurikulum\KurikulumRaportController::class, 'show'])
+            ->name('rapor.show');
+
+        Route::get('/rapor/{id}/{semester}/{tahun}', [App\Http\Controllers\Kurikulum\KurikulumRaportController::class, 'detail'])
+            ->name('rapor.detail');
+
+        Route::get('/rapor/{id}/{semester}/{tahun}/cetak', [App\Http\Controllers\Kurikulum\KurikulumRaportController::class, 'exportPdf'])
+            ->name('rapor.cetak');
+
+        Route::get('/rapor/{id}/{semester}/{tahun}/show', [App\Http\Controllers\Kurikulum\KurikulumRaportController::class, 'show_html'])
+            ->name('rapor.show_html');
+
+        Route::get('/kurikulum/manajemen-kelas', [KelasController::class, 'index'])
+            ->name('kurikulum.kelas.index');
+
+        // Halaman utama manajemen kelas
+        Route::get('/manajemen-kelas', [KelasController::class, 'index'])
+            ->name('kelas.index');
+
+        // ============================
+        //  MANAGEMEN KELAS — EDIT
+        // ============================
+
+        Route::get('/manajemen-kelas/{id}/edit', [KelasController::class, 'edit'])
+            ->name('kelas.edit');
+
+        Route::put('/manajemen-kelas/{id}', [KelasController::class, 'update'])
+            ->name('kelas.update');
+
+        Route::get('/manajemen-kelas/{id}/export', [KelasController::class, 'export'])
+            ->name('kelas.export');
+
+        // JURUSAN
+        Route::get('/jurusan', [JurusanController::class, 'index'])
+            ->name('jurusan.index');
+
+        Route::get('/jurusan/create', [JurusanController::class, 'create'])
+            ->name('jurusan.create');
+
+        Route::post('/jurusan', [JurusanController::class, 'store'])
+            ->name('jurusan.store');
+
+        Route::get('/jurusan/{id}', [JurusanController::class, 'show'])
+            ->name('jurusan.show');
+
+        Route::get('/jurusan/{id}/edit', [JurusanController::class, 'edit'])
+            ->name('jurusan.edit');
+
+        Route::put('/jurusan/{id}', [JurusanController::class, 'update'])
+            ->name('jurusan.update');
+
+        Route::delete('/jurusan/{id}', [JurusanController::class, 'destroy'])
+            ->name('jurusan.destroy');
+
+        // Kelulusan & Alumni (reuse TU controllers for data views)
+        Route::get('/kelulusan', [KelulusanController::class, 'index'])
+            ->name('kelulusan.index');
+        Route::get('/kelulusan/rombel/{rombelId}/{tahun}', [KelulusanController::class, 'showRombel'])
+            ->name('kelulusan.rombel.show');
+            
+        // 🔥 KENAIKAN KELAS (TAMBAHKAN JUGA DI SINI JIKA BELUM)
+        Route::get('/kenaikan-kelas', [App\Http\Controllers\Kurikulum\KenaikanKelasController::class, 'index'])->name('kenaikan-kelas.index');
+        Route::post('/kenaikan-kelas/preview', [App\Http\Controllers\Kurikulum\KenaikanKelasController::class, 'preview'])->name('kenaikan-kelas.preview');
+        Route::post('/kenaikan-kelas/process', [App\Http\Controllers\Kurikulum\KenaikanKelasController::class, 'process'])->name('kenaikan-kelas.process');
+    });
 
     // Debug route untuk cek nilai dan mata pelajaran
     if (config('app.debug')) {
@@ -1039,4 +1105,22 @@ Route::middleware(['auth'])->group(function () {
             return view('debug.nilai-raport', compact('nilaiCount', 'siswaCount', 'mapelCount', 'nilaiSample', 'mapelWithoutKelompok'));
         });
     }
+
+    // API untuk ambil data KKM (validasi nilai)
+Route::get('/api/kkm/by-kelas', function (Request $request) {
+    $kelasId = $request->kelas_id;
+    $tahun = $request->tahun_ajaran;
+    
+    $tahunAjaran = App\Models\TahunAjaran::where('tahun', $tahun)->first();
+    
+    if (!$kelasId || !$tahunAjaran) {
+        return response()->json([]);
+    }
+    
+    $kkms = App\Models\Kkm::where('kelas_id', $kelasId)
+        ->where('tahun_ajaran_id', $tahunAjaran->id)
+        ->get();
+    
+    return response()->json($kkms->pluck('nilai_kkm', 'mata_pelajaran_id'));
+});
 });

@@ -32,15 +32,24 @@ class NilaiRaport extends Model
         return $this->belongsTo(MataPelajaran::class, 'mata_pelajaran_id');
     }
 
-    // 🔥 INI YANG WAJIB (PENYEBAB ERROR KAMU)
     public function kelas()
     {
         return $this->belongsTo(Kelas::class, 'kelas_id');
     }
 
-    // (opsional tapi disarankan)
     public function rombel()
     {
         return $this->belongsTo(Rombel::class, 'rombel_id');
+    }
+
+    // 🔥 Tambahan untuk validasi & filtering (opsional tapi berguna)
+    public function scopeBySemester($query, $semester)
+    {
+        return $query->where('semester', $semester);
+    }
+
+    public function scopeByTahunAjaran($query, $tahunAjaran)
+    {
+        return $query->where('tahun_ajaran', $tahunAjaran);
     }
 }

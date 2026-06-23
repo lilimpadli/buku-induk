@@ -315,11 +315,11 @@
                                 'siswa_id' => $siswa->id,
                                 'semester' => $r->semester,
                                 'tahun' => $r->tahun_ajaran
-                            ]) }}" class="btn btn-outline-gradient flex-grow-1" style="cursor: pointer;">
+                            ]) }}" class="btn btn-primary flex-grow-1" style="cursor: pointer; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white;">
                                 <i class="fas fa-eye me-2"></i> Lihat
                             </a>
                             <a href="{{ route('walikelas.nilai_raport.pdf', [$siswa->id, $r->semester, str_replace('/', '-', $r->tahun_ajaran)]) }}" 
-                               target="_blank" class="btn btn-danger-gradient" style="cursor: pointer;">
+                            target="_blank" class="btn btn-danger" style="cursor: pointer; background: linear-gradient(135deg, #F093FB 0%, #F5576C 100%); border: none; color: white;">
                                 <i class="fas fa-file-pdf me-2"></i> PDF
                             </a>
                         </div>

@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class KonsentrasiKeahlian extends Model
 {
-	protected $table = 'konsentrasi_keahlian';
-	protected $fillable = [
-		'nama_konsentrasi',
-	];
+    protected $table = 'konsentrasi_keahlian';
+    
+    protected $fillable = [
+        'nama_konsentrasi',
+        // Hanya ini yang ada di tabel
+    ];
 }

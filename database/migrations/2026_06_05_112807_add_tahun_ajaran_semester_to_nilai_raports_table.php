@@ -1,0 +1,27 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('nilai_raports', function (Blueprint $table) {
+            // Tambahkan kolom foreign key
+            $table->foreignId('tahun_ajaran_id')->after('id')->nullable()->constrained('tahun_ajarans')->onDelete('cascade');
+            $table->foreignId('semester_id')->after('tahun_ajaran_id')->nullable()->constrained('semesters')->onDelete('cascade');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('nilai_raports', function (Blueprint $table) {
+            // Hapus foreign key dulu baru hapus kolom
+            $table->dropForeign(['tahun_ajaran_id']);
+            $table->dropForeign(['semester_id']);
+            $table->dropColumn(['tahun_ajaran_id', 'semester_id']);
+        });
+    }
+};

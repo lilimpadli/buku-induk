@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Kurikulum;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Jurusan;
-use App\Models\KonsentrasiKeahlian;
 
 class ProgramKeahlianController extends Controller
 {
@@ -17,8 +16,7 @@ class ProgramKeahlianController extends Controller
 
     public function create()
     {
-        $konsentrasi = KonsentrasiKeahlian::all();
-        return view('kurikulum.program_keahlian.create', compact('konsentrasi'));
+        return view('kurikulum.program_keahlian.create');
     }
 
     public function store(Request $request)
@@ -26,22 +24,22 @@ class ProgramKeahlianController extends Controller
         $request->validate([
             'kode' => 'required|unique:jurusans,kode',
             'nama' => 'required',
-            'id_konsentrasi' => 'required|exists:konsentrasi_keahlian,id',
         ]);
-        $jurusan = new Jurusan();
-        $jurusan->kode = $request->kode;
-        $jurusan->nama = $request->nama;
-        $jurusan->id_bidang = null; // default, bisa diubah nanti
-        $jurusan->save();
-        // relasi ke konsentrasi bisa diatur jika ada pivot
-        return redirect()->route('kurikulum.program-keahlian.index')->with('success', 'Program Keahlian berhasil ditambahkan');
+
+        Jurusan::create([
+            'kode' => $request->kode,
+            'nama' => $request->nama,
+            'id_bidang' => null,
+        ]);
+
+        return redirect()->route('kurikulum.program-keahlian.index')
+            ->with('success', 'Program Keahlian berhasil ditambahkan');
     }
 
     public function edit($id)
     {
         $jurusan = Jurusan::findOrFail($id);
-        $konsentrasi = KonsentrasiKeahlian::all();
-        return view('kurikulum.program_keahlian.edit', compact('jurusan', 'konsentrasi'));
+        return view('kurikulum.program_keahlian.edit', compact('jurusan'));
     }
 
     public function update(Request $request, $id)
@@ -49,20 +47,24 @@ class ProgramKeahlianController extends Controller
         $request->validate([
             'kode' => 'required|unique:jurusans,kode,' . $id,
             'nama' => 'required',
-            'id_konsentrasi' => 'required|exists:konsentrasi_keahlian,id',
         ]);
+
         $jurusan = Jurusan::findOrFail($id);
-        $jurusan->kode = $request->kode;
-        $jurusan->nama = $request->nama;
-        $jurusan->save();
-        // relasi ke konsentrasi bisa diatur jika ada pivot
-        return redirect()->route('kurikulum.program-keahlian.index')->with('success', 'Program Keahlian berhasil diupdate');
+        $jurusan->update([
+            'kode' => $request->kode,
+            'nama' => $request->nama,
+        ]);
+
+        return redirect()->route('kurikulum.program-keahlian.index')
+            ->with('success', 'Program Keahlian berhasil diperbarui');
     }
 
     public function destroy($id)
     {
         $jurusan = Jurusan::findOrFail($id);
         $jurusan->delete();
-        return redirect()->route('kurikulum.program-keahlian.index')->with('success', 'Program Keahlian berhasil dihapus');
+
+        return redirect()->route('kurikulum.program-keahlian.index')
+            ->with('success', 'Program Keahlian berhasil dihapus');
     }
 }

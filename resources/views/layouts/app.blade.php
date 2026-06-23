@@ -626,54 +626,86 @@
                                     <i class="fas fa-user-graduate"></i> <span>Manajemen Siswa</span>
                                 </a>
                             @endif
+{{-- ROLE: KURIKULUM --}}
+@if(Auth::user()->normalized_role == 'kurikulum')
+    <a href="{{ route('kurikulum.dashboard') }}" class="nav-link {{ request()->routeIs('kurikulum.dashboard') ? 'active' : '' }}">
+        <i class="fas fa-home"></i> <span>Dashboard</span>
+    </a>
 
-                            {{-- ROLE: KURIKULUM --}}
-                            @if(Auth::user()->normalized_role == 'kurikulum')
-                                <a href="{{ route('kurikulum.dashboard') }}" class="nav-link {{ request()->routeIs('kurikulum.dashboard') ? 'active' : '' }}">
-                                    <i class="fas fa-home"></i> <span>Dashboard</span>
-                                </a>
+    <div class="nav-section-title">DATA</div>
 
-                                <div class="nav-section-title">DATA</div>
+    <a href="{{ route('kurikulum.data-pribadi.index') }}" class="nav-link {{ request()->routeIs('kurikulum.data-pribadi*') ? 'active' : '' }}">
+        <i class="fas fa-id-card"></i> <span>Data Pribadi</span>
+    </a>
 
-                                <a href="{{ route('kurikulum.data-pribadi.index') }}" class="nav-link {{ request()->routeIs('kurikulum.data-pribadi*') ? 'active' : '' }}">
-                                    <i class="fas fa-id-card"></i> <span>Data Pribadi</span>
-                                </a>
+    <a href="{{ route('kurikulum.user.index') }}" class="nav-link">
+        <i class="fas fa-users-cog"></i> <span>Manajemen User</span>
+    </a>
 
-                                <a href="{{ route('kurikulum.kelas.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kelas*') ? 'active' : '' }}">
-                                    <i class="fas fa-school"></i> <span>Manajemen Kelas</span>
-                                </a>
+    <a href="{{ route('kurikulum.siswa.index') }}" class="nav-link {{ request()->routeIs('kurikulum.siswa*') ? 'active' : '' }}">
+        <i class="fas fa-user-graduate"></i> <span>Manajemen Siswa</span>
+    </a>
 
-                                <a href="{{ route('kurikulum.kurikulum.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kurikulum*') ? 'active' : '' }}">
-                                    <i class="fas fa-graduation-cap"></i> <span>Manajemen Kurikulum</span>
-                                </a>
+    <a href="{{ route('kurikulum.kelas.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kelas*') ? 'active' : '' }}">
+        <i class="fas fa-school"></i> <span>Manajemen Kelas</span>
+    </a>
 
-                                <a href="{{ route('kurikulum.jurusan.index') }}" class="nav-link {{ request()->routeIs('kurikulum.jurusan*') ? 'active' : '' }}">
-                                    <i class="fas fa-graduation-cap"></i> <span>Manajemen Jurusan</span>
-                                </a>
+    <a href="{{ route('kurikulum.kurikulum.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kurikulum*') ? 'active' : '' }}">
+        <i class="fas fa-graduation-cap"></i> <span>Manajemen Kurikulum</span>
+    </a>
 
-                                <a href="{{ route('kurikulum.guru.index') }}" class="nav-link {{ request()->routeIs('kurikulum.guru*') ? 'active' : '' }}">
-                                    <i class="fas fa-chalkboard-teacher"></i> <span>Manajemen Guru</span>
-                                </a>
+    <a href="{{ route('kurikulum.jurusan.index') }}" class="nav-link {{ request()->routeIs('kurikulum.jurusan*') ? 'active' : '' }}">
+        <i class="fas fa-graduation-cap"></i> <span>Manajemen Jurusan</span>
+    </a>
 
-                                <a href="{{ route('kurikulum.mata-pelajaran.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mata-pelajaran*') ? 'active' : '' }}">
-                                    <i class="fas fa-book-open"></i> <span>Manajemen Mata Pelajaran</span>
-                                </a>
+    <a href="{{ route('kurikulum.guru.index') }}" class="nav-link {{ request()->routeIs('kurikulum.guru*') ? 'active' : '' }}">
+        <i class="fas fa-chalkboard-teacher"></i> <span>Manajemen Guru</span>
+    </a>
 
-                                {{-- KURIKULUM: CRUD BIDANG/PROGRAM/KONSENTRASI KEAHLIAN --}}
-                                <div class="nav-section-title">KEAHLIAN</div>
-                                <a href="{{ route('kurikulum.bidang-keahlian.index') }}" class="nav-link {{ request()->routeIs('kurikulum.bidang-keahlian*') ? 'active' : '' }}">
-                                    <i class="fas fa-layer-group"></i> <span>Bidang Keahlian</span>
-                                </a>
-                               
-                                <a href="{{ route('kurikulum.program-keahlian.index') }}" class="nav-link {{ request()->routeIs('kurikulum.program-keahlian*') ? 'active' : '' }}">
-                                    <i class="fas fa-cube"></i> <span>Program Keahlian</span>
-                                </a>
+    <a href="{{ route('kurikulum.mata-pelajaran.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mata-pelajaran*') ? 'active' : '' }}">
+        <i class="fas fa-book-open"></i> <span>Manajemen Mata Pelajaran</span>
+    </a>
 
-                                 <a href="{{ route('kurikulum.konsentrasi-keahlian.index') }}" class="nav-link {{ request()->routeIs('kurikulum.konsentrasi-keahlian*') ? 'active' : '' }}">
-                                    <i class="fas fa-cubes"></i> <span>Konsentrasi Keahlian</span>
-                                </a>
-                            @endif
+    {{-- BUKU INDUK --}}
+    <a href="{{ route('kurikulum.buku-induk.index') }}" class="nav-link {{ request()->routeIs('kurikulum.buku-induk*') ? 'active' : '' }}">
+        <i class="fas fa-book"></i> <span>Buku Induk</span>
+    </a>
 
+  <div class="nav-section-title">KURIKULUM</div>
+    <a href="{{ route('kurikulum.kkm.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kkm*') ? 'active' : '' }}">
+        <i class="fas fa-chart-line"></i> <span>Manajemen KKM</span>
+    </a>
+    {{-- 
+    <div class="nav-section-title">KURIKULUM</div>
+    <a href="{{ route('kurikulum.kkm.index') }}" class="nav-link">
+        <i class="fas fa-chart-line"></i> <span>Manajemen KKM</span>
+    </a>
+    --}}
+
+    <div class="nav-section-title">AKADEMIK</div>
+    <a href="{{ route('kurikulum.kenaikan-kelas.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kenaikan-kelas*') ? 'active' : '' }}">
+        <i class="fas fa-arrow-up"></i> <span>Kenaikan Kelas</span>
+    </a>
+
+    <div class="nav-section-title">RAPOR</div>
+    <a href="{{ route('kurikulum.rapor.index') }}" class="nav-link {{ request()->routeIs('kurikulum.rapor*') ? 'active' : '' }}">
+        <i class="fas fa-print"></i> <span>Cetak Rapor</span>
+    </a>
+
+    {{-- KURIKULUM: CRUD BIDANG/PROGRAM/KONSENTRASI KEAHLIAN --}}
+    <div class="nav-section-title">KEAHLIAN</div>
+    <a href="{{ route('kurikulum.bidang-keahlian.index') }}" class="nav-link {{ request()->routeIs('kurikulum.bidang-keahlian*') ? 'active' : '' }}">
+        <i class="fas fa-layer-group"></i> <span>Bidang Keahlian</span>
+    </a>
+   
+    <a href="{{ route('kurikulum.program-keahlian.index') }}" class="nav-link {{ request()->routeIs('kurikulum.program-keahlian*') ? 'active' : '' }}">
+        <i class="fas fa-cube"></i> <span>Program Keahlian</span>
+    </a>
+
+    <a href="{{ route('kurikulum.konsentrasi-keahlian.index') }}" class="nav-link {{ request()->routeIs('kurikulum.konsentrasi-keahlian*') ? 'active' : '' }}">
+        <i class="fas fa-cubes"></i> <span>Konsentrasi Keahlian</span>
+    </a>
+@endif
                         </nav>
                     @endauth
                 </div>
