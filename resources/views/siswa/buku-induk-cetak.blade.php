@@ -403,21 +403,16 @@
                         <div class="data-label">Alamat Siswa</div>
                         <div class="data-value">Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</div>
                     </div>
-<<<<<<< HEAD
-=======
+
                     
->>>>>>> fa4d2120cd77b67cc2d3e6b1736c605e2b6926d5
                 </div>
 
                 <div class="data-section">
                     <div class="data-row">
-<<<<<<< HEAD
                         <div class="data-label">Nama Orang Tua</div>
                         <div class="data-value"></div>
-=======
                        <div class="data-section-title">Nama Orang Tua</div>
                        
->>>>>>> fa4d2120cd77b67cc2d3e6b1736c605e2b6926d5
                     </div>
                     <div class="data-row">
                         <div class="data-label">a. Ayah</div>
@@ -445,11 +440,8 @@
                     </div>
                     <div class="data-row">
                         <div class="data-label">b. Alamat Rumah</div>
-<<<<<<< HEAD
                         <div class="data-value">{{ $siswa->wali->alamat ?? '-' }}</div>
-=======
                         <div class="data-value">{{ $siswa->alamat_wali ?? '-' }}</div>
->>>>>>> fa4d2120cd77b67cc2d3e6b1736c605e2b6926d5
                     </div>
                 </div>
 
@@ -546,8 +538,6 @@
         window.print();
     </script>
 </body>
-<<<<<<< HEAD
 </html>
-=======
 </html>
->>>>>>> fa4d2120cd77b67cc2d3e6b1736c605e2b6926d5
+

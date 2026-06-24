@@ -481,19 +481,27 @@
                     <div class="data-section-title">Lulus/Tamat</div>
                     <div class="data-row">
                         <div class="data-label">a. Nomor Ijazah</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->ijazah_nomor ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">b. Tanggal Ijazah</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->ijazah_tanggal ? \Carbon\Carbon::parse($siswa->ijazah_tanggal)->format('d F Y') : '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">c. Nomor Transkip</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->transkip_nomor ?? '-' }}</div>
                     </div>
                     <div class="data-row">
-                        <div class="data-label">d. Tanggal Transip</div>
-                        <div class="data-value">-</div>
+                        <div class="data-label">d. Tanggal Transkip</div>
+                        <div class="data-value">{{ $siswa->transkip_tanggal ? \Carbon\Carbon::parse($siswa->transkip_tanggal)->format('d F Y') : '-' }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">e. Tanggal Lulus</div>
+                        <div class="data-value">{{ $siswa->tanggal_lulus ? \Carbon\Carbon::parse($siswa->tanggal_lulus)->format('d F Y') : '-' }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">f. Status Kelulusan</div>
+                        <div class="data-value">{{ $siswa->status_kelulusan ?? '-' }}</div>
                     </div>
                 </div>
 
@@ -501,19 +509,19 @@
                     <div class="data-section-title">Praktek Kerja Industri</div>
                     <div class="data-row">
                         <div class="data-label">a. Nilai</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->pkl_nilai ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">b. Nomor Sertifikat</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->pkl_sertifikat ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">c. Nama Industri</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->pkl_nama_industri ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">d. Alamat</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->pkl_alamat ?? '-' }}</div>
                     </div>
                 </div>
                 

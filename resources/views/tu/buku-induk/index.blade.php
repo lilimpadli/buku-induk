@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Buku Induk Siswa')
 
@@ -6,171 +6,139 @@
 <style>
     :root {
         --primary: #4F46E5;
-        --primary-dark: #4338CA;
         --secondary: #7C3AED;
-        --success: #10B981;
-        --warning: #F59E0B;
-        --danger: #EF4444;
-        --info: #3B82F6;
         --dark: #1F2937;
         --gray: #6B7280;
-        --light: #F9FAFB;
     }
 
-    /* Animations */
     @keyframes fadeInUp {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Bubble Animations */
-    @keyframes bubbleFloat1 {
-        0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
-        50% { transform: translate(30px, -20px) scale(1.2); opacity: 0.5; }
-        100% { transform: translate(-20px, -40px) scale(0.8); opacity: 0; }
-    }
-
-    @keyframes bubbleFloat2 {
-        0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-        50% { transform: translate(-25px, -30px) scale(1.3); opacity: 0.6; }
-        100% { transform: translate(20px, -50px) scale(0.7); opacity: 0; }
-    }
-
-    @keyframes bubbleFloat3 {
-        0% { transform: translate(0, 0) scale(1); opacity: 0.2; }
-        50% { transform: translate(40px, -15px) scale(1.1); opacity: 0.4; }
-        100% { transform: translate(-30px, -60px) scale(0.9); opacity: 0; }
-    }
-
-    @keyframes bubbleFloat4 {
-        0% { transform: translate(0, 0) scale(1); opacity: 0.35; }
-        50% { transform: translate(-35px, -25px) scale(1.25); opacity: 0.55; }
-        100% { transform: translate(25px, -45px) scale(0.75); opacity: 0; }
-    }
-
-    @keyframes rotateSlow {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
     }
 
     .fade-in-up {
         animation: fadeInUp 0.5s ease forwards;
     }
 
-    /* Hero Banner */
     .hero-banner {
         background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         border-radius: 28px;
         padding: 32px;
         margin-bottom: 28px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .bubble {
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.15);
-        backdrop-filter: blur(4px);
-        pointer-events: none;
-    }
-
-    .bubble-1 { width: 80px; height: 80px; top: 20%; right: 15%; animation: bubbleFloat1 8s ease-in-out infinite; }
-    .bubble-2 { width: 120px; height: 120px; bottom: 10%; left: 5%; animation: bubbleFloat2 10s ease-in-out infinite; animation-delay: 1s; }
-    .bubble-3 { width: 60px; height: 60px; top: 60%; right: 25%; animation: bubbleFloat3 7s ease-in-out infinite; animation-delay: 2s; }
-    .bubble-4 { width: 40px; height: 40px; bottom: 30%; right: 40%; animation: bubbleFloat4 6s ease-in-out infinite; animation-delay: 0.5s; }
-    .bubble-5 { width: 100px; height: 100px; top: -30px; left: 20%; animation: bubbleFloat2 12s ease-in-out infinite; animation-delay: 3s; }
-    .bubble-6 { width: 50px; height: 50px; bottom: 15%; right: 10%; animation: bubbleFloat1 5s ease-in-out infinite; animation-delay: 1.5s; }
-
-    .rotating-orb {
-        position: absolute;
-        width: 150px;
-        height: 150px;
-        right: -50px;
-        top: -50px;
-        background: radial-gradient(circle, rgba(255,255,255,0.2), rgba(255,255,255,0));
-        border-radius: 50%;
-        animation: rotateSlow 20s linear infinite;
+        overflow: visible;
+        color: white;
     }
 
     .hero-title {
         font-size: 28px;
         font-weight: 800;
-        color: white;
         margin-bottom: 8px;
-        position: relative;
-        z-index: 2;
     }
 
     .hero-subtitle {
-        color: rgba(255,255,255,0.85);
+        color: rgba(255,255,255,0.95);
         font-size: 14px;
-        position: relative;
-        z-index: 2;
+    }
+
+    .hero-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        flex-wrap: wrap;
+        overflow: visible;
     }
 
     .hero-stats {
         display: flex;
         gap: 24px;
+        flex-wrap: wrap;
         margin-top: 20px;
-        position: relative;
-        z-index: 2;
+    }
+
+    .hero-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+        overflow: visible;
+        z-index: 1100;
+    }
+
+    .hero-actions .btn-modern {
+        min-width: 180px;
+        transition: transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+        background: white;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+        box-shadow: 0 6px 18px rgba(79,70,229,0.12);
+        border-radius: 14px;
+        padding: 12px 24px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+
+    .hero-actions .btn-modern i {
+        color: var(--primary);
+    }
+
+    .hero-actions .btn-modern:hover,
+    .hero-actions .btn-modern:focus {
+        transform: translateY(-3px);
+        box-shadow: 0 22px 45px rgba(79,70,229,0.22);
+        background: rgba(255,255,255,0.98);
+        color: var(--primary);
+    }
+
+    .hero-actions .btn-modern.btn-modern-primary {
+        background: white;
+        color: var(--primary);
+        border-color: var(--primary);
+    }
+
+    .hero-actions .dropdown-toggle {
+        background: white;
+        color: var(--primary);
+        border-color: var(--primary);
+    }
+
+    .hero-actions .dropdown-toggle:hover,
+    .hero-actions .dropdown-toggle:focus {
+        background: rgba(79,70,229,0.1);
     }
 
     .hero-stat {
         background: rgba(255,255,255,0.15);
-        backdrop-filter: blur(10px);
         border-radius: 20px;
         padding: 12px 24px;
-        text-align: center;
         min-width: 110px;
-        transition: all 0.3s ease;
-    }
-
-    .hero-stat:hover {
-        transform: translateY(-3px);
-        background: rgba(255,255,255,0.25);
     }
 
     .hero-stat-value {
         font-size: 28px;
         font-weight: 800;
-        color: white;
     }
 
     .hero-stat-label {
         font-size: 11px;
-        color: rgba(255,255,255,0.7);
+        color: rgba(255,255,255,0.85);
         margin-top: 4px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
 
-    /* Filter Card */
     .filter-card {
         background: white;
         border-radius: 20px;
         border: 1px solid #eef2ff;
         padding: 24px;
         margin-bottom: 28px;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .filter-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--primary), var(--secondary));
-    }
-
-    .filter-card:hover {
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-        transform: translateY(-2px);
     }
 
     .filter-title {
@@ -183,60 +151,62 @@
         gap: 10px;
     }
 
-    .filter-title i {
-        color: var(--primary);
-        font-size: 18px;
-    }
-
     .form-control-modern,
     .form-select-modern {
+        width: 100%;
         height: 48px;
         border-radius: 14px;
         border: 1.5px solid #e2e8f0;
         font-size: 14px;
-        transition: all 0.3s ease;
-        background: white;
+        padding: 0 14px;
+        transition: all 0.2s ease;
     }
 
     .form-control-modern:focus,
     .form-select-modern:focus {
         border-color: var(--primary);
         box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
-        outline: none;
     }
 
     .btn-modern {
         border-radius: 14px;
         font-weight: 600;
         padding: 12px 24px;
-        transition: all 0.3s ease;
         display: inline-flex;
         align-items: center;
         gap: 8px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
     }
 
     .btn-modern-primary {
         background: linear-gradient(135deg, var(--primary), var(--secondary));
-        border: none;
         color: white;
     }
 
-    .btn-modern-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(79,70,229,0.3);
+    .btn-modern-primary:hover,
+    .btn-modern-primary:focus {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(79,70,229,0.2);
     }
 
-    /* Table Container */
+    .btn-modern-outline {
+        background: white;
+        color: var(--dark);
+        border: 1.5px solid #e2e8f0;
+    }
+
+    .btn-modern-outline:hover,
+    .btn-modern-outline:focus {
+        color: var(--primary);
+        border-color: var(--primary);
+    }
+
     .table-container {
         background: white;
         border-radius: 20px;
         border: 1px solid #eef2ff;
-        overflow: hidden;
-        transition: all 0.3s ease;
-    }
-
-    .table-container:hover {
-        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
     }
 
     .table-modern {
@@ -250,14 +220,12 @@
         font-size: 13px;
         font-weight: 700;
         color: #475569;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
         border-bottom: 1px solid #eef2ff;
+        text-align: left;
     }
 
     .table-modern tbody td {
         padding: 16px;
-        vertical-align: middle;
         border-bottom: 1px solid #f1f5f9;
         font-size: 14px;
         color: #334155;
@@ -267,7 +235,6 @@
         background: #f8faff;
     }
 
-    /* Avatar */
     .student-avatar-modern {
         width: 44px;
         height: 44px;
@@ -279,7 +246,6 @@
         color: white;
         font-weight: 700;
         font-size: 18px;
-        transition: all 0.3s ease;
     }
 
     .student-avatar-modern img {
@@ -289,11 +255,6 @@
         border-radius: 14px;
     }
 
-    .student-avatar-modern:hover {
-        transform: scale(1.05);
-    }
-
-    /* Badges */
     .badge-modern {
         display: inline-flex;
         align-items: center;
@@ -310,7 +271,6 @@
     .badge-rombel { background: #f1f5f9; color: #475569; }
     .badge-inactive { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #dc2626; }
 
-    /* Action Buttons */
     .action-group {
         display: flex;
         gap: 8px;
@@ -324,18 +284,17 @@
         align-items: center;
         justify-content: center;
         transition: all 0.2s ease;
-        text-decoration: none;
+        border: none;
         cursor: pointer;
     }
 
     .action-btn-view { background: rgba(59,130,246,0.1); color: #3b82f6; }
-    .action-btn-view:hover { background: #3b82f6; color: white; transform: translateY(-2px); }
+    .action-btn-view:hover { background: #3b82f6; color: white; }
     .action-btn-edit { background: rgba(245,158,11,0.1); color: #f59e0b; }
-    .action-btn-edit:hover { background: #f59e0b; color: white; transform: translateY(-2px); }
+    .action-btn-edit:hover { background: #f59e0b; color: white; }
     .action-btn-print { background: rgba(16,185,129,0.1); color: #10b981; }
-    .action-btn-print:hover { background: #10b981; color: white; transform: translateY(-2px); }
+    .action-btn-print:hover { background: #10b981; color: white; }
 
-    /* Empty State */
     .empty-state-modern {
         text-align: center;
         padding: 60px 20px;
@@ -369,7 +328,6 @@
         font-size: 14px;
     }
 
-    /* Pagination Modern - FIXED */
     .pagination-modern {
         display: flex;
         justify-content: center;
@@ -377,10 +335,6 @@
         margin-top: 24px;
         padding: 20px;
         flex-wrap: wrap;
-    }
-
-    .pagination-modern .page-item {
-        list-style: none;
     }
 
     .pagination-modern .page-link {
@@ -393,88 +347,127 @@
         justify-content: center;
         border: 1px solid #e2e8f0;
         color: var(--gray);
-        transition: all 0.2s ease;
         text-decoration: none;
-        font-size: 14px;
-        font-weight: 500;
         background: white;
     }
 
-    .pagination-modern .page-link:hover {
-        background: var(--primary);
-        color: white;
-        border-color: var(--primary);
+    /* DROPDOWN FIX - PASTI MUNCUL */
+    .dropdown {
+        position: relative !important;
+        overflow: visible !important;
+        z-index: 99999 !important;
     }
 
-    .pagination-modern .active .page-link {
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        color: white;
-        border: none;
+    .dropdown-menu {
+        position: absolute !important;
+        top: calc(100% + 5px) !important;
+        left: 0 !important;
+        right: auto !important;
+        z-index: 99999 !important;
+        min-width: 240px !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(79,70,229,0.18) !important;
+        background: #ffffff !important;
+        box-shadow: 0 24px 50px rgba(15, 23, 42, 0.16) !important;
+        overflow: visible !important;
+        padding: 8px !important;
+        display: none !important;
     }
 
-    .pagination-modern .disabled .page-link {
-        opacity: 0.5;
-        cursor: not-allowed;
-        background: #f1f5f9;
+    .dropdown.show .dropdown-menu {
+        display: block !important;
     }
 
-    /* Mobile Card View */
-    .mobile-card-view {
-        display: none;
+    .dropdown-item {
+        border-radius: 10px !important;
+        padding: 10px 16px !important;
+        transition: background-color 0.2s ease, color 0.2s ease !important;
+        font-weight: 500 !important;
+        font-size: 14px !important;
+        color: #1F2937 !important;
     }
 
-    .student-card-modern {
-        background: white;
-        border-radius: 20px;
-        border: 1px solid #eef2ff;
-        padding: 20px;
-        margin-bottom: 16px;
-        transition: all 0.3s ease;
+    .dropdown-item:hover {
+        background-color: #f8faff !important;
+        color: var(--primary) !important;
     }
 
-    .student-card-modern:hover {
-        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-        transform: translateY(-2px);
+    .dropdown-item i {
+        margin-right: 10px !important;
+        width: 20px !important;
+        text-align: center !important;
     }
 
-    /* Responsive */
+    /* FIX TOMBOL EXPORT/IMPORT/TEMPLATE */
+    .hero-actions .btn-modern {
+        background: white !important;
+        color: var(--primary) !important;
+        border: 2px solid var(--primary) !important;
+        box-shadow: 0 6px 18px rgba(79,70,229,0.12) !important;
+        min-width: 180px !important;
+        padding: 12px 24px !important;
+        border-radius: 14px !important;
+        font-weight: 600 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .hero-actions .btn-modern i {
+        color: var(--primary) !important;
+    }
+
+    .hero-actions .btn-modern:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 22px 45px rgba(79,70,229,0.22) !important;
+        background: var(--primary) !important;
+        color: white !important;
+    }
+
+    .hero-actions .btn-modern:hover i {
+        color: white !important;
+    }
+
+    .hero-actions .dropdown-toggle::after {
+        margin-left: 8px !important;
+    }
+
+    /* OVERFLOW FIX SEMUA CONTAINER */
+    .container-fluid,
+    .hero-banner,
+    .hero-top,
+    .hero-actions,
+    .filter-card,
+    .table-container {
+        overflow: visible !important;
+    }
+
     @media (max-width: 768px) {
         .table-responsive-desktop { display: none; }
         .mobile-card-view { display: block; }
         .hero-banner { padding: 24px; }
         .hero-title { font-size: 22px; }
-        .hero-stats { flex-wrap: wrap; gap: 12px; }
-        .hero-stat { min-width: calc(50% - 12px); padding: 10px; }
-        .hero-stat-value { font-size: 20px; }
+        .hero-top { flex-direction: column; align-items: stretch; }
+        .hero-actions { justify-content: flex-start; margin-top: 16px; }
+        .hero-actions .btn-modern { min-width: 100%; }
+        .hero-stats { gap: 12px; }
         .filter-card { padding: 16px; }
     }
 
     @media (min-width: 769px) {
         .mobile-card-view { display: none; }
-        .table-responsive-desktop { display: block; }
     }
 </style>
 
 <div class="container-fluid px-3 px-md-4 py-4">
-    
-    <!-- Hero Banner -->
     <div class="hero-banner fade-in-up">
-        <div class="bubble bubble-1"></div>
-        <div class="bubble bubble-2"></div>
-        <div class="bubble bubble-3"></div>
-        <div class="bubble bubble-4"></div>
-        <div class="bubble bubble-5"></div>
-        <div class="bubble bubble-6"></div>
-        <div class="rotating-orb"></div>
-        
-        <div class="row align-items-center">
-            <div class="col-md-12">
-                <h1 class="hero-title">
-                    <i class="fas fa-book-open me-2"></i> Buku Induk Siswa
-                </h1>
-                <p class="hero-subtitle">
-                    Kelola dan lihat data lengkap buku induk seluruh siswa
-                </p>
+        <div class="hero-top">
+            <div>
+                <h1 class="hero-title"><i class="fas fa-book-open me-2"></i> Buku Induk Siswa</h1>
+                <p class="hero-subtitle">Kelola dan lihat data lengkap buku induk seluruh siswa</p>
                 <div class="hero-stats">
                     <div class="hero-stat">
                         <div class="hero-stat-value">{{ $siswas->total() }}</div>
@@ -486,40 +479,182 @@
                     </div>
                 </div>
             </div>
+            <div class="hero-actions">
+                <!-- EXPORT DROPDOWN -->
+                <div class="dropdown">
+                    <button class="btn btn-modern btn-modern-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-file-export me-2"></i> Export
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ route('tu.buku-induk.export.siswa') }}"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
+                        <li><a class="dropdown-item" href="{{ route('tu.buku-induk.export.nilai') }}"><i class="fas fa-chart-bar"></i> Nilai Rapor</a></li>
+                        <li><a class="dropdown-item" href="{{ route('tu.buku-induk.export.pkl') }}"><i class="fas fa-briefcase"></i> PKL & Ijazah</a></li>
+                    </ul>
+                </div>
+
+                <!-- IMPORT DROPDOWN -->
+                <div class="dropdown">
+                    <button class="btn btn-modern btn-modern-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-file-import me-2"></i> Import
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#importSiswaModal"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#importNilaiModal"><i class="fas fa-chart-bar"></i> Nilai Rapor</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#importPklModal"><i class="fas fa-briefcase"></i> PKL & Ijazah</a></li>
+                    </ul>
+                </div>
+
+                <!-- TEMPLATE DROPDOWN -->
+                <div class="dropdown">
+                    <button class="btn btn-modern btn-modern-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-file-download me-2"></i> Download Template
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ route('tu.buku-induk.template.siswa') }}"><i class="fas fa-user-graduate"></i> Template Data Siswa</a></li>
+                        <li><a class="dropdown-item" href="{{ route('tu.buku-induk.template.nilai') }}"><i class="fas fa-chart-bar"></i> Template Nilai Rapor</a></li>
+                        <li><a class="dropdown-item" href="{{ route('tu.buku-induk.template.pkl') }}"><i class="fas fa-briefcase"></i> Template PKL & Ijazah</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Filter Card -->
-    <div class="filter-card fade-in-up" style="animation-delay: 0.1s">
-        <div class="filter-title">
-            <i class="fas fa-sliders-h"></i> Filter Data
+    <!-- ALERT NOTIFICATIONS -->
+    @if(session('success') || session('warning') || session('error') || session('import_errors'))
+    <div class="alert-box fade-in-up mb-4">
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        @if(session('warning'))
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i> {{ session('warning') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-times-circle me-2"></i> {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        @if(session('import_errors'))
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i> Beberapa baris tidak berhasil diimport:
+                <ul class="mb-0 mt-2">
+                    @foreach(session('import_errors') as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+    </div>
+    @endif
+
+    <!-- MODAL IMPORT SISWA -->
+    <div class="modal fade" id="importSiswaModal" tabindex="-1" aria-labelledby="importSiswaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-modern">
+                <div class="modal-header modal-header-modern">
+                    <h5 class="modal-title" id="importSiswaModalLabel"><i class="fas fa-user-graduate me-2"></i> Import Data Siswa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('tu.buku-induk.import.siswa') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body modal-body-modern">
+                        <p class="text-muted">Pilih file Excel (.xlsx / .xls / .csv) berisi data siswa. Pastikan kolom sesuai dengan template.</p>
+                        <div class="mb-3">
+                            <label for="importSiswaFile" class="form-label fw-semibold">File Excel</label>
+                            <input class="form-control" type="file" id="importSiswaFile" name="file" accept=".xlsx,.xls,.csv" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer modal-footer-modern">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-modern btn-modern-primary">Upload & Import</button>
+                    </div>
+                </form>
+            </div>
         </div>
+    </div>
+
+    <!-- MODAL IMPORT NILAI -->
+    <div class="modal fade" id="importNilaiModal" tabindex="-1" aria-labelledby="importNilaiModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-modern">
+                <div class="modal-header modal-header-modern">
+                    <h5 class="modal-title" id="importNilaiModalLabel"><i class="fas fa-chart-bar me-2"></i> Import Nilai Rapor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('tu.buku-induk.import.nilai') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body modal-body-modern">
+                        <p class="text-muted">Pilih file Excel (.xlsx / .xls / .csv) berisi nilai rapor. Pastikan kolom sesuai dengan template.</p>
+                        <div class="mb-3">
+                            <label for="importNilaiFile" class="form-label fw-semibold">File Excel</label>
+                            <input class="form-control" type="file" id="importNilaiFile" name="file" accept=".xlsx,.xls,.csv" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer modal-footer-modern">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-modern btn-modern-primary">Upload & Import</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL IMPORT PKL & IJAZAH -->
+    <div class="modal fade" id="importPklModal" tabindex="-1" aria-labelledby="importPklModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-modern">
+                <div class="modal-header modal-header-modern">
+                    <h5 class="modal-title" id="importPklModalLabel"><i class="fas fa-briefcase me-2"></i> Import PKL & Ijazah</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('tu.buku-induk.import.pkl') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body modal-body-modern">
+                        <p class="text-muted">Pilih file Excel (.xlsx / .xls / .csv) berisi data PKL & Ijazah. Pastikan kolom sesuai dengan template.</p>
+                        <div class="mb-3">
+                            <label for="importPklFile" class="form-label fw-semibold">File Excel</label>
+                            <input class="form-control" type="file" id="importPklFile" name="file" accept=".xlsx,.xls,.csv" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer modal-footer-modern">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-modern btn-modern-primary">Upload & Import</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTER CARD -->
+    <div class="filter-card fade-in-up">
+        <div class="filter-title"><i class="fas fa-sliders-h"></i> Filter Data</div>
         <form method="GET" class="row g-3">
             <div class="col-md-5 col-12">
-                <input type="text" name="search" class="form-control-modern w-100" 
-                    placeholder="🔍 Cari nama, NIS, atau NISN..." 
-                    value="{{ request('search') }}">
+                <input type="text" name="search" class="form-control-modern" placeholder="🔍 Cari nama, NIS, atau NISN..." value="{{ request('search') }}">
             </div>
             <div class="col-md-5 col-12">
-                <select name="jurusan_id" class="form-select-modern w-100">
+                <select name="jurusan_id" class="form-select-modern">
                     <option value="">-- Semua Jurusan --</option>
                     @foreach($jurusans as $jurusan)
-                        <option value="{{ $jurusan->id }}" {{ request('jurusan_id') == $jurusan->id ? 'selected' : '' }}>
-                            {{ $jurusan->nama }}
-                        </option>
+                        <option value="{{ $jurusan->id }}" {{ request('jurusan_id') == $jurusan->id ? 'selected' : '' }}>{{ $jurusan->nama }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="col-md-2 col-12">
-                <button type="submit" class="btn btn-modern-primary w-100">
-                    <i class="fas fa-search"></i> Cari
-                </button>
+                <button type="submit" class="btn btn-modern btn-modern-primary w-100"><i class="fas fa-search me-2"></i> Cari</button>
             </div>
         </form>
     </div>
 
-    <!-- Desktop Table View -->
-    <div class="table-container fade-in-up" style="animation-delay: 0.2s">
+    <!-- TABLE -->
+    <div class="table-container fade-in-up">
         <div class="table-responsive-desktop">
             <table class="table-modern">
                 <thead>
@@ -578,29 +713,16 @@
                                 $isTerminal = $siswa->mutasiTerakhir && in_array(strtolower($siswa->mutasiTerakhir->status ?? ''), $terminalStatuses);
                             @endphp
                             @if($isTerminal)
-                                <span class="badge-modern badge-inactive">
-                                    <i class="fas fa-exclamation-circle"></i> {{ ucfirst($siswa->mutasiTerakhir->status ?? 'Lulus') }}
-                                </span>
+                                <span class="badge-modern badge-inactive"><i class="fas fa-exclamation-circle"></i> {{ ucfirst($siswa->mutasiTerakhir->status ?? 'Lulus') }}</span>
                             @else
-                                <span class="badge-modern badge-active">
-                                    <i class="fas fa-check-circle"></i> Aktif
-                                </span>
+                                <span class="badge-modern badge-active"><i class="fas fa-check-circle"></i> Aktif</span>
                             @endif
                         </td>
                         <td>
                             <div class="action-group">
-                                <a href="{{ route('tu.buku-induk.show', $siswa) }}" 
-                                   class="action-btn action-btn-view" data-bs-toggle="tooltip" title="Lihat Buku Induk">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="{{ route('tu.buku-induk.edit', $siswa->id) }}" 
-                                   class="action-btn action-btn-edit" data-bs-toggle="tooltip" title="Edit Data Siswa">
-                                    <i class="fas fa-pen"></i>
-                                </a>
-                                <a href="{{ route('tu.buku-induk.cetak', $siswa) }}" 
-                                   target="_blank" class="action-btn action-btn-print" data-bs-toggle="tooltip" title="Cetak Buku Induk">
-                                    <i class="fas fa-print"></i>
-                                </a>
+                                <a href="{{ route('tu.buku-induk.show', $siswa) }}" class="action-btn action-btn-view" data-bs-toggle="tooltip" title="Lihat Buku Induk"><i class="fas fa-eye"></i></a>
+                                <a href="{{ route('tu.buku-induk.edit', $siswa->id) }}" class="action-btn action-btn-edit" data-bs-toggle="tooltip" title="Edit Data Siswa"><i class="fas fa-pen"></i></a>
+                                <a href="{{ route('tu.buku-induk.cetak', $siswa) }}" target="_blank" class="action-btn action-btn-print" data-bs-toggle="tooltip" title="Cetak Buku Induk"><i class="fas fa-print"></i></a>
                             </div>
                         </td>
                     </tr>
@@ -608,16 +730,10 @@
                     <tr>
                         <td colspan="7" class="text-center py-5">
                             <div class="empty-state-modern">
-                                <div class="empty-icon">
-                                    <i class="fas fa-book-open"></i>
-                                </div>
+                                <div class="empty-icon"><i class="fas fa-book-open"></i></div>
                                 <div class="empty-title">Belum Ada Data</div>
-                                <div class="empty-description">
-                                    Belum ada siswa yang terdaftar di buku induk
-                                </div>
-                                <a href="{{ route('tu.siswa.create') }}" class="btn btn-modern-primary mt-3">
-                                    <i class="fas fa-plus"></i> Tambah Siswa
-                                </a>
+                                <div class="empty-description">Belum ada siswa yang terdaftar di buku induk</div>
+                                <a href="{{ route('tu.siswa.create') }}" class="btn btn-modern btn-modern-primary mt-3"><i class="fas fa-plus"></i> Tambah Siswa</a>
                             </div>
                         </td>
                     </tr>
@@ -626,7 +742,7 @@
             </table>
         </div>
 
-        <!-- Mobile Card View -->
+        <!-- MOBILE CARD VIEW -->
         <div class="mobile-card-view">
             @forelse($siswas as $siswa)
             <div class="student-card-modern">
@@ -643,7 +759,6 @@
                         <small class="text-muted">NIS: {{ $siswa->nis ?? '-' }}</small>
                     </div>
                 </div>
-                
                 <div class="row g-2 mb-3">
                     <div class="col-6">
                         <small class="text-muted d-block">NISN</small>
@@ -669,44 +784,28 @@
                     </div>
                     <div class="col-6">
                         <small class="text-muted d-block">Status</small>
-                        @php
-                            $terminalStatuses = ['pindah', 'do', 'meninggal', 'lulus'];
-                            $isTerminal = $siswa->mutasiTerakhir && in_array(strtolower($siswa->mutasiTerakhir->status ?? ''), $terminalStatuses);
-                        @endphp
-                        @if($isTerminal)
-                            <span class="badge-modern badge-inactive">
-                                {{ ucfirst($siswa->mutasiTerakhir->status ?? 'Lulus') }}
-                            </span>
+                        @if($siswa->mutasiTerakhir && in_array(strtolower($siswa->mutasiTerakhir->status ?? ''), ['pindah','do','meninggal','lulus']))
+                            <span class="badge-modern badge-inactive">{{ ucfirst($siswa->mutasiTerakhir->status ?? 'Lulus') }}</span>
                         @else
                             <span class="badge-modern badge-active">Aktif</span>
                         @endif
                     </div>
                 </div>
-                
                 <div class="d-flex gap-2 mt-3">
-                    <a href="{{ route('tu.buku-induk.show', $siswa) }}" class="btn btn-modern-primary flex-grow-1">
-                        <i class="fas fa-eye"></i> Lihat
-                    </a>
-                    <a href="{{ route('tu.buku-induk.edit', $siswa->id) }}" class="btn btn-modern-outline">
-                        <i class="fas fa-pen"></i>
-                    </a>
-                    <a href="{{ route('tu.buku-induk.cetak', $siswa) }}" target="_blank" class="btn btn-modern-outline">
-                        <i class="fas fa-print"></i>
-                    </a>
+                    <a href="{{ route('tu.buku-induk.show', $siswa) }}" class="btn btn-modern btn-modern-primary flex-grow-1"><i class="fas fa-eye"></i> Lihat</a>
+                    <a href="{{ route('tu.buku-induk.edit', $siswa->id) }}" class="btn btn-modern btn-modern-outline"><i class="fas fa-pen"></i></a>
+                    <a href="{{ route('tu.buku-induk.cetak', $siswa) }}" target="_blank" class="btn btn-modern btn-modern-outline"><i class="fas fa-print"></i></a>
                 </div>
             </div>
             @empty
             <div class="empty-state-modern">
-                <div class="empty-icon">
-                    <i class="fas fa-book-open"></i>
-                </div>
+                <div class="empty-icon"><i class="fas fa-book-open"></i></div>
                 <div class="empty-title">Belum Ada Data</div>
                 <div class="empty-description">Belum ada siswa yang terdaftar di buku induk</div>
             </div>
             @endforelse
         </div>
 
-        <!-- Pagination - FIXED -->
         @if($siswas->hasPages())
         <div class="pagination-modern">
             {{ $siswas->appends(request()->query())->links('pagination::bootstrap-4') }}
@@ -718,7 +817,6 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Override pagination style to fix Previous/Next text size
         const paginationLinks = document.querySelectorAll('.pagination-modern .page-link');
         paginationLinks.forEach(link => {
             if (link.textContent.trim() === '&laquo; Previous' || link.textContent.trim() === 'Previous') {
@@ -729,16 +827,14 @@
             }
         });
 
-        // Smooth scroll to top on pagination click
         document.querySelectorAll('.pagination-modern a, .pagination a').forEach(link => {
-            link.addEventListener('click', function(e) {
+            link.addEventListener('click', function() {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         });
 
-        // Initialize tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(function(tooltipTriggerEl) {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     });

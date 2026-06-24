@@ -12,9 +12,18 @@ use App\Models\Ayah;
 use App\Models\Ibu;
 use App\Models\Wali;
 use App\Models\User;
+use App\Exports\NilaiExport;
+use App\Exports\SiswaExport;
+use App\Exports\PklIjazahExport;
+use App\Exports\SiswaTemplateExport;
+use App\Exports\NilaiTemplateExport;
+use App\Exports\PklIjazahTemplateExport;
+use App\Imports\SiswaImport;
+use App\Imports\NilaiImport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BukuIndukController extends Controller
 {
@@ -93,6 +102,110 @@ class BukuIndukController extends Controller
         $nilaiByKelompok = $this->groupNilaiByKelompok($siswa);
         
         return view('tu.buku-induk.show', compact('siswa', 'nilaiByKelompok'));
+    }
+
+    public function exportSiswa()
+    {
+        $filename = 'data_siswa_' . date('Ymd_His') . '.xlsx';
+        return Excel::download(new SiswaExport(), $filename);
+    }
+
+    public function exportNilai()
+    {
+        $filename = 'nilai_semua_siswa_' . date('Ymd_His') . '.xlsx';
+        return Excel::download(new NilaiExport(), $filename);
+    }
+
+    public function exportPkl()
+    {
+        $filename = 'pkl_ijazah_' . date('Ymd_His') . '.xlsx';
+        return Excel::download(new PklIjazahExport(), $filename);
+    }
+
+    public function importSiswa(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        $import = new SiswaImport();
+        Excel::import($import, $request->file('file'));
+
+        $message = 'Import data siswa berhasil disimpan.';
+        if (method_exists($import, 'getErrors')) {
+            $errors = $import->getErrors();
+            if (!empty($errors)) {
+                return redirect()->route('tu.buku-induk.index')
+                    ->with('warning', 'Import selesai namun ada beberapa baris tidak diproses.')
+                    ->with('import_errors', $errors);
+            }
+        }
+
+        return redirect()->route('tu.buku-induk.index')->with('success', $message);
+    }
+
+    public function importNilai(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        $import = new NilaiImport();
+        Excel::import($import, $request->file('file'));
+
+        $message = 'Import nilai berhasil disimpan.';
+        if (method_exists($import, 'getErrors')) {
+            $errors = $import->getErrors();
+            if (!empty($errors)) {
+                return redirect()->route('tu.buku-induk.index')
+                    ->with('warning', 'Import selesai namun ada beberapa baris tidak diproses.')
+                    ->with('import_errors', $errors);
+            }
+        }
+
+        return redirect()->route('tu.buku-induk.index')->with('success', $message);
+    }
+
+    public function importPkl(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        $import = new SiswaImport();
+        Excel::import($import, $request->file('file'));
+
+        $message = 'Import PKL & Ijazah berhasil disimpan.';
+        if (method_exists($import, 'getErrors')) {
+            $errors = $import->getErrors();
+            if (!empty($errors)) {
+                return redirect()->route('tu.buku-induk.index')
+                    ->with('warning', 'Import selesai namun ada beberapa baris tidak diproses.')
+                    ->with('import_errors', $errors);
+            }
+        }
+
+        return redirect()->route('tu.buku-induk.index')->with('success', $message);
+    }
+
+    public function downloadTemplateSiswa()
+    {
+        return Excel::download(new SiswaTemplateExport(), 'template_data_siswa.xlsx');
+    }
+
+    public function downloadTemplateNilai()
+    {
+        return Excel::download(new NilaiTemplateExport(), 'template_nilai_rapor.xlsx');
+    }
+
+    public function downloadTemplatePkl()
+    {
+        return Excel::download(new PklIjazahTemplateExport(), 'template_pkl_ijazah.xlsx');
+    }
+
+    public function downloadTemplatePklIjazah()
+    {
+        return Excel::download(new PklIjazahTemplateExport(), 'template_pkl_ijazah.xlsx');
     }
 
     /**
@@ -177,6 +290,16 @@ class BukuIndukController extends Controller
             'rt' => 'nullable|string',
             'rw' => 'nullable|string',
             'kode_pos' => 'nullable|string',
+            'pkl_nilai' => 'nullable|string',
+            'pkl_sertifikat' => 'nullable|string',
+            'pkl_nama_industri' => 'nullable|string',
+            'pkl_alamat' => 'nullable|string',
+            'ijazah_nomor' => 'nullable|string',
+            'ijazah_tanggal' => 'nullable|date',
+            'transkip_nomor' => 'nullable|string',
+            'transkip_tanggal' => 'nullable|date',
+            'tanggal_lulus' => 'nullable|date',
+            'status_kelulusan' => 'nullable|string',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             // other fields may be added as needed
         ]);

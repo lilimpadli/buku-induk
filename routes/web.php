@@ -535,6 +535,26 @@ Route::prefix('tu')
         // Buku Induk
         Route::get('/buku-induk', [BukuIndukController::class, 'index'])
             ->name('buku-induk.index');
+        Route::get('/buku-induk/export/siswa', [BukuIndukController::class, 'exportSiswa'])
+            ->name('buku-induk.export.siswa');
+        Route::get('/buku-induk/export/nilai', [BukuIndukController::class, 'exportNilai'])
+            ->name('buku-induk.export.nilai');
+        Route::get('/buku-induk/export/pkl', [BukuIndukController::class, 'exportPkl'])
+            ->name('buku-induk.export.pkl');
+        Route::post('/buku-induk/import/siswa', [BukuIndukController::class, 'importSiswa'])
+            ->name('buku-induk.import.siswa');
+        Route::post('/buku-induk/import/nilai', [BukuIndukController::class, 'importNilai'])
+            ->name('buku-induk.import.nilai');
+        Route::post('/buku-induk/import/pkl', [BukuIndukController::class, 'importPkl'])
+            ->name('buku-induk.import.pkl');
+        Route::get('/buku-induk/template/siswa', [BukuIndukController::class, 'downloadTemplateSiswa'])
+            ->name('buku-induk.template.siswa');
+        Route::get('/buku-induk/template/nilai', [BukuIndukController::class, 'downloadTemplateNilai'])
+            ->name('buku-induk.template.nilai');
+        Route::get('/buku-induk/template/pkl', [BukuIndukController::class, 'downloadTemplatePkl'])
+            ->name('buku-induk.template.pkl');
+        Route::get('/buku-induk/template/pkl-ijazah', [BukuIndukController::class, 'downloadTemplatePklIjazah'])
+            ->name('buku-induk.template.pkl-ijazah');
         Route::get('/buku-induk/{siswa}', [BukuIndukController::class, 'show'])
             ->name('buku-induk.show');
         Route::get('/buku-induk/{siswa}/edit', [BukuIndukController::class, 'edit'])

@@ -813,7 +813,67 @@
                             </div>
                         </div>
 
-                        {{-- D. STATUS MUTASI --}}
+                        {{-- D. PKL --}}
+                        <div class="section-card">
+                            <div class="section-title">
+                                <i class="fas fa-briefcase text-info"></i>
+                                D. DATA PKL
+                            </div>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="label">Nilai PKL</span>
+                                    <span class="value">{{ $siswa->pkl_nilai ?? '-' }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Sertifikat PKL</span>
+                                    <span class="value">{{ $siswa->pkl_sertifikat ?? '-' }}</span>
+                                </div>
+                                <div class="info-item" style="grid-column: 1 / -1;">
+                                    <span class="label">Nama Industri</span>
+                                    <span class="value">{{ $siswa->pkl_nama_industri ?? '-' }}</span>
+                                </div>
+                                <div class="info-item" style="grid-column: 1 / -1;">
+                                    <span class="label">Alamat Industri</span>
+                                    <span class="value">{{ $siswa->pkl_alamat ?? '-' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- E. IJAZAH / KELULUSAN --}}
+                        <div class="section-card">
+                            <div class="section-title">
+                                <i class="fas fa-certificate text-success"></i>
+                                E. IJAZAH / KELULUSAN
+                            </div>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="label">Nomor Ijazah</span>
+                                    <span class="value">{{ $siswa->ijazah_nomor ?? '-' }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Tanggal Ijazah</span>
+                                    <span class="value">{{ $siswa->ijazah_tanggal ? \Carbon\Carbon::parse($siswa->ijazah_tanggal)->isoFormat('D MMMM Y') : '-' }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Nomor Transkip</span>
+                                    <span class="value">{{ $siswa->transkip_nomor ?? '-' }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Tanggal Transkip</span>
+                                    <span class="value">{{ $siswa->transkip_tanggal ? \Carbon\Carbon::parse($siswa->transkip_tanggal)->isoFormat('D MMMM Y') : '-' }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Tanggal Lulus</span>
+                                    <span class="value">{{ $siswa->tanggal_lulus ? \Carbon\Carbon::parse($siswa->tanggal_lulus)->isoFormat('D MMMM Y') : '-' }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Status Kelulusan</span>
+                                    <span class="value">{{ $siswa->status_kelulusan ?? '-' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- F. STATUS MUTASI --}}
                         <div class="section-card">
                             <div class="section-title">
                                 <i class="fas fa-exchange-alt text-danger"></i>
