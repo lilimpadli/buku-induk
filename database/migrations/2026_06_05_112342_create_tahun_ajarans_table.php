@@ -10,10 +10,21 @@ return new class extends Migration
     {
         Schema::create('tahun_ajarans', function (Blueprint $table) {
             $table->id();
-            $table->string('tahun', 9); // contoh: 2024/2025
-            $table->date('tanggal_mulai');
-            $table->date('tanggal_selesai');
+
+            // tahun ajaran (contoh: 2024/2025)
+            $table->string('tahun', 9);
+
+            // periode
+            $table->date('tanggal_mulai')->nullable();
+            $table->date('tanggal_selesai')->nullable();
+
+            // status
             $table->boolean('is_active')->default(false);
+            $table->boolean('is_current')->default(false);
+
+            // tambahan info
+            $table->text('keterangan')->nullable();
+
             $table->timestamps();
         });
     }
