@@ -687,6 +687,30 @@
         <i class="fas fa-arrow-up"></i> <span>Kenaikan Kelas</span>
     </a>
 
+    <a href="{{ route('kurikulum.tahun-ajaran.index') }}" class="nav-link {{ request()->routeIs('kurikulum.tahun-ajaran*') ? 'active' : '' }}">
+        <i class="fas fa-calendar-alt"></i> <span>Tahun Ajaran</span>
+    </a>
+
+    <a href="{{ route('kurikulum.semester.index') }}" class="nav-link {{ request()->routeIs('kurikulum.semester*') ? 'active' : '' }}">
+        <i class="fas fa-calendar-week"></i> <span>Semester</span>
+    </a>
+
+    <div class="nav-section-title">MASTER JADWAL</div>
+
+    <a href="{{ route('kurikulum.jam-pelajaran.index') }}" class="nav-link {{ request()->routeIs('kurikulum.jam-pelajaran*') ? 'active' : '' }}">
+        <i class="fas fa-clock"></i> <span>Jam Pelajaran</span>
+    </a>
+
+    <a href="{{ route('kurikulum.ruang-kelas.index') }}" class="nav-link {{ request()->routeIs('kurikulum.ruang-kelas*') ? 'active' : '' }}">
+        <i class="fas fa-door-open"></i> <span>Ruang Kelas</span>
+    </a>
+
+    <div class="nav-section-title">JADWAL</div>
+
+    <a href="{{ route('kurikulum.jadwal-pelajaran.index') }}" class="nav-link {{ request()->routeIs('kurikulum.jadwal-pelajaran*') ? 'active' : '' }}">
+        <i class="fas fa-calendar-alt"></i> <span>Jadwal Pelajaran</span>
+    </a>
+
     <div class="nav-section-title">RAPOR</div>
     <a href="{{ route('kurikulum.rapor.index') }}" class="nav-link {{ request()->routeIs('kurikulum.rapor*') ? 'active' : '' }}">
         <i class="fas fa-print"></i> <span>Cetak Rapor</span>

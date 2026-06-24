@@ -1022,6 +1022,77 @@ Route::prefix('kurikulum')
 
         Route::get('/kelas/{rombel}', [KelasController::class, 'show'])->name('kelas.show');
 
+
+        // ============================================================
+        // TAHUN AJARAN (Kurikulum)
+        // ============================================================
+        Route::prefix('tahun-ajaran')->name('tahun-ajaran.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Kurikulum\TahunAjaranController::class, 'index'])->name('index');
+            Route::get('/create', [App\Http\Controllers\Kurikulum\TahunAjaranController::class, 'create'])->name('create');
+            Route::post('/', [App\Http\Controllers\Kurikulum\TahunAjaranController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\TahunAjaranController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [App\Http\Controllers\Kurikulum\TahunAjaranController::class, 'update'])->name('update');
+            Route::delete('/{id}', [App\Http\Controllers\Kurikulum\TahunAjaranController::class, 'destroy'])->name('destroy');
+            Route::post('/{id}/set-current', [App\Http\Controllers\Kurikulum\TahunAjaranController::class, 'setCurrent'])->name('set-current');
+            Route::post('/{id}/toggle-active', [App\Http\Controllers\Kurikulum\TahunAjaranController::class, 'toggleActive'])->name('toggle-active');
+        });
+
+        // ============================================================
+        // SEMESTER (Kurikulum)
+        // ============================================================
+        Route::prefix('semester')->name('semester.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Kurikulum\SemesterController::class, 'index'])->name('index');
+            Route::get('/create', [App\Http\Controllers\Kurikulum\SemesterController::class, 'create'])->name('create');
+            Route::post('/', [App\Http\Controllers\Kurikulum\SemesterController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\SemesterController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [App\Http\Controllers\Kurikulum\SemesterController::class, 'update'])->name('update');
+            Route::delete('/{id}', [App\Http\Controllers\Kurikulum\SemesterController::class, 'destroy'])->name('destroy');
+            Route::post('/{id}/set-current', [App\Http\Controllers\Kurikulum\SemesterController::class, 'setCurrent'])->name('set-current');
+            Route::post('/{id}/toggle-active', [App\Http\Controllers\Kurikulum\SemesterController::class, 'toggleActive'])->name('toggle-active');
+        });
+
+
+        // ============================================================
+        // JAM PELAJARAN (Kurikulum)
+        // ============================================================
+        Route::prefix('jam-pelajaran')->name('jam-pelajaran.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Kurikulum\JamPelajaranController::class, 'index'])->name('index');
+            Route::get('/create', [App\Http\Controllers\Kurikulum\JamPelajaranController::class, 'create'])->name('create');
+            Route::post('/', [App\Http\Controllers\Kurikulum\JamPelajaranController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\JamPelajaranController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [App\Http\Controllers\Kurikulum\JamPelajaranController::class, 'update'])->name('update');
+            Route::delete('/{id}', [App\Http\Controllers\Kurikulum\JamPelajaranController::class, 'destroy'])->name('destroy');
+            Route::post('/{id}/toggle', [App\Http\Controllers\Kurikulum\JamPelajaranController::class, 'toggleActive'])->name('toggle');
+        });
+
+        // ============================================================
+        // RUANG KELAS (Kurikulum)
+        // ============================================================
+        Route::prefix('ruang-kelas')->name('ruang-kelas.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Kurikulum\RuangKelasController::class, 'index'])->name('index');
+            Route::get('/create', [App\Http\Controllers\Kurikulum\RuangKelasController::class, 'create'])->name('create');
+            Route::post('/', [App\Http\Controllers\Kurikulum\RuangKelasController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\RuangKelasController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [App\Http\Controllers\Kurikulum\RuangKelasController::class, 'update'])->name('update');
+            Route::delete('/{id}', [App\Http\Controllers\Kurikulum\RuangKelasController::class, 'destroy'])->name('destroy');
+            Route::post('/{id}/toggle', [App\Http\Controllers\Kurikulum\RuangKelasController::class, 'toggleActive'])->name('toggle');
+        });
+
+
+        // ============================================================
+        // JADWAL PELAJARAN (Kurikulum)
+        // ============================================================
+        Route::prefix('jadwal-pelajaran')->name('jadwal-pelajaran.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Kurikulum\JadwalPelajaranController::class, 'index'])->name('index');
+            Route::get('/create', [App\Http\Controllers\Kurikulum\JadwalPelajaranController::class, 'create'])->name('create');
+            Route::post('/', [App\Http\Controllers\Kurikulum\JadwalPelajaranController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [App\Http\Controllers\Kurikulum\JadwalPelajaranController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [App\Http\Controllers\Kurikulum\JadwalPelajaranController::class, 'update'])->name('update');
+            Route::delete('/{id}', [App\Http\Controllers\Kurikulum\JadwalPelajaranController::class, 'destroy'])->name('destroy');
+            Route::post('/{id}/toggle', [App\Http\Controllers\Kurikulum\JadwalPelajaranController::class, 'toggleActive'])->name('toggle');
+            Route::get('/api/rombel/{rombelId}', [App\Http\Controllers\Kurikulum\JadwalPelajaranController::class, 'getByRombel'])->name('api.rombel');
+        });
+
         // RAPOR SISWA
         Route::get('/rapor', [App\Http\Controllers\Kurikulum\KurikulumRaportController::class, 'index'])
             ->name('rapor.index');

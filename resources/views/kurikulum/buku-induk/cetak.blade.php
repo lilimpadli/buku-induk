@@ -22,8 +22,10 @@
             margin: 0 auto;
             background-color: white;
             padding: 8mm;
-            min-height: 297mm;
+            height: 297mm;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         .buku-induk-header {
             text-align: center;
@@ -49,7 +51,7 @@
             flex-grow: 1;
             overflow: hidden;
         }
-
+        
         .nilai-column {
             flex: 2.2;
             display: flex;
@@ -64,17 +66,17 @@
         }
 
         .data-section {
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         .data-section-title {
             font-weight: bold;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
             font-size: 8px;
             text-decoration: underline;
         }
         .data-row {
             display: flex;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
             align-items: flex-end;
         }
         .data-label {
@@ -91,26 +93,43 @@
             font-size: 8px;
             padding-bottom: 1px;
         }
-
+        
+        .photo-info-container {
+            text-align: center;
+            margin-bottom: 8px;
+        }
         .photo-box {
-            width: 90px;
-            height: 120px;
+            width: 70px;
+            height: 95px;
             border: 1px solid #000;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 6px;
-            overflow: hidden;
-            background: #f9f9f9;
         }
         .photo-box img {
-            width: 100%;
-            height: 100%;
+            width: 68px;
+            height: 93px;
             object-fit: cover;
         }
-        .photo-box .no-photo {
-            font-size: 8px;
-            color: #999;
+        .side-table {
+            width: 100%;
+            font-size: 6px;
+            text-align: left;
+        }
+        .side-table td {
+            padding: 1px 2px;
+            vertical-align: top;
+        }
+        .side-table td.label {
+            font-weight: 700;
+            width: 45%;
+        }
+        .side-table td.sep {
+            width: 4%;
+        }
+        .side-table td.value {
+            width: 51%;
         }
 
         .hasil-prestasi-title {
@@ -119,7 +138,6 @@
             margin: 0 0 6px;
             font-size: 10px;
         }
-
         .table-responsive {
             flex-grow: 1;
             overflow: hidden;
@@ -166,8 +184,8 @@
         }
 
         .signature-section {
-            margin-top: 8px;
-            padding-top: 4px;
+            margin-top: auto;
+            padding-top: 8px;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
@@ -184,7 +202,7 @@
         }
         .signature-line {
             border-top: 1px solid #000;
-            height: 30px;
+            height: 36px;
             margin-top: 6px;
         }
         .stamp-box {
@@ -200,7 +218,7 @@
         }
         .signature-box-small {
             width: 110px;
-            height: 35px;
+            height: 40px;
             border: 1px solid #000;
             margin-bottom: 4px;
         }
@@ -211,11 +229,14 @@
                 margin: 5mm;
                 -webkit-print-color-adjust: exact;
             }
-            body { padding: 0; margin: 0; }
+            body {
+                padding: 0;
+                margin: 0;
+            }
             .container {
                 box-shadow: none;
                 width: 210mm;
-                min-height: 297mm;
+                height: 297mm;
                 overflow: hidden;
                 page-break-after: always;
                 padding: 5mm;
@@ -225,9 +246,15 @@
                 flex-direction: row;
                 height: calc(100% - 40px);
             }
-            .buku-induk-table { font-size: 6pt; }
-            .data-label, .data-value { font-size: 7pt; }
-            .table-responsive { height: 100%; }
+            .buku-induk-table {
+                font-size: 6pt;
+            }
+            .data-label, .data-value {
+                font-size: 7pt;
+            }
+            .table-responsive {
+                height: 100%;
+            }
         }
     </style>
 </head>
@@ -248,7 +275,7 @@
                             <tr>
                                 <th rowspan="3" style="width: 35%;">MATA PELAJARAN</th>
                                 @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
-                                    <th colspan="2">{{ $tahunAjaran }}</th>
+                                    <th colspan="2" class="text-center">{{ $tahunAjaran }}</th>
                                 @endforeach
                             </tr>
                             <tr>
@@ -290,21 +317,44 @@
                                 @endforeach
                             @else
                                 <tr>
-                                    <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}">Belum ada data nilai</td>
+                                    <td>-</td>
+                                    @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                        <td>-</td>
+                                        <td>-</td>
+                                    @endforeach
+                                </tr>
+                                <tr>
+                                    <td>-</td>
+                                    @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                        <td>-</td>
+                                        <td>-</td>
+                                    @endforeach
                                 </tr>
                             @endif
+                            
+                            @for ($i = 0; $i < 15; $i++)
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                    @endforeach
+                                </tr>
+                            @endfor
                         </tbody>
                     </table>
                 </div>
             </div>
 
             <div class="data-column">
-                <div class="photo-box">
-                    @if(isset($siswa->user) && $siswa->user->photo)
-                        <img src="{{ asset('storage/' . $siswa->user->photo) }}" alt="{{ $siswa->nama_lengkap }}" onerror="this.style.display='none'">
-                    @else
-                        <span class="no-photo">No Photo</span>
-                    @endif
+                <div class="photo-info-container">
+                    <div class="photo-box">
+                        @if(isset($siswa->user) && $siswa->user->photo)
+                            <img src="{{ asset('storage/' . $siswa->user->photo) }}" alt="{{ $siswa->nama_lengkap }}" onerror="this.style.display='none'">
+                        @else
+                            <span style="font-size: 8px; color: #999;">Photo</span>
+                        @endif
+                    </div>
                 </div>
 
                 <div class="data-section">
@@ -322,7 +372,7 @@
                     </div>
                     <div class="data-row">
                         <div class="data-label">Tempat/Tgl.Lahir</div>
-                        <div class="data-value">{{ $siswa->tempat_lahir ?? '-' }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->translatedFormat('d F Y') : '-' }}</div>
+                        <div class="data-value">{{ $siswa->tempat_lahir ?? '-' }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d F Y') : '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">Warganegara</div>
@@ -333,13 +383,20 @@
                         <div class="data-value">{{ $siswa->agama ?? '-' }}</div>
                     </div>
                     <div class="data-row">
+                        <div class="data-label">Kewarganegaraan</div>
+                        <div class="data-value">{{ $siswa->kewarganegaraan ?? '-' }}</div>
+                    </div>
+                    <div class="data-row">
                         <div class="data-label">Alamat Siswa</div>
-                        <div class="data-value">{{ $siswa->alamat ?? '-' }}</div>
+                        <div class="data-value">Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</div>
                     </div>
                 </div>
 
                 <div class="data-section">
-                    <div class="data-section-title">Nama Orang Tua</div>
+                    <div class="data-row">
+                        <div class="data-label">Nama Orang Tua</div>
+                        <div class="data-value"></div>
+                    </div>
                     <div class="data-row">
                         <div class="data-label">a. Ayah</div>
                         <div class="data-value">{{ $siswa->ayah->nama ?? '-' }}</div>
@@ -353,20 +410,28 @@
                         <div class="data-value">{{ $siswa->ayah->pekerjaan ?? '-' }}</div>
                     </div>
                     <div class="data-row">
-                        <div class="data-label">d. Alamat</div>
-                        <div class="data-value">{{ $siswa->ayah->alamat ?? $siswa->ibu->alamat ?? '-' }}</div>
+                        <div class="data-label">d. Alamat Rumah</div>
+                        <div class="data-value">Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">Nama Wali</div>
                         <div class="data-value">{{ $siswa->wali->nama ?? '-' }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">a. Pekerjaan</div>
+                        <div class="data-value">{{ $siswa->wali->pekerjaan ?? '-' }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">b. Alamat Rumah</div>
+                        <div class="data-value">{{ $siswa->wali->alamat ?? '-' }}</div>
                     </div>
                 </div>
 
                 <div class="data-section">
                     <div class="data-section-title">Diterima menjadi Siswa</div>
                     <div class="data-row">
-                        <div class="data-label">a. Tanggal</div>
-                        <div class="data-value">{{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->translatedFormat('d F Y') : '-' }}</div>
+                        <div class="data-label">a. Mulai Tanggal</div>
+                        <div class="data-value">{{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->format('d F Y') : '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">b. Asal sekolah</div>
@@ -376,23 +441,78 @@
 
                 <div class="data-section">
                     <div class="data-section-title">Meninggalkan Sekolah</div>
+                    @php
+                        $mutasiTerakhir = $siswa->mutasis ? $siswa->mutasis->sortByDesc('id')->first() : null;
+                    @endphp
                     <div class="data-row">
                         <div class="data-label">a. Tanggal</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">
+                            @if($mutasiTerakhir)
+                                {{ $mutasiTerakhir->tanggal_mutasi ? \Carbon\Carbon::parse($mutasiTerakhir->tanggal_mutasi)->format('d F Y') : '-' }}
+                            @else
+                                -
+                            @endif
+                        </div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">b. Alasan</div>
+                        <div class="data-value">
+                            @if($mutasiTerakhir)
+                                {{ $mutasiTerakhir->alasan_pindah ?? '-' }}
+                            @else
+                                -
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-section">
+                    <div class="data-section-title">Lulus/Tamat</div>
+                    <div class="data-row">
+                        <div class="data-label">a. Nomor Ijazah</div>
+                        <div class="data-value">-</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">b. Tanggal Ijazah</div>
+                        <div class="data-value">-</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">c. Nomor Transkip</div>
+                        <div class="data-value">-</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">d. Tanggal Transip</div>
                         <div class="data-value">-</div>
                     </div>
                 </div>
 
+                <div class="data-section">
+                    <div class="data-section-title">Praktek Kerja Industri</div>
+                    <div class="data-row">
+                        <div class="data-label">a. Nilai</div>
+                        <div class="data-value">-</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">b. Nomor Sertifikat</div>
+                        <div class="data-value">-</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">c. Nama Industri</div>
+                        <div class="data-value">-</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">d. Alamat</div>
+                        <div class="data-value">-</div>
+                    </div>
+                </div>
+                
                 <div class="signature-section">
                     <div class="signature-info">
                         <div class="signature-box-small"></div>
                         <p>Mengetahui</p>
                         <p>Kepala Sekolah</p>
                     </div>
-                    <div class="stamp-box"></div>
+                    <div class="stamp-box" aria-hidden="true"></div>
                 </div>
             </div>
         </div>
