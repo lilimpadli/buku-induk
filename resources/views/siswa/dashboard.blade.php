@@ -1,929 +1,298 @@
 @extends('layouts.app')
 
+@section('title', 'Dashboard Siswa')
+
 @section('content')
-
 <style>
-    /* ===================== STYLE DASHBOARD SISWA ===================== */
+    /* Global Dashboard Reset & Typography */
+    .dashboard-wrapper {
+        background-color: #f8fafc;
+        min-height: 100vh;
+        padding: 30px 20px;
+    }
     
-    :root {
-        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --success-gradient: linear-gradient(135deg, #13B497 0%, #59D4A4 100%);
-        --danger-gradient: linear-gradient(135deg, #F093FB 0%, #F5576C 100%);
-        --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        --card-hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        --text-primary: #2d3748;
-        --text-secondary: #718096;
-        --bg-light: #f7fafc;
-        --border-radius: 16px;
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    body {
-        background-color: var(--bg-light);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        color: var(--text-primary);
-    }
-
-    /* Header Styles */
-    .dashboard-header {
-        background: var(--primary-gradient);
-        color: white;
-        padding: 2rem 1.5rem;
-        border-radius: var(--border-radius);
-        margin-bottom: 2rem;
-        box-shadow: var(--card-shadow);
+    /* Hero Banner Modern */
+    .hero-banner {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+        border: none;
+        border-radius: 24px;
         position: relative;
         overflow: hidden;
+        box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.2);
     }
-
-    .dashboard-header::before {
-        content: "";
+    .hero-circle-1 {
         position: absolute;
-        top: 0;
-        right: 0;
-        width: 300px;
-        height: 300px;
-        background: rgba(255, 255, 255, 0.1);
+        top: -50px;
+        right: -50px;
+        width: 250px;
+        height: 250px;
+        background: rgba(255, 255, 255, 0.08);
         border-radius: 50%;
-        transform: translate(100px, -100px);
+    }
+    .hero-circle-2 {
+        position: absolute;
+        bottom: -80px;
+        right: 150px;
+        width: 180px;
+        height: 180px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
     }
 
-    .dashboard-header h2 {
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        position: relative;
-        z-index: 1;
-        font-size: 1.75rem;
-    }
-
-    .dashboard-header .text-muted {
-        color: rgba(255, 255, 255, 0.9) !important;
-        position: relative;
-        z-index: 1;
-        font-weight: 500;
-    }
-
-    .dashboard-header .btn-gradient {
-        position: relative;
-        z-index: 1;
-    }
-
-    /* Card Styles */
+    /* Mini Stat Cards */
     .stat-card {
-        border-radius: var(--border-radius);
         border: none;
-        box-shadow: var(--card-shadow);
-        transition: var(--transition);
-        overflow: hidden;
-        position: relative;
-        height: 100%;
-        background: white;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--card-hover-shadow);
-    }
-
-    .stat-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 5px;
-        background: var(--primary-gradient);
-    }
-
-    .stat-card.success::before {
-        background: var(--success-gradient);
-    }
-
-    .stat-card.danger::before {
-        background: var(--danger-gradient);
-    }
-
-    .stat-card.info::before {
-        background: var(--info-gradient);
-    }
-
-    .stat-icon {
-        width: 64px;
-        height: 64px;
         border-radius: 16px;
+        background: #ffffff;
+        padding: 20px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
         display: flex;
         align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 24px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        transition: var(--transition);
-        flex-shrink: 0;
+        gap: 16px;
+        border-left: 5px solid transparent;
     }
-
-    .stat-card:hover .stat-icon {
-        transform: scale(1.1);
-    }
-
-    .stat-icon.primary {
-        background: var(--primary-gradient);
-    }
-
-    .stat-icon.success {
-        background: var(--success-gradient);
-    }
-
-    .stat-icon.danger {
-        background: var(--danger-gradient);
-    }
-
-    .stat-icon.info {
-        background: var(--info-gradient);
-    }
-
-    /* Button Styles */
-    .btn-gradient {
-        background: var(--primary-gradient);
-        border: none;
-        color: white;
-        font-weight: 600;
-        padding: 0.6rem 1.2rem;
-        border-radius: 10px;
-        transition: var(--transition);
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    }
-
-    .btn-gradient:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-        color: white;
-    }
-
-    .btn-outline-gradient {
-        background: transparent;
-        border: 2px solid #667eea;
-        color: #667eea;
-        font-weight: 600;
-        padding: 0.6rem 1.2rem;
-        border-radius: 10px;
-        transition: var(--transition);
-    }
-
-    .btn-outline-gradient:hover {
-        background: var(--primary-gradient);
-        color: white;
-        border-color: transparent;
-        transform: translateY(-2px);
-    }
-
-    /* Profile Card */
-    .profile-card {
-        border-radius: var(--border-radius);
-        border: none;
-        box-shadow: var(--card-shadow);
-        overflow: hidden;
-        height: 100%;
-        background: white;
-        transition: var(--transition);
-    }
-
-    .profile-card:hover {
-        box-shadow: var(--card-hover-shadow);
-        transform: translateY(-3px);
-    }
-
-    .profile-image {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        border: 5px solid white;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        object-fit: cover;
-    }
-
-    .profile-placeholder {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        color: white;
-        font-size: 54px;
-        border: 5px solid white;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    }
-
-    /* Animations */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .fade-in {
-        animation: fadeIn 0.6s ease-out;
-    }
-
-    /* Parent Contact Card */
-    .parent-contact-card {
-        border-radius: var(--border-radius);
-        box-shadow: var(--card-shadow);
-        border: none;
-        background: white;
-        transition: var(--transition);
-    }
-
-    .parent-contact-card:hover {
-        box-shadow: var(--card-hover-shadow);
-        transform: translateY(-3px);
-    }
-
-    .parent-data-card {
+    .stat-icon {
+        width: 48px;
+        height: 48px;
         border-radius: 12px;
-        border: none;
-        background: #f8f9fa;
-        padding: 1rem;
-        margin-bottom: 0.75rem;
-    }
-
-    .parent-data-card h6 {
-        font-weight: 700;
-        margin-bottom: 0.75rem;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        justify-content: center;
+        font-size: 20px;
     }
 
-    /* =============== MOBILE OPTIMIZATIONS =============== */
-    @media (max-width: 768px) {
-        /* General mobile adjustments */
-        body {
-            font-size: 14px;
-        }
-
-        .container-fluid {
-            padding: 0.75rem !important;
-        }
-
-        /* Mobile Header */
-        .dashboard-header {
-            padding: 1.25rem;
-            border-radius: 16px;
-            margin-bottom: 1rem;
-        }
-
-        .dashboard-header::before {
-            width: 180px;
-            height: 180px;
-            transform: translate(80px, -80px);
-        }
-        
-        .dashboard-header h2 {
-            font-size: 1.3rem;
-            margin-bottom: 0.4rem;
-            line-height: 1.3;
-        }
-
-        .dashboard-header .text-muted {
-            font-size: 0.9rem;
-        }
-
-        .dashboard-header .d-flex {
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .dashboard-header .btn-gradient {
-            width: 100%;
-            padding: 0.65rem 1rem;
-            font-size: 0.9rem;
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
-        }
-
-        /* Stat Cards Mobile */
-        .stat-card {
-            border-radius: 14px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-        }
-
-        .stat-card .card-body {
-            padding: 1rem;
-        }
-        
-        .stat-icon {
-            width: 52px;
-            height: 52px;
-            font-size: 20px;
-            border-radius: 12px;
-        }
-
-        .stat-card .h5 {
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 0;
-        }
-
-        .stat-card .small {
-            font-size: 0.75rem;
-        }
-
-        .stat-card .text-muted.small {
-            font-size: 0.7rem;
-        }
-
-        /* Profile Card Mobile */
-        .profile-card {
-            border-radius: 16px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-        }
-
-        .profile-card .card-body {
-            padding: 1.5rem 1rem;
-        }
-        
-        .profile-image, .profile-placeholder {
-            width: 100px;
-            height: 100px;
-            font-size: 38px;
-            border-width: 4px;
-            margin-bottom: 1rem;
-        }
-
-        .profile-card h3 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .profile-card .text-muted {
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
-        }
-
-        /* Mobile Buttons Grid */
-        .profile-card .row.g-2 {
-            gap: 0.5rem;
-        }
-
-        .profile-card .btn-outline-gradient,
-        .profile-card .btn-outline-danger {
-            padding: 0.65rem 1rem;
-            font-size: 0.85rem;
-            border-radius: 10px;
-            font-weight: 600;
-        }
-
-        .profile-card .btn-outline-gradient i,
-        .profile-card .btn-outline-danger i {
-            font-size: 0.85rem;
-        }
-
-        /* Action buttons at bottom */
-        .profile-card .d-flex.gap-3 {
-            flex-direction: column;
-            gap: 0.6rem !important;
-        }
-
-        .profile-card .d-flex.gap-3 .btn {
-            width: 100%;
-            padding: 0.7rem 1rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        /* Parent Contact Card Mobile */
-        .parent-contact-card {
-            border-radius: 16px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-        }
-
-        .parent-contact-card .card-body {
-            padding: 1.25rem;
-        }
-
-        .parent-contact-card h5 {
-            font-size: 1.15rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .parent-data-card {
-            padding: 1rem;
-            border-radius: 12px;
-            margin-bottom: 0.75rem;
-        }
-
-        .parent-data-card h6 {
-            font-size: 0.95rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .parent-data-card .table {
-            font-size: 0.8rem;
-            margin-bottom: 0;
-        }
-
-        .parent-data-card .table th {
-            font-weight: 600;
-            color: #4a5568;
-            padding: 0.4rem 0;
-        }
-
-        .parent-data-card .table td {
-            padding: 0.4rem 0;
-            color: #2d3748;
-        }
-
-        .parent-contact-card .btn-gradient {
-            padding: 0.7rem 1rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        /* Modal Mobile */
-        .modal-dialog {
-            margin: 0.5rem;
-            max-width: calc(100% - 1rem);
-        }
-
-        .modal-content {
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        }
-
-        .modal-header {
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .modal-body {
-            padding: 1.25rem;
-        }
-
-        .modal-footer {
-            padding: 1rem 1.25rem;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .modal-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .modal .form-label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 0.4rem;
-        }
-
-        .modal .form-control {
-            font-size: 0.9rem;
-            padding: 0.6rem 0.75rem;
-            border-radius: 8px;
-        }
-
-        .modal .form-text {
-            font-size: 0.75rem;
-            margin-top: 0.3rem;
-        }
-
-        .modal .btn {
-            padding: 0.6rem 1.2rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-radius: 8px;
-        }
-
-        /* Spacing adjustments */
-        .row.g-3 {
-            gap: 0.75rem;
-        }
-
-        .mb-3 {
-            margin-bottom: 0.75rem !important;
-        }
-
-        .mb-4 {
-            margin-bottom: 1rem !important;
-        }
+    /* Rombak Total Navigasi Cepat Dokumen (Premium Panel) */
+    .nav-panel-card {
+        border: none;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+    .quick-nav-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        text-decoration: none !important;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .quick-nav-item:hover {
+        background: #f8fafc;
+        border-color: #3b82f6;
+        transform: translateY(-3px);
+        box-shadow: 0 12px 20px -5px rgba(59, 130, 246, 0.15);
+    }
+    .nav-item-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .nav-item-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        transition: all 0.2s;
+    }
+    .quick-nav-item:hover .nav-item-icon {
+        transform: scale(1.08);
+    }
+    .nav-item-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 2px;
+    }
+    .nav-item-desc {
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 0;
+    }
+    .nav-item-arrow {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        transition: all 0.2s;
+    }
+    .quick-nav-item:hover .nav-item-arrow {
+        background: #3b82f6;
+        color: #ffffff;
+        transform: translateX(4px);
     }
 
-    /* Extra small devices */
-    @media (max-width: 400px) {
-        .dashboard-header h2 {
-            font-size: 1.15rem;
-        }
-
-        .dashboard-header .text-muted {
-            font-size: 0.85rem;
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            font-size: 18px;
-        }
-
-        .stat-card .h5 {
-            font-size: 0.95rem;
-        }
-
-        .profile-image, .profile-placeholder {
-            width: 90px;
-            height: 90px;
-            font-size: 34px;
-        }
-
-        .profile-card h3 {
-            font-size: 1.1rem;
-        }
-
-        .btn-gradient, .btn-outline-gradient {
-            font-size: 0.8rem;
-            padding: 0.6rem 0.9rem;
-        }
+    /* Info List Styling */
+    .info-grid {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     }
-
-    /* Landscape mobile optimization */
-    @media (max-width: 768px) and (orientation: landscape) {
-        .dashboard-header {
-            padding: 1rem;
-        }
-
-        .profile-image, .profile-placeholder {
-            width: 80px;
-            height: 80px;
-            font-size: 32px;
-        }
-
-        .modal-dialog {
-            max-height: 90vh;
-            overflow-y: auto;
-        }
+    .data-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid #f1f5f9;
     }
-
-    /* Desktop styles preserved */
-    @media (min-width: 769px) {
-        /* Keep original desktop styles */
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .profile-card:hover {
-            transform: translateY(-3px);
-        }
-
-        .parent-contact-card:hover {
-            transform: translateY(-3px);
-        }
+    .data-row:last-child {
+        border-bottom: none;
     }
 </style>
 
-<div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="dashboard-header fade-in">
-        <div class="d-flex align-items-center justify-content-between">
-            <div>
-                <h2 class="mb-1">Selamat Datang, {{ $siswa->nama_lengkap ?? Auth::user()->name }}! 👋</h2>
-                <div class="text-muted">
-                    Kelas kamu: 
-                    @if($siswa && $siswa->rombel)
-                        @php
-                            $rombelDisplay = $siswa->rombel->nama ?? '';
-                            if(!empty($rombelDisplay)){
-                                if(preg_match('/^([a-zA-Z]+)\s*([0-9]+)$/', $rombelDisplay, $m)){
-                                    $rombelDisplay = strtoupper($m[1]) . ' ' . $m[2];
-                                } else {
-                                    $rombelDisplay = ucwords(strtolower($rombelDisplay));
-                                }
-                            }
-                        @endphp
-                        {{ $rombelDisplay ?: '-' }}
-                    @else
-                        -
-                    @endif
-                </div>
-            </div>
-            <div class="d-flex gap-2">
-                <a href="{{ route('siswa.dataDiri.edit') }}" class="btn btn-gradient">
-                    <i class="fas fa-edit me-1"></i>
-                    <span class="d-none d-sm-inline">Edit Profil</span>
-                    <span class="d-inline d-sm-none">Edit</span>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="row g-3 mb-3">
-        <div class="col-lg-6 col-md-6 fade-in" style="animation-delay: 0.1s;">
-            <div class="card stat-card h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="stat-icon primary me-3">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="text-muted small mb-1">Wali Kelas</div>
-                            <div class="h5 mb-0">{{ $siswa && $siswa->rombel && $siswa->rombel->guru ? $siswa->rombel->guru->nama : 'Belum ditentukan' }}</div>
-                        </div>
-                    </div>
-                    <div class="mt-2 small text-muted">Guru pengampu kelas Anda</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6 col-md-6 fade-in" style="animation-delay: 0.2s;">
-            <div class="card stat-card success h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="stat-icon success me-3">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="text-muted small mb-1">Status Profil</div>
-                            @if(isset($missing) && count($missing) > 0)
-                                <div class="h5 mb-0 text-warning">{{ count($missing) }} Field Kosong</div>
-                            @else
-                                <div class="h5 mb-0 text-success">Lengkap</div>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="mt-2 small text-muted">
-                        @if(isset($missing) && count($missing) > 0)
-                            Masih ada {{ count($missing) }} field yang perlu diisi
-                        @else
-                            Semua data penting sudah terisi
-                        @endif
-                    </div>
+<div class="dashboard-wrapper">
+    <div class="card hero-banner text-white mb-4">
+        <div class="hero-circle-1"></div>
+        <div class="hero-circle-2"></div>
+        <div class="card-body p-4 p-md-5">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <span class="badge bg-white text-primary fw-bold mb-3 px-3 py-2 rounded-pill shadow-sm">
+                        <i class="fas fa-graduation-cap me-1"></i> {{ $siswa->rombel->kelas->nama ?? 'Kelas Aktif' }}
+                    </span>
+                    <h1 class="fw-bold mb-2" style="letter-spacing: -0.5px;">Selamat Datang, {{ $siswa->nama_lengkap }}!</h1>
+                    <p class="text-white-50 mb-0 fs-6">Sistem monitoring Buku Induk Digital. Seluruh arsip identitas, data wali, serta rekam jejak akumulasi nilai rapor Anda tertata aman di sini.</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="row g-3">
-        <!-- Profile Card -->
-        <div class="col-xl-8 fade-in" style="animation-delay: 0.5s;">
-            <div class="card profile-card h-100">
-                <div class="card-body text-center">
-                    @if($siswa && $siswa->foto)
-                        <img src="{{ asset('storage/' . $siswa->foto) }}" class="profile-image mb-3" alt="Foto Siswa">
-                    @else
-                        <div class="profile-placeholder bg-gradient mb-3 mx-auto" style="background: var(--primary-gradient);">
-                            {{ $siswa ? strtoupper(substr($siswa->nama_lengkap,0,1)) : 'S' }}
-                        </div>
-                    @endif
-                    
-                    <h3 class="mb-2">{{ $siswa->nama_lengkap ?? 'Belum Lengkap' }}</h3>
-                    <p class="text-muted mb-3">NIS: {{ $siswa->nis ?? '-' }} • NISN: {{ $siswa->nisn ?? '-' }}</p>
-                    
-                    <div class="row g-2 mb-3">
-                        <div class="col-6">
-                            <button type="button" class="btn btn-outline-gradient w-100" data-bs-toggle="modal" data-bs-target="#editNamaModal">
-                                <i class="fas fa-user me-1"></i> Edit Nama
-                            </button>
-                        </div>
-                        <div class="col-6">
-                            <button type="button" class="btn btn-outline-gradient w-100" data-bs-toggle="modal" data-bs-target="#editEmailModal">
-                                <i class="fas fa-envelope me-1"></i> Edit Email
-                            </button>
-                        </div>
-                        <div class="col-6">
-                            <button type="button" class="btn btn-outline-gradient w-100" data-bs-toggle="modal" data-bs-target="#editFotoModal">
-                                <i class="fas fa-camera me-1"></i> Edit Foto
-                            </button>
-                        </div>
-                        <div class="col-6">
-                            <button type="button" class="btn btn-outline-gradient w-100" data-bs-toggle="modal" data-bs-target="#editPasswordModal">
-                                <i class="fas fa-key me-1"></i> Password
-                            </button>
-                        </div>
-                        @if($siswa && $siswa->foto)
-                        <div class="col-12">
-                            <button type="button" class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#confirmDeleteFotoModal">
-                                <i class="fas fa-trash me-1"></i> Hapus Foto
-                            </button>
-                        </div>
-                        @endif
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card stat-card" style="border-left-color: #3b82f6;">
+                <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;">
+                    <i class="fas fa-fingerprint"></i>
+                </div>
+                <div>
+                    <small class="text-muted d-block uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">NOMOR INDUK SISWA</style></small>
+                    <span class="fw-bold text-dark fs-5">{{ $siswa->nis }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card" style="border-left-color: #10b981;">
+                <div class="stat-icon" style="background: #ecfdf5; color: #10b981;">
+                    <i class="fas fa-passport"></i>
+                </div>
+                <div>
+                    <small class="text-muted d-block uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">NOMOR NISN NASIONAL</small>
+                    <span class="fw-bold text-dark fs-5">{{ $siswa->nisn ?? '-' }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card" style="border-left-color: #8b5cf6;">
+                <div class="stat-icon" style="background: #f5f3ff; color: #8b5cf6;">
+                    <i class="fas fa-school"></i>
+                </div>
+                <div>
+                    <small class="text-muted d-block uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">STATUS KESISWAAN</small>
+                    <span class="badge bg-success-subtle text-success px-2 py-1 rounded fw-bold" style="font-size: 12px;">Siswa Aktif</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card info-grid h-100 border-0">
+                <div class="card-body p-0">
+                    <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold text-dark mb-0">
+                            <i class="fas fa-user-check text-primary me-2"></i>Berkas Utama Terverifikasi
+                        </h5>
                     </div>
                     
-                    <div class="d-flex gap-3 justify-content-center">
-                        <a href="{{ route('siswa.dataDiri.exportPDF') }}" class="btn btn-gradient" target="_blank">
-                            <i class="fas fa-download me-1"></i> Unduh Data
-                        </a>
-                        <a href="{{ route('siswa.dataDiri.edit') }}" class="btn btn-outline-gradient">
-                            <i class="fas fa-edit me-1"></i> Lengkapi Profil
-                        </a>
+                    <div class="data-row">
+                        <span class="text-muted fw-medium">Nama Lengkap</span>
+                        <span class="fw-bold text-dark">{{ $siswa->nama_lengkap }}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="text-muted fw-medium">Jenis Kelamin</span>
+                        <span class="text-secondary">{{ $siswa->jenis_kelamin }}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="text-muted fw-medium">Tempat, Tanggal Lahir</span>
+                        <span class="text-dark">{{ $siswa->tempat_lahir }}, {{ $siswa->tanggal_lahir }}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="text-muted fw-medium">Agama</span>
+                        <span class="text-dark">{{ $siswa->agama }}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="text-muted fw-medium">Asal Sekolah</span>
+                        <span class="text-dark text-truncate" style="max-width: 220px;">{{ $siswa->sekolah_asal ?? '-' }}</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Parent Contact Card -->
-        <div class="col-xl-4">
-            <div class="card parent-contact-card shadow-sm fade-in" style="animation-delay: 0.6s;">
-                <div class="card-body">
-                    <h5 class="mb-3">Kontak Orang Tua</h5>
-
-                    <div class="mb-3">
-                        <div class="parent-data-card">
-                            <h6 class="text-primary">
-                                <i class="fas fa-user-tie"></i>Data Ayah
-                            </h6>
-                            <table class="table table-borderless table-sm mb-0">
-                                <tbody>
-                                    <tr>
-                                        <th width="40%">Nama</th>
-                                        <td>{{ $siswa->ayah->nama ?? '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Telepon</th>
-                                        <td>{{ $siswa->ayah->telepon ?? '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Pekerjaan</th>
-                                        <td>{{ $siswa->ayah->pekerjaan ?? '-' }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+        <div class="col-lg-6">
+            <div class="card nav-panel-card h-100">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-dark mb-4">
+                        <i class="fas fa-folder-open text-warning me-2"></i>Akses Lembar Buku Induk
+                    </h5>
+                    
+                    <div class="d-flex flex-column gap-3">
+                        <a href="{{ route('siswa.bukuInduk.show', ['tab' => 'biodata']) }}" class="quick-nav-item">
+                            <div class="nav-item-left">
+                                <div class="nav-item-icon" style="background: #eff6ff; color: #2563eb;">
+                                    <i class="fas fa-id-badge"></i>
+                                </div>
+                                <div>
+                                    <h6 class="nav-item-title">Lembar Profil & Biodata</h6>
+                                    <p class="nav-item-desc">Informasi detail identitas fisik & domisili rumah</p>
+                                </div>
+                            </div>
+                            <div class="nav-item-arrow">
+                                <i class="fas fa-arrow-right small"></i>
+                            </div>
+                        </a>
                         
-                        <div class="parent-data-card">
-                            <h6 class="text-danger">
-                                <i class="fas fa-user"></i>Data Ibu
-                            </h6>
-                            <table class="table table-borderless table-sm mb-0">
-                                <tbody>
-                                    <tr>
-                                        <th width="40%">Nama</th>
-                                        <td>{{ $siswa->ibu->nama ?? '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Telepon</th>
-                                        <td>{{ $siswa->ibu->telepon ?? '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Pekerjaan</th>
-                                        <td>{{ $siswa->ibu->pekerjaan ?? '-' }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <a href="{{ route('siswa.bukuInduk.show', ['tab' => 'keluarga']) }}" class="quick-nav-item">
+                            <div class="nav-item-left">
+                                <div class="nav-item-icon" style="background: #fef2f2; color: #dc2626;">
+                                    <i class="fas fa-users-cog"></i>
+                                </div>
+                                <div>
+                                    <h6 class="nav-item-title">Data Orang Tua / Wali</h6>
+                                    <p class="nav-item-desc">Detail pekerjaan, nama, dan kontak penanggung jawab</p>
+                                </div>
+                            </div>
+                            <div class="nav-item-arrow">
+                                <i class="fas fa-arrow-right small"></i>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('siswa.bukuInduk.show', ['tab' => 'nilai']) }}" class="quick-nav-item">
+                            <div class="nav-item-left">
+                                <div class="nav-item-icon" style="background: #f0fdf4; color: #16a34a;">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div>
+                                    <h6 class="nav-item-title">Transkrip Nilai Akademik</h6>
+                                    <p class="nav-item-desc font-sans">Rekapitulasi nilai capaian belajar mapel per semester</p>
+                                </div>
+                            </div>
+                            <div class="nav-item-arrow">
+                                <i class="fas fa-arrow-right small"></i>
+                            </div>
+                        </a>
                     </div>
-                    
-                    <a href="{{ route('siswa.dataDiri.edit') }}" class="btn btn-gradient w-100">
-                        <i class="fas fa-edit me-1"></i>Edit Kontak Orang Tua
-                    </a>
+
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Modal Edit Nama -->
-<div class="modal fade" id="editNamaModal" tabindex="-1" aria-labelledby="editNamaModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editNamaModalLabel">Edit Nama Lengkap</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ route('siswa.updateProfile') }}" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
-                        <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" value="{{ $siswa->nama_lengkap ?? '' }}" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Edit Email -->
-<div class="modal fade" id="editEmailModal" tabindex="-1" aria-labelledby="editEmailModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editEmailModalLabel">Edit Email</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ route('siswa.updateEmail') }}" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" value="{{ Auth::user()->email }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="current_password" class="form-label">Password Saat Ini</label>
-                        <input type="password" class="form-control" id="current_password" name="current_password" required>
-                        <div class="form-text">Masukkan password saat ini untuk mengubah email</div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Edit Foto -->
-<div class="modal fade" id="editFotoModal" tabindex="-1" aria-labelledby="editFotoModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editFotoModalLabel">Ganti Foto Profil</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ route('siswa.uploadPhoto') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="foto" class="form-label">Pilih Foto</label>
-                        <input type="file" class="form-control" id="foto" name="foto" accept="image/*" required>
-                        <div class="form-text">Format: JPG, JPEG, PNG. Maksimal: 2MB</div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Upload</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Konfirmasi Hapus Foto -->
-<div class="modal fade" id="confirmDeleteFotoModal" tabindex="-1" aria-labelledby="confirmDeleteFotoModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmDeleteFotoModalLabel">Hapus Foto Profil</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ route('siswa.profile.photo.delete') }}" method="POST">
-                @csrf
-                @method('DELETE')
-                <div class="modal-body">
-                    <p>Anda yakin ingin menghapus foto profil? Tindakan ini tidak dapat dikembalikan.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-danger">Hapus</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Edit Password -->
-<div class="modal fade" id="editPasswordModal" tabindex="-1" aria-labelledby="editPasswordModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editPasswordModalLabel">Ubah Password</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ route('siswa.updatePassword') }}" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="current_password" class="form-label">Password Saat Ini</label>
-                        <input type="password" class="form-control" id="current_password" name="current_password" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password Baru</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                        <div class="form-text">Minimal 8 karakter</div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password_confirmation" class="form-label">Konfirmasi Password Baru</label>
-                        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Ubah</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 @endsection

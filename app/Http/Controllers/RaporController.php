@@ -237,4 +237,22 @@ class RaporController extends Controller
             'ekstraTerisi' => EkstrakurikulerSiswa::count(),
         ]);
     }
+
+
+   public function showBukuInduk($siswa_id)
+{
+    $siswa = DataSiswa::findOrFail($siswa_id);
+    // Ambil data nilai
+    $semuaNilai = NilaiRaport::where('siswa_id', $siswa_id)->get();
+    
+    // Ambil daftar tahun unik, urutkan dari 2025 -> 2024 -> 2023
+    $daftarTahun = NilaiRaport::where('siswa_id', $siswa_id)
+        ->pluck('tahun_ajaran')
+        ->unique()
+        ->sortDesc()
+        ->values();
+
+    return view('buku_induk.index', compact('siswa', 'semuaNilai', 'daftarTahun'));
 }
+}
+

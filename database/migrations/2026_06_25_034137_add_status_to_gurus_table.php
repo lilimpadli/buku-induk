@@ -9,13 +9,9 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('jalur_ppdb', function (Blueprint $table) {
-    $table->id();
-    $table->string('nama_jalur');
-    $table->timestamps();
-});
+       //
     }
 
     /**
@@ -23,6 +19,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('jalur_ppdb');
+        Schema::table('gurus', function (Blueprint $table) {
+            //
+        });
     }
 };

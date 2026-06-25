@@ -13,8 +13,10 @@ class MataPelajaran extends Model
         'nama',
         'kelompok',
         'urutan',
+        'kkm', // Tambahkan ini
     ];
 
+    // ... sisa kode relasi Anda tetap sama
     public function nilai()
     {
         return $this->hasMany(NilaiRaport::class, 'mata_pelajaran_id');

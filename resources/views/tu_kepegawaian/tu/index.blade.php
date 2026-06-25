@@ -18,7 +18,6 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
-    <!-- Filter Form -->
     <div class="card mb-3">
         <div class="card-body">
             <form method="GET" action="{{ route('tu_kepegawaian.tu.index') }}" class="row g-3">
@@ -56,8 +55,8 @@
                         <th>Nomor Induk</th>
                         <th>Email</th>
                         <th>Role</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
+                        <th>Tgl Dibuat</th>
+                        <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -69,15 +68,15 @@
                             <td>{{ $user->email ?? '-' }}</td>
                             <td>{{ ucfirst($user->role) }}</td>
                             <td>{{ $user->created_at ? $user->created_at->format('d/m/Y') : '-' }}</td>
-                            <td>
-                                <a href="{{ route('tu_kepegawaian.tu.edit', $user->id) }}" class="btn btn-sm btn-warning me-1">
-                                    <i class="fas fa-edit"></i> Edit
+                            <td class="text-center text-nowrap">
+                                <a href="{{ route('tu_kepegawaian.tu.edit', $user->id) }}" class="btn btn-sm btn-warning text-white" title="Edit">
+                                    <i class="fas fa-edit"></i>
                                 </a>
-                                <form method="POST" action="{{ route('tu_kepegawaian.tu.destroy', $user->id) }}" style="display: inline;">
+                                <form method="POST" action="{{ route('tu_kepegawaian.tu.destroy', $user->id) }}" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus TU ini?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus TU ini?')">
-                                        <i class="fas fa-trash"></i> Hapus
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
                             </td>

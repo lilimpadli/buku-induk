@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Rombel;
 
 class Guru extends Model
 {
     use HasFactory;
+
+    protected $table = 'gurus';
 
     protected $fillable = [
         'nama',
@@ -18,6 +19,10 @@ class Guru extends Model
         'tempat_lahir',
         'tanggal_lahir',
         'jenis_kelamin',
+        'pendidikan',           // Tambahkan ini jika belum ada
+        'status_kepegawaian',   // WAJIB: Agar filter bisa bekerja
+        'gelar_depan',
+        'gelar_belakang',
         'alamat',
         'jurusan_id',
         'kelas_id',
@@ -25,34 +30,33 @@ class Guru extends Model
         'rombel_id',
     ];
 
+    // Relasi ke User
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    // Relasi ke Jurusan
     public function jurusan()
     {
         return $this->belongsTo(Jurusan::class);
     }
 
+    // Relasi ke Kelas
     public function kelas()
     {
         return $this->belongsTo(Kelas::class);
     }
 
-    // Rombels yang dia ampu (relasi one-to-many)
-    public function rombels()
+    // Relasi Rombel (Wali Kelas)
+    public function rombel()
     {
-        return $this->hasMany(Rombel::class, 'guru_id');
+        return $this->belongsTo(Rombel::class, 'rombel_id');
     }
 
-    public function waliKelas()
-{
-    return $this->hasMany(Rombel::class, 'guru_id');
-}
-
+    // Relasi ke Tugas Tambahan
     public function tugasTambahans()
     {
-        return $this->hasMany(TugasTambahan::class);
+        return $this->hasMany(TugasTambahan::class, 'guru_id');
     }
 }

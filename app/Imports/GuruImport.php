@@ -18,6 +18,36 @@ class GuruImport implements ToModel, WithStartRow, SkipsEmptyRows, WithHeadingRo
     protected $errors = [];
     protected $successCount = 0;
     protected $defaultPassword = '12345678';
+    protected $selectedColumns = [];
+    protected $columnMap = [];
+
+    public function setSelectedColumns(array $columns)
+    {
+        $this->selectedColumns = array_values(array_filter($columns, fn($value) => trim($value) !== ''));
+        return $this;
+    }
+
+    public function setColumnMap(array $map)
+    {
+        $normalized = [];
+        foreach ($map as $field => $header) {
+            if (trim($header) === '') {
+                continue;
+            }
+            $normalized[$field] = trim($header);
+        }
+        $this->columnMap = $normalized;
+        return $this;
+    }
+
+    protected function normalizeHeaderKey(string $header): string
+    {
+        $clean = trim($header);
+        $clean = preg_replace('/[^A-Za-z0-9]+/', '_', $clean);
+        $clean = strtolower(trim($clean, '_'));
+
+        return $clean;
+    }
 
     public function startRow(): int
     {
@@ -39,28 +69,44 @@ class GuruImport implements ToModel, WithStartRow, SkipsEmptyRows, WithHeadingRo
         $keyMap = [
             'nama' => ['nama', 'Nama', 'NAMA', 'name'],
             'nomor_induk' => ['nomor_induk', 'nomor induk', 'nip', 'NIP', 'nip_guru', 'niP', 'Nomor Induk', 'nomor_induk'],
-            'jenis_kelamin' => ['jenis_kelamin', 'jenis kelamin', 'jenis_kelamin', 'Jenis Kelamin', 'gender'],
+            'jenis_kelamin' => ['jenis_kelamin', 'jenis kelamin', 'Jenis Kelamin', 'gender'],
             'email' => ['email', 'Email', 'EMAIL', 'e_mail'],
             'role' => ['role', 'Role', 'ROLE', 'jabatan'],
             'rombel_id' => ['rombel_id', 'rombel_Id', 'rombel', 'rombel id', 'rombelid'],
             'jurusan_id' => ['jurusan_id', 'jurusan_Id', 'jurusan', 'jurusan id', 'jurusanid'],
+            'status_kepegawaian' => ['status_kepegawaian', 'status kepegawaian', 'status', 'status_kepegawaian', 'statuskepegawaian'],
+            'pendidikan' => ['pendidikan', 'Pendidikan', 'jenjang', 'jenjang pendidikan'],
+            'gelar_depan' => ['gelar_depan', 'gelar depan', 'gelardepan'],
+            'gelar_belakang' => ['gelar_belakang', 'gelar belakang', 'gelarbelakang'],
         ];
 
-        // Map each key to its standard form
+        $rowByHeader = [];
         foreach ($row as $key => $value) {
-            // Normalize key: lowercase and replace spaces with underscores
-            $normalizedKey = strtolower(str_replace(' ', '_', trim($key)));
-            
-            // Find which standard key this maps to
-            $standardKey = $normalizedKey;
-            foreach ($keyMap as $standard => $variants) {
-                if (in_array($normalizedKey, array_map('strtolower', $variants))) {
-                    $standardKey = $standard;
-                    break;
+            $rowByHeader[$this->normalizeHeaderKey((string)$key)] = $value;
+        }
+
+        if (!empty($this->columnMap)) {
+            foreach ($this->columnMap as $standardField => $header) {
+                $headerKey = $this->normalizeHeaderKey($header);
+                if (array_key_exists($headerKey, $rowByHeader)) {
+                    $normalized[$standardField] = $rowByHeader[$headerKey];
                 }
             }
-            
-            $normalized[$standardKey] = $value;
+        } else {
+            foreach ($rowByHeader as $key => $value) {
+                $standardKey = $key;
+                foreach ($keyMap as $standard => $variants) {
+                    if (in_array($key, array_map(fn($variant) => $this->normalizeHeaderKey($variant), $variants), true)) {
+                        $standardKey = $standard;
+                        break;
+                    }
+                }
+                $normalized[$standardKey] = $value;
+            }
+        }
+
+        if (!empty($this->selectedColumns)) {
+            $normalized = array_intersect_key($normalized, array_flip($this->selectedColumns));
         }
 
         return $normalized;
@@ -201,6 +247,10 @@ class GuruImport implements ToModel, WithStartRow, SkipsEmptyRows, WithHeadingRo
             $guru->nama = $nama;
             $guru->email = $email;  // HARUS DIISI karena unique dan NOT NULL
             $guru->jenis_kelamin = $jenis_kelamin;
+            $guru->status_kepegawaian = !empty($normalizedRow['status_kepegawaian']) ? trim($normalizedRow['status_kepegawaian']) : null;
+            $guru->pendidikan = !empty($normalizedRow['pendidikan']) ? trim($normalizedRow['pendidikan']) : null;
+            $guru->gelar_depan = !empty($normalizedRow['gelar_depan']) ? trim($normalizedRow['gelar_depan']) : null;
+            $guru->gelar_belakang = !empty($normalizedRow['gelar_belakang']) ? trim($normalizedRow['gelar_belakang']) : null;
             $guru->user_id = $user->id;
 
             // Normalize role values for assignment logic

@@ -459,58 +459,49 @@
 
     <div class="card shadow">
         @if($gurus->count() > 0)
-            <div class="list-group list-group-flush">
-                @forelse($gurus as $u)
-                    <div class="list-group-item">
-                        <div class="teacher-info">
-                            <div class="teacher-avatar">
-                                @if($u->photo)
-                                    <img src="{{ asset('storage/' . $u->photo) }}" alt="{{ $u->name }}">
-                                @else
-                                    {{ strtoupper(substr($u->name, 0, 1)) }}
-                                @endif
-                            </div>
-                            <div class="teacher-details">
-                                <strong>{{ $u->name }}</strong>
-                                <small>{{ ucfirst($u->role) }} • {{ $u->nomor_induk ?? $u->email }}</small>
-                                
-                                @if($u->guru && $u->guru->rombels && $u->guru->rombels->count())
-                                    <div class="teacher-classes">
-                                        @foreach($u->guru->rombels as $r)
-                                            @php
-                                                $kelas = $r->kelas;
-                                            @endphp
-                                            <span class="badge">
-                                                <i class="fas fa-chalkboard me-1 d-none d-sm-inline"></i>
-                                                {{ $kelas?->tingkat ? $kelas->tingkat . ' - ' . ($kelas->jurusan->nama ?? '') : '-' }} / {{ $r->nama }}
-                                            </span>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <small class="text-muted">
-                                        <i class="fas fa-info-circle me-1"></i>
-                                        Belum mengajar rombel
-                                    </small>
-                                @endif
-                            </div>
-                            <div class="teacher-actions">
-                                @if($u->guru)
-                                    <a href="{{ route('tu.guru.show', $u->guru->id) }}" class="btn btn-sm btn-primary" title="Detail">
-                                        <i class="fas fa-eye"></i> Detail
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="empty-state">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                        <h5>Belum ada pengguna</h5>
-                        <p>Belum ada data pengguna yang tersedia.</p>
-                    </div>
-                @endforelse
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 4%;">#</th>
+                            <th style="width: 18%;">Nama</th>
+                            <th style="width: 12%;">NIP</th>
+                            <th style="width: 16%;">Status Kepegawaian</th>
+                            <th style="width: 12%;">Pendidikan</th>
+                            <th style="width: 14%;">Gelar Depan</th>
+                            <th style="width: 14%;">Gelar Belakang</th>
+                            <th style="width: 10%;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($gurus as $u)
+                            <tr>
+                                <td>{{ $loop->iteration + ($gurus->currentPage() - 1) * $gurus->perPage() }}</td>
+                                <td>{{ $u->name ?? '-' }}</td>
+                                <td>{{ optional($u->guru)->nip ?? '-' }}</td>
+                                <td>{{ optional($u->guru)->status_kepegawaian ?? '-' }}</td>
+                                <td>{{ optional($u->guru)->pendidikan ?? '-' }}</td>
+                                <td>{{ optional($u->guru)->gelar_depan ?? '-' }}</td>
+                                <td>{{ optional($u->guru)->gelar_belakang ?? '-' }}</td>
+                                <td>
+                                    @if($u->guru)
+                                        <a href="{{ route('tu.guru.show', $u->guru->id) }}" class="btn btn-sm btn-primary">
+                                            Detail
+                                        </a>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="8" class="text-center py-4">Data guru tidak ditemukan.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-            
+
             <div class="d-flex justify-content-center mt-3 p-3">
                 {{ $gurus->links('pagination::bootstrap-4') }}
             </div>

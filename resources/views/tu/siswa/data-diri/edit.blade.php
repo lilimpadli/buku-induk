@@ -81,7 +81,7 @@
                                 @endforeach
                             </select>
                         @else
-                            <input type="text" name="rombel_nama" class="form-control" value="{{ old('rombel_nama', $siswa->rombel->nama ?? '') }}">
+                            <input type="text" name="rombel_nama" class="form-control" value="{{ old('rombel_nama', $siswa->rombel->nama ?? '') }}" readonly>
                         @endif
                     </div>
                 </div>
@@ -105,71 +105,59 @@
                 </div>
 
                 <hr>
-                <h5>Data Ayah</h5>
+                <h5 class="text-primary">Data Ayah</h5>
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Nama Ayah</label>
-                        <input type="text" name="ayah_nama" class="form-control" value="{{ old('ayah_nama', $siswa->ayah->nama ?? '') }}">
+                        <input type="text" name="ayah_nama" class="form-control" value="{{ old('ayah_nama', $siswa->nama_ayah) }}">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Pekerjaan</label>
-                        <input type="text" name="ayah_pekerjaan" class="form-control" value="{{ old('ayah_pekerjaan', $siswa->ayah->pekerjaan ?? '') }}">
+                        <input type="text" name="ayah_pekerjaan" class="form-control" value="{{ old('ayah_pekerjaan', $siswa->pekerjaan_ayah) }}">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Telepon</label>
-                        <input type="text" name="ayah_telepon" class="form-control" value="{{ old('ayah_telepon', $siswa->ayah->telepon ?? '') }}">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label">Alamat Ayah</label>
-                        <input type="text" name="ayah_alamat" class="form-control" value="{{ old('ayah_alamat', $siswa->ayah->alamat ?? '') }}">
+                        <input type="text" name="ayah_telepon" class="form-control" value="{{ old('ayah_telepon', $siswa->telepon_ayah) }}">
                     </div>
                 </div>
 
                 <hr>
-                <h5>Data Ibu</h5>
+                <h5 class="text-danger">Data Ibu</h5>
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Nama Ibu</label>
-                        <input type="text" name="ibu_nama" class="form-control" value="{{ old('ibu_nama', $siswa->ibu->nama ?? '') }}">
+                        <input type="text" name="ibu_nama" class="form-control" value="{{ old('ibu_nama', $siswa->nama_ibu) }}">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Pekerjaan</label>
-                        <input type="text" name="ibu_pekerjaan" class="form-control" value="{{ old('ibu_pekerjaan', $siswa->ibu->pekerjaan ?? '') }}">
+                        <input type="text" name="ibu_pekerjaan" class="form-control" value="{{ old('ibu_pekerjaan', $siswa->pekerjaan_ibu) }}">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Telepon</label>
-                        <input type="text" name="ibu_telepon" class="form-control" value="{{ old('ibu_telepon', $siswa->ibu->telepon ?? '') }}">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label">Alamat Ibu</label>
-                        <input type="text" name="ibu_alamat" class="form-control" value="{{ old('ibu_alamat', $siswa->ibu->alamat ?? '') }}">
+                        <input type="text" name="ibu_telepon" class="form-control" value="{{ old('ibu_telepon', $siswa->telepon_ibu) }}">
                     </div>
                 </div>
 
                 <hr>
-                <h5>Data Wali</h5>
+                <h5 class="text-warning">Data Wali</h5>
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Nama Wali</label>
-                        <input type="text" name="wali_nama" class="form-control" value="{{ old('wali_nama', $siswa->wali->nama ?? '') }}">
+                        <input type="text" name="wali_nama" class="form-control" value="{{ old('wali_nama', $siswa->nama_wali) }}">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Pekerjaan</label>
-                        <input type="text" name="wali_pekerjaan" class="form-control" value="{{ old('wali_pekerjaan', $siswa->wali->pekerjaan ?? '') }}">
+                        <input type="text" name="wali_pekerjaan" class="form-control" value="{{ old('wali_pekerjaan', $siswa->pekerjaan_wali) }}">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Telepon</label>
-                        <input type="text" name="wali_telepon" class="form-control" value="{{ old('wali_telepon', $siswa->wali->telepon ?? '') }}">
+                        <input type="text" name="wali_telepon" class="form-control" value="{{ old('wali_telepon', $siswa->telepon_wali) }}">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12 mb-3">
                         <label class="form-label">Alamat Wali</label>
-                        <input type="text" name="wali_alamat" class="form-control" value="{{ old('wali_alamat', $siswa->wali->alamat ?? '') }}">
+                        <input type="text" name="wali_alamat" class="form-control" value="{{ old('wali_alamat', $siswa->alamat_wali) }}">
                     </div>
                 </div>
 
@@ -183,6 +171,5 @@
             </form>
         </div>
     </div>
-
 </div>
 @endsection

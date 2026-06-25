@@ -3,111 +3,69 @@
 namespace App\Http\Controllers;
 
 use App\Models\Guru;
-use App\Models\User;
+use App\Models\Jurusan;
 use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 
 class GuruController extends Controller
 {
     /**
-     * Tampilkan profil guru (login)
+     * Menampilkan daftar guru dengan filter lengkap
      */
-    public function show()
+    public function index(Request $request)
     {
-        /** @var User $user */
-        $user = Auth::user();
+        $query = Guru::query();
 
-        $guru = Guru::where('user_id', $user->id)->first();
+        // Logika Filter
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('nama', 'like', '%' . $request->search . '%')
+                  ->orWhere('nip', 'like', '%' . $request->search . '%');
+            });
+        }
 
-        return view('walikelas.guru.profile', compact('guru', 'user'));
+        if ($request->filled('jurusan')) $query->where('jurusan_id', $request->jurusan);
+        if ($request->filled('role')) $query->where('role', $request->role);
+        if ($request->filled('status_kepegawaian')) $query->where('status_kepegawaian', $request->status_kepegawaian);
+        if ($request->filled('jenis_kelamin')) $query->where('jenis_kelamin', $request->jenis_kelamin);
+        if ($request->filled('pendidikan')) $query->where('pendidikan', $request->pendidikan);
+
+        // Ambil data untuk rekap
+        $isFiltered = $request->anyFilled(['search', 'jurusan', 'role', 'status_kepegawaian', 'jenis_kelamin', 'pendidikan']);
+        $dataUntukRekap = $query->get();
+        
+        $rekap = [
+            'Total' => $dataUntukRekap->count(),
+            'L' => $dataUntukRekap->where('jenis_kelamin', 'L')->count(),
+            'P' => $dataUntukRekap->where('jenis_kelamin', 'P')->count(),
+            'D4' => $dataUntukRekap->where('pendidikan', 'D4')->count(),
+            'S1' => $dataUntukRekap->where('pendidikan', 'S1')->count(),
+            'S2' => $dataUntukRekap->where('pendidikan', 'S2')->count(),
+            'Sertif_Sudah' => $dataUntukRekap->where('sertifikasi', 'Sudah')->count(),
+        ];
+
+        $gurus = $query->paginate(10)->withQueryString();
+        $jurusans = Jurusan::all();
+
+        return view('tu_kepegawaian.guru.index', compact('gurus', 'jurusans', 'rekap', 'isFiltered'));
+    } 
+
+    /**
+     * TU menampilkan profil spesifik guru
+     */
+    public function show($id)
+    {
+        $guru = Guru::findOrFail($id);
+        return view('tu_kepegawaian.guru.show', compact('guru'));
     }
 
     /**
-     * Form edit profil
+     * TU melakukan update data guru
      */
-    public function edit()
+    public function update(Request $request, $id)
     {
-        /** @var User $user */
-        $user = Auth::user();
-
-        $guru = Guru::where('user_id', $user->id)->first();
-
-        return view('walikelas.guru.edit', compact('guru', 'user'));
-    }
-
-    /**
-     * Update profil guru
-     */
-    public function update(Request $request): RedirectResponse
-    {
-        /** @var User $user */
-        $user = Auth::user();
-
-        $guru = Guru::where('user_id', $user->id)->first();
-
-        $redirectRoute = 'walikelas.data_diri.profile';
-        if (!$guru) {
-            return redirect()
-                ->route($redirectRoute)
-                ->with('error', 'Data guru tidak ditemukan.');
-        }
-
-        // ================= VALIDASI DATA =================
-        $validated = $request->validate([
-            'nama'           => 'required|string|max:255',
-            'nip'            => ['nullable', 'string', 'max:50', Rule::unique('gurus', 'nip')->ignore($guru->id)],
-            'email'          => 'nullable|email|max:255',
-            'tempat_lahir'   => 'nullable|string|max:255',
-            'tanggal_lahir'  => 'nullable|date',
-            'jenis_kelamin'  => 'nullable|string|max:30',
-            'alamat'         => 'nullable|string',
-            'photo'          => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
-
-        // ================= UPDATE DATA GURU =================
-        $guru->update([
-            'nama'          => $validated['nama'],
-            'nip'           => $validated['nip'] ?? null,
-            'email'         => $validated['email'] ?? null,
-            'tempat_lahir'  => $validated['tempat_lahir'] ?? null,
-            'tanggal_lahir' => $validated['tanggal_lahir'] ?? null,
-            'jenis_kelamin' => $validated['jenis_kelamin'] ?? null,
-            'alamat'        => $validated['alamat'] ?? null,
-        ]);
-
-        // ================= SINKRON USER =================
-        $user->name = $validated['nama'];
-
-        if (!empty($validated['email'])) {
-            $user->email = $validated['email'];
-        }
-
-        // Sinkron nomor_induk (untuk login dengan NIP baru)
-        if (!empty($validated['nip'])) {
-            $user->nomor_induk = $validated['nip'];
-        }
-
-        // ================= UPLOAD FOTO =================
-        if ($request->hasFile('photo')) {
-
-            // Hapus foto lama
-            if ($user->photo && Storage::disk('public')->exists($user->photo)) {
-                Storage::disk('public')->delete($user->photo);
-            }
-
-            // Simpan foto baru
-            $path = $request->file('photo')->store('photos', 'public');
-            $user->photo = $path;
-        }
-
-        // ================= SIMPAN USER =================
-        $user->save();
-
-        return redirect()
-            ->route($redirectRoute)
-            ->with('success', 'Profil berhasil diperbarui.');
+        $guru = Guru::findOrFail($id);
+        // Tambahkan logika update Anda di sini
+        $guru->update($request->all());
+        return back()->with('success', 'Data berhasil diperbarui');
     }
 }

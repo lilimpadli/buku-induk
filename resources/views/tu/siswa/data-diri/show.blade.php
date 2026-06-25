@@ -9,14 +9,17 @@
             <h2 class="fw-bold mb-1">Detail Siswa</h2>
             <p class="text-muted mb-4">{{ $siswa->nama_lengkap }}</p>
         </div>
-        <div class="ms-3">
-            <a href="{{ route('tu.siswa.edit', $siswa->id) }}" class="btn btn-warning me-2">
+        <div class="ms-3 d-flex gap-2">
+            <a href="{{ route('tu.siswa.index') }}" class="btn btn-secondary d-flex align-items-center gap-2">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
+            <a href="{{ route('tu.siswa.edit', $siswa->id) }}" class="btn btn-warning d-flex align-items-center gap-2">
                 <i class="fas fa-edit"></i> Edit
             </a>
-            <a href="{{ route('tu.siswa.exportPDF', $siswa->id) }}" class="btn btn-success me-2">
+            <a href="{{ route('tu.siswa.exportPDF', $siswa->id) }}" class="btn btn-success d-flex align-items-center gap-2">
                 <i class="fas fa-file-pdf"></i> Export
             </a>
-            <a href="{{ route('tu.siswa.raport', $siswa->id) }}" class="btn btn-primary">
+            <a href="{{ route('tu.siswa.raport', $siswa->id) }}" class="btn btn-primary d-flex align-items-center gap-2">
                 <i class="fas fa-file-alt"></i> Raport
             </a>
         </div>

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\DataSiswa;
 use App\Models\User;
 use App\Models\NilaiRaport;
-use App\Models\Ppdb;
 use App\Models\Kelas;
 use App\Models\Jurusan;
 use App\Models\MataPelajaran;
@@ -80,9 +79,6 @@ class TUController extends Controller
         // Statistik nilai raport
         $totalNilai = NilaiRaport::count();
         $nilaiTerbaru = NilaiRaport::with('siswa')->latest()->take(5)->get();
-
-        // Recent PPDB submissions (for dashboard) - eager load relations
-        $ppdbTerbaru = Ppdb::with(['jalur', 'sesi', 'jurusan'])->latest()->take(5)->get();
         
         return view('tu.dashboard', compact(
             'totalSiswa', 
@@ -97,7 +93,6 @@ class TUController extends Controller
             'kelasLimit',
             'totalNilai',
             'nilaiTerbaru',
-            'ppdbTerbaru'
         ));
     }
     

@@ -15,22 +15,31 @@ class RoleMiddleware
         }
 
         $user = Auth::user();
-        $userRole = $user->role;
+        $userRole = strtolower(trim($user->role));
+        
+        // --- PERBAIKAN: Menambahkan logika "alias" ---
+        // Jika user adalah 'tu_kepegawaian', kita perlakukan seolah-olah dia memiliki role 'tu'
+        if ($userRole === 'tu_kepegawaian') {
+            $userRole = 'tu';
+        }
+        // ---------------------------------------------
 
-        if (!in_array($userRole, $roles)) {
-            abort(403, 'Anda tidak punya akses.');
+        $allowedRoles = array_map(function($role) {
+            return strtolower(trim($role));
+        }, $roles);
+
+        if (!in_array($userRole, $allowedRoles)) {
+            abort(403, 'Akses ditolak! Role Anda saat ini adalah: "' . $user->role . '" sedangkan yang diizinkan adalah: ' . implode(', ', $allowedRoles));
         }
 
-        // Validasi role-specific records di database
-        // Role guru harus punya record di tabel gurus
-        if (in_array('guru', $roles) && $userRole === 'guru') {
+        // Validasi role-specific records
+        if (in_array('guru', $allowedRoles) && $userRole === 'guru') {
             if (!$user->guru) {
                 abort(403, 'Anda bukan guru.');
             }
         }
 
-        // Role walikelas harus punya record di tabel gurus dengan status wali kelas
-        if (in_array('walikelas', $roles) && $userRole === 'walikelas') {
+        if (in_array('walikelas', $allowedRoles) && $userRole === 'walikelas') {
             if (!$user->guru) {
                 abort(403, 'Anda bukan wali kelas.');
             }

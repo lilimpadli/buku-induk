@@ -53,12 +53,42 @@
                 <input type="text" name="telepon" value="{{ old('telepon') }}" class="form-control">
             </div>
             <div class="col-md-6">
+                <label class="form-label">Status Kepegawaian</label>
+                <select name="status_kepegawaian" class="form-select">
+                    <option value="">Pilih Status Kepegawaian</option>
+                    <option value="PNS" {{ old('status_kepegawaian') == 'PNS' ? 'selected' : '' }}>PNS</option>
+                    <option value="PPPK" {{ old('status_kepegawaian') == 'PPPK' ? 'selected' : '' }}>PPPK</option>
+                    <option value="Honorer" {{ old('status_kepegawaian') == 'Honorer' ? 'selected' : '' }}>Honorer</option>
+                    <option value="Guru Tetap Yayasan" {{ old('status_kepegawaian') == 'Guru Tetap Yayasan' ? 'selected' : '' }}>Guru Tetap Yayasan</option>
+                    <option value="Guru Tidak Tetap" {{ old('status_kepegawaian') == 'Guru Tidak Tetap' ? 'selected' : '' }}>Guru Tidak Tetap</option>
+                </select>
+            </div>
+            <div class="col-md-6">
                 <label class="form-label">Jenis Kelamin</label>
                 <select name="jenis_kelamin" class="form-select" required>
                     <option value="">Pilih Jenis Kelamin</option>
                     <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-laki</option>
                     <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
                 </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Pendidikan</label>
+                <select name="pendidikan" class="form-select">
+                    <option value="">Pilih Pendidikan</option>
+                    <option value="S1" {{ old('pendidikan') == 'S1' ? 'selected' : '' }}>S1</option>
+                    <option value="S2" {{ old('pendidikan') == 'S2' ? 'selected' : '' }}>S2</option>
+                    <option value="S3" {{ old('pendidikan') == 'S3' ? 'selected' : '' }}>S3</option>
+                    <option value="D4" {{ old('pendidikan') == 'D4' ? 'selected' : '' }}>D4</option>
+                    <option value="D3" {{ old('pendidikan') == 'D3' ? 'selected' : '' }}>D3</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Gelar Depan</label>
+                <input type="text" name="gelar_depan" value="{{ old('gelar_depan') }}" class="form-control">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Gelar Belakang</label>
+                <input type="text" name="gelar_belakang" value="{{ old('gelar_belakang') }}" class="form-control">
             </div>
             <div class="col-md-6">
                 <label class="form-label">Tempat Lahir</label>

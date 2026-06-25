@@ -11,18 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ppdb', function (Blueprint $table) {
-            $table->string('nis', 20)->nullable()->after('nama_lengkap');
+        Schema::table('mata_pelajarans', function (Blueprint $table) {
+            $table->integer('kkm')->after('nama'); // Menambahkan kolom kkm
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('ppdb', function (Blueprint $table) {
-            $table->dropColumn('nis');
+        Schema::table('mata_pelajarans', function (Blueprint $table) {
+            $table->dropColumn('kkm');
         });
     }
 };

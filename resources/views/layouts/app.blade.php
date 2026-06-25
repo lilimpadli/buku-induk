@@ -426,11 +426,21 @@
                                     <i class="fas fa-home"></i> <span>Dashboard</span>
                                 </a>
 
-                                <div class="nav-section-title">DATA</div>
+                                <div class="nav-section-title">DATA BUKU INDUK</div>
 
+                                <a href="{{ route('siswa.bukuInduk.show', ['tab' => 'biodata']) }}" 
+                                class="nav-link {{ request()->routeIs('siswa.bukuInduk*') && (request()->get('tab', 'biodata') == 'biodata') ? 'active' : '' }}">
+                                    <i class="fas fa-user"></i> <span>Profil & Biodata</span>
+                                </a>
 
-                                <a href="{{ route('siswa.bukuInduk.show') }}" class="nav-link {{ request()->routeIs('siswa.bukuInduk*') ? 'active' : '' }}">
-                                    <i class="fas fa-book"></i> <span>Buku Induk</span>
+                                <a href="{{ route('siswa.bukuInduk.show', ['tab' => 'keluarga']) }}" 
+                                class="nav-link {{ request()->routeIs('siswa.bukuInduk*') && request()->get('tab') == 'keluarga' ? 'active' : '' }}">
+                                    <i class="fas fa-users"></i> <span>Data Orang Tua</span>
+                                </a>
+
+                                <a href="{{ route('siswa.bukuInduk.show', ['tab' => 'nilai']) }}" 
+                                class="nav-link {{ request()->routeIs('siswa.bukuInduk*') && request()->get('tab') == 'nilai' ? 'active' : '' }}">
+                                    <i class="fas fa-graduation-cap"></i> <span>Nilai Akademik</span>
                                 </a>
                             @endif
 
@@ -537,26 +547,32 @@
                                 </a>
                             @endif
 
-                            {{-- ROLE: TU KEPEGAWAIAN --}}
-                            @if(Auth::user()->role == 'tu_kepegawaian')
-                                <a href="{{ route('tu_kepegawaian.dashboard') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.dashboard') ? 'active' : '' }}">
-                                    <i class="fas fa-home"></i> <span>Dashboard</span>
-                                </a>
+                          {{-- ROLE: TU KEPEGAWAIAN --}}
+                            <div class="nav-section-title">KEPEGAWAIAN</div>
 
-                                <div class="nav-section-title">KEPEGAWAIAN</div>
+                            <a href="{{ route('tu_kepegawaian.dashboard') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.dashboard') ? 'active' : '' }}">
+                                <i class="fas fa-home"></i> <span>Dashboard</span>
+                            </a>
 
-                                <a href="{{ route('tu_kepegawaian.guru.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.guru*') ? 'active' : '' }}">
-                                    <i class="fas fa-chalkboard-teacher"></i> <span>Data Guru</span>
-                                </a>
+                            <a href="{{ route('tu_kepegawaian.data-guru.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.data-guru.*') ? 'active bg-primary text-white' : 'text-dark' }}">
+                                <i class="fas fa-user-graduate me-2"></i> <span>Data Guru</span>
+                            </a>
 
-                                <a href="{{ route('tu_kepegawaian.tu.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.tu*') ? 'active' : '' }}">
-                                    <i class="fas fa-user-tie"></i> <span>Data TU</span>
-                                </a>
+                            <a href="{{ route('tu_kepegawaian.tu.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.tu.index') ? 'active' : '' }}">
+                                <i class="fas fa-user-tie"></i> <span>Data Pegawai</span>
+                            </a>
 
-                                <a href="{{ route('tu_kepegawaian.tugas_tambahan.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.tugas_tambahan*') ? 'active' : '' }}">
-                                    <i class="fas fa-tasks"></i> <span>Tugas Tambahan</span>
-                                </a>
-                            @endif
+                            <a href="{{ route('tu_kepegawaian.riwayat.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.riwayat.index') ? 'active' : '' }}">
+                                <i class="fas fa-history"></i> <span>Riwayat Tugas</span>
+                            </a>
+
+                            <a href="{{ route('tu_kepegawaian.penugasan.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.penugasan.index') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-tasks"></i> <span>Penugasan Guru</span>
+                            </a>
+
+                          <a href="{{ route('tu_kepegawaian.mutasi.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.mutasi*') ? 'active' : '' }}">
+                              <i class="fas fa-exchange-alt"></i> <span>Mutasi Pegawai</span>
+                          </a>
 
                             {{-- ROLE: SUPER ADMIN --}}
                             @if(Auth::user()->role == 'super_admin')

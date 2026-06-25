@@ -9,15 +9,11 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('sesi_ppdb', function (Blueprint $table) {
-    $table->id();
-    $table->string('nama_sesi'); // Sesi 1, Sesi 2
-    $table->string('tahun_ajaran');
-    $table->timestamps();
-});
-
+        Schema::table('gurus', function (Blueprint $table) {
+            $table->string('status_kepegawaian')->nullable(); // Menambahkan kolom
+        });
     }
 
     /**
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sesi_ppdb');
+        Schema::table('gurus', function (Blueprint $table) {
+            //
+        });
     }
 };

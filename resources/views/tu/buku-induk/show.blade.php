@@ -348,7 +348,8 @@
 
         .page-header,
         .action-buttons,
-        .btn {
+        .btn,
+        .bottom-action-buttons {
             display: none !important;
         }
 
@@ -577,6 +578,14 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Tombol Kembali di Bagian Bawah -->
+            <div class="bottom-action-buttons d-flex justify-content-start mt-4">
+                <a href="{{ route('tu.buku-induk.index') }}" class="btn btn-secondary btn-sm px-3">
+                    <i class="fas fa-arrow-left me-1"></i> Kembali ke Daftar
+                </a>
+            </div>
+
         </div>
     </div>
 </div>

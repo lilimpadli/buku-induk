@@ -694,95 +694,93 @@
             return;
         }
 
-        // AJAX request
-        fetch('{{ route("tu.mutasi.bulk") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({
-                siswa_ids: selectedSiswaIds,
-                kelas_id: kelasId,
-                rombel_id: rombelId,
-                keterangan: keterangan
-            })
+<script>
+    // AJAX untuk Bulk Mutasi
+    fetch('/tu_kepegawaian/mutasi/bulk', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+            siswa_ids: selectedSiswaIds,
+            kelas_id: kelasId,
+            rombel_id: rombelId,
+            keterangan: keterangan
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Mutasi berhasil dilakukan untuk ' + data.count + ' siswa');
-                location.reload();
-            } else {
-                alert('Error: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Terjadi kesalahan');
-        });
-    });
-
-    // Handle UP ALL
-    function confirmUpAll() {
-        // Show modal untuk input tahun ajaran
-        const modal = new bootstrap.Modal(document.getElementById('upAllModal'));
-        modal.show();
-    }
-
-    function performUpAll() {
-        const tahunAjaran = document.getElementById('tahunAjaranInput').value;
-        
-        if (!tahunAjaran) {
-            alert('Tahun ajaran harus diisi!');
-            return;
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Mutasi berhasil dilakukan untuk ' + data.count + ' siswa');
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan');
+    });
+});
 
-        // Hide modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('upAllModal'));
-        modal.hide();
+// Handle UP ALL
+function confirmUpAll() {
+    const modal = new bootstrap.Modal(document.getElementById('upAllModal'));
+    modal.show();
+}
 
-        // Show loading state
-        const upAllBtn = document.getElementById('upAllBtn');
-        const originalHtml = upAllBtn.innerHTML;
-        upAllBtn.disabled = true;
-        upAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Loading...';
-
-        // AJAX request dengan tahun ajaran
-        fetch('{{ route("tu.mutasi.up-all") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({
-                tahun_ajaran: tahunAjaran
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            upAllBtn.disabled = false;
-            upAllBtn.innerHTML = originalHtml;
-
-            if (data.success) {
-                const message = `✓ SUKSES!\n\n` +
-                               `Siswa Naik Kelas: ${data.naik_kelas}\n` +
-                               `Siswa Lulus: ${data.lulus}\n\n` +
-                               `Total: ${data.naik_kelas + data.lulus}`;
-                
-                alert(message);
-                location.reload();
-            } else {
-                alert('Error: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            upAllBtn.disabled = false;
-            upAllBtn.innerHTML = originalHtml;
-            alert('Terjadi kesalahan: ' + error.message);
-        });
+function performUpAll() {
+    const tahunAjaran = document.getElementById('tahunAjaranInput').value;
+    
+    if (!tahunAjaran) {
+        alert('Tahun ajaran harus diisi!');
+        return;
     }
+
+    const modal = bootstrap.Modal.getInstance(document.getElementById('upAllModal'));
+    modal.hide();
+
+    const upAllBtn = document.getElementById('upAllBtn');
+    const originalHtml = upAllBtn.innerHTML;
+    upAllBtn.disabled = true;
+    upAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Loading...';
+
+    // AJAX request dengan URL langsung
+    fetch('/tu_kepegawaian/mutasi/up-all', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+            tahun_ajaran: tahunAjaran
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        upAllBtn.disabled = false;
+        upAllBtn.innerHTML = originalHtml;
+
+        if (data.success) {
+            const message = `✓ SUKSES!\n\n` +
+                            `Siswa Naik Kelas: ${data.naik_kelas}\n` +
+                            `Siswa Lulus: ${data.lulus}\n\n` +
+                            `Total: ${data.naik_kelas + data.lulus}`;
+            
+            alert(message);
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        upAllBtn.disabled = false;
+        upAllBtn.innerHTML = originalHtml;
+        alert('Terjadi kesalahan: ' + error.message);
+    });
+}
 </script>
 @endpush
 
