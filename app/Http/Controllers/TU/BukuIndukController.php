@@ -76,12 +76,16 @@ class BukuIndukController extends Controller
             $query->whereNotIn('id', $excludedIds);
         }
 
-        $siswas = $query->paginate(15);
+        $perPage = (int) $request->query('per_page', 15);
+        $allowedPerPage = [15, 25, 50, 100, 200, 500];
+        $perPage = in_array($perPage, $allowedPerPage) ? $perPage : 15;
+
+        $siswas = $query->paginate($perPage)->withQueryString();
         
         // Get all jurusans for filter dropdown
         $jurusans = Jurusan::orderBy('nama')->get();
 
-        return view('tu.buku-induk.index', compact('siswas', 'jurusans'));
+        return view('tu.buku-induk.index', compact('siswas', 'jurusans', 'perPage'));
     }
 
     /**

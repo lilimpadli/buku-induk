@@ -90,10 +90,15 @@ class TUController extends Controller
 
         $allRombels = Rombel::with('kelas')->orderBy('nama')->get();
         $allJurusans = Jurusan::orderBy('nama')->get();
-        $siswas = $query->paginate(10)->withQueryString();
+
+        $perPage = (int) request()->query('per_page', 15);
+        $allowedPerPage = [15, 25, 50, 100, 200, 500];
+        $perPage = in_array($perPage, $allowedPerPage) ? $perPage : 15;
+
+        $siswas = $query->paginate($perPage)->withQueryString();
         $currentTingkat = request()->query('tingkat', '');
 
-        return view('tu.siswa.index', compact('siswas', 'search', 'allRombels', 'filterRombel', 'allJurusans', 'currentTingkat'));
+        return view('tu.siswa.index', compact('siswas', 'search', 'allRombels', 'filterRombel', 'allJurusans', 'currentTingkat', 'perPage'));
     }
 
     /**

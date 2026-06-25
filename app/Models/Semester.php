@@ -14,7 +14,6 @@ class Semester extends Model
         return $this->belongsTo(TahunAjaran::class);
     }
 
-    // ===== TAMBAHKAN INI =====
     public function scopeActive($query)
     {
         return $query->where('is_active', true);

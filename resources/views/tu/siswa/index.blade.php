@@ -698,6 +698,12 @@ body{
                     @endforeach
                 </select>
 
+                <select name="per_page" class="form-select-modern" style="max-width:100px;">
+                    @foreach([15,25,50,100,200,500] as $size)
+                        <option value="{{ $size }}" {{ request('per_page', 15) == $size ? 'selected' : '' }}>{{ $size }}</option>
+                    @endforeach
+                </select>
+
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn-modern btn-outline-modern">
                         <i class="fas fa-search"></i> Filter
@@ -775,14 +781,15 @@ body{
         {{ session('success') }}
     </div>
 @endif
-    <!-- TABLE -->
+
     @if($siswas->count() > 0)
+        @if($siswas->total())
+            <div class="mb-3 text-muted">
+                Menampilkan {{ $siswas->firstItem() }} - {{ $siswas->lastItem() }} dari {{ $siswas->total() }} data
+            </div>
+        @endif
 
-        <div class="table-card">
-
-            <div class="table-responsive">
-
-                <table class="table-modern">
+        <table class="table-modern">
 
                     <thead>
                         <tr>

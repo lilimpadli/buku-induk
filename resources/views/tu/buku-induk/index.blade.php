@@ -660,13 +660,20 @@
         <div class="filter-title"><i class="fas fa-sliders-h"></i> Filter Data</div>
         <form method="GET" class="row g-3">
             <div class="col-md-5 col-12">
-                <input type="text" name="search" class="form-control-modern" placeholder="?? Cari nama, NIS, atau NISN..." value="{{ request('search') }}">
+                <input type="text" name="search" class="form-control-modern" placeholder="Cari nama, NIS, atau NISN..." value="{{ request('search') }}">
             </div>
-            <div class="col-md-5 col-12">
+            <div class="col-md-3 col-12">
                 <select name="jurusan_id" class="form-select-modern">
                     <option value="">-- Semua Jurusan --</option>
                     @foreach($jurusans as $jurusan)
                         <option value="{{ $jurusan->id }}" {{ request('jurusan_id') == $jurusan->id ? 'selected' : '' }}>{{ $jurusan->nama }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2 col-12">
+                <select name="per_page" class="form-select-modern" style="max-width:100px;">
+                    @foreach([15,25,50,100,200,500] as $size)
+                        <option value="{{ $size }}" {{ request('per_page', 15) == $size ? 'selected' : '' }}>{{ $size }}</option>
                     @endforeach
                 </select>
             </div>
@@ -677,6 +684,9 @@
     </div>
 
     <!-- TABLE -->
+    <div class="mb-3 text-muted">
+        Menampilkan {{ $siswas->firstItem() }} - {{ $siswas->lastItem() }} dari {{ $siswas->total() }} data
+    </div>
     <div class="table-container fade-in-up">
         <div class="table-responsive-desktop">
             <table class="table-modern">
