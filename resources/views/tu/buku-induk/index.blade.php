@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Buku Induk Siswa')
 
@@ -25,7 +25,9 @@
         border-radius: 28px;
         padding: 32px;
         margin-bottom: 28px;
-        overflow: visible;
+        overflow: visible !important;
+        position: relative;
+        z-index: 2;
         color: white;
     }
 
@@ -353,29 +355,50 @@
 
     /* DROPDOWN FIX - PASTI MUNCUL */
     .dropdown {
-        position: relative !important;
+        position: static !important;
         overflow: visible !important;
         z-index: 99999 !important;
     }
 
+    .hero-actions {
+        position: relative;
+        z-index: 10;
+    }
+
+    .hero-actions .dropdown {
+        position: relative !important;
+    }
+
     .dropdown-menu {
         position: absolute !important;
-        top: calc(100% + 5px) !important;
+        top: 100% !important;
         left: 0 !important;
         right: auto !important;
-        z-index: 99999 !important;
-        min-width: 240px !important;
+        z-index: 999999 !important;
+        min-width: 280px !important;
         border-radius: 16px !important;
         border: 1px solid rgba(79,70,229,0.18) !important;
         background: #ffffff !important;
         box-shadow: 0 24px 50px rgba(15, 23, 42, 0.16) !important;
         overflow: visible !important;
         padding: 8px !important;
-        display: none !important;
+        visibility: hidden !important;
+        opacity: 0;
+        transform: translateY(6px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        white-space: nowrap;
     }
 
-    .dropdown.show .dropdown-menu {
+    .dropdown.show .dropdown-menu,
+    .dropdown-menu.show {
+        visibility: visible !important;
         display: block !important;
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+    }
+
+    .hero-actions .dropdown-menu {
+        z-index: 1000000 !important;
     }
 
     .dropdown-item {
@@ -487,7 +510,7 @@
                     </button>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{{ route('tu.buku-induk.export.siswa') }}"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
-                        <li><a class="dropdown-item" href="{{ route('tu.buku-induk.export.nilai') }}"><i class="fas fa-chart-bar"></i> Nilai Rapor</a></li>
+                        <li><a class="dropdown-item" href="{{ route('tu.buku-induk.export.nilai', ['jurusan_id' => request('jurusan_id')]) }}"><i class="fas fa-chart-bar"></i> Nilai Rapor</a></li>
                         <li><a class="dropdown-item" href="{{ route('tu.buku-induk.export.pkl') }}"><i class="fas fa-briefcase"></i> PKL & Ijazah</a></li>
                     </ul>
                 </div>
@@ -499,7 +522,7 @@
                     </button>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#importSiswaModal"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
-                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#importNilaiModal"><i class="fas fa-chart-bar"></i> Nilai Rapor</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#importNilaiModal" data-jurusan-id="{{ request('jurusan_id') }}"><i class="fas fa-chart-bar"></i> Nilai Rapor</a></li>
                         <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#importPklModal"><i class="fas fa-briefcase"></i> PKL & Ijazah</a></li>
                     </ul>
                 </div>
@@ -511,7 +534,7 @@
                     </button>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{{ route('tu.buku-induk.template.siswa') }}"><i class="fas fa-user-graduate"></i> Template Data Siswa</a></li>
-                        <li><a class="dropdown-item" href="{{ route('tu.buku-induk.template.nilai') }}"><i class="fas fa-chart-bar"></i> Template Nilai Rapor</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#downloadTemplateNilaiModal"><i class="fas fa-chart-bar"></i> Template Nilai Rapor</a></li>
                         <li><a class="dropdown-item" href="{{ route('tu.buku-induk.template.pkl') }}"><i class="fas fa-briefcase"></i> Template PKL & Ijazah</a></li>
                     </ul>
                 </div>
@@ -637,7 +660,7 @@
         <div class="filter-title"><i class="fas fa-sliders-h"></i> Filter Data</div>
         <form method="GET" class="row g-3">
             <div class="col-md-5 col-12">
-                <input type="text" name="search" class="form-control-modern" placeholder="🔍 Cari nama, NIS, atau NISN..." value="{{ request('search') }}">
+                <input type="text" name="search" class="form-control-modern" placeholder="?? Cari nama, NIS, atau NISN..." value="{{ request('search') }}">
             </div>
             <div class="col-md-5 col-12">
                 <select name="jurusan_id" class="form-select-modern">
@@ -820,10 +843,10 @@
         const paginationLinks = document.querySelectorAll('.pagination-modern .page-link');
         paginationLinks.forEach(link => {
             if (link.textContent.trim() === '&laquo; Previous' || link.textContent.trim() === 'Previous') {
-                link.textContent = '← Prev';
+                link.textContent = '? Prev';
             }
             if (link.textContent.trim() === 'Next &raquo;' || link.textContent.trim() === 'Next') {
-                link.textContent = 'Next →';
+                link.textContent = 'Next ?';
             }
         });
 
@@ -839,6 +862,122 @@
         });
     });
 </script>
+    <!-- MODAL DOWNLOAD TEMPLATE NILAI WITH FILTERS -->
+    <div class="modal fade" id="downloadTemplateNilaiModal" tabindex="-1" aria-labelledby="downloadTemplateNilaiModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-modern">
+                <div class="modal-header modal-header-modern">
+                    <h5 class="modal-title" id="downloadTemplateNilaiModalLabel"><i class="fas fa-file-download me-2"></i> Download Template Nilai Rapor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="downloadTemplateForm" method="POST" action="{{ route('tu.buku-induk.template.nilai.filtered') }}">
+                    @csrf
+                    <div class="modal-body modal-body-modern">
+                        <p class="text-muted mb-3">Pilih filter untuk template yang akan diunduh:</p>
+
+                        <!-- KURIKULUM FILTER -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold mb-2"><i class="fas fa-graduation-cap me-2"></i> Kurikulum</label>
+                            <div class="checkbox-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="kurikulum_ids[]" value="1" id="kurikulum1">
+                                    <label class="form-check-label" for="kurikulum1">
+                                        MERDEKA
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="kurikulum_ids[]" value="2" id="kurikulum2">
+                                    <label class="form-check-label" for="kurikulum2">
+                                        BRIGHTERLY
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- JURUSAN FILTER -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold mb-2"><i class="fas fa-briefcase me-2"></i> Jurusan</label>
+                            <div class="checkbox-group" style="max-height: 200px; overflow-y: auto;">
+                                @foreach($jurusans as $jurusan)
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="jurusan_ids[]" value="{{ $jurusan->id }}" id="jurusan{{ $jurusan->id }}">
+                                    <label class="form-check-label" for="jurusan{{ $jurusan->id }}">
+                                        {{ $jurusan->nama }}
+                                    </label>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <!-- TINGKAT FILTER -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold mb-2"><i class="fas fa-layer-group me-2"></i> Tingkat</label>
+                            <div class="checkbox-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tingkat_levels[]" value="X" id="tingkat_x">
+                                    <label class="form-check-label" for="tingkat_x">
+                                        Kelas X
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tingkat_levels[]" value="XI" id="tingkat_xi">
+                                    <label class="form-check-label" for="tingkat_xi">
+                                        Kelas XI
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tingkat_levels[]" value="XII" id="tingkat_xii">
+                                    <label class="form-check-label" for="tingkat_xii">
+                                        Kelas XII
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tingkat_levels[]" value="10" id="tingkat_10">
+                                    <label class="form-check-label" for="tingkat_10">
+                                        Kelas 10
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer modal-footer-modern">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-modern btn-modern-primary"><i class="fas fa-download me-2"></i> Download Template</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .checkbox-group {
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .checkbox-group .form-check {
+            margin-bottom: 8px;
+        }
+
+        .checkbox-group .form-check:last-child {
+            margin-bottom: 0;
+        }
+
+        .checkbox-group .form-check-input {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .checkbox-group .form-check-label {
+            cursor: pointer;
+            margin-left: 6px;
+            margin-bottom: 0;
+        }
+    </style>
+
 @endpush
 
 @endsection

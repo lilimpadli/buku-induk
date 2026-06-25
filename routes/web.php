@@ -555,6 +555,8 @@ Route::prefix('tu')
             ->name('buku-induk.template.pkl');
         Route::get('/buku-induk/template/pkl-ijazah', [BukuIndukController::class, 'downloadTemplatePklIjazah'])
             ->name('buku-induk.template.pkl-ijazah');
+        Route::post('/buku-induk/template/nilai-filtered', [BukuIndukController::class, 'downloadTemplateNilaiFiltered'])
+            ->name('buku-induk.template.nilai.filtered');
         Route::get('/buku-induk/{siswa}', [BukuIndukController::class, 'show'])
             ->name('buku-induk.show');
         Route::get('/buku-induk/{siswa}/edit', [BukuIndukController::class, 'edit'])
@@ -936,11 +938,6 @@ Route::prefix('kurikulum')
         Route::get('/ppdb/jurusan/{jurusanId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarJalur'])->name('ppdb.jurusan.jalur.pendaftar');
         Route::get('/ppdb/{id}/assign', [PpdbController::class, 'showAssignForm'])->name('ppdb.assign.form');
         Route::post('/ppdb/{id}/assign', [PpdbController::class, 'assign'])->name('ppdb.assign');
-
-        // Buku Induk (Kurikulum)
-        Route::get('/buku-induk', [App\Http\Controllers\Kurikulum\BukuIndukController::class, 'index'])->name('buku-induk.index');
-        Route::get('/buku-induk/{siswa}', [App\Http\Controllers\Kurikulum\BukuIndukController::class, 'show'])->name('buku-induk.show');
-        Route::get('/buku-induk/{siswa}/cetak', [App\Http\Controllers\Kurikulum\BukuIndukController::class, 'cetak'])->name('buku-induk.cetak');
 
         // Mutasi Siswa (Kurikulum)
         Route::get('/mutasi/laporan', [App\Http\Controllers\Kurikulum\MutasiController::class, 'laporan'])->name('mutasi.laporan');

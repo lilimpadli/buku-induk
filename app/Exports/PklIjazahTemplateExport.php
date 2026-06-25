@@ -16,6 +16,9 @@ class PklIjazahTemplateExport implements FromArray, WithHeadings, ShouldAutoSize
     public function headings(): array
     {
         return [
+            'kelas',
+            'nama_rombel',
+            'rombel_id',
             'nis',
             'nisn',
             'nama_lengkap',

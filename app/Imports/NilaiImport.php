@@ -8,8 +8,9 @@ use App\Models\NilaiRaport;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
+use Maatwebsite\Excel\Concerns\WithStartRow;
 
-class NilaiImport implements ToModel, WithHeadingRow, SkipsEmptyRows
+class NilaiImport implements ToModel, WithHeadingRow, SkipsEmptyRows, WithStartRow
 {
     protected array $errors = [];
     protected array $mapelLookup = [];
@@ -20,6 +21,12 @@ class NilaiImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             $this->mapelLookup[strtolower(trim($mapel->nama))] = $mapel->id;
             $this->mapelLookup[strtolower(trim($mapel->id))] = $mapel->id;
         });
+    }
+
+    // Skip first 6 rows (info rows) and use row 7 as header
+    public function startRow(): int
+    {
+        return 7;
     }
 
     public function model(array $row)

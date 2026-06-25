@@ -18,6 +18,9 @@ use App\Exports\PklIjazahExport;
 use App\Exports\SiswaTemplateExport;
 use App\Exports\NilaiTemplateExport;
 use App\Exports\PklIjazahTemplateExport;
+use App\Exports\NilaiRaportExportByJurusan;
+use App\Exports\NilaiRaportTemplateByJurusan;
+use App\Exports\NilaiRaportTemplateByFilters;
 use App\Imports\SiswaImport;
 use App\Imports\NilaiImport;
 use Illuminate\Support\Facades\DB;
@@ -110,10 +113,15 @@ class BukuIndukController extends Controller
         return Excel::download(new SiswaExport(), $filename);
     }
 
-    public function exportNilai()
+    public function exportNilai(Request $request)
     {
-        $filename = 'nilai_semua_siswa_' . date('Ymd_His') . '.xlsx';
-        return Excel::download(new NilaiExport(), $filename);
+        $jurusanId = $request->query('jurusan_id');
+        $search = $request->query('search');
+        $semester = $request->query('semester');
+        $tahunAjaran = $request->query('tahun_ajaran');
+
+        $filename = 'nilai_raport_' . ($jurusanId ? 'jurusan_' . $jurusanId . '_' : '') . date('Ymd_His') . '.xlsx';
+        return Excel::download(new NilaiRaportExportByJurusan($jurusanId, $search, $semester, $tahunAjaran), $filename);
     }
 
     public function exportPkl()
@@ -206,6 +214,24 @@ class BukuIndukController extends Controller
     public function downloadTemplatePklIjazah()
     {
         return Excel::download(new PklIjazahTemplateExport(), 'template_pkl_ijazah.xlsx');
+    }
+
+    public function downloadTemplateNilaiFiltered(Request $request)
+    {
+        // Increase memory limit for large exports
+        ini_set('memory_limit', '1024M');
+        set_time_limit(300);
+        
+        $kurikulumIds = $request->input('kurikulum_ids', []);
+        $jurusanIds = $request->input('jurusan_ids', []);
+        $tingkatLevels = $request->input('tingkat_levels', []);
+
+        $fileName = 'template_nilai_rapor_' . date('Ymd_His') . '.xlsx';
+        
+        return Excel::download(
+            new NilaiRaportTemplateByFilters($kurikulumIds, $jurusanIds, $tingkatLevels),
+            $fileName
+        );
     }
 
     /**
