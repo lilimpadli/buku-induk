@@ -134,18 +134,15 @@ $selected_jurusan = old('jurusan_id', $siswa?->rombel?->kelas?->jurusan?->id);
             <div class="col-md-4">
                 <label class="form-label">Jenis Kelamin</label>
 
-                <select name="jenis_kelamin" class="form-select" required>
+                <select name="jenis_kelamin_id" class="form-select" required>
                     <option value="">-- Pilih --</option>
 
-                    <option value="Laki-laki"
-                        {{ old('jenis_kelamin', $siswa->jenis_kelamin ?? '') == 'Laki-laki' ? 'selected' : '' }}>
-                        Laki-laki
-                    </option>
-
-                    <option value="Perempuan"
-                        {{ old('jenis_kelamin', $siswa->jenis_kelamin ?? '') == 'Perempuan' ? 'selected' : '' }}>
-                        Perempuan
-                    </option>
+                    @foreach($jenisKelamins as $item)
+                        <option value="{{ $item->id }}"
+                            {{ (string) old('jenis_kelamin_id', $siswa->jenis_kelamin_id ?? '') === (string) $item->id ? 'selected' : '' }}>
+                            {{ $item->nama }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
 
@@ -259,13 +256,39 @@ $selected_jurusan = old('jurusan_id', $siswa?->rombel?->kelas?->jurusan?->id);
                        value="{{ old('tanggal_lahir', $siswa->tanggal_lahir ?? '') }}">
             </div>
 
+            @php
+                $currentAgamaId = old('agama_id', $siswa->agama_id ?? '');
+                $currentAgamaLainnya = old('agama_lainnya', $siswa->agama_lainnya ?? '');
+                $selectedAgamaId = $currentAgamaLainnya !== '' && $currentAgamaId === '' ? 'other' : $currentAgamaId;
+                $showAgamaLainnya = $selectedAgamaId === 'other';
+            @endphp
+
             <div class="col-md-4">
                 <label class="form-label">Agama</label>
 
+                <select name="agama_id" id="agamaSelect" class="form-select">
+                    <option value="">-- Pilih --</option>
+                    @foreach($agamas as $item)
+                        <option value="{{ $item->id }}"
+                            {{ (string) $selectedAgamaId === (string) $item->id ? 'selected' : '' }}>
+                            {{ $item->nama }}
+                        </option>
+                    @endforeach
+                    <option value="other" {{ $selectedAgamaId === 'other' ? 'selected' : '' }}>
+                        Lainnya
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-md-4 {{ $showAgamaLainnya ? '' : 'd-none' }}" id="agama_lainnya_group">
+                <label class="form-label">Agama Lainnya</label>
+
                 <input type="text"
-                       name="agama"
+                       name="agama_lainnya"
+                       id="agama_lainnya"
                        class="form-control"
-                       value="{{ old('agama', $siswa->agama ?? '') }}">
+                       placeholder="Tuliskan agama lain jika dipilih"
+                       value="{{ $currentAgamaLainnya }}">
             </div>
 
             <div class="col-md-4">
@@ -372,3 +395,27 @@ $selected_jurusan = old('jurusan_id', $siswa?->rombel?->kelas?->jurusan?->id);
 
 
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const agamaSelect = document.getElementById('agamaSelect');
+        const agamaLainnyaGroup = document.getElementById('agama_lainnya_group');
+
+        function toggleAgamaLainnya() {
+            if (!agamaSelect || !agamaLainnyaGroup) {
+                return;
+            }
+
+            if (agamaSelect.value === 'other') {
+                agamaLainnyaGroup.classList.remove('d-none');
+            } else {
+                agamaLainnyaGroup.classList.add('d-none');
+            }
+        }
+
+        if (agamaSelect) {
+            agamaSelect.addEventListener('change', toggleAgamaLainnya);
+            toggleAgamaLainnya();
+        }
+    });
+</script>

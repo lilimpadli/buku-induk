@@ -10,8 +10,10 @@ use App\Models\Kelas;
 use App\Models\Jurusan;
 use App\Models\MataPelajaran;
 use App\Models\Ayah;
+use App\Models\Agama;
 use App\Models\Guru;
 use App\Models\Ibu;
+use App\Models\JenisKelamin;
 use App\Models\Wali;
 use App\Models\Rombel;
 use App\Models\MutasiSiswa;
@@ -109,7 +111,9 @@ class TUController extends Controller
         $jurusans = Jurusan::all();
         $rombels = Rombel::all();
         $kelas = Kelas::with('jurusan')->get();
-        return view('tu.siswa.create', compact('jurusans', 'rombels', 'kelas'));
+        $jenisKelamins = JenisKelamin::all();
+        $agamas = Agama::all();
+        return view('tu.siswa.create', compact('jurusans', 'rombels', 'kelas', 'jenisKelamins', 'agamas'));
     }
 
     /**
@@ -117,13 +121,21 @@ class TUController extends Controller
      */
     public function siswaStore(Request $request)
     {
+        $isAgamaLainnya = $request->input('agama_id') === 'other';
+
+        if ($isAgamaLainnya) {
+            $request->merge(['agama_id' => null]);
+        }
+
         $data = $request->validate([
             'nama_lengkap' => 'required|string|max:255',
             'nis' => 'nullable|string|max:30|unique:data_siswa,nis',
             'nisn' => 'nullable|string|max:30|unique:data_siswa,nisn',
-            'jenis_kelamin' => 'nullable|in:L,P,Laki-laki,Perempuan',
+            'jenis_kelamin_id' => 'required|exists:jenis_kelamins,id',
             'tempat_lahir' => 'nullable|string|max:100',
             'tanggal_lahir' => 'nullable|date',
+            'agama_id' => 'nullable|exists:agamas,id',
+            'agama_lainnya' => 'required_without:agama_id|nullable|string|max:50',
             'alamat' => 'nullable|string',
             'rombel_id' => 'nullable|exists:rombels,id',
         ]);
@@ -134,9 +146,11 @@ class TUController extends Controller
                 'nama_lengkap' => $data['nama_lengkap'],
                 'nis' => $data['nis'] ?? null,
                 'nisn' => $data['nisn'] ?? null,
-                'jenis_kelamin' => $data['jenis_kelamin'] ?? null,
+                'jenis_kelamin_id' => $data['jenis_kelamin_id'],
                 'tempat_lahir' => $data['tempat_lahir'] ?? null,
                 'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
+                'agama_id' => $data['agama_id'] ?? null,
+                'agama_lainnya' => $isAgamaLainnya ? $data['agama_lainnya'] : null,
                 'alamat' => $data['alamat'] ?? null,
                 'rombel_id' => $data['rombel_id'] ?? null,
             ]);
@@ -167,7 +181,9 @@ class TUController extends Controller
         $jurusans = Jurusan::all();
         $rombels = Rombel::all();
         $kelas = Kelas::with('jurusan')->get();
-        return view('tu.siswa.edit', compact('siswa', 'jurusans', 'rombels', 'kelas'));
+        $jenisKelamins = JenisKelamin::all();
+        $agamas = Agama::all();
+        return view('tu.siswa.edit', compact('siswa', 'jurusans', 'rombels', 'kelas', 'jenisKelamins', 'agamas'));
     }
 
     /**
@@ -177,14 +193,21 @@ class TUController extends Controller
     {
         $siswa = DataSiswa::findOrFail($id);
 
+        $isAgamaLainnya = $request->input('agama_id') === 'other';
+
+        if ($isAgamaLainnya) {
+            $request->merge(['agama_id' => null]);
+        }
+
         $request->validate([
             'nama_lengkap' => 'required|string|max:255',
             'nis' => 'required|string|max:20|unique:data_siswa,nis,' . $id,
             'nisn' => 'nullable|string|max:20|unique:data_siswa,nisn,' . $id,
-            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
+            'jenis_kelamin_id' => 'required|exists:jenis_kelamins,id',
             'tempat_lahir' => 'nullable|string|max:255',
             'tanggal_lahir' => 'nullable|date',
-            'agama' => 'nullable|string|max:50',
+            'agama_id' => 'nullable|exists:agamas,id',
+            'agama_lainnya' => 'required_without:agama_id|nullable|string|max:50',
             'no_hp' => 'nullable|string|max:30',
             'rombel_id' => 'nullable|exists:rombels,id',
             'password' => 'nullable|string|min:6|confirmed',
@@ -196,10 +219,11 @@ class TUController extends Controller
                 'nama_lengkap' => $request->nama_lengkap,
                 'nis' => $request->nis,
                 'nisn' => $request->nisn,
-                'jenis_kelamin' => $request->jenis_kelamin,
+                'jenis_kelamin_id' => $request->jenis_kelamin_id,
                 'tempat_lahir' => $request->tempat_lahir,
                 'tanggal_lahir' => $request->tanggal_lahir,
-                'agama' => $request->agama,
+                'agama_id' => $request->agama_id ?? null,
+                'agama_lainnya' => $isAgamaLainnya ? $request->agama_lainnya : null,
                 'no_hp' => $request->no_hp,
                 'rombel_id' => $request->rombel_id,
             ]);
