@@ -3,542 +3,501 @@
 @section('title', 'Detail Jurusan - ' . $jurusan->nama)
 
 @section('content')
+
 <style>
-    /* ===================== STYLE DETAIL JURUSAN - RESPONSIVE ===================== */
-    
-    :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+:root{
+    --primary-blue:#2F53FF;
+    --secondary-blue:#7C3AED;
+    --accent-cyan:#22D3EE;
+    --light-bg:#F4F7FE;
+    --text-dark:#1E293B;
+    --text-muted:#64748B;
+
+    --shadow-light:0 8px 24px rgba(15,23,42,0.06);
+    --shadow-medium:0 16px 40px rgba(15,23,42,0.08);
+    --shadow-hover:0 18px 45px rgba(47,83,255,0.14);
+
+    --radius-xl:28px;
+    --radius-lg:20px;
+}
+
+body{
+    background:var(--light-bg);
+    font-family:'Poppins',sans-serif;
+}
+
+/* ================= HEADER ================= */
+
+.page-header{
+    background:linear-gradient(135deg,var(--primary-blue) 0%,var(--secondary-blue) 100%);
+    border-radius:32px;
+    padding:36px;
+    margin-bottom:28px;
+    color:white;
+    box-shadow:var(--shadow-medium);
+    position:relative;
+    overflow:hidden;
+}
+
+.page-header::before{
+    content:'';
+    position:absolute;
+    top:-80px;
+    right:-60px;
+    width:220px;
+    height:220px;
+    background:rgba(255,255,255,.08);
+    border-radius:50%;
+}
+
+.page-title{
+    font-size:2.2rem;
+    font-weight:800;
+    margin-bottom:8px;
+    position:relative;
+    z-index:2;
+}
+
+.page-subtitle{
+    margin:0;
+    opacity:.9;
+    max-width:650px;
+    line-height:1.7;
+    position:relative;
+    z-index:2;
+}
+
+/* ================= CARD ================= */
+
+.modern-card{
+    background:white;
+    border:none;
+    border-radius:var(--radius-xl);
+    box-shadow:var(--shadow-light);
+    overflow:hidden;
+    margin-bottom:26px;
+    transition:.3s ease;
+    animation:fadeInUp .4s ease;
+}
+
+.modern-card:hover{
+    transform:translateY(-2px);
+    box-shadow:var(--shadow-hover);
+}
+
+.modern-card .card-body{
+    padding:32px;
+}
+
+.section-title{
+    font-size:1.1rem;
+    font-weight:700;
+    color:var(--text-dark);
+    margin-bottom:22px;
+    padding-bottom:14px;
+    border-bottom:2px solid #EEF2F7;
+}
+
+/* ================= INFO BOX ================= */
+
+.info-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:20px;
+}
+
+.info-item{
+    background:#F8FBFF;
+    border-radius:20px;
+    padding:20px;
+    border:1px solid #EEF2F7;
+    transition:.3s ease;
+}
+
+.info-item:hover{
+    border-color:#DCE7FF;
+    transform:translateY(-1px);
+}
+
+.info-label{
+    font-size:.82rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--text-muted);
+    margin-bottom:8px;
+}
+
+.info-value{
+    font-size:1rem;
+    font-weight:700;
+    color:var(--text-dark);
+}
+
+/* ================= BADGE ================= */
+
+.jurusan-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:9px 16px;
+    border-radius:999px;
+    color:#fff;
+    font-size:.8rem;
+    font-weight:700;
+    box-shadow:0 10px 24px rgba(15,23,42,0.12);
+    background:linear-gradient(135deg,#2563EB 0%,#38BDF8 100%);
+}
+
+.jurusan-badge[data-jurusan-code="RPL" i],
+.jurusan-badge[data-jurusan-code="PPLG" i]{
+    background:linear-gradient(135deg,#F59E0B 0%,#FCD34D 100%);
+}
+
+.jurusan-badge[data-jurusan-code="MP" i]{
+    background:linear-gradient(135deg,#7F1D1D 0%,#991B1B 100%);
+}
+
+.jurusan-badge[data-jurusan-code="AK" i],
+.jurusan-badge[data-jurusan-code="AKL" i]{
+    background:linear-gradient(135deg,#F97316 0%,#FB923C 100%);
+}
+
+.jurusan-badge[data-jurusan-code="TJKT" i]{
+    background:linear-gradient(135deg,#38BDF8 0%,#7DD3FC 100%);
+}
+
+.jurusan-badge[data-jurusan-code="TKRO" i],
+.jurusan-badge[data-jurusan-code="TO" i]{
+    background:linear-gradient(135deg,#1D4ED8 0%,#3B82F6 100%);
+}
+
+.jurusan-badge[data-jurusan-code="DPIB" i]{
+    background:linear-gradient(135deg,#6B7280 0%,#9CA3AF 100%);
+}
+
+.jurusan-badge[data-jurusan-code="SP" i],
+.jurusan-badge[data-jurusan-code="SK" i]{
+    background:linear-gradient(135deg,#0F172A 0%,#374151 100%);
+}
+
+/* ================= STATS ================= */
+
+.stats-card{
+    background:linear-gradient(135deg,#2F53FF 0%,#7C3AED 100%);
+    border-radius:24px;
+    padding:24px;
+    color:white;
+    height:100%;
+    position:relative;
+    overflow:hidden;
+}
+
+.stats-card::before{
+    content:'';
+    position:absolute;
+    right:-30px;
+    bottom:-30px;
+    width:120px;
+    height:120px;
+    background:rgba(255,255,255,.08);
+    border-radius:50%;
+}
+
+.stats-label{
+    font-size:.85rem;
+    opacity:.85;
+    margin-bottom:8px;
+}
+
+.stats-value{
+    font-size:2.1rem;
+    font-weight:800;
+    line-height:1;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrapper{
+    border-radius:22px;
+    overflow:hidden;
+    border:1px solid #EEF2F7;
+}
+
+.table-modern{
+    margin-bottom:0;
+}
+
+.table-modern thead th{
+    background:#F8FAFC;
+    border:none;
+    padding:20px;
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--text-muted);
+    font-weight:700;
+}
+
+.table-modern tbody td{
+    padding:18px 20px;
+    vertical-align:middle;
+    border-top:1px solid #EEF2F7;
+    color:var(--text-dark);
+    font-size:.95rem;
+}
+
+.table-modern tbody tr{
+    transition:.3s ease;
+}
+
+.table-modern tbody tr:hover{
+    background:#F8FBFF;
+}
+
+.kelas-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 14px;
+    border-radius:999px;
+    background:#EEF4FF;
+    color:#2F53FF;
+    font-weight:700;
+    font-size:.82rem;
+}
+
+/* ================= BUTTON ================= */
+
+.action-buttons{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-top:10px;
+}
+
+.btn-modern{
+    border:none;
+    border-radius:18px;
+    padding:12px 22px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    font-weight:700;
+    font-size:.92rem;
+    transition:.3s ease;
+    text-decoration:none;
+}
+
+.btn-modern:hover{
+    transform:translateY(-2px);
+}
+
+.btn-secondary-modern{
+    background:#E2E8F0;
+    color:#334155;
+}
+
+.btn-secondary-modern:hover{
+    background:#CBD5E1;
+    color:#1E293B;
+}
+
+.btn-primary-modern{
+    background:linear-gradient(135deg,var(--primary-blue) 0%,var(--secondary-blue) 100%);
+    color:white;
+    box-shadow:0 12px 24px rgba(47,83,255,.18);
+}
+
+.btn-primary-modern:hover{
+    color:white;
+}
+
+/* ================= EMPTY ================= */
+
+.empty-state{
+    padding:40px 20px !important;
+    text-align:center;
+    color:var(--text-muted);
+}
+
+/* ================= ANIMATION ================= */
+
+@keyframes fadeInUp{
+    from{
+        opacity:0;
+        transform:translateY(16px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:768px){
+
+    .page-header{
+        padding:26px;
+        border-radius:24px;
     }
 
-    body {
-        background-color: var(--light-bg);
+    .page-title{
+        font-size:1.7rem;
     }
 
-    /* Page Header */
-    h2.fw-bold {
-        font-size: 28px;
-        color: #1E293B;
-        font-weight: 700;
-        margin-bottom: 0.25rem !important;
+    .modern-card .card-body{
+        padding:22px;
     }
 
-    p.text-muted {
-        color: #64748B !important;
-        font-size: 15px;
-        margin-bottom: 1.5rem !important;
+    .info-grid{
+        grid-template-columns:1fr;
     }
 
-    /* Card Styles */
-    .card {
-        border-radius: 15px !important;
-        border: none;
-        box-shadow: var(--card-shadow);
-        transition: all 0.3s ease;
-        margin-bottom: 1.5rem;
+    .table-modern thead{
+        display:none;
     }
 
-    .card:hover {
-        box-shadow: var(--hover-shadow);
+    .table-modern,
+    .table-modern tbody,
+    .table-modern tr,
+    .table-modern td{
+        display:block;
+        width:100%;
     }
 
-    .card-body {
-        padding: 2rem;
+    .table-modern tr{
+        padding:14px;
+        border-bottom:1px solid #EEF2F7;
     }
 
-    .card-body h5 {
-        font-weight: 600;
-        color: #1E293B;
-        font-size: 18px;
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 2px solid #E2E8F0;
+    .table-modern td{
+        border:none;
+        display:flex;
+        justify-content:space-between;
+        gap:20px;
+        padding:10px 0;
     }
 
-    /* Table Styles */
-    .table-borderless {
-        margin-bottom: 0;
+    .table-modern td::before{
+        font-weight:700;
+        color:var(--text-muted);
+        font-size:.75rem;
+        text-transform:uppercase;
     }
 
-    .table-borderless tr {
-        transition: background-color 0.2s ease;
+    .table-modern td:nth-child(1)::before{
+        content:'No';
     }
 
-    .table-borderless tr:hover {
-        background-color: rgba(47, 83, 255, 0.03);
+    .table-modern td:nth-child(2)::before{
+        content:'Tingkat';
     }
 
-    .table-borderless td {
-        padding: 12px 8px;
-        vertical-align: top;
-        font-size: 15px;
-        color: #334155;
+    .table-modern td:nth-child(3)::before{
+        content:'Nama Kelas';
     }
 
-    .table-borderless td:first-child {
-        font-weight: 500;
-        color: #64748B;
-        width: 150px;
+    .table-modern td:nth-child(4)::before{
+        content:'Rombel';
     }
 
-    .table-borderless td:last-child {
-        color: #1E293B;
-        font-weight: 400;
+    .action-buttons{
+        flex-direction:column;
     }
 
-    /* Table Hover */
-    .table-responsive {
-        border-radius: 12px;
-        overflow: hidden;
+    .btn-modern{
+        width:100%;
     }
-
-    .table-hover thead {
-        background-color: #F8FAFC;
-    }
-
-    .table-hover thead th {
-        color: #475569;
-        font-weight: 600;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 2px solid #E2E8F0;
-        padding: 1rem;
-    }
-
-    .table-hover tbody tr {
-        transition: all 0.2s ease;
-        border-bottom: 1px solid #F1F5F9;
-    }
-
-    .table-hover tbody tr:hover {
-        background-color: rgba(47, 83, 255, 0.03);
-        transform: scale(1.01);
-    }
-
-    .table-hover tbody td {
-        padding: 1rem;
-        vertical-align: middle;
-        color: #334155;
-        font-size: 14px;
-    }
-
-    /* Action Buttons */
-    .action-buttons {
-        display: flex;
-        gap: 10px;
-        margin-top: 1.5rem;
-        flex-wrap: wrap;
-    }
-
-    .btn {
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-weight: 500;
-        font-size: 14px;
-        transition: all 0.3s ease;
-        border: none;
-    }
-
-    .btn-secondary {
-        background-color: #E2E8F0;
-        color: #475569;
-    }
-
-    .btn-secondary:hover {
-        background-color: #CBD5E1;
-        color: #334155;
-        transform: translateY(-2px);
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        color: white;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(47, 83, 255, 0.4);
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 2rem;
-        color: #64748B;
-    }
-
-    /* Animations */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .card {
-        animation: fadeIn 0.4s ease-out;
-    }
-
-    .card:nth-child(1) { animation-delay: 0.05s; }
-    .card:nth-child(2) { animation-delay: 0.1s; }
-
-    /* ===================== RESPONSIVE STYLES ===================== */
-
-    /* Tablet (max-width: 991px) */
-    @media (max-width: 991px) {
-        h2.fw-bold {
-            font-size: 24px;
-        }
-
-        p.text-muted {
-            font-size: 14px;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .card-body h5 {
-            font-size: 17px;
-        }
-
-        .table-borderless td:first-child {
-            width: 140px;
-        }
-
-        .table-hover thead th,
-        .table-hover tbody td {
-            font-size: 13px;
-            padding: 0.75rem;
-        }
-    }
-
-    /* Mobile (max-width: 767px) */
-    @media (max-width: 767px) {
-        .container-fluid {
-            padding-left: 15px;
-            padding-right: 15px;
-        }
-
-        /* Page Header */
-        h2.fw-bold {
-            font-size: 22px;
-            margin-bottom: 0.5rem !important;
-        }
-
-        p.text-muted {
-            font-size: 14px;
-            margin-bottom: 1.25rem !important;
-        }
-
-        /* Card */
-        .card {
-            border-radius: 12px !important;
-            margin-bottom: 1.25rem;
-        }
-
-        .card-body {
-            padding: 1.25rem;
-        }
-
-        .card-body h5 {
-            font-size: 16px;
-            margin-bottom: 1.25rem;
-            padding-bottom: 0.5rem;
-        }
-
-        /* Info Section - Stack columns */
-        .row > .col-md-6 {
-            margin-bottom: 1.5rem;
-        }
-
-        .row > .col-md-6:last-child {
-            margin-bottom: 0;
-        }
-
-        /* Table Borderless - Vertical Layout */
-        .table-borderless tr {
-            display: flex;
-            flex-direction: column;
-            padding: 10px 0;
-            border-bottom: 1px solid #F1F5F9;
-        }
-
-        .table-borderless tr:last-child {
-            border-bottom: none;
-        }
-
-        .table-borderless td {
-            padding: 4px 0;
-            width: 100% !important;
-        }
-
-        .table-borderless td:first-child {
-            font-size: 13px;
-            color: #64748B;
-            margin-bottom: 4px;
-        }
-
-        .table-borderless td:last-child {
-            font-size: 14px;
-            color: #1E293B;
-            padding-left: 0;
-        }
-
-        /* Table Hover - Responsive */
-        .table-responsive {
-            margin: -1rem;
-            padding: 1rem;
-        }
-
-        .table-hover {
-            font-size: 13px;
-        }
-
-        .table-hover thead {
-            display: none; /* Hide header on mobile */
-        }
-
-        .table-hover tbody tr {
-            display: block;
-            margin-bottom: 1rem;
-            border: 1px solid #E2E8F0;
-            border-radius: 8px;
-            padding: 1rem;
-        }
-
-        .table-hover tbody tr:hover {
-            transform: none;
-        }
-
-        .table-hover tbody td {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            border: none;
-        }
-
-        .table-hover tbody td::before {
-            content: attr(data-label);
-            font-weight: 600;
-            color: #64748B;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Add data-label attribute via inline styles won't work, 
-           so we'll use nth-child selectors */
-        .table-hover tbody td:nth-child(1)::before {
-            content: "No";
-        }
-
-        .table-hover tbody td:nth-child(2)::before {
-            content: "Tingkat";
-        }
-
-        .table-hover tbody td:nth-child(3)::before {
-            content: "Nama Kelas";
-        }
-
-        .table-hover tbody td:nth-child(4)::before {
-            content: "Total Rombel";
-        }
-
-        /* Empty state */
-        .table-hover tbody tr td[colspan] {
-            display: block;
-            text-align: center;
-            padding: 1.5rem;
-        }
-
-        .table-hover tbody tr td[colspan]::before {
-            display: none;
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 1.25rem;
-        }
-
-        .action-buttons .btn {
-            width: 100%;
-            justify-content: center;
-        }
-    }
-
-    /* Small Mobile (max-width: 480px) */
-    @media (max-width: 480px) {
-        h2.fw-bold {
-            font-size: 20px;
-        }
-
-        p.text-muted {
-            font-size: 13px;
-        }
-
-        .card-body {
-            padding: 1rem;
-        }
-
-        .card-body h5 {
-            font-size: 15px;
-            margin-bottom: 1rem;
-        }
-
-        .table-borderless td:first-child {
-            font-size: 12px;
-        }
-
-        .table-borderless td:last-child {
-            font-size: 13px;
-        }
-
-        .table-hover {
-            font-size: 12px;
-        }
-
-        .table-hover tbody tr {
-            padding: 0.875rem;
-        }
-
-        .table-hover tbody td {
-            padding: 0.4rem 0;
-            font-size: 13px;
-        }
-
-        .table-hover tbody td::before {
-            font-size: 11px;
-        }
-
-        .btn {
-            font-size: 13px;
-            padding: 9px 16px;
-        }
-    }
-
-    /* Desktop (min-width: 1200px) */
-    @media (min-width: 1200px) {
-        .container-fluid {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        h2.fw-bold {
-            font-size: 30px;
-        }
-
-        p.text-muted {
-            font-size: 16px;
-        }
-
-        .card-body {
-            padding: 2.5rem;
-        }
-
-        .card-body h5 {
-            font-size: 19px;
-        }
-
-        .table-borderless td {
-            font-size: 16px;
-            padding: 14px 10px;
-        }
-
-        .table-borderless td:first-child {
-            width: 180px;
-        }
-
-        .table-hover thead th,
-        .table-hover tbody td {
-            padding: 1.25rem;
-            font-size: 15px;
-        }
-    }
-
-    /* Print Styles */
-    @media print {
-        .action-buttons {
-            display: none !important;
-        }
-
-        .card {
-            box-shadow: none;
-            border: 1px solid #ddd;
-            page-break-inside: avoid;
-        }
-
-        .card-body {
-            padding: 1rem;
-        }
-
-        .table-hover tbody tr:hover {
-            transform: none;
-            background-color: transparent;
-        }
-    }
+}
 </style>
 
 <div class="container-fluid">
-    <h2 class="fw-bold mb-1">Detail Jurusan</h2>
-    <p class="text-muted mb-4">{{ $jurusan->nama }}</p>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>Informasi Jurusan</h5>
-                    <table class="table table-borderless">
-                        <tbody>
-                            <tr>
-                                <td>ID Jurusan</td>
-                                <td>: {{ $jurusan->id }}</td>
-                            </tr>
-                            <tr>
-                                <td>Kode Jurusan</td>
-                                <td>: {{ $jurusan->kode }}</td>
-                            </tr>
-                            <tr>
-                                <td>Nama Jurusan</td>
-                                <td>: {{ $jurusan->nama }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+<!-- HEADER -->
+<div class="page-header">
+    <h1 class="page-title">
+        Detail Jurusan
+    </h1>
+
+    <p class="page-subtitle">
+        Informasi lengkap jurusan beserta daftar kelas yang tersedia di dalamnya.
+    </p>
+</div>
+
+<!-- INFO -->
+<div class="modern-card">
+    <div class="card-body">
+
+        <div class="row g-4 align-items-stretch">
+
+            <div class="col-lg-8">
+                <div class="section-title">
+                    Informasi Jurusan
                 </div>
-                <div class="col-md-6">
-                    <h5>Statistik</h5>
-                    <table class="table table-borderless">
-                        <tbody>
-                            <tr>
-                                <td>Total Kelas</td>
-                                <td>: {{ $jurusan->kelas->count() }} kelas</td>
-                            </tr>
-                        </tbody>
-                    </table>
+
+                <div class="info-grid">
+
+                    <div class="info-item">
+                        <div class="info-label">ID Jurusan</div>
+                        <div class="info-value">
+                            #{{ $jurusan->id }}
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Kode Jurusan</div>
+
+                        <div class="info-value">
+                            <span class="jurusan-badge"
+                                  data-jurusan-code="{{ $jurusan->kode ?? '' }}">
+                                {{ $jurusan->kode }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-item" style="grid-column: span 2;">
+                        <div class="info-label">Nama Jurusan</div>
+                        <div class="info-value">
+                            {{ $jurusan->nama }}
+                        </div>
+                    </div>
+
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <h5>Daftar Kelas</h5>
-            
+            <div class="col-lg-4">
+                <div class="stats-card">
+                    <div class="stats-label">
+                        Total Kelas
+                    </div>
+
+                    <div class="stats-value">
+                        {{ $jurusan->kelas->count() }}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- TABLE -->
+<div class="modern-card">
+    <div class="card-body">
+
+        <div class="section-title">
+            Daftar Kelas
+        </div>
+
+        <div class="table-wrapper">
+
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-modern align-middle">
+
                     <thead>
                         <tr>
                             <th>No</th>
@@ -547,30 +506,69 @@
                             <th>Total Rombel</th>
                         </tr>
                     </thead>
+
                     <tbody>
+
                         @forelse($jurusan->kelas as $kelas)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $kelas->tingkat }}</td>
-                                <td>{{ $kelas->tingkat }} {{ $jurusan->nama }}</td>
-                                <td>{{ $kelas->rombels->count() }}</td>
+
+                                <td>
+                                    {{ $loop->iteration }}
+                                </td>
+
+                                <td>
+                                    <span class="kelas-pill">
+                                        {{ $kelas->tingkat }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ $kelas->tingkat }} {{ $jurusan->nama }}
+                                </td>
+
+                                <td>
+                                    {{ $kelas->rombels->count() }} rombel
+                                </td>
+
                             </tr>
                         @empty
+
                             <tr>
-                                <td colspan="4" class="text-center empty-state">
+                                <td colspan="4" class="empty-state">
                                     Belum ada kelas di jurusan ini.
                                 </td>
                             </tr>
+
                         @endforelse
+
                     </tbody>
+
                 </table>
             </div>
-        </div>
-    </div>
 
-    <div class="action-buttons">
-        <a href="{{ route('kurikulum.jurusan.index') }}" class="btn btn-secondary">Kembali</a>
-        <a href="{{ route('kurikulum.jurusan.edit', $jurusan->id) }}" class="btn btn-primary">Edit Jurusan</a>
+        </div>
+
     </div>
 </div>
+
+<!-- BUTTON -->
+<div class="action-buttons">
+
+    <a href="{{ route('super_admin.manajemen-jurusan.index') }}"
+       class="btn-modern btn-secondary-modern">
+        <i class="fas fa-arrow-left"></i>
+        Kembali
+    </a>
+
+    <a href="{{ route('super_admin.manajemen-jurusan.edit', $jurusan->id) }}"
+       class="btn-modern btn-primary-modern">
+        <i class="fas fa-edit"></i>
+        Edit Jurusan
+    </a>
+
+</div>
+
+
+</div>
+
 @endsection

@@ -23,38 +23,33 @@ class ManajemenKelasController extends Controller
 
         // Search
         if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
+            $query->where(function($q) use ($search) {
                 $q->where('nama', 'like', '%' . $search . '%')
-                    ->orWhereHas('kelas', function ($q2) use ($search) {
-                        $q2->where('tingkat', 'like', '%' . $search . '%');
-                    })
-                    ->orWhereHas('kelas.jurusan', function ($q2) use ($search) {
-                        $q2->where('nama', 'like', '%' . $search . '%');
-                    })
-                    ->orWhereHas('guru', function ($q2) use ($search) {
-                        $q2->where('nama', 'like', '%' . $search . '%');
-                    });
+                  ->orWhereHas('kelas', function($q2) use ($search) {
+                      $q2->where('tingkat', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('kelas.jurusan', function($q2) use ($search) {
+                      $q2->where('nama', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('guru', function($q2) use ($search) {
+                      $q2->where('nama', 'like', '%' . $search . '%');
+                  });
             });
         }
 
         // Filter jurusan
         if (!empty($jurusan_id)) {
-            $query->whereHas('kelas', function ($q) use ($jurusan_id) {
+            $query->whereHas('kelas', function($q) use ($jurusan_id) {
                 $q->where('jurusan_id', $jurusan_id);
             });
         }
 
         $allJurusans = Jurusan::all();
 
-        // Pagination
+        // Dapatkan hasil dengan pagination
         $rombels = $query->paginate(12)->withQueryString();
 
-        return view('super_admin.manajemen-kelas.index', compact(
-            'rombels',
-            'allJurusans',
-            'search',
-            'jurusan_id'
-        ));
+        return view('super_admin.manajemen-kelas.index', compact('rombels', 'allJurusans', 'search', 'jurusan_id'));
     }
 
     public function create()

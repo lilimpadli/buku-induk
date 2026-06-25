@@ -1,582 +1,536 @@
 @extends('layouts.app')
 
-@section('title', 'Mata Pelajaran')
+@section('title', 'Manajemen Mata Pelajaran')
 
 @section('content')
 <style>
-    /* ===================== STYLE MATA PELAJARAN ===================== */
-    
+    /* ===================== ROOT ===================== */
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
-        background-color: var(--light-bg);
+        background-color: #f7fafc;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    /* Card Styles */
-    .card {
-        border-radius: 16px;
+    /* ===== OVERRIDE LAYOUT ===== */
+    main {
+        padding: 15px 10px !important;
+        overflow-x: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .container-fluid {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 5px !important;
+        overflow-x: auto !important;
+    }
+
+    /* ===== HEADER ===== */
+    .page-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 1rem 1.2rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 1rem;
+        box-shadow: var(--card-shadow);
+        width: 100%;
+    }
+
+    .page-header h3 {
+        font-weight: 700;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .page-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 0.75rem;
+        margin: 0;
+    }
+
+    .btn-gradient {
+        background: var(--primary-gradient);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.4rem 1rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+    }
+
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .btn-outline-gradient {
+        background: transparent;
+        border: 1px solid #667eea;
+        color: #667eea;
+        font-weight: 600;
+        padding: 0.3rem 0.8rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+    }
+
+    .btn-outline-gradient:hover {
+        background: var(--primary-gradient);
+        color: white;
+        border-color: transparent;
+    }
+
+    .btn-edit {
+        background: #F59E0B;
+        border: none;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 0.65rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        white-space: nowrap;
+    }
+
+    .btn-edit:hover {
+        background: #D97706;
+        color: white;
+    }
+
+    .btn-delete {
+        background: #EF4444;
+        border: none;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 0.65rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
+    .btn-delete:hover {
+        background: #DC2626;
+        color: white;
+    }
+
+    /* ===== FILTER ===== */
+    .filter-card {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 1rem;
+        width: 100%;
+    }
+
+    .filter-card .card-body {
+        padding: 0.8rem 1rem;
+    }
+
+    .filter-card .form-select {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        border: 1px solid #E2E8F0;
+        min-width: 100px;
+    }
+
+    .filter-card .form-label {
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: #64748B;
+        margin-bottom: 2px;
+    }
+
+    /* ===== TABLE ===== */
+    .table-card {
+        border-radius: var(--border-radius);
         border: none;
         box-shadow: var(--card-shadow);
         overflow: hidden;
-        transition: all 0.3s ease;
+        width: 100%;
     }
 
-    .card:hover {
-        box-shadow: var(--hover-shadow);
+    .table-card .card-header {
+        background: white;
+        border-bottom: 1px solid #E2E8F0;
+        padding: 0.5rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 5px;
     }
 
-    .card-header {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        color: white;
-        padding: 20px 24px;
-        border-bottom: none;
-    }
-
-    .card-header h5 {
+    .table-card .card-header h5 {
         margin: 0;
         font-weight: 700;
-        font-size: 20px;
+        color: #1E293B;
+        font-size: 0.85rem;
+        white-space: nowrap;
     }
 
-    .card-body {
-        padding: 24px;
+    .table-card .card-header h5 i {
+        color: #667eea;
+        margin-right: 6px;
     }
 
-    /* Alert Styles */
-    .alert {
-        border-radius: 12px;
-        border: none;
-        padding: 16px 20px;
-        font-weight: 500;
+    .table-card .card-header .badge {
+        font-size: 0.6rem;
+        padding: 2px 8px;
+        white-space: nowrap;
     }
 
-    .alert-success {
-        background-color: rgba(16, 185, 129, 0.1);
-        color: var(--success-color);
-    }
-
-    /* Filter Section */
-    .filter-section {
-        background-color: #F8FAFC;
-        padding: 16px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-    }
-
-    .form-select {
-        border: 1px solid #E2E8F0;
-        border-radius: 8px;
-        padding: 10px 14px;
-        font-size: 14px;
-        transition: all 0.2s;
-    }
-
-    .form-select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(47, 83, 255, 0.1);
-    }
-
-    /* Button Group */
-    .btn-group {
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        border-radius: 8px;
-        overflow: hidden;
-    }
-
-    .btn-group .btn {
-        border: none;
-        padding: 10px 16px;
-        font-weight: 500;
-        font-size: 14px;
-        transition: all 0.2s;
-    }
-
-    .btn-group .btn-primary {
-        background-color: var(--primary-color);
-        color: white;
-    }
-
-    .btn-group .btn-outline-secondary {
-        background-color: white;
-        color: #64748B;
-    }
-
-    .btn-group .btn-outline-secondary:hover {
-        background-color: #F1F5F9;
-    }
-
-    /* Regular Buttons */
-    .btn {
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        border: none;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        color: white;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(47, 83, 255, 0.4);
-    }
-
-    .btn-outline-secondary {
-        background-color: white;
-        color: #64748B;
-        border: 1px solid #E2E8F0;
-    }
-
-    .btn-outline-secondary:hover {
-        background-color: #F8FAFC;
-        color: #475569;
-    }
-
-    .btn-sm {
-        padding: 6px 14px;
-        font-size: 13px;
-    }
-
-    .btn-warning {
-        background-color: var(--warning-color);
-        color: white;
-    }
-
-    .btn-warning:hover {
-        background-color: #D97706;
-        transform: translateY(-1px);
-    }
-
-    .btn-danger {
-        background-color: var(--danger-color);
-        color: white;
-    }
-
-    .btn-danger:hover {
-        background-color: #DC2626;
-        transform: translateY(-1px);
-    }
-
-    /* Table Styles */
     .table-responsive {
-        border-radius: 12px;
-        overflow: hidden;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .table {
+        width: 100%;
+        min-width: 550px;
         margin-bottom: 0;
+        font-size: 0.7rem;
     }
 
-    .table thead th {
-        background-color: #F8FAFC;
-        color: #475569;
+    .table th {
         font-weight: 600;
-        font-size: 13px;
+        font-size: 0.6rem;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        padding: 16px 20px;
-        border-bottom: 2px solid #E2E8F0;
+        letter-spacing: 0.3px;
+        color: #64748B;
+        padding: 0.4rem 0.5rem;
+        white-space: nowrap;
+        background-color: #F8FAFC;
+        border-bottom: none;
     }
 
-    .table tbody td {
-        padding: 16px 20px;
+    .table td {
+        padding: 0.4rem 0.5rem;
         vertical-align: middle;
-        border-bottom: 1px solid #F1F5F9;
-        color: #1E293B;
-        font-size: 14px;
-    }
-
-    .table tbody tr {
-        transition: all 0.2s ease;
+        border-color: #E2E8F0;
     }
 
     .table tbody tr:hover {
-        background-color: rgba(47, 83, 255, 0.03);
+        background-color: rgba(102, 126, 234, 0.03);
     }
 
-    .table-striped tbody tr:nth-of-type(odd) {
-        background-color: rgba(248, 250, 252, 0.5);
+    /* ===== BADGE ===== */
+    .badge-kelompok {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.6rem;
+        font-weight: 600;
+        display: inline-block;
+        white-space: nowrap;
     }
 
-    /* Mobile Menu Toggle */
-    .mobile-filter-toggle {
-        display: none;
+    .badge-kelompok.a {
+        background: #D1FAE5;
+        color: #059669;
     }
 
-    .mobile-filter-content {
-        display: block;
+    .badge-kelompok.b {
+        background: #DBEAFE;
+        color: #2563EB;
     }
 
-    /* Empty State */
+    .badge-kurikulum {
+        background: #E2E8F0;
+        color: #475569;
+        padding: 1px 8px;
+        border-radius: 10px;
+        font-size: 0.55rem;
+        font-weight: 500;
+        display: inline-block;
+        margin: 1px;
+        white-space: nowrap;
+    }
+
+    .badge-jurusan {
+        background: #FEF3C7;
+        color: #D97706;
+        padding: 1px 8px;
+        border-radius: 10px;
+        font-size: 0.55rem;
+        font-weight: 500;
+        display: inline-block;
+        margin: 1px;
+        white-space: nowrap;
+    }
+
+    .badge-tingkat {
+        background: #667eea;
+        color: white;
+        padding: 1px 8px;
+        border-radius: 10px;
+        font-size: 0.55rem;
+        font-weight: 500;
+        display: inline-block;
+        margin: 1px;
+        white-space: nowrap;
+    }
+
+    /* ===== ACTION ===== */
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+    }
+
+    .action-buttons form {
+        margin: 0;
+        padding: 0;
+        display: inline;
+    }
+
+    /* ===== EMPTY ===== */
     .empty-state {
         text-align: center;
-        padding: 60px 20px;
-        color: #64748B;
+        padding: 2rem 1rem;
     }
 
     .empty-state i {
-        font-size: 48px;
-        margin-bottom: 15px;
-        opacity: 0.5;
+        font-size: 2rem;
+        color: #CBD5E1;
+        display: block;
+        margin-bottom: 0.5rem;
     }
 
-    /* Animations */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+    .empty-state h5 {
+        font-size: 0.9rem;
     }
 
-    .card {
-        animation: fadeIn 0.5s ease-out;
+    /* ===== PAGINATION ===== */
+    .pagination-wrapper {
+        padding: 0.5rem 1rem;
+        border-top: 1px solid #E2E8F0;
     }
 
-    /* ===================== RESPONSIVE STYLES ===================== */
-
-    /* Tablet (768px - 991px) */
-    @media (max-width: 991px) {
-        .card-header h5 {
-            font-size: 18px;
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 992px) {
+        .filter-card .row {
+            gap: 8px;
         }
-
-        .btn-group .btn {
-            padding: 8px 12px;
-            font-size: 13px;
-        }
-    }
-
-    /* Mobile (max 767px) */
-    @media (max-width: 767px) {
-        .container-fluid {
-            padding-left: 12px;
-            padding-right: 12px;
-        }
-
-        /* Card Header */
-        .card-header {
-            padding: 16px;
-            flex-direction: column;
-            gap: 12px;
-            align-items: flex-start !important;
-        }
-
-        .card-header h5 {
-            font-size: 16px;
+        .filter-card .col-md-3,
+        .filter-card .col-md-4,
+        .filter-card .col-md-5 {
             width: 100%;
         }
-
-        .card-header .btn {
+        .filter-card .btn {
             width: 100%;
             justify-content: center;
         }
+    }
 
-        .card-body {
-            padding: 16px;
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 0.8rem 1rem;
         }
-
-        /* Filter Section */
-        .filter-section {
-            padding: 12px;
+        .page-header h3 {
+            font-size: 0.95rem;
         }
-
-        .mobile-filter-toggle {
-            display: block;
+        .table-card .card-header {
+            flex-wrap: wrap;
+        }
+        .table-card .card-header .btn-gradient {
             width: 100%;
-            margin-bottom: 12px;
+            justify-content: center;
         }
-
-        .mobile-filter-content {
-            display: none;
-        }
-
-        .mobile-filter-content.show {
-            display: block;
-        }
-
-        /* Filter Form - Stack Vertically */
-        .mb-3 form {
-            flex-direction: column !important;
-            gap: 12px !important;
-        }
-
-        .form-select {
-            width: 100% !important;
-            font-size: 14px;
-        }
-
-        /* Button Group - Stack on Mobile */
-        .btn-group {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            border-radius: 8px;
-        }
-
-        .btn-group .btn {
-            width: 100%;
-            border-radius: 0 !important;
-            text-align: left;
-            padding: 12px 16px;
-            border-bottom: 1px solid #E2E8F0;
-        }
-
-        .btn-group .btn:first-child {
-            border-radius: 8px 8px 0 0 !important;
-        }
-
-        .btn-group .btn:last-child {
-            border-radius: 0 0 8px 8px !important;
-            border-bottom: none;
-        }
-
-        /* Filter Buttons */
-        .mb-3 form > .btn {
-            width: 100%;
-            padding: 12px;
-            font-size: 14px;
-        }
-
-        /* Table - Horizontal Scroll */
-        .table-responsive {
-            margin: 0 -16px;
-            border-radius: 0;
-        }
-
         .table {
-            font-size: 12px;
+            min-width: 480px;
+            font-size: 0.6rem;
         }
-
-        .table thead th {
-            padding: 10px 8px;
-            font-size: 10px;
-            white-space: nowrap;
+        .table th,
+        .table td {
+            padding: 0.3rem 0.4rem;
         }
-
-        .table tbody td {
-            padding: 10px 8px;
-            font-size: 12px;
+        .btn-edit,
+        .btn-delete {
+            padding: 2px 6px;
+            font-size: 0.5rem;
         }
-
-        /* Hide some columns on mobile */
-        .table thead th:nth-child(3),
-        .table tbody td:nth-child(3),
-        .table thead th:nth-child(5),
-        .table tbody td:nth-child(5) {
-            display: none;
+        .badge-kelompok {
+            font-size: 0.5rem;
+            padding: 1px 6px;
         }
-
-        /* Action buttons stack */
-        .table .d-flex {
-            flex-direction: column !important;
-            gap: 6px !important;
+        .badge-kurikulum,
+        .badge-jurusan,
+        .badge-tingkat {
+            font-size: 0.45rem;
+            padding: 1px 5px;
         }
-
-        .table .d-flex .btn {
-            width: 100%;
-        }
-
-        .table .d-flex form {
-            width: 100%;
-        }
-
-        .table .d-flex form button {
-            width: 100%;
-        }
-
-        /* Alert */
-        .alert {
-            font-size: 13px;
-            padding: 12px 14px;
+        .action-buttons {
+            flex-wrap: wrap;
+            gap: 3px;
         }
     }
 
-    /* Mobile Small (max 575px) */
-    @media (max-width: 575px) {
-        .card-header h5 {
-            font-size: 15px;
-        }
-
-        .btn {
-            font-size: 13px;
-        }
-
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 11px;
-        }
-
-        /* Hide more columns on very small screens */
-        .table thead th:nth-child(4),
-        .table tbody td:nth-child(4) {
-            display: none;
-        }
-
+    @media (max-width: 576px) {
         .table {
-            font-size: 11px;
+            min-width: 400px;
+            font-size: 0.55rem;
         }
-
-        .table thead th {
-            padding: 8px 6px;
-            font-size: 9px;
+        .table th,
+        .table td {
+            padding: 0.2rem 0.3rem;
         }
-
-        .table tbody td {
-            padding: 8px 6px;
-            font-size: 11px;
+        .btn-edit,
+        .btn-delete {
+            padding: 1px 5px;
+            font-size: 0.45rem;
         }
-    }
-
-    /* Desktop Large (1200px+) */
-    @media (min-width: 1200px) {
-        .card-header h5 {
-            font-size: 22px;
-        }
-
-        .table thead th {
-            font-size: 14px;
-            padding: 18px 24px;
-        }
-
-        .table tbody td {
-            font-size: 15px;
-            padding: 18px 24px;
-        }
-    }
-
-    /* Improve gap spacing on mobile */
-    @media (max-width: 767px) {
-        .d-flex.gap-2 {
-            gap: 8px !important;
+        .action-buttons {
+            gap: 2px;
         }
     }
 </style>
 
-<div class="container-fluid mt-4">
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Daftar Mata Pelajaran</h5>
-            <a href="{{ route('kurikulum.mata-pelajaran.create') }}" class="btn btn-sm btn-light">
-                <i class="fas fa-plus"></i> <span class="d-none d-sm-inline">Tambah</span>
-            </a>
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap">
+            <div>
+                <h3><i class="fas fa-book-open me-1"></i> Manajemen Mata Pelajaran</h3>
+                <div class="text-muted">Kelola data mata pelajaran</div>
+            </div>
+            <div>
+                <a href="{{ route('kurikulum.mata-pelajaran.create') }}" class="btn-gradient">
+                    <i class="fas fa-plus"></i> Tambah
+                </a>
+            </div>
         </div>
+    </div>
+
+    <!-- Filter -->
+    <div class="card filter-card">
         <div class="card-body">
-            @if(session('success'))
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-                </div>
-            @endif
-
-            <!-- Filter Section -->
-            <div class="filter-section">
-                <!-- Mobile Toggle Button -->
-                <button class="btn btn-outline-secondary mobile-filter-toggle w-100" type="button" onclick="toggleMobileFilter()">
-                    <i class="fas fa-filter me-2"></i> Filter & Pencarian
-                    <i class="fas fa-chevron-down float-end" id="filterChevron"></i>
-                </button>
-
-                <!-- Filter Content -->
-                <div class="mobile-filter-content" id="mobileFilterContent">
-                    <form method="GET" class="d-flex gap-2 align-items-center flex-wrap" action="{{ route('kurikulum.mata-pelajaran.index') }}">
-                        <!-- Jurusan Select -->
-                        <select name="jurusan" class="form-select" style="width:220px">
+            <form method="GET" class="row g-1 g-md-2 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label">Filter</label>
+                    <div class="d-flex gap-1 flex-wrap">
+                        <select name="jurusan" class="form-select" style="flex:1; min-width:100px;">
                             <option value="">Semua Jurusan</option>
                             @foreach($jurusans as $j)
                                 <option value="{{ $j->id }}" {{ (string)($jurusan ?? '') === (string)$j->id ? 'selected' : '' }}>{{ $j->nama }}</option>
                             @endforeach
                         </select>
-
-                        <!-- Tingkat Filter -->
-                        <div class="btn-group" role="group" aria-label="Tingkat filter">
-                            <a href="{{ route('kurikulum.mata-pelajaran.index', array_filter(['jurusan' => $jurusan])) }}" class="btn {{ empty($tingkat) ? 'btn-primary' : 'btn-outline-secondary' }}">
-                                Semua
-                            </a>
-                            <a href="{{ route('kurikulum.mata-pelajaran.index', array_merge(array_filter(['jurusan' => $jurusan]), ['tingkat' => 10])) }}" class="btn {{ (string)($tingkat ?? '') === '10' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                                Kelas 10
-                            </a>
-                            <a href="{{ route('kurikulum.mata-pelajaran.index', array_merge(array_filter(['jurusan' => $jurusan]), ['tingkat' => 11])) }}" class="btn {{ (string)($tingkat ?? '') === '11' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                                Kelas 11
-                            </a>
-                            <a href="{{ route('kurikulum.mata-pelajaran.index', array_merge(array_filter(['jurusan' => $jurusan]), ['tingkat' => 12])) }}" class="btn {{ (string)($tingkat ?? '') === '12' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                                Kelas 12
-                            </a>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <button class="btn btn-primary" type="submit">
-                            <i class="fas fa-check"></i> Terapkan
-                        </button>
-                        <a href="{{ route('kurikulum.mata-pelajaran.index') }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-redo"></i> Reset
-                        </a>
-                    </form>
+                        <select name="tingkat" class="form-select" style="flex:1; min-width:80px;">
+                            <option value="">Semua Tingkat</option>
+                            <option value="10" {{ (string)($tingkat ?? '') === '10' ? 'selected' : '' }}>10</option>
+                            <option value="11" {{ (string)($tingkat ?? '') === '11' ? 'selected' : '' }}>11</option>
+                            <option value="12" {{ (string)($tingkat ?? '') === '12' ? 'selected' : '' }}>12</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
+                <div class="col-md-7">
+                    <div class="d-flex gap-1 flex-wrap">
+                        <button type="submit" class="btn-gradient">Terapkan</button>
+                        <a href="{{ route('kurikulum.mata-pelajaran.index') }}" class="btn-outline-gradient">Reset</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
-            <!-- Table -->
+    <!-- Table -->
+    <div class="card table-card">
+        <div class="card-header">
+            <h5><i class="fas fa-table"></i> Daftar Mata Pelajaran</h5>
+            <span class="badge bg-primary">{{ $mapels->count() }}</span>
+        </div>
+        <div class="card-body">
+            @if(session('success'))
+                <div class="alert alert-success m-2" id="successAlert" style="font-size:0.75rem; padding:0.4rem 0.8rem;">
+                    <i class="fas fa-check-circle me-1"></i> {{ session('success') }}
+                </div>
+            @endif
+
             <div class="table-responsive">
-                <table class="table table-striped">
+                <table class="table table-hover align-middle">
                     <thead>
                         <tr>
+                            <th width="5%">No</th>
                             <th>Nama</th>
                             <th>Kelompok</th>
                             <th>Kurikulum</th>
                             <th>Jurusan</th>
                             <th>Tingkat</th>
-                            <th>Urutan</th>
-                            <th>Aksi</th>
+                            <th width="18%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($mapels as $m)
+                        @forelse($mapels as $key => $m)
                         <tr>
-                            <td><strong>{{ $m->nama }}</strong></td>
+                            <td>{{ $key + 1 }}</td>
+                            <td><span class="fw-semibold">{{ $m->nama }}</span></td>
                             <td>
-                                <span class="badge bg-secondary">{{ $m->kelompok }}</span>
+                                <span class="badge-kelompok {{ strtolower($m->kelompok) }}">
+                                    {{ $m->kelompok }}
+                                </span>
                             </td>
                             <td>
                                 @if($m->kurikulums->count() > 0)
                                     @foreach($m->kurikulums as $kurikulum)
-                                        <span class="badge bg-info me-1">{{ $kurikulum->nama_kurikulum }}</span>
+                                        <span class="badge-kurikulum">{{ $kurikulum->nama_kurikulum }}</span>
                                     @endforeach
                                 @else
-                                    -
+                                    <span style="font-size:0.5rem; color:#94A3B8;">-</span>
                                 @endif
                             </td>
                             <td>
                                 @if($m->jurusans->count() > 0)
                                     @foreach($m->jurusans as $jurusan)
-                                        <span class="badge bg-warning text-dark me-1">{{ $jurusan->nama }}</span>
+                                        <span class="badge-jurusan">{{ $jurusan->nama }}</span>
                                     @endforeach
                                 @else
-                                    -
+                                    <span style="font-size:0.5rem; color:#94A3B8;">-</span>
                                 @endif
                             </td>
-                            <td>{{ ($m->tingkats ?? collect())->pluck('tingkat')->implode(', ') }}</td>
                             <td>
-                                <span class="badge bg-primary">{{ $m->urutan }}</span>
+                                @php $tingkats = $m->tingkats->pluck('tingkat')->toArray(); @endphp
+                                @if(count($tingkats) > 0)
+                                    @foreach($tingkats as $t)
+                                        <span class="badge-tingkat">{{ $t }}</span>
+                                    @endforeach
+                                @else
+                                    <span style="font-size:0.5rem; color:#94A3B8;">-</span>
+                                @endif
                             </td>
                             <td>
-                                <div class="d-flex gap-2 align-items-center">
-                                    <a href="{{ route('kurikulum.mata-pelajaran.edit', $m->id) }}" class="btn btn-sm btn-warning">
-                                        <i class="fas fa-edit"></i> <span class="d-none d-lg-inline">Edit</span>
+                                <div class="action-buttons">
+                                    <a href="{{ route('kurikulum.mata-pelajaran.edit', $m->id) }}" class="btn-edit">
+                                        <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="{{ route('kurikulum.mata-pelajaran.destroy', $m->id) }}" method="POST" onsubmit="return confirm('Hapus mata pelajaran ini?')">
+                                    <form action="{{ route('kurikulum.mata-pelajaran.destroy', $m->id) }}" method="POST" onsubmit="return confirm('Hapus?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="btn btn-sm btn-danger">
-                                            <i class="fas fa-trash"></i> <span class="d-none d-lg-inline">Hapus</span>
+                                        <button type="submit" class="btn-delete">
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
                                 </div>
@@ -584,10 +538,10 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="text-center">
+                            <td colspan="7">
                                 <div class="empty-state">
                                     <i class="fas fa-book"></i>
-                                    <p>Belum ada mata pelajaran.</p>
+                                    <h5 class="text-muted">Belum ada data</h5>
                                 </div>
                             </td>
                         </tr>
@@ -595,24 +549,24 @@
                     </tbody>
                 </table>
             </div>
+
+            @if(method_exists($mapels, 'links'))
+            <div class="pagination-wrapper">
+                {{ $mapels->appends(request()->query())->links() }}
+            </div>
+            @endif
         </div>
     </div>
 </div>
 
 <script>
-function toggleMobileFilter() {
-    const filterContent = document.getElementById('mobileFilterContent');
-    const chevron = document.getElementById('filterChevron');
-    
-    filterContent.classList.toggle('show');
-    
-    if (filterContent.classList.contains('show')) {
-        chevron.classList.remove('fa-chevron-down');
-        chevron.classList.add('fa-chevron-up');
-    } else {
-        chevron.classList.remove('fa-chevron-up');
-        chevron.classList.add('fa-chevron-down');
-    }
-}
+    setTimeout(function() {
+        let alert = document.getElementById('successAlert');
+        if(alert) {
+            alert.style.transition = 'opacity 0.5s';
+            alert.style.opacity = '0';
+            setTimeout(function() { alert.remove(); }, 500);
+        }
+    }, 3000);
 </script>
 @endsection

@@ -1,359 +1,506 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Siswa')
+@section('title', 'Detail Siswa - ' . ($s->nama_lengkap ?? ''))
 
 @section('content')
 <style>
-    /* ===================== STYLE DETAIL SISWA ===================== */
+    /* ===================== STYLE DETAIL SISWA (SESUAI DASHBOARD) ===================== */
     
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #13B497 0%, #59D4A4 100%);
+        --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        --danger-gradient: linear-gradient(135deg, #F093FB 0%, #F5576C 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --card-hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        --text-primary: #2d3748;
+        --text-secondary: #718096;
+        --bg-light: #f7fafc;
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
-        background-color: var(--light-bg);
+        background-color: var(--bg-light);
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: var(--text-primary);
     }
 
-    /* Responsive Container */
-    .report-container {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 0 1rem;
-    }
-
-    h3.mb-0 {
-        font-size: 28px;
-        color: #1E293B;
+    /* Page Header - SAMA DENGAN DASHBOARD */
+    .page-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 2rem 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+        box-shadow: var(--card-shadow);
         position: relative;
-        padding-left: 15px;
-        margin-bottom: 5px !important;
+        overflow: hidden;
     }
 
-    h3.mb-0::before {
+    .page-header::before {
         content: "";
         position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 5px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 3px;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(100px, -100px);
+    }
+
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        position: relative;
+        z-index: 1;
     }
 
     /* Card Styles */
     .card {
-        border-radius: 16px;
+        border-radius: var(--border-radius);
         border: none;
         box-shadow: var(--card-shadow);
         overflow: hidden;
-        transition: all 0.3s ease;
+        transition: var(--transition);
         margin-bottom: 1.5rem;
     }
 
     .card:hover {
-        box-shadow: var(--hover-shadow);
+        transform: translateY(-3px);
+        box-shadow: var(--card-hover-shadow);
     }
 
-    .card-body {
-        padding: 1.5rem;
-    }
-
-    .card.shadow-sm {
-        box-shadow: var(--card-shadow);
-    }
-
-    /* Section Headers */
-    h5, h6 {
-        font-size: 18px;
-        color: #1E293B;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        position: relative;
-        padding-left: 15px;
-    }
-
-    h5::before, h6::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 4px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 2px;
-    }
-
-    /* Profile Image */
-    .rounded-circle {
-        border: 4px solid white;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-    }
-
-    .rounded-circle:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-    }
-
-    /* Student Name */
-    h5.mb-0 {
-        font-size: 20px;
+    .card-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         font-weight: 700;
-        color: #1E293B;
-        margin-bottom: 5px !important;
+        font-size: 1.1rem;
+        border-bottom: 2px solid #667eea;
+        padding: 1rem 1.5rem;
     }
 
-    /* Buttons */
-    .btn {
-        border-radius: 8px;
+    .card-header i {
+        color: #667eea;
+        margin-right: 8px;
+    }
+
+    /* Profile Section */
+    .profile-avatar {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid white;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        transition: var(--transition);
+    }
+
+    .profile-avatar:hover {
+        transform: scale(1.05);
+    }
+
+    .profile-avatar-placeholder {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        font-weight: 700;
+        background: var(--primary-gradient);
+        color: white;
+        border: 4px solid white;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        margin: 0 auto;
+    }
+
+    /* Info Row */
+    .info-row {
+        display: flex;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .info-label {
+        width: 160px;
         font-weight: 600;
-        padding: 0.5rem 1.2rem;
-        transition: all 0.2s ease;
+        color: #4a5568;
+    }
+
+    .info-value {
+        flex: 1;
+        color: #2d3748;
+    }
+
+    /* Button Styles - SAMA DENGAN DASHBOARD */
+    .btn-gradient {
+        background: var(--primary-gradient);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.6rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         display: inline-flex;
         align-items: center;
+        gap: 8px;
     }
 
-    .btn:hover {
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        color: white;
+    }
+
+    .btn-outline-gradient {
+        background: transparent;
+        border: 2px solid #667eea;
+        color: #667eea;
+        font-weight: 600;
+        padding: 0.6rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-outline-gradient:hover {
+        background: var(--primary-gradient);
+        color: white;
+        border-color: transparent;
         transform: translateY(-2px);
     }
 
-    .btn-outline-secondary {
-        color: #64748B;
-        border-color: #E2E8F0;
-    }
-
-    .btn-outline-secondary:hover {
-        background-color: #F1F5F9;
-        border-color: #CBD5E1;
-    }
-
-    .btn-primary {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-    }
-
-    .btn-primary:hover {
-        background-color: var(--secondary-color);
-        border-color: var(--secondary-color);
-    }
-
-    /* Table Styles */
-    .table {
-        margin-bottom: 0;
-    }
-
-    .table-borderless th,
-    .table-borderless td {
+    .btn-danger-gradient {
+        background: var(--danger-gradient);
         border: none;
-        padding: 0.5rem 0;
-    }
-
-    .table-borderless th {
-        color: #64748B;
+        color: white;
         font-weight: 600;
-        font-size: 14px;
-        width: 40%;
+        padding: 0.6rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .table-borderless td {
-        color: #334155;
-        font-size: 14px;
+    .btn-danger-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
+        color: white;
     }
 
-    /* Text Styles */
-    .text-muted {
-        color: #64748B !important;
-    }
-
-    strong {
-        color: #475569;
+    /* Badge */
+    .badge-custom {
+        padding: 6px 12px;
+        border-radius: 20px;
         font-weight: 600;
+        font-size: 12px;
     }
 
     /* Animations */
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
+        from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
-    .card {
-        animation: fadeIn 0.5s ease-out;
+    .fade-in {
+        animation: fadeIn 0.6s ease-out;
     }
 
     /* Responsive */
     @media (max-width: 768px) {
-        .card-body {
-            padding: 1.25rem;
+        .page-header {
+            padding: 1.5rem 1rem;
         }
         
-        h3.mb-0 {
-            font-size: 22px;
-            margin-bottom: 0.5rem !important;
+        .page-header h3 {
+            font-size: 1.5rem;
         }
         
-        .btn {
-            padding: 0.6rem 1rem;
-            font-size: 13px;
+        .info-row {
+            flex-direction: column;
+        }
+        
+        .info-label {
             width: 100%;
-            display: block;
-            text-align: center;
-            white-space: normal;
-            margin: 0.5rem 0 !important;
+            margin-bottom: 5px;
         }
         
-        .table-borderless th,
-        .table-borderless td {
-            font-size: 12px;
-            padding: 0.4rem 0;
-        }
-
-        .report-container {
-            padding: 0 0.5rem;
-        }
-
-        .d-flex.justify-content-between {
-            display: flex !important;
+        .action-buttons {
             flex-direction: column;
-            align-items: stretch !important;
-            gap: 0.75rem;
+            gap: 10px;
         }
-
-        .d-flex.justify-content-between > div {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .col-lg-4, .col-lg-8 {
-            flex: 0 0 100% !important;
-            max-width: 100% !important;
-        }
-
-        .row > .col-lg-4:first-child {
-            margin-bottom: 1rem;
-        }
-
-        .mb-3 {
-            margin-bottom: 1rem !important;
+        
+        .action-buttons .btn {
+            width: 100%;
+            justify-content: center;
         }
     }
 </style>
 
-<div class="container-fluid mt-4">
-    <div class="report-container">
-
-    <div class="d-flex justify-content-between align-items-start mb-3">
+<div class="container-fluid py-4">
+    <!-- Header - TANPA TOMBOL KEMBALI -->
+    <div class="page-header fade-in">
         <div>
-            <h3 class="mb-0">Detail Siswa</h3>
-            <small class="text-muted">Informasi lengkap siswa</small>
-        </div>
-        <div>
-            <a href="{{ route('walikelas.siswa.index') }}" class="btn btn-outline-secondary">Kembali</a>
-            @if(auth()->check())
-                @php $role = auth()->user()->role; @endphp
-                @if($role == 'walikelas')
-                    <a href="{{ route('walikelas.siswa.exportPDF', $s->id) }}" class="btn btn-danger" target="_blank">Export PDF</a>
-                @elseif($role == 'guru')
-                    <a href="{{ route('guru.siswa.exportPDF', $s->id) }}" class="btn btn-danger" target="_blank">Export PDF</a>
-                @endif
-            @endif
+            <h3 class="mb-1">👤 Detail Siswa</h3>
+            <div class="text-muted">Informasi lengkap data siswa</div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-4">
-            <div class="card shadow-sm mb-3 text-center">
+    <div class="row g-4">
+        <!-- Kolom Kiri - Profil -->
+        <div class="col-lg-4 fade-in" style="animation-delay: 0.1s;">
+            <!-- Card Profil -->
+            <div class="card text-center">
                 <div class="card-body">
                     @if(!empty($s->foto) && file_exists(public_path('storage/' . $s->foto)))
-                        <img src="{{ asset('storage/' . $s->foto) }}" class="rounded-circle mb-3" width="140" height="140" style="object-fit:cover;">
+                        <img src="{{ asset('storage/' . $s->foto) }}" class="profile-avatar mb-3" alt="{{ $s->nama_lengkap }}">
                     @else
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode($s->nama_lengkap) }}&size=140" class="rounded-circle mb-3" width="140" height="140">
+                        <div class="profile-avatar-placeholder mx-auto mb-3">
+                            {{ strtoupper(substr($s->nama_lengkap, 0, 1)) }}
+                        </div>
                     @endif
 
-                    <h5 class="mb-0">{{ $s->nama_lengkap }}</h5>
-                    <small class="text-muted">NIS: {{ $s->nis }} | NISN: {{ $s->nisn ?? '-' }}</small>
+                    <h5 class="fw-bold mb-1">{{ $s->nama_lengkap }}</h5>
+                    <div class="mb-2">
+                        <span class="badge-custom bg-primary text-white">
+                            <i class="fas fa-id-card me-1"></i> NIS: {{ $s->nis ?? '-' }}
+                        </span>
+                        <span class="badge-custom bg-info text-dark mt-1 mt-sm-0">
+                            <i class="fas fa-qrcode me-1"></i> NISN: {{ $s->nisn ?? '-' }}
+                        </span>
+                    </div>
 
                     <hr>
-                    <p class="mb-1"><strong>Kelas:</strong> {{ $s->kelas ?? '-' }}</p>
-                    <p class="mb-0"><strong>Tanggal Diterima:</strong> {{ $s->tanggal_diterima ?? '-' }}</p>
+
+                    <div class="text-start">
+                        <div class="info-row">
+                            <div class="info-label"><i class="fas fa-graduation-cap me-2 text-primary"></i> Rombel</div>
+                            <div class="info-value">{{ $s->rombel->nama ?? '-' }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label"><i class="fas fa-venus-mars me-2 text-primary"></i> Jenis Kelamin</div>
+                            <div class="info-value">{{ $s->jenis_kelamin ?? '-' }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label"><i class="fas fa-calendar-alt me-2 text-primary"></i> Tanggal Diterima</div>
+                            <div class="info-value">{{ $s->tanggal_diterima ?? '-' }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="card shadow-sm mb-3">
+            <!-- Card Kontak -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-phone-alt"></i> Kontak
+                </div>
                 <div class="card-body">
-                    <h6>Kontak</h6>
-                    <p class="mb-1"><strong>No HP:</strong> {{ $s->no_hp ?? '-' }}</p>
-                    <p class="mb-1"><strong>Telepon Ayah:</strong> {{ $s->ayah->telepon ?? '-' }}</p>
-                    <p class="mb-1"><strong>Telepon Ibu:</strong> {{ $s->ibu->telepon ?? '-' }}</p>
-                    <p class="mb-0"><strong>Telepon Wali:</strong> {{ $s->wali->telepon ?? '-' }}</p>
+                    <div class="info-row">
+                        <div class="info-label"><i class="fas fa-mobile-alt me-2 text-primary"></i> No HP Siswa</div>
+                        <div class="info-value">{{ $s->no_hp ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label"><i class="fas fa-father me-2 text-primary"></i> Telepon Ayah</div>
+                        <div class="info-value">{{ $s->ayah->telepon ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label"><i class="fas fa-mother me-2 text-primary"></i> Telepon Ibu</div>
+                        <div class="info-value">{{ $s->ibu->telepon ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label"><i class="fas fa-user-friends me-2 text-primary"></i> Telepon Wali</div>
+                        <div class="info-value">{{ $s->wali->telepon ?? '-' }}</div>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- Kolom Kanan - Detail Informasi -->
         <div class="col-lg-8">
-            <div class="card shadow-sm mb-3 p-3">
-                <h5>Informasi Pribadi</h5>
-                <div class="row mt-2">
-                    <div class="col-md-6">
-                        <table class="table table-borderless table-sm">
-                            <tr><th>Nama Lengkap</th><td>{{ $s->nama_lengkap }}</td></tr>
-                            <tr><th>Jenis Kelamin</th><td>{{ $s->jenis_kelamin }}</td></tr>
-                            <tr><th>Tempat, Tanggal Lahir</th><td>{{ $s->tempat_lahir ?? '-' }}, {{ $s->tanggal_lahir ?? '-' }}</td></tr>
-                            <tr><th>Agama</th><td>{{ $s->agama ?? '-' }}</td></tr>
-                            <tr><th>Kewarganegaraan</th><td>{{ $s->kewarganegaraan ?? '-' }}</td></tr>
-                            <tr><th>Status Keluarga</th><td>{{ $s->status_keluarga ?? '-' }}</td></tr>
-                            <tr><th>Anak Ke</th><td>{{ $s->anak_ke ?? '-' }}</td></tr>
-                        </table>
-                    </div>
-                    <div class="col-md-6">
-                        <table class="table table-borderless table-sm">
-                            <tr><th>Alamat</th><td>Dusun {{ $s->dusun ?? '-' }}, RT/RW {{ $s->rt ?? '-' }}/{{ $s->rw ?? '-' }}, {{ $s->kelurahan ?? '-' }}, {{ $s->kecamatan ?? '-' }}, {{ $s->kode_pos ?? '-' }}</td></tr>
-                            <tr><th>Sekolah Asal</th><td>{{ $s->sekolah_asal ?? '-' }}</td></tr>
-                            <tr><th>Tanggal Diterima</th><td>{{ $s->tanggal_diterima ?? '-' }}</td></tr>
-                            <tr><th>Rombel</th><td>{{ $s->rombel->nama ?? ($s->rombel_id ? 'Rombel #' . $s->rombel_id : '-') }}</td></tr>
-                            <tr><th>Catatan Wali</th><td>{{ $s->catatan_wali_kelas ?? '-' }}</td></tr>
-                        </table>
+            <!-- Informasi Pribadi -->
+            <div class="card fade-in" style="animation-delay: 0.2s;">
+                <div class="card-header">
+                    <i class="fas fa-user-circle"></i> Informasi Pribadi
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <div class="info-label">Nama Lengkap</div>
+                                <div class="info-value">{{ $s->nama_lengkap }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Jenis Kelamin</div>
+                                <div class="info-value">{{ $s->jenis_kelamin ?? '-' }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Tempat, Tanggal Lahir</div>
+                                <div class="info-value">{{ $s->tempat_lahir ?? '-' }}, {{ $s->tanggal_lahir ?? '-' }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Agama</div>
+                                <div class="info-value">{{ $s->agama ?? '-' }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <div class="info-label">Kewarganegaraan</div>
+                                <div class="info-value">{{ $s->kewarganegaraan ?? '-' }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status Keluarga</div>
+                                <div class="info-value">{{ $s->status_keluarga ?? '-' }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Anak Ke</div>
+                                <div class="info-value">{{ $s->anak_ke ?? '-' }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Sekolah Asal</div>
+                                <div class="info-value">{{ $s->sekolah_asal ?? '-' }}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card shadow-sm p-3">
-                <h5>Data Orang Tua / Wali</h5>
-                <div class="row mt-2">
-                    <div class="col-md-6">
-                        <table class="table table-borderless table-sm">
-                            <tr><th>Nama Ayah</th><td>{{ $s->ayah->nama ?? '-' }}</td></tr>
-                            <tr><th>Pekerjaan Ayah</th><td>{{ $s->ayah->pekerjaan ?? '-' }}</td></tr>
-                            <tr><th>Telepon Ayah</th><td>{{ $s->ayah->telepon ?? '-' }}</td></tr>
-                            <tr><th>Alamat Ayah</th><td>{{ $s->ayah->alamat ?? '-' }}</td></tr>
-                            <tr><th>Nama Ibu</th><td>{{ $s->ibu->nama ?? '-' }}</td></tr>
-                            <tr><th>Pekerjaan Ibu</th><td>{{ $s->ibu->pekerjaan ?? '-' }}</td></tr>
-                            <tr><th>Telepon Ibu</th><td>{{ $s->ibu->telepon ?? '-' }}</td></tr>
-                            <tr><th>Alamat Ibu</th><td>{{ $s->ibu->alamat ?? '-' }}</td></tr>
-                        </table>
+            <!-- Alamat -->
+            <div class="card fade-in" style="animation-delay: 0.3s;">
+                <div class="card-header">
+                    <i class="fas fa-map-marker-alt"></i> Alamat
+                </div>
+                <div class="card-body">
+                    <div class="info-row">
+                        <div class="info-label">Dusun</div>
+                        <div class="info-value">{{ $s->dusun ?? '-' }}</div>
                     </div>
-                    <div class="col-md-6">
-                        <table class="table table-borderless table-sm">
-                            <tr><th>Nama Wali</th><td>{{ $s->wali->nama ?? '-' }}</td></tr>
-                            <tr><th>Pekerjaan Wali</th><td>{{ $s->wali->pekerjaan ?? '-' }}</td></tr>
-                            <tr><th>Alamat Wali</th><td>{{ $s->wali->alamat ?? '-' }}</td></tr>
-                            <tr><th>Telepon Wali</th><td>{{ $s->wali->telepon ?? '-' }}</td></tr>
-                        </table>
+                    <div class="info-row">
+                        <div class="info-label">RT / RW</div>
+                        <div class="info-value">{{ $s->rt ?? '-' }} / {{ $s->rw ?? '-' }}</div>
                     </div>
+                    <div class="info-row">
+                        <div class="info-label">Kelurahan</div>
+                        <div class="info-value">{{ $s->kelurahan ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Kecamatan</div>
+                        <div class="info-value">{{ $s->kecamatan ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Kode Pos</div>
+                        <div class="info-value">{{ $s->kode_pos ?? '-' }}</div>
+                    </div>
+                    @if($s->catatan_wali_kelas)
+                    <div class="info-row">
+                        <div class="info-label">Catatan Wali Kelas</div>
+                        <div class="info-value">{{ $s->catatan_wali_kelas }}</div>
+                    </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Data Orang Tua -->
+            <div class="card fade-in" style="animation-delay: 0.4s;">
+                <div class="card-header">
+                    <i class="fas fa-family"></i> Data Orang Tua
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold mb-3"><i class="fas fa-father text-primary me-2"></i> Ayah</h6>
+                            <div class="info-row">
+                                <div class="info-label">Nama</div>
+                                <div class="info-value">{{ $s->ayah->nama ?? '-' }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Pekerjaan</div>
+                                <div class="info-value">{{ $s->ayah->pekerjaan ?? '-' }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Pendidikan</div>
+                                <div class="info-value">{{ $s->ayah->pendidikan ?? '-' }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Alamat</div>
+                                <div class="info-value">{{ $s->ayah->alamat ?? '-' }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold mb-3"><i class="fas fa-mother text-primary me-2"></i> Ibu</h6>
+                            <div class="info-row">
+                                <div class="info-label">Nama</div>
+                                <div class="info-value">{{ $s->ibu->nama ?? '-' }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Pekerjaan</div>
+                                <div class="info-value">{{ $s->ibu->pekerjaan ?? '-' }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Pendidikan</div>
+                                <div class="info-value">{{ $s->ibu->pendidikan ?? '-' }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Alamat</div>
+                                <div class="info-value">{{ $s->ibu->alamat ?? '-' }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if($s->wali && $s->wali->nama)
+                    <hr>
+                    <h6 class="fw-bold mb-3"><i class="fas fa-user-friends text-primary me-2"></i> Wali</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <div class="info-label">Nama Wali</div>
+                                <div class="info-value">{{ $s->wali->nama ?? '-' }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Pekerjaan</div>
+                                <div class="info-value">{{ $s->wali->pekerjaan ?? '-' }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <div class="info-label">Alamat</div>
+                                <div class="info-value">{{ $s->wali->alamat ?? '-' }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Telepon</div>
+                                <div class="info-value">{{ $s->wali->telepon ?? '-' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- BUTTON AKSI - Footer (HANYA 2 TOMBOL) -->
+    <div class="card fade-in mt-3" style="animation-delay: 0.5s;">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 action-buttons">
+                <a href="{{ route('walikelas.siswa.index') }}" class="btn btn-outline-gradient">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Daftar
+                </a>
+                <a href="{{ route('walikelas.siswa.exportPDF', $s->id) }}" class="btn btn-danger-gradient" target="_blank">
+                    <i class="fas fa-file-pdf"></i> Cetak Data Siswa
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection

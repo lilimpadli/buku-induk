@@ -1,519 +1,455 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Guru: ' . $guru->nama)
+@section('title', 'Detail Guru')
 
 @section('content')
 <style>
+    /* ===================== STYLE DETAIL GURU ===================== */
+    
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --card-hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
-        background-color: var(--light-bg);
+        background-color: #f7fafc;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    h3 {
-        font-size: 28px;
-        color: #1E293B;
-        position: relative;
-        padding-left: 15px;
-        margin-bottom: 1.5rem !important;
+    /* ===== OVERRIDE LAYOUT ===== */
+    main {
+        padding: 20px 15px !important;
+        overflow-x: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
-    h3::before {
+    .container-fluid {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 10px !important;
+        overflow-x: auto !important;
+    }
+
+    /* ===== HEADER ===== */
+    .page-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 1.5rem 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .page-header::before {
         content: "";
         position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 5px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 3px;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(100px, -100px);
+        pointer-events: none;
     }
 
-    .card {
-        border-radius: 16px;
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        font-size: 1.3rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 0.9rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-back {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.4rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* ===== CARD ===== */
+    .info-card {
+        border-radius: var(--border-radius);
         border: none;
         box-shadow: var(--card-shadow);
-        margin-bottom: 20px;
-        transition: all 0.3s ease;
+        overflow: hidden;
+        width: 100%;
+        margin-bottom: 1.5rem;
     }
 
-    .card:hover {
-        box-shadow: var(--hover-shadow);
+    .info-card .card-header {
+        background: white;
+        border-bottom: 1px solid #E2E8F0;
+        padding: 0.8rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
+    .info-card .card-header h5 {
+        margin: 0;
+        font-weight: 700;
+        color: #1E293B;
+        font-size: 1rem;
+    }
+
+    .info-card .card-header h5 i {
+        color: #667eea;
+        margin-right: 6px;
+    }
+
+    .info-card .card-body {
+        padding: 1.2rem 1.5rem;
+    }
+
+    /* ===== INFO ROW ===== */
     .info-row {
         display: flex;
-        padding: 15px;
-        background-color: rgba(47, 83, 255, 0.03);
-        border-radius: 8px;
-        margin-bottom: 10px;
-        transition: all 0.3s ease;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #F1F5F9;
     }
 
-    .info-row:hover {
-        background-color: rgba(47, 83, 255, 0.06);
-        transform: translateX(5px);
+    .info-row:last-child {
+        border-bottom: none;
     }
 
     .info-label {
+        width: 180px;
         font-weight: 600;
         color: #64748B;
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        min-width: 150px;
+        font-size: 0.85rem;
         flex-shrink: 0;
     }
 
     .info-value {
-        color: #1E293B;
-        font-weight: 500;
         flex: 1;
+        color: #1E293B;
+        font-size: 0.9rem;
     }
 
-    .btn-back {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        border: none;
-        border-radius: 8px;
-        padding: 10px 24px;
+    /* ===== BADGE ===== */
+    .badge-role {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
         font-weight: 600;
-        color: white;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
+        display: inline-block;
+        white-space: nowrap;
     }
 
-    .btn-back:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(47, 83, 255, 0.4);
-        color: white;
+    .badge-role.guru {
+        background: #DBEAFE;
+        color: #2563EB;
+    }
+
+    .badge-role.walikelas {
+        background: #D1FAE5;
+        color: #059669;
+    }
+
+    .badge-role.kaprog {
+        background: #FEF3C7;
+        color: #D97706;
+    }
+
+    .badge-role.tu {
+        background: #E2E8F0;
+        color: #475569;
+    }
+
+    .badge-role.kurikulum {
+        background: #FCE7F3;
+        color: #DB2777;
+    }
+
+    .badge-role.super_admin {
+        background: #FEE2E2;
+        color: #DC2626;
+    }
+
+    .badge-gender {
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    .badge-gender.laki {
+        background: #DBEAFE;
+        color: #2563EB;
+    }
+
+    .badge-gender.perempuan {
+        background: #FCE7F3;
+        color: #DB2777;
+    }
+
+    /* ===== TABLE ===== */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .table {
+        width: 100%;
+        min-width: 400px;
         margin-bottom: 0;
+        font-size: 0.85rem;
     }
 
-    .table thead th {
+    .table th {
         font-weight: 600;
-        color: #475569;
-        font-size: 14px;
+        font-size: 0.7rem;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 2px solid #E2E8F0;
-        padding: 15px 20px;
+        letter-spacing: 0.3px;
+        color: #64748B;
+        padding: 0.6rem 0.8rem;
+        white-space: nowrap;
         background-color: #F8FAFC;
+        border-bottom: none;
     }
 
-    .table tbody td {
-        padding: 15px 20px;
+    .table td {
+        padding: 0.6rem 0.8rem;
         vertical-align: middle;
-        border-bottom: 1px solid #F1F5F9;
-    }
-
-    .table tbody tr {
-        transition: all 0.2s ease;
+        border-color: #E2E8F0;
     }
 
     .table tbody tr:hover {
-        background-color: rgba(47, 83, 255, 0.03);
+        background-color: rgba(102, 126, 234, 0.03);
+    }
+
+    .badge-siswa {
+        background: #667eea;
+        color: white;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        display: inline-block;
+        white-space: nowrap;
     }
 
     .empty-state {
         text-align: center;
-        padding: 40px 20px;
-        color: #64748B;
+        padding: 2rem 1rem;
+        color: #94A3B8;
     }
 
     .empty-state i {
-        opacity: 0.5;
+        font-size: 2rem;
+        color: #CBD5E1;
+        display: block;
+        margin-bottom: 0.5rem;
     }
 
-    /* Card Section Headers */
-    .card-section-header {
-        padding: 20px;
-        border-bottom: 2px solid #F1F5F9;
-    }
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1rem 1rem;
+        }
+        .page-header h3 {
+            font-size: 1.1rem;
+        }
+        .page-header .text-muted {
+            font-size: 0.75rem;
+        }
 
-    .card-section-header h5 {
-        margin: 0;
-        font-weight: 700;
-        color: #1E293B;
-        font-size: 18px;
-    }
-
-    /* Badge Styles */
-    .badge {
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-weight: 500;
-        font-size: 13px;
-    }
-
-    /* ===================== RESPONSIVE STYLES ===================== */
-
-    /* Tablet (768px - 991px) */
-    @media (max-width: 991px) {
-        h3 {
-            font-size: 24px;
+        .info-row {
+            flex-direction: column;
+            padding: 0.6rem 0;
         }
 
         .info-label {
-            min-width: 130px;
-            font-size: 12px;
-        }
-
-        .table thead th {
-            font-size: 13px;
-            padding: 12px 15px;
-        }
-
-        .table tbody td {
-            padding: 12px 15px;
-        }
-    }
-
-    /* Mobile (max 767px) */
-    @media (max-width: 767px) {
-        .container {
-            padding-left: 12px;
-            padding-right: 12px;
-        }
-
-        h3 {
-            font-size: 20px;
-            padding-left: 12px;
-        }
-
-        h3::before {
-            width: 4px;
-        }
-
-        /* Header Section */
-        .d-flex.justify-content-between {
-            flex-direction: column;
-            gap: 15px;
-            align-items: flex-start !important;
-        }
-
-        .btn-back {
             width: 100%;
-            justify-content: center;
-            padding: 12px 20px;
-            font-size: 14px;
-        }
-
-        /* Card Styling */
-        .card {
-            border-radius: 12px;
-            margin-bottom: 16px;
-        }
-
-        .card-body {
-            padding: 16px !important;
-        }
-
-        .card-section-header {
-            padding: 16px;
-        }
-
-        .card-section-header h5 {
-            font-size: 16px;
-        }
-
-        /* Info Rows - Stack on Mobile */
-        .info-row {
-            flex-direction: column;
-            padding: 12px;
-            gap: 6px;
-        }
-
-        .info-label {
-            min-width: 100%;
-            font-size: 11px;
-            margin-bottom: 4px;
-            color: #64748B;
+            font-size: 0.75rem;
+            margin-bottom: 2px;
         }
 
         .info-value {
-            font-size: 14px;
-            padding-left: 0;
+            font-size: 0.85rem;
         }
 
-        /* Table Responsive */
-        .table-responsive {
-            border-radius: 0;
-            margin: 0;
+        .info-card .card-header {
+            padding: 0.6rem 1rem;
+        }
+
+        .info-card .card-body {
+            padding: 0.8rem 1rem;
         }
 
         .table {
-            font-size: 13px;
+            min-width: 350px;
+            font-size: 0.75rem;
         }
-
-        .table thead th {
-            font-size: 11px;
-            padding: 10px 8px;
-            white-space: nowrap;
-        }
-
-        .table tbody td {
-            padding: 10px 8px;
-            font-size: 13px;
-        }
-
-        /* Hide some columns on very small screens */
-        .table thead th:nth-child(3),
-        .table tbody td:nth-child(3) {
-            display: none;
-        }
-
-        /* Empty State */
-        .empty-state {
-            padding: 30px 15px;
-        }
-
-        .empty-state i {
-            font-size: 2.5rem !important;
-        }
-
-        .empty-state p {
-            font-size: 14px;
-            margin: 0;
-        }
-
-        /* Badge sizing */
-        .badge {
-            padding: 4px 10px;
-            font-size: 12px;
+        .table th,
+        .table td {
+            padding: 0.4rem 0.5rem;
         }
     }
 
-    /* Mobile Small (max 575px) */
-    @media (max-width: 575px) {
-        h3 {
-            font-size: 18px;
-        }
-
-        .card-section-header h5 {
-            font-size: 15px;
-        }
-
-        .info-row {
-            padding: 10px;
-        }
-
-        .info-label {
-            font-size: 10px;
-        }
-
-        .info-value {
-            font-size: 13px;
-        }
-
+    @media (max-width: 576px) {
         .table {
-            font-size: 12px;
+            min-width: 300px;
+            font-size: 0.65rem;
         }
-
-        .table thead th {
-            font-size: 10px;
-            padding: 8px 6px;
+        .table th,
+        .table td {
+            padding: 0.3rem 0.4rem;
         }
-
-        .table tbody td {
-            padding: 8px 6px;
-            font-size: 12px;
+        .badge-siswa {
+            font-size: 0.55rem;
+            padding: 1px 6px;
         }
-
-        /* Show only essential columns */
-        .table thead th:nth-child(2),
-        .table tbody td:nth-child(2) {
-            display: none;
-        }
-    }
-
-    /* Desktop Large (1200px+) */
-    @media (min-width: 1200px) {
-        .container {
-            max-width: 1140px;
-        }
-
-        h3 {
-            font-size: 30px;
-        }
-
-        .info-label {
-            min-width: 180px;
-            font-size: 14px;
-        }
-
-        .info-value {
-            font-size: 16px;
-        }
-
-        .card-section-header h5 {
-            font-size: 20px;
-        }
-    }
-
-    /* Utility Classes for Responsive */
-    @media (max-width: 767px) {
-        .mobile-stack {
-            flex-direction: column !important;
-        }
-
-        .mobile-full-width {
-            width: 100% !important;
-        }
-
-        .mobile-text-center {
-            text-align: center !important;
-        }
-
-        .mobile-hidden {
-            display: none !important;
-        }
-    }
-
-    /* Animation */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .card {
-        animation: fadeIn 0.5s ease-out;
-    }
-
-    .info-row {
-        animation: fadeIn 0.3s ease-out;
     }
 </style>
 
-<div class="container mt-4">
+<div class="container-fluid px-4">
     <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>Detail Guru</h3>
-        <a href="{{ route('kurikulum.guru.manage.index') }}" class="btn-back">
-            <i class="fa fa-arrow-left"></i>
-            <span>Kembali</span>
-        </a>
+    <div class="page-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap">
+            <div>
+                <h3><i class="fas fa-user-tie me-2"></i> Detail Guru</h3>
+                <div class="text-muted">Informasi lengkap data guru</div>
+            </div>
+            <div>
+                <a href="{{ route('kurikulum.guru.manage.index') }}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+            </div>
+        </div>
     </div>
 
-    <!-- DATA DIRI GURU -->
-    <div class="card">
-        <div class="card-section-header">
-            <h5>Informasi Pribadi</h5>
+    <!-- DATA DIRI -->
+    <div class="info-card">
+        <div class="card-header">
+            <h5><i class="fas fa-id-card"></i> Informasi Pribadi</h5>
         </div>
         <div class="card-body">
             <div class="info-row">
                 <div class="info-label">Nama Lengkap</div>
-                <div class="info-value">{{ $guru->nama }}</div>
+                <div class="info-value"><strong>{{ $guru->nama }}</strong></div>
             </div>
-
             <div class="info-row">
                 <div class="info-label">NIP</div>
                 <div class="info-value">{{ $guru->nip ?? '-' }}</div>
             </div>
-
-            <div class="info-row">
-                <div class="info-label">NIK / Nomor Induk</div>
-                <div class="info-value">{{ optional($guru->user)->nomor_induk ?? '-' }}</div>
-            </div>
-
             <div class="info-row">
                 <div class="info-label">Email</div>
                 <div class="info-value">{{ $guru->email ?? '-' }}</div>
             </div>
-
             <div class="info-row">
                 <div class="info-label">Telepon</div>
                 <div class="info-value">{{ $guru->telepon ?? '-' }}</div>
             </div>
-
             <div class="info-row">
                 <div class="info-label">Jenis Kelamin</div>
                 <div class="info-value">
                     @if($guru->jenis_kelamin === 'L')
-                        <span class="badge bg-info">Laki-laki</span>
+                        <span class="badge-gender laki"><i class="fas fa-male me-1"></i> Laki-laki</span>
                     @elseif($guru->jenis_kelamin === 'P')
-                        <span class="badge bg-danger">Perempuan</span>
+                        <span class="badge-gender perempuan"><i class="fas fa-female me-1"></i> Perempuan</span>
                     @else
                         -
                     @endif
                 </div>
             </div>
-
             <div class="info-row">
-                <div class="info-label">Tempat Lahir</div>
-                <div class="info-value">{{ $guru->tempat_lahir ?? '-' }}</div>
-            </div>
-
-            <div class="info-row">
-                <div class="info-label">Tanggal Lahir</div>
+                <div class="info-label">Tempat, Tanggal Lahir</div>
                 <div class="info-value">
+                    {{ $guru->tempat_lahir ?? '-' }}
                     @if($guru->tanggal_lahir)
-                        {{ \Carbon\Carbon::parse($guru->tanggal_lahir)->format('d/m/Y') }}
-                    @else
-                        -
+                        , {{ \Carbon\Carbon::parse($guru->tanggal_lahir)->format('d/m/Y') }}
                     @endif
                 </div>
             </div>
-
             <div class="info-row">
                 <div class="info-label">Alamat</div>
                 <div class="info-value">{{ $guru->alamat ?? '-' }}</div>
             </div>
-
             <div class="info-row">
                 <div class="info-label">Jurusan</div>
                 <div class="info-value">{{ optional($guru->jurusan)->nama ?? '-' }}</div>
             </div>
-
             <div class="info-row">
                 <div class="info-label">Role / Jabatan</div>
                 <div class="info-value">
                     @php
                         $role = optional($guru->user)->role ?? '-';
-                        $roleLabel = [
+                        $roleClass = match($role) {
+                            'guru' => 'guru',
+                            'walikelas' => 'walikelas',
+                            'kaprog' => 'kaprog',
+                            'tu' => 'tu',
+                            'kurikulum' => 'kurikulum',
+                            'super_admin' => 'super_admin',
+                            default => ''
+                        };
+                        $roleLabel = match($role) {
                             'guru' => 'Guru',
                             'walikelas' => 'Wali Kelas',
                             'kaprog' => 'Kaprog',
                             'tu' => 'TU',
-                            'kurikulum' => 'Kurikulum'
-                        ][$role] ?? ucfirst($role);
+                            'kurikulum' => 'Kurikulum',
+                            'super_admin' => 'Super Admin',
+                            default => $role
+                        };
                     @endphp
-                    <span class="badge bg-primary">{{ $roleLabel }}</span>
+                    @if($role != '-')
+                        <span class="badge-role {{ $roleClass }}">{{ $roleLabel }}</span>
+                    @else
+                        -
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ROMBEL YANG DIAMPU -->
-    <div class="card">
-        <div class="card-section-header">
-            <h5>Rombel yang Diampu</h5>
+    <!-- ROMBEL -->
+    <div class="info-card">
+        <div class="card-header">
+            <h5><i class="fas fa-users"></i> Rombel yang Diampu</h5>
         </div>
         <div class="card-body p-0">
             @if($guru->rombels && $guru->rombels->count() > 0)
                 <div class="table-responsive">
-                    <table class="table mb-0">
+                    <table class="table table-hover align-middle">
                         <thead>
                             <tr>
+                                <th>No</th>
                                 <th>Rombel</th>
                                 <th>Tingkat</th>
                                 <th>Jurusan</th>
@@ -521,15 +457,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($guru->rombels as $rombel)
+                            @foreach($guru->rombels as $key => $rombel)
                                 <tr>
-                                    <td>
-                                        <strong>{{ $rombel->nama }}</strong>
-                                    </td>
+                                    <td>{{ $key + 1 }}</td>
+                                    <td><span class="fw-semibold">{{ $rombel->nama }}</span></td>
                                     <td>{{ optional($rombel->kelas)->tingkat ?? '-' }}</td>
                                     <td>{{ optional(optional($rombel->kelas)->jurusan)->nama ?? '-' }}</td>
                                     <td class="text-center">
-                                        <span class="badge bg-secondary">
+                                        <span class="badge-siswa">
                                             {{ $rombel->siswa_count ?? $rombel->siswa->count() }}
                                         </span>
                                     </td>
@@ -540,12 +475,11 @@
                 </div>
             @else
                 <div class="empty-state">
-                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                    <i class="fas fa-inbox"></i>
                     <p>Belum ada rombel yang diampu.</p>
                 </div>
             @endif
         </div>
     </div>
-
 </div>
 @endsection

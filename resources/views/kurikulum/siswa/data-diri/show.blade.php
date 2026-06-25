@@ -4,674 +4,499 @@
 
 @section('content')
 <style>
-    /* ===================== STYLE DETAIL SISWA - RESPONSIVE ===================== */
-    
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    body {
-        background-color: var(--light-bg);
+    body { background-color: #f7fafc; font-family: 'Inter', sans-serif; }
+
+    main {
+        padding: 20px 15px !important;
+        overflow-x: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
-    /* Header Section */
-    .detail-header {
-        display: flex;
-        align-items: start;
-        justify-content: space-between;
+    .container-fluid {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 10px !important;
+        overflow-x: auto !important;
+    }
+
+    .page-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 1.5rem 1.5rem;
+        border-radius: var(--border-radius);
         margin-bottom: 1.5rem;
-        gap: 15px;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+        width: 100%;
     }
 
-    .detail-header h2 {
-        font-weight: bold;
+    .page-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(100px, -100px);
+        pointer-events: none;
+    }
+
+    .page-header h3 {
+        font-weight: 700;
         margin-bottom: 0.25rem;
-        font-size: 28px;
-        color: #1E293B;
+        font-size: 1.3rem;
+        position: relative;
+        z-index: 1;
     }
 
-    .detail-header p {
-        color: #64748B;
-        margin-bottom: 0;
-        font-size: 15px;
+    .page-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 0.9rem;
+        position: relative;
+        z-index: 1;
     }
 
-    .header-actions {
+    .btn-back {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.4rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-edit {
+        background: #F59E0B;
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.4rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .btn-edit:hover {
+        background: #D97706;
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    .btn-cetak {
+        background: #13B497;
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.4rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .btn-cetak:hover {
+        background: #0e9a7e;
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    .btn-rapor {
+        background: #667eea;
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.4rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .btn-rapor:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    .info-card {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        width: 100%;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-card .card-header {
+        background: white;
+        border-bottom: 1px solid #E2E8F0;
+        padding: 0.8rem 1.5rem;
         display: flex;
-        gap: 8px;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .info-card .card-header h5 {
+        margin: 0;
+        font-weight: 700;
+        color: #1E293B;
+        font-size: 1rem;
+    }
+
+    .info-card .card-header h5 i {
+        color: #667eea;
+        margin-right: 6px;
+    }
+
+    .info-card .card-body {
+        padding: 1.2rem 1.5rem;
+    }
+
+    .info-row {
+        display: flex;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #F1F5F9;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        width: 180px;
+        font-weight: 600;
+        color: #64748B;
+        font-size: 0.85rem;
         flex-shrink: 0;
     }
 
-    .header-actions .btn {
+    .info-value {
+        flex: 1;
+        color: #1E293B;
+        font-size: 0.9rem;
+    }
+
+    .badge-gender {
+        padding: 2px 12px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        display: inline-block;
         white-space: nowrap;
-        border-radius: 8px;
-        font-size: 14px;
-        padding: 8px 16px;
-        transition: all 0.3s ease;
     }
 
-    .header-actions .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    .badge-gender.laki {
+        background: #DBEAFE;
+        color: #2563EB;
     }
 
-    /* Nav Tabs */
+    .badge-gender.perempuan {
+        background: #FCE7F3;
+        color: #DB2777;
+    }
+
     .nav-tabs {
         border-bottom: 2px solid #E2E8F0;
-        margin-bottom: 0;
-    }
-
-    .nav-tabs .nav-item {
-        margin-bottom: -2px;
+        margin-bottom: 1.5rem;
     }
 
     .nav-tabs .nav-link {
         border: none;
         color: #64748B;
-        padding: 12px 20px;
+        padding: 0.6rem 1.2rem;
         font-weight: 500;
-        font-size: 15px;
+        font-size: 0.85rem;
         border-bottom: 2px solid transparent;
-        transition: all 0.3s ease;
+        transition: var(--transition);
         border-radius: 0;
     }
 
     .nav-tabs .nav-link:hover {
-        color: var(--primary-color);
-        background-color: rgba(47, 83, 255, 0.05);
+        color: #667eea;
+        background: rgba(102, 126, 234, 0.05);
     }
 
     .nav-tabs .nav-link.active {
-        color: var(--primary-color);
-        border-bottom: 2px solid var(--primary-color);
-        background-color: transparent;
+        color: #667eea;
+        border-bottom: 2px solid #667eea;
+        background: transparent;
         font-weight: 600;
     }
 
-    /* Card Styles */
-    .card {
-        border-radius: 15px;
-        border: none;
-        box-shadow: var(--card-shadow);
-        transition: all 0.3s ease;
-        margin-top: 1.5rem;
-    }
-
-    .card:hover {
-        box-shadow: var(--hover-shadow);
-    }
-
-    .card-body {
-        padding: 2rem;
-    }
-
-    .card-body h5 {
-        font-weight: 600;
-        color: #1E293B;
-        margin-bottom: 1.5rem;
-        font-size: 18px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #E2E8F0;
-    }
-
-    /* Table Styles */
-    .table-borderless {
-        margin-bottom: 0;
-    }
-
-    .table-borderless tr {
-        transition: background-color 0.2s ease;
-    }
-
-    .table-borderless tr:hover {
-        background-color: rgba(47, 83, 255, 0.03);
-    }
-
-    .table-borderless td {
-        padding: 12px 8px;
-        vertical-align: top;
-        font-size: 15px;
-        color: #334155;
-    }
-
-    .table-borderless td:first-child {
-        font-weight: 500;
-        color: #64748B;
-        width: 180px;
-    }
-
-    .table-borderless td:last-child {
-        color: #1E293B;
-        font-weight: 400;
-    }
-
-    /* Divider */
-    hr {
-        border-top: 2px solid #E2E8F0;
-        margin: 2rem 0;
-        opacity: 1;
-    }
-
-    /* Tab Content */
     .tab-content {
-        animation: fadeIn 0.4s ease-in;
+        animation: fadeIn 0.3s ease-out;
     }
 
     @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Modal Styles */
-    .modal-content {
-        border-radius: 12px;
-        border: none;
-    }
-
-    .modal-header {
-        background-color: var(--light-bg);
-        border-bottom: 1px solid #E2E8F0;
-        border-radius: 12px 12px 0 0;
-    }
-
-    .modal-title {
-        font-weight: 600;
-        color: #1E293B;
-    }
-
-    /* ===================== RESPONSIVE STYLES ===================== */
-
-    /* Tablet (max-width: 991px) */
-    @media (max-width: 991px) {
-        .detail-header h2 {
-            font-size: 24px;
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1rem 1rem;
+        }
+        .page-header h3 {
+            font-size: 1.1rem;
+        }
+        .page-header .text-muted {
+            font-size: 0.75rem;
         }
 
-        .detail-header p {
-            font-size: 14px;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .table-borderless td:first-child {
-            width: 160px;
-        }
-
-        .nav-tabs .nav-link {
-            padding: 10px 16px;
-            font-size: 14px;
-        }
-    }
-
-    /* Mobile (max-width: 767px) */
-    @media (max-width: 767px) {
-        .container-fluid {
-            padding-left: 15px;
-            padding-right: 15px;
-        }
-
-        /* Header */
-        .detail-header {
+        .info-row {
             flex-direction: column;
-            align-items: stretch;
-            gap: 15px;
-            margin-bottom: 1.25rem;
+            padding: 0.6rem 0;
         }
 
-        .detail-header h2 {
-            font-size: 22px;
-            margin-bottom: 0.5rem;
-        }
-
-        .detail-header p {
-            font-size: 14px;
-            margin-bottom: 0.75rem;
-        }
-
-        .header-actions {
+        .info-label {
             width: 100%;
-            flex-direction: column;
+            font-size: 0.75rem;
+            margin-bottom: 2px;
         }
 
-        .header-actions .btn {
+        .info-value {
+            font-size: 0.85rem;
+        }
+
+        .info-card .card-header {
+            padding: 0.6rem 1rem;
+        }
+
+        .info-card .card-body {
+            padding: 0.8rem 1rem;
+        }
+
+        .btn-back,
+        .btn-edit,
+        .btn-cetak,
+        .btn-rapor {
             width: 100%;
             justify-content: center;
-            padding: 10px 16px;
         }
 
-        /* Tabs */
+        .d-flex.gap-2 {
+            flex-direction: column;
+        }
+
         .nav-tabs {
             flex-wrap: nowrap;
             overflow-x: auto;
-            overflow-y: hidden;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
         }
-
-        .nav-tabs::-webkit-scrollbar {
-            height: 4px;
-        }
-
-        .nav-tabs::-webkit-scrollbar-thumb {
-            background-color: #CBD5E1;
-            border-radius: 4px;
-        }
-
-        .nav-tabs .nav-item {
-            flex-shrink: 0;
-        }
-
         .nav-tabs .nav-link {
-            padding: 10px 16px;
-            font-size: 14px;
             white-space: nowrap;
-        }
-
-        /* Card */
-        .card {
-            margin-top: 1rem;
-            border-radius: 12px;
-        }
-
-        .card-body {
-            padding: 1.25rem;
-        }
-
-        .card-body h5 {
-            font-size: 16px;
-            margin-bottom: 1.25rem;
-            padding-bottom: 8px;
-        }
-
-        /* Table */
-        .table-borderless {
-            font-size: 14px;
-        }
-
-        .table-borderless tr {
-            display: flex;
-            flex-direction: column;
-            padding: 10px 0;
-            border-bottom: 1px solid #F1F5F9;
-        }
-
-        .table-borderless tr:last-child {
-            border-bottom: none;
-        }
-
-        .table-borderless td {
-            padding: 4px 0;
-            width: 100% !important;
-        }
-
-        .table-borderless td:first-child {
-            font-size: 13px;
-            color: #64748B;
-            margin-bottom: 4px;
-        }
-
-        .table-borderless td:last-child {
-            font-size: 14px;
-            color: #1E293B;
-            padding-left: 0;
-        }
-
-        /* Divider */
-        hr {
-            margin: 1.5rem 0;
-        }
-
-        /* Modal */
-        .modal-dialog {
-            margin: 10px;
-        }
-    }
-
-    /* Small Mobile (max-width: 480px) */
-    @media (max-width: 480px) {
-        .detail-header h2 {
-            font-size: 20px;
-        }
-
-        .detail-header p {
-            font-size: 13px;
-        }
-
-        .card-body {
-            padding: 1rem;
-        }
-
-        .card-body h5 {
-            font-size: 15px;
-            margin-bottom: 1rem;
-        }
-
-        .table-borderless {
-            font-size: 13px;
-        }
-
-        .table-borderless td:first-child {
-            font-size: 12px;
-        }
-
-        .table-borderless td:last-child {
-            font-size: 13px;
-        }
-
-        .nav-tabs .nav-link {
-            padding: 9px 14px;
-            font-size: 13px;
-        }
-
-        .header-actions .btn {
-            font-size: 13px;
-            padding: 9px 14px;
-        }
-    }
-
-    /* Desktop (min-width: 1200px) */
-    @media (min-width: 1200px) {
-        .container-fluid {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .detail-header h2 {
-            font-size: 30px;
-        }
-
-        .card-body {
-            padding: 2.5rem;
-        }
-
-        .table-borderless td {
-            font-size: 16px;
-            padding: 14px 10px;
-        }
-
-        .table-borderless td:first-child {
-            width: 200px;
-        }
-    }
-
-    /* Print Styles */
-    @media print {
-        .header-actions,
-        .nav-tabs,
-        .btn-close {
-            display: none !important;
-        }
-
-        .tab-pane {
-            display: block !important;
-            opacity: 1 !important;
-        }
-
-        .card {
-            box-shadow: none;
-            border: 1px solid #ddd;
-            page-break-inside: avoid;
-            margin-top: 1rem;
-        }
-
-        .card-body {
-            padding: 1rem;
-        }
-
-        hr {
-            border-top: 1px solid #000;
+            font-size: 0.75rem;
+            padding: 0.5rem 1rem;
         }
     }
 </style>
 
-<div class="container-fluid">
-    <!-- Header Section -->
-    <div class="detail-header">
-        <div class="header-info">
-            <h2>Detail Siswa</h2>
-            <p>{{ $siswa->nama_lengkap }}</p>
-        </div>
-        <div class="ms-3">
-            <a href="{{ route('kurikulum.data-siswa.edit', $siswa->id) }}" class="btn btn-warning me-2">
-                <i class="fas fa-edit"></i> Edit
-            </a>
-            <a href="{{ route('kurikulum.siswa.cetak', $siswa->id) }}" class="btn btn-success me-2" target="_blank">
-                <i class="fas fa-print"></i> Cetak
-            </a>
-            <a href="{{ route('kurikulum.rapor.show', $siswa->id) }}" class="btn btn-primary">
-                <i class="fas fa-file-alt"></i> <span class="d-none d-sm-inline">Raport</span>
-            </a>
+<div class="container-fluid px-4">
+    <div class="page-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap">
+            <div>
+                <h3><i class="fas fa-user me-2"></i> Detail Siswa</h3>
+                <div class="text-muted">{{ $siswa->nama_lengkap }}</div>
+            </div>
+            <div class="d-flex gap-2 mt-2 mt-sm-0 flex-wrap">
+                <a href="{{ route('kurikulum.siswa.index') }}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+                <a href="{{ route('kurikulum.siswa.data-diri.edit', $siswa->id) }}" class="btn-edit">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a href="{{ route('kurikulum.siswa.cetak', $siswa->id) }}" class="btn-cetak" target="_blank">
+                    <i class="fas fa-print"></i> Cetak
+                </a>
+                <a href="{{ route('kurikulum.rapor.show', $siswa->id) }}" class="btn-rapor">
+                    <i class="fas fa-file-alt"></i> Raport
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- Flash Modal -->
-    @if(session('success') || session('error'))
-        <div class="modal fade" id="flashModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-sm modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Status</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        @if(session('success'))
-                            <div class="text-success">{{ session('success') }}</div>
-                        @else
-                            <div class="text-danger">{{ session('error') }}</div>
-                        @endif
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                try {
-                    var m = new bootstrap.Modal(document.getElementById('flashModal'));
-                    m.show();
-                } catch (e) {
-                    var msg = {!! json_encode(session('success') ?? session('error')) !!};
-                    if (msg) alert(msg);
-                }
-            });
-        </script>
-    @endif
-
-    <!-- Nav Tabs -->
-    <ul class="nav nav-tabs" id="siswaTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" 
-                    id="data-siswa-tab" 
-                    data-bs-toggle="tab" 
-                    data-bs-target="#data-siswa" 
-                    type="button" 
-                    role="tab" 
-                    aria-controls="data-siswa" 
-                    aria-selected="true">
-                Data Siswa
+    <ul class="nav nav-tabs" id="siswaTabs">
+        <li class="nav-item">
+            <button class="nav-link active" id="data-siswa-tab" data-bs-toggle="tab" data-bs-target="#data-siswa">
+                <i class="fas fa-user me-1"></i> Data Siswa
             </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" 
-                    id="data-orangtua-tab" 
-                    data-bs-toggle="tab" 
-                    data-bs-target="#data-orangtua" 
-                    type="button" 
-                    role="tab" 
-                    aria-controls="data-orangtua" 
-                    aria-selected="false">
-                Data Orang Tua
+        <li class="nav-item">
+            <button class="nav-link" id="data-orangtua-tab" data-bs-toggle="tab" data-bs-target="#data-orangtua">
+                <i class="fas fa-users me-1"></i> Data Orang Tua
             </button>
         </li>
     </ul>
 
-    <!-- Tab Content -->
     <div class="tab-content" id="siswaTabsContent">
-        <!-- Tab Data Siswa -->
-        <div class="tab-pane fade show active" 
-             id="data-siswa" 
-             role="tabpanel" 
-             aria-labelledby="data-siswa-tab">
-            <div class="card shadow-sm">
+        <div class="tab-pane fade show active" id="data-siswa">
+            <div class="info-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-id-card"></i> Informasi Siswa</h5>
+                </div>
                 <div class="card-body">
-                    <h5>Informasi Siswa</h5>
-                    <table class="table table-borderless">
-                        <tbody>
-                            <tr>
-                                <td>NIS</td>
-                                <td>: {{ $siswa->nis }}</td>
-                            </tr>
-                            <tr>
-                                <td>NISN</td>
-                                <td>: {{ $siswa->nisn }}</td>
-                            </tr>
-                            <tr>
-                                <td>Nama Lengkap</td>
-                                <td>: {{ $siswa->nama_lengkap }}</td>
-                            </tr>
-                            <tr>
-                                <td>Tempat Lahir</td>
-                                <td>: {{ $siswa->tempat_lahir }}</td>
-                            </tr>
-                            <tr>
-                                <td>Tanggal Lahir</td>
-                                <td>: {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d-m-Y') : '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Jenis Kelamin</td>
-                                <td>: {{ $siswa->jenis_kelamin }}</td>
-                            </tr>
-                            <tr>
-                                <td>Agama</td>
-                                <td>: {{ $siswa->agama }}</td>
-                            </tr>
-                            <tr>
-                                <td>Kewarganegaraan</td>
-                                <td>: {{ $siswa->kewarganegaraan ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Alamat</td>
-                                <td>: Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>No HP</td>
-                                <td>: {{ $siswa->no_hp }}</td>
-                            </tr>
-                            <tr>
-                                <td>Kelas</td>
-                                <td>: {{ $siswa->kelas }}</td>
-                            </tr>
-                            <tr>
-                                <td>Rombel</td>
-                                <td>: {{ $siswa->rombel->nama ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Tanggal Diterima</td>
-                                <td>: {{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->format('d-m-Y') : '-' }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="info-row">
+                        <div class="info-label">NIS</div>
+                        <div class="info-value"><strong>{{ $siswa->nis }}</strong></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">NISN</div>
+                        <div class="info-value">{{ $siswa->nisn ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Nama Lengkap</div>
+                        <div class="info-value">{{ $siswa->nama_lengkap }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Tempat, Tanggal Lahir</div>
+                        <div class="info-value">
+                            {{ $siswa->tempat_lahir ?? '-' }}
+                            @if($siswa->tanggal_lahir)
+                                , {{ \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d-m-Y') }}
+                            @endif
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Jenis Kelamin</div>
+                        <div class="info-value">
+                            <span class="badge-gender {{ strtolower($siswa->jenis_kelamin) == 'laki-laki' ? 'laki' : 'perempuan' }}">
+                                {{ $siswa->jenis_kelamin ?? '-' }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Agama</div>
+                        <div class="info-value">{{ $siswa->agama ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Kelas / Rombel</div>
+                        <div class="info-value">{{ optional($siswa->rombel)->nama ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Alamat</div>
+                        <div class="info-value">{{ $siswa->alamat ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">No HP</div>
+                        <div class="info-value">{{ $siswa->no_hp ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Tanggal Diterima</div>
+                        <div class="info-value">{{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->format('d-m-Y') : '-' }}</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Tab Data Orang Tua -->
-        <div class="tab-pane fade" 
-             id="data-orangtua" 
-             role="tabpanel" 
-             aria-labelledby="data-orangtua-tab">
-            <div class="card shadow-sm">
+        <div class="tab-pane fade" id="data-orangtua">
+            <div class="info-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-user-tie"></i> Data Ayah</h5>
+                </div>
                 <div class="card-body">
-                    <h5>Data Ayah</h5>
-                    <table class="table table-borderless">
-                        <tbody>
-                            <tr>
-                                <td>Nama</td>
-                                <td>: {{ $siswa->ayah->nama ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Pekerjaan</td>
-                                <td>: {{ $siswa->ayah->pekerjaan ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Telepon</td>
-                                <td>: {{ $siswa->ayah->telepon ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Alamat</td>
-                                <td>: {{ $siswa->ayah->alamat ?? '-' }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="info-row">
+                        <div class="info-label">Nama</div>
+                        <div class="info-value">{{ $siswa->ayah->nama ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Pekerjaan</div>
+                        <div class="info-value">{{ $siswa->ayah->pekerjaan ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Telepon</div>
+                        <div class="info-value">{{ $siswa->ayah->telepon ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Alamat</div>
+                        <div class="info-value">{{ $siswa->ayah->alamat ?? '-' }}</div>
+                    </div>
+                </div>
+            </div>
 
-                    <hr>
+            <div class="info-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-user-tie"></i> Data Ibu</h5>
+                </div>
+                <div class="card-body">
+                    <div class="info-row">
+                        <div class="info-label">Nama</div>
+                        <div class="info-value">{{ $siswa->ibu->nama ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Pekerjaan</div>
+                        <div class="info-value">{{ $siswa->ibu->pekerjaan ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Telepon</div>
+                        <div class="info-value">{{ $siswa->ibu->telepon ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Alamat</div>
+                        <div class="info-value">{{ $siswa->ibu->alamat ?? '-' }}</div>
+                    </div>
+                </div>
+            </div>
 
-                    <h5>Data Ibu</h5>
-                    <table class="table table-borderless">
-                        <tbody>
-                            <tr>
-                                <td>Nama</td>
-                                <td>: {{ $siswa->ibu->nama ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Pekerjaan</td>
-                                <td>: {{ $siswa->ibu->pekerjaan ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Telepon</td>
-                                <td>: {{ $siswa->ibu->telepon ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Alamat</td>
-                                <td>: {{ $siswa->ibu->alamat ?? '-' }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <hr>
-
-                    <h5>Data Wali</h5>
-                    <table class="table table-borderless">
-                        <tbody>
-                            <tr>
-                                <td>Nama</td>
-                                <td>: {{ $siswa->wali->nama ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Pekerjaan</td>
-                                <td>: {{ $siswa->wali->pekerjaan ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Telepon</td>
-                                <td>: {{ $siswa->wali->telepon ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Alamat</td>
-                                <td>: {{ $siswa->wali->alamat ?? '-' }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="info-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-user-tie"></i> Data Wali</h5>
+                </div>
+                <div class="card-body">
+                    <div class="info-row">
+                        <div class="info-label">Nama</div>
+                        <div class="info-value">{{ $siswa->wali->nama ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Pekerjaan</div>
+                        <div class="info-value">{{ $siswa->wali->pekerjaan ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Telepon</div>
+                        <div class="info-value">{{ $siswa->wali->telepon ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Alamat</div>
+                        <div class="info-value">{{ $siswa->wali->alamat ?? '-' }}</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
 @endsection

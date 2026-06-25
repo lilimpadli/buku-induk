@@ -7,7 +7,26 @@ use App\Models\Siswa;
 use App\Models\Rombel;
 use App\Models\Jurusan;
 use App\Models\MataPelajaran;
+use App\Models\KenaikanKelas;
+use App\Models\Ayah;
+use App\Models\Ibu;
+use App\Models\Wali;
+use App\Models\User;
+use App\Exports\NilaiExport;
+use App\Exports\SiswaExport;
+use App\Exports\PklIjazahExport;
+use App\Exports\SiswaTemplateExport;
+use App\Exports\NilaiTemplateExport;
+use App\Exports\PklIjazahTemplateExport;
+use App\Exports\NilaiRaportExportByJurusan;
+use App\Exports\NilaiRaportTemplateByJurusan;
+use App\Exports\NilaiRaportTemplateByFilters;
+use App\Imports\SiswaImport;
+use App\Imports\NilaiImport;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BukuIndukController extends Controller
 {
@@ -38,12 +57,35 @@ class BukuIndukController extends Controller
             $query->where('jenis_kelamin', $request->jenis_kelamin);
         }
 
-        $siswas = $query->paginate(15);
+        // Only include students currently assigned to a rombel
+        $query->whereNotNull('rombel_id');
+
+        // Exclude students who have a 'lulus' mutation (moved to alumni)
+        // Use case-insensitive comparison to handle variations like 'Lulus'
+        $query->whereDoesntHave('mutasis', function($q) {
+            $q->whereRaw('LOWER(status) = ?', ['lulus']);
+        });
+
+        // Also exclude students recorded in kenaikan_kelas with status 'lulus' (case-insensitive)
+        $excludedIds = KenaikanKelas::whereRaw('LOWER(status) = ?', ['lulus'])
+            ->pluck('siswa_id')
+            ->unique()
+            ->filter()
+            ->toArray();
+        if (!empty($excludedIds)) {
+            $query->whereNotIn('id', $excludedIds);
+        }
+
+        $perPage = (int) $request->query('per_page', 15);
+        $allowedPerPage = [15, 25, 50, 100, 200, 500];
+        $perPage = in_array($perPage, $allowedPerPage) ? $perPage : 15;
+
+        $siswas = $query->paginate($perPage)->withQueryString();
         
         // Get all jurusans for filter dropdown
         $jurusans = Jurusan::orderBy('nama')->get();
 
-        return view('tu.buku-induk.index', compact('siswas', 'jurusans'));
+        return view('tu.buku-induk.index', compact('siswas', 'jurusans', 'perPage'));
     }
 
     /**
@@ -67,6 +109,133 @@ class BukuIndukController extends Controller
         $nilaiByKelompok = $this->groupNilaiByKelompok($siswa);
         
         return view('tu.buku-induk.show', compact('siswa', 'nilaiByKelompok'));
+    }
+
+    public function exportSiswa()
+    {
+        $filename = 'data_siswa_' . date('Ymd_His') . '.xlsx';
+        return Excel::download(new SiswaExport(), $filename);
+    }
+
+    public function exportNilai(Request $request)
+    {
+        $jurusanId = $request->query('jurusan_id');
+        $search = $request->query('search');
+        $semester = $request->query('semester');
+        $tahunAjaran = $request->query('tahun_ajaran');
+
+        $filename = 'nilai_raport_' . ($jurusanId ? 'jurusan_' . $jurusanId . '_' : '') . date('Ymd_His') . '.xlsx';
+        return Excel::download(new NilaiRaportExportByJurusan($jurusanId, $search, $semester, $tahunAjaran), $filename);
+    }
+
+    public function exportPkl()
+    {
+        $filename = 'pkl_ijazah_' . date('Ymd_His') . '.xlsx';
+        return Excel::download(new PklIjazahExport(), $filename);
+    }
+
+    public function importSiswa(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        $import = new SiswaImport();
+        Excel::import($import, $request->file('file'));
+
+        $message = 'Import data siswa berhasil disimpan.';
+        if (method_exists($import, 'getErrors')) {
+            $errors = $import->getErrors();
+            if (!empty($errors)) {
+                return redirect()->route('tu.buku-induk.index')
+                    ->with('warning', 'Import selesai namun ada beberapa baris tidak diproses.')
+                    ->with('import_errors', $errors);
+            }
+        }
+
+        return redirect()->route('tu.buku-induk.index')->with('success', $message);
+    }
+
+    public function importNilai(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        $import = new NilaiImport();
+        Excel::import($import, $request->file('file'));
+
+        $message = 'Import nilai berhasil disimpan.';
+        if (method_exists($import, 'getErrors')) {
+            $errors = $import->getErrors();
+            if (!empty($errors)) {
+                return redirect()->route('tu.buku-induk.index')
+                    ->with('warning', 'Import selesai namun ada beberapa baris tidak diproses.')
+                    ->with('import_errors', $errors);
+            }
+        }
+
+        return redirect()->route('tu.buku-induk.index')->with('success', $message);
+    }
+
+    public function importPkl(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        $import = new SiswaImport();
+        Excel::import($import, $request->file('file'));
+
+        $message = 'Import PKL & Ijazah berhasil disimpan.';
+        if (method_exists($import, 'getErrors')) {
+            $errors = $import->getErrors();
+            if (!empty($errors)) {
+                return redirect()->route('tu.buku-induk.index')
+                    ->with('warning', 'Import selesai namun ada beberapa baris tidak diproses.')
+                    ->with('import_errors', $errors);
+            }
+        }
+
+        return redirect()->route('tu.buku-induk.index')->with('success', $message);
+    }
+
+    public function downloadTemplateSiswa()
+    {
+        return Excel::download(new SiswaTemplateExport(), 'template_data_siswa.xlsx');
+    }
+
+    public function downloadTemplateNilai()
+    {
+        return Excel::download(new NilaiTemplateExport(), 'template_nilai_rapor.xlsx');
+    }
+
+    public function downloadTemplatePkl()
+    {
+        return Excel::download(new PklIjazahTemplateExport(), 'template_pkl_ijazah.xlsx');
+    }
+
+    public function downloadTemplatePklIjazah()
+    {
+        return Excel::download(new PklIjazahTemplateExport(), 'template_pkl_ijazah.xlsx');
+    }
+
+    public function downloadTemplateNilaiFiltered(Request $request)
+    {
+        // Increase memory limit for large exports
+        ini_set('memory_limit', '1024M');
+        set_time_limit(300);
+        
+        $kurikulumIds = $request->input('kurikulum_ids', []);
+        $jurusanIds = $request->input('jurusan_ids', []);
+        $tingkatLevels = $request->input('tingkat_levels', []);
+
+        $fileName = 'template_nilai_rapor_' . date('Ymd_His') . '.xlsx';
+        
+        return Excel::download(
+            new NilaiRaportTemplateByFilters($kurikulumIds, $jurusanIds, $tingkatLevels),
+            $fileName
+        );
     }
 
     /**
@@ -120,6 +289,108 @@ class BukuIndukController extends Controller
         // This would require a PDF library like DomPDF
         // For now, we'll return the print view
         return $this->cetak($siswa);
+    }
+
+    /**
+     * Show edit form for Buku Induk (edit siswa data)
+     */
+    public function edit(Siswa $siswa)
+    {
+        $siswa->load(['user','ayah','ibu','wali','rombel.kelas.jurusan','mutasiTerakhir']);
+        return view('tu.buku-induk.edit', compact('siswa'));
+    }
+
+    /**
+     * Update siswa data from Buku Induk edit form
+     */
+    public function update(Request $request, Siswa $siswa)
+    {
+        $validated = $request->validate([
+            'nis' => 'required|string',
+            'nama_lengkap' => 'required|string',
+            'nisn' => 'nullable|string',
+            'jenis_kelamin' => 'nullable|string',
+            'tempat_lahir' => 'nullable|string',
+            'tanggal_lahir' => 'nullable|date',
+            'agama' => 'nullable|string',
+            'kewarganegaraan' => 'nullable|string',
+            'dusun' => 'nullable|string',
+            'kelurahan' => 'nullable|string',
+            'kecamatan' => 'nullable|string',
+            'rt' => 'nullable|string',
+            'rw' => 'nullable|string',
+            'kode_pos' => 'nullable|string',
+            'pkl_nilai' => 'nullable|string',
+            'pkl_sertifikat' => 'nullable|string',
+            'pkl_nama_industri' => 'nullable|string',
+            'pkl_alamat' => 'nullable|string',
+            'ijazah_nomor' => 'nullable|string',
+            'ijazah_tanggal' => 'nullable|date',
+            'transkip_nomor' => 'nullable|string',
+            'transkip_tanggal' => 'nullable|date',
+            'tanggal_lulus' => 'nullable|date',
+            'status_kelulusan' => 'nullable|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            // other fields may be added as needed
+        ]);
+
+        // Update main siswa fields
+        $siswa->update($validated);
+
+        // Handle ayah/ibu/wali relations if provided
+        $ayahData = $request->input('ayah', []);
+        if (!empty(array_filter($ayahData))) {
+            if ($siswa->ayah) {
+                $siswa->ayah->update($ayahData);
+            } else {
+                $created = Ayah::create($ayahData);
+                $siswa->ayah_id = $created->id;
+            }
+        }
+
+        $ibuData = $request->input('ibu', []);
+        if (!empty(array_filter($ibuData))) {
+            if ($siswa->ibu) {
+                $siswa->ibu->update($ibuData);
+            } else {
+                $created = Ibu::create($ibuData);
+                $siswa->ibu_id = $created->id;
+            }
+        }
+
+        $waliData = $request->input('wali', []);
+        if (!empty(array_filter($waliData))) {
+            if ($siswa->wali) {
+                $siswa->wali->update($waliData);
+            } else {
+                $created = Wali::create($waliData);
+                $siswa->wali_id = $created->id;
+            }
+        }
+
+        // Handle photo upload / removal for related user
+        $removeFoto = $request->input('remove_foto', '0');
+        if ($removeFoto === '1' && $siswa->user && $siswa->user->photo) {
+            Storage::disk('public')->delete($siswa->user->photo);
+            $siswa->user->photo = null;
+            $siswa->user->save();
+        }
+
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $path = $file->store('foto-siswa', 'public');
+            if ($siswa->user) {
+                if ($siswa->user->photo) {
+                    Storage::disk('public')->delete($siswa->user->photo);
+                }
+                $siswa->user->photo = $path;
+                $siswa->user->save();
+            }
+        }
+
+        $siswa->save();
+
+        return redirect()->route('tu.buku-induk.show', $siswa->id)->with('success', 'Data siswa berhasil diperbarui.');
     }
 
     /**

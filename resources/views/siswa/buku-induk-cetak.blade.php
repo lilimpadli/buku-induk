@@ -403,13 +403,16 @@
                         <div class="data-label">Alamat Siswa</div>
                         <div class="data-value">Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</div>
                     </div>
+
                     
                 </div>
 
                 <div class="data-section">
                     <div class="data-row">
                         <div class="data-label">Nama Orang Tua</div>
-                        <div class="data-value"></div>                       
+                        <div class="data-value"></div>
+                       <div class="data-section-title">Nama Orang Tua</div>
+                       
                     </div>
                     <div class="data-row">
                         <div class="data-label">a. Ayah</div>
@@ -443,7 +446,7 @@
                 </div>
 
                 <div class="data-section">
-                    <div class="data-label">Diterima menjadi Siswa</div>
+                    <div class="data-section-title">Diterima menjadi Siswa</div>
                     <div class="data-row">
                         <div class="data-label">a. Mulai Tanggal</div>
                         <div class="data-value">{{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->translatedFormat('d F Y') : '-' }}</div>
@@ -455,7 +458,7 @@
                 </div>
 
                 <div class="data-section">
-                    <div class="data-label">Meninggalkan Sekolah</div>
+                    <div class="data-section-title">Meninggalkan Sekolah</div>
                     <div class="data-row">
                         <div class="data-label">a. Tanggal</div>
                         <div class="data-value">
@@ -479,7 +482,7 @@
                 </div>
 
                 <div class="data-section">
-                    <div class="data-label">Lulus/Tamat</div>
+                    <div class="data-section-title">Lulus/Tamat</div>
                     <div class="data-row">
                         <div class="data-label">a. Nomor Ijazah</div>
                         <div class="data-value">-</div>
@@ -499,7 +502,7 @@
                 </div>
 
                 <div class="data-section">
-                    <div class="data-label">Praktek Kerja Industri</div>
+                    <div class="data-section-title">Praktek Kerja Industri</div>
                     <div class="data-row">
                         <div class="data-label">a. Nilai</div>
                         <div class="data-value">-</div>
@@ -536,3 +539,5 @@
     </script>
 </body>
 </html>
+</html>
+

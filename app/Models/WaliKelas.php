@@ -48,4 +48,20 @@ class WaliKelas extends Model
     {
         return $this->hasMany(Rombel::class, 'guru_id', 'id');
     }
+
+    public function getRombelId()
+    {
+        // Ambil rombel yang memiliki guru_id = id wali kelas
+        $rombel = Rombel::where('guru_id', $this->id)->first();
+        return $rombel ? $rombel->id : null;
+    }
+
+    public function getSiswa()
+    {
+        $rombelId = $this->getRombelId();
+        if (!$rombelId) {
+            return collect();
+        }
+        return DataSiswa::where('rombel_id', $rombelId)->get();
+}
 }

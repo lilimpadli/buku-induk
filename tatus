@@ -1,0 +1,249 @@
+[1mdiff --cc routes/web.php[m
+[1mindex 255c606,8a9964c..0000000[m
+[1m--- a/routes/web.php[m
+[1m+++ b/routes/web.php[m
+[36m@@@ -478,128 -464,107 +485,122 @@@[m [mRoute::middleware(['auth'])->group(func[m
+      Route::get('/siswa/{id}/detail', [KaprogDashboardController::class, 'detail'])[m
+          ->name('siswa.detail');[m
+  [m
+[31m-     /*[m
+[31m-     |--------------------------------------------------------------------------[m
+[31m-     | TU[m
+[31m-     |--------------------------------------------------------------------------[m
+[31m-     */[m
+[31m-     Route::prefix('tu')[m
+[31m-         ->name('tu.')[m
+[31m-         ->middleware('role:tu')[m
+[31m-         ->group(function () {[m
+[31m-             // Dashboard[m
+[31m-             Route::get('/dashboard', [TUController::class, 'dashboard'])->name('dashboard');[m
+[31m- [m
+[31m-             // Data Pribadi Guru/TU[m
+[31m-             Route::get('/data-pribadi', [DataPribadiController::class, 'index'])->name('data-pribadi.index');[m
+[31m-             Route::get('/data-pribadi/edit', [DataPribadiController::class, 'edit'])->name('data-pribadi.edit');[m
+[31m-             Route::put('/data-pribadi', [DataPribadiController::class, 'update'])->name('data-pribadi.update');[m
+[31m- [m
+[31m-             // Route untuk guru (TU management)[m
+[31m-             Route::get('/guru', [TUController::class, 'guruIndex'])->name('guru.index');[m
+[31m-             Route::get('/guru/export', [TUController::class, 'exportGuru'])->name('guru.export');[m
+[31m-             Route::get('/guru/create', [TUController::class, 'guruCreate'])->name('guru.create');[m
+[31m-             Route::post('/guru', [TUController::class, 'guruStore'])->name('guru.store');[m
+[31m-             Route::get('/guru/{id}', [TUController::class, 'guruShow'])->name('guru.show');[m
+[31m-             Route::get('/guru/{id}/edit', [TUController::class, 'guruEdit'])->name('guru.edit');[m
+[31m-             Route::put('/guru/{id}', [TUController::class, 'guruUpdate'])->name('guru.update');[m
+[31m-             Route::delete('/guru/{id}', [TUController::class, 'guruDestroy'])->name('guru.destroy');[m
+[31m- [m
+[31m-             // Route untuk siswa[m
+[31m-             Route::get('/siswa', [TUController::class, 'siswa'])->name('siswa.index');[m
+[31m-             Route::get('/siswa/export/jurusan/{jurusanId}', [TUController::class, 'exportSiswaByJurusan'])->name('siswa.export.jurusan');[m
+[31m-             Route::get('/siswa/export/angkatan/{jurusanId}', [TUController::class, 'exportSiswaByAngkatan'])->name('siswa.export.angkatan');[m
+[31m-             Route::get('/siswa/{id}/export-pdf', [TUController::class, 'siswaExportPdf'])->name('siswa.exportPDF');[m
+[31m-             Route::get('/siswa/template/download', [TUController::class, 'downloadSiswaTemplate'])->name('siswa.template.download');[m
+[31m-             Route::post('/siswa/import', [TUController::class, 'importSiswa'])->name('siswa.import');[m
+[31m-             Route::get('/siswa/create', [TUController::class, 'siswaCreate'])->name('siswa.create');[m
+[31m-             Route::post('/siswa', [TUController::class, 'siswaStore'])->name('siswa.store');[m
+[31m-             Route::get('/siswa/{id}', [TUController::class, 'siswaDetail'])->name('siswa.detail');[m
+[31m-             Route::get('/siswa/{id}/raport', [TUController::class, 'siswaRaport'])->name('siswa.raport');[m
+[31m-             Route::get('/siswa/{id}/edit', [TUController::class, 'siswaEdit'])->name('siswa.edit');[m
+[31m-             Route::put('/siswa/{id}', [TUController::class, 'siswaUpdate'])->name('siswa.update');[m
+[31m-             Route::delete('/siswa/{id}', [TUController::class, 'siswaDestroy'])->name('siswa.destroy');[m
+[31m- [m
+[31m-             // Route untuk kelas[m
+[31m-             Route::get('/kelas', [TUController::class, 'kelas'])->name('kelas.index');[m
+[31m-             Route::get('/kelas/create', [TUController::class, 'kelasCreate'])->name('kelas.create');[m
+[31m-             Route::post('/kelas', [TUController::class, 'kelasStore'])->name('kelas.store');[m
+[31m-             // Export siswa per rombel (TU) - mirror Kaprog export[m
+[31m-             Route::get('/kelas/{id}/export', [TUController::class, 'exportSiswaByRombel'])->name('kelas.export');[m
+[31m-             Route::post('/kelas/download-template', [TUController::class, 'downloadTemplate'])->name('kelas.download_template');[m
+[31m-             Route::post('/kelas/import', [TUController::class, 'importLedger'])->name('kelas.import');[m
+[31m-             Route::get('/kelas/{id}', [TUController::class, 'kelasDetail'])->name('kelas.show');[m
+[31m-             Route::get('/kelas/{id}/edit', [TUController::class, 'kelasEdit'])->name('kelas.edit');[m
+[31m-             Route::put('/kelas/{id}', [TUController::class, 'kelasUpdate'])->name('kelas.update');[m
+[31m-             Route::delete('/kelas/{id}', [TUController::class, 'kelasDestroy'])->name('kelas.destroy');[m
+[31m- [m
+[31m-             Route::get('/wali-kelas', [TUController::class, 'waliKelas'])->name('wali-kelas');[m
+[31m-             Route::get('/wali-kelas/create', [TUController::class, 'waliKelasCreate'])->name('wali-kelas.create');[m
+[31m-             Route::post('/wali-kelas', [TUController::class, 'waliKelasStore'])->name('wali-kelas.store');[m
+[31m-             Route::get('/wali-kelas/{id}', [TUController::class, 'waliKelasDetail'])->name('wali-kelas.detail');[m
+[31m-             Route::get('/wali-kelas/{id}/edit', [TUController::class, 'waliKelasEdit'])->name('wali-kelas.edit');[m
+[31m-             Route::put('/wali-kelas/{id}', [TUController::class, 'waliKelasUpdate'])->name('wali-kelas.update');[m
+[31m-             Route::delete('/wali-kelas/{id}', [TUController::class, 'waliKelasDestroy'])->name('wali-kelas.destroy');[m
+[31m- [m
+[31m-             // Route untuk laporan[m
+[31m-             Route::get('/laporan-nilai', [TUController::class, 'laporanNilai'])->name('laporan.nilai');[m
+[31m- [m
+[31m-             // PPDB (TU) - tampilkan pendaftar dan assign ke rombel[m
+[31m-             Route::prefix('ppdb')->name('ppdb.')->group(function () {[m
+[31m-                 Route::get('/', [PpdbController::class, 'tuIndex'])->name('index');[m
+[31m-                 Route::get('/jurusan/{id}', [PpdbController::class, 'showJurusan'])->name('jurusan.show');[m
+[31m-                 Route::get('/jurusan/{id}/pendaftar', [PpdbController::class, 'showPendaftarJurusan'])->name('jurusan.pendaftar');[m
+[31m-                 Route::get('/jurusan/{jurusanId}/sesi/{sesiId}', [PpdbController::class, 'showPendaftarSesi'])->name('jurusan.sesi.pendaftar');[m
+[31m-                 Route::get('/jurusan/{jurusanId}/jalur/{jalurId}', [PpdbController::class, 'showPendaftarJalur'])->name('jurusan.jalur.pendaftar');[m
+[31m-                 Route::get('/{id}/assign', [PpdbController::class, 'showAssignForm'])->name('assign.form');[m
+[31m-                 Route::post('/{id}/assign', [PpdbController::class, 'assign'])->name('assign');[m
+[31m-             });[m
+[31m- [m
+[31m-             // Nilai Raport (TU) - mimic walikelas routes for TU role[m
+[31m-             Route::get('/nilai-raport', [TUController::class, 'nilaiRaportIndex'])->name('nilai_raport.index');[m
+[31m-             Route::get('/nilai-raport/list/{id}', [TUController::class, 'siswaRaport'])->name('nilai_raport.list');[m
+[31m-             Route::get('/nilai-raport/show', [TUController::class, 'nilaiRaportShow'])->name('nilai_raport.show');[m
+[31m-             Route::get('/nilai-raport/edit', [TUController::class, 'nilaiRaportEdit'])->name('nilai_raport.edit');[m
+[31m-             Route::put('/nilai-raport/update', [TUController::class, 'nilaiRaportUpdate'])->name('nilai_raport.update');[m
+[31m-             Route::delete('/nilai-raport/delete', [TUController::class, 'nilaiRaportDestroy'])->name('nilai_raport.destroy');[m
+[31m- [m
+[31m-             // Cetak rapor (TU) — use TU controller so it renders TU-specific PDF[m
+[31m-             Route::get('/rapor/{siswa_id}/{semester}/{tahun}/cetak', [TUController::class, 'cetakRaport'])->name('rapor.cetak');[m
+[31m- [m
+[31m-             // Mutasi Siswa (TU)[m
+[31m-             Route::get('/mutasi/laporan', [MutasiController::class, 'laporan'])->name('mutasi.laporan');[m
+[31m-             // AJAX student search for mutasi create form[m
+[31m-             Route::get('/mutasi/search-students', [MutasiController::class, 'searchStudents'])->name('mutasi.search');[m
+[31m-             Route::post('/mutasi/bulk', [MutasiController::class, 'bulk'])->name('mutasi.bulk');[m
+[31m-             Route::post('/mutasi/up-all', [MutasiController::class, 'upAll'])->name('mutasi.up-all');[m
+[31m-             Route::post('/mutasi/siswa', [MutasiController::class, 'updateSiswa'])->name('mutasi.siswa.update');[m
+[31m-             Route::get('/mutasi/kelas/rombel/{rombel}', [MutasiController::class, 'showRombel'])->name('mutasi.kelas.show');[m
+[31m-             Route::get('/mutasi/kelas/{jurusan}', [MutasiController::class, 'kelasByJurusan'])->name('mutasi.kelas');[m
+[31m-             Route::resource('/mutasi', MutasiController::class)->names('mutasi');[m
+[31m- [m
+[31m-             // Buku Induk (TU)[m
+[31m-             Route::get('/buku-induk', [BukuIndukController::class, 'index'])->name('buku-induk.index');[m
+[31m-             Route::get('/buku-induk/{siswa}', [BukuIndukController::class, 'show'])->name('buku-induk.show');[m
+[31m-             Route::get('/buku-induk/{siswa}/cetak', [BukuIndukController::class, 'cetak'])->name('buku-induk.cetak');[m
+[31m-             Route::get('/buku-induk/{siswa}/export', [BukuIndukController::class, 'export'])->name('buku-induk.export');[m
+[31m- [m
+[31m-             // Kelulusan & Alumni (TU)[m
+[31m-             Route::get('/kelulusan', [KelulusanController::class, 'index'])->name('kelulusan.index');[m
+[31m-             Route::get('/kelulusan/rombel/{rombelId}/{tahun}', [KelulusanController::class, 'showRombel'])->name('kelulusan.rombel.show');[m
+[31m- [m
+[31m-             // Alumni (TU)[m
+[31m-             Route::prefix('alumni')->name('alumni.')->group(function () {[m
+[31m-                 Route::get('/', [App\Http\Controllers\TU\AlumniController::class, 'index'])->name('index');[m
+[31m-                 Route::get('/by-jurusan/{jurusanId}', [App\Http\Controllers\TU\AlumniController::class, 'byJurusan'])->name('by-jurusan');[m
+[31m-                 Route::get('/{id}', [App\Http\Controllers\TU\AlumniController::class, 'show'])->name('show');[m
+[31m-                 Route::get('/buku-induk/{siswa_id}', [App\Http\Controllers\TU\AlumniController::class, 'bukuInduk'])->name('buku-induk.show');[m
+[31m-                 Route::get('/buku-induk/{siswa_id}/cetak', [App\Http\Controllers\TU\AlumniController::class, 'bukuIndukCetak'])->name('buku-induk.cetak');[m
+[31m-                 Route::get('/raport/{siswa_id}', [App\Http\Controllers\TU\AlumniController::class, 'raporList'])->name('raport.list');[m
+[31m-                 Route::get('/raport/{siswa_id}/{semester}/{tahun}', [App\Http\Controllers\TU\AlumniController::class, 'raporShow'])->name('raport.show');[m
+[31m-                 Route::get('/raport/{siswa_id}/{semester}/{tahun}/cetak', [App\Http\Controllers\TU\AlumniController::class, 'raporCetak'])->name('raport.cetak');[m
+[31m-             });[m
+[31m-             }); [m
+  [m
+[32m+ Route::prefix('tu')[m
+[32m+     ->name('tu.')[m
+[32m+     ->middleware(['auth'])[m
+[32m+     ->group(function () {[m
+[32m+ [m
+[32m+         // Dashboard[m
+[32m+         Route::get('/dashboard', [TUController::class, 'dashboard'])[m
+[32m+             ->name('dashboard');[m
+[32m+ [m
+[32m+         // Data Siswa[m
+[32m+         Route::get('/siswa', [TUController::class, 'siswa'])->name('siswa.index');[m
+[32m+         Route::get('/siswa/export', [TUController::class, 'exportSiswaExcel'])->name('siswa.export');[m
+[32m+         Route::get('/siswa/export/kelas', [TUController::class, 'exportSiswaByKelas'])->name('siswa.exportByKelas');[m
+[32m+         Route::get('/siswa/export/jurusan', [TUController::class, 'exportSiswaByJurusan'])->name('siswa.exportByJurusan');[m
+[32m+         Route::get('/siswa/export/aktif', [TUController::class, 'exportSiswaAktif'])->name('siswa.exportAktif');[m
+[32m+         Route::get('/siswa/template', [TUController::class, 'downloadTemplate'])->name('siswa.template');[m
+[32m+         Route::post('/siswa/import', [TUController::class, 'importSiswa'])->name('siswa.import');[m
+[32m+         // TU: tambah siswa[m
+[32m+         Route::get('/siswa/create', [TUController::class, 'siswaCreate'])->name('siswa.create');[m
+[32m+         Route::post('/siswa', [TUController::class, 'siswaStore'])->name('siswa.store');[m
+[32m+         Route::get('/siswa/{id}', [TUController::class, 'siswaDetail'])->name('siswa.detail');[m
+[32m+         Route::get('/siswa/{id}/edit', [TUController::class, 'siswaEdit'])->name('siswa.edit');[m
+[32m+         Route::put('/siswa/{id}', [TUController::class, 'siswaUpdate'])->name('siswa.update');[m
+[32m+         Route::delete('/siswa/{id}', [TUController::class, 'siswaDestroy'])->name('siswa.destroy');[m
+[32m+         Route::get('/siswa/{id}/export', [TUController::class, 'siswaExportPDF'])->name('siswa.exportPDF');[m
+[32m+         // Data Pribadi[m
+[32m+         Route::get('/data-pribadi', [DataPribadiController::class, 'index'])[m
+[32m+             ->name('data-pribadi.index');[m
+[32m+         Route::get('/data-pribadi/edit', [DataPribadiController::class, 'edit'])[m
+[32m+             ->name('data-pribadi.edit');[m
+[32m+         Route::put('/data-pribadi', [DataPribadiController::class, 'update'])[m
+[32m+             ->name('data-pribadi.update');[m
+[32m+ [m
+[32m+         // Kelas TU[m
+[32m+         Route::get('/kelas', [TUController::class, 'kelas'])->name('kelas.index');[m
+[32m+         Route::get('/kelas/create', [TUController::class, 'kelasCreate'])->name('kelas.create');[m
+[32m+         Route::post('/kelas', [TUController::class, 'kelasStore'])->name('kelas.store');[m
+[32m+         Route::get('/kelas/export-all', [TUController::class, 'exportKelasAll'])->name('kelas.exportAll');[m
+[32m+         Route::get('/kelas/template', [TUController::class, 'downloadKelasTemplate'])->name('kelas.template');[m
+[32m+         Route::post('/kelas/import', [TUController::class, 'importKelas'])->name('kelas.import');[m
+[32m+         Route::get('/kelas/{id}', [TUController::class, 'kelasDetail'])->name('kelas.show');[m
+[32m+         Route::get('/kelas/{id}/export', [TUController::class, 'exportSiswaByRombel'])->name('kelas.export');[m
+[32m+         Route::get('/kelas/{id}/edit', [TUController::class, 'kelasEdit'])->name('kelas.edit');[m
+[32m+         Route::put('/kelas/{id}', [TUController::class, 'kelasUpdate'])->name('kelas.update');[m
+[32m+         Route::delete('/kelas/{id}', [TUController::class, 'kelasDestroy'])->name('kelas.destroy');[m
+[32m+ [m
+[32m+         // Buku Induk[m
+[32m+         Route::get('/buku-induk', [BukuIndukController::class, 'index'])[m
+[32m+             ->name('buku-induk.index');[m
+[32m+         Route::get('/buku-induk/{siswa}', [BukuIndukController::class, 'show'])[m
+[32m+             ->name('buku-induk.show');[m
+[32m+         Route::get('/buku-induk/{siswa}/edit', [BukuIndukController::class, 'edit'])[m
+[32m+             ->name('buku-induk.edit');[m
+[32m+         Route::put('/buku-induk/{siswa}', [BukuIndukController::class, 'update'])[m
+[32m+             ->name('buku-induk.update');[m
+[32m+         Route::get('/buku-induk/{siswa}/cetak', [BukuIndukController::class, 'cetak'])[m
+[32m+             ->name('buku-induk.cetak');[m
+[32m+ [m
+[32m+         // Mutasi[m
+[32m+         Route::get('/mutasi', [MutasiController::class, 'index'])->name('mutasi.index');[m
+[32m+         Route::get('/mutasi/create', [MutasiController::class, 'create'])->name('mutasi.create');[m
+[32m+         Route::post('/mutasi', [MutasiController::class, 'store'])->name('mutasi.store');[m
+[32m+         Route::get('/mutasi/search', [MutasiController::class, 'searchStudents'])->name('mutasi.search');[m
+[32m+         Route::post('/mutasi/siswa/update', [MutasiController::class, 'updateSiswa'])->name('mutasi.siswa.update');[m
+[32m+         Route::post('/mutasi/bulk', [MutasiController::class, 'bulk'])->name('mutasi.bulk');[m
+[32m+         Route::post('/mutasi/up-all', [MutasiController::class, 'upAll'])->name('mutasi.up-all');[m
+[32m+         Route::get('/mutasi/laporan', [MutasiController::class, 'laporan'])->name('mutasi.laporan');[m
+[32m+ [m
+[32m+         // Mutasi kelas/rombel[m
+[32m+         Route::get('/mutasi/kelas/{id}', [MutasiController::class, 'kelasByJurusan'])->name('mutasi.kelas');[m
+[32m+         Route::get('/mutasi/kelas/show/{rombel}', [MutasiController::class, 'showRombel'])->name('mutasi.kelas.show');[m
+[32m+ [m
+[32m++        // Nilai Raport (TU) - mimic walikelas routes for TU role[m
+[32m++        Route::get('/nilai-raport', [TUController::class, 'nilaiRaportIndex'])->name('nilai_raport.index');[m
+[32m++        Route::get('/nilai-raport/list/{id}', [TUController::class, 'siswaRaport'])->name('nilai_raport.list');[m
+[32m++        Route::get('/nilai-raport/show', [TUController::class, 'nilaiRaportShow'])->name('nilai_raport.show');[m
+[32m++        Route::get('/nilai-raport/edit', [TUController::class, 'nilaiRaportEdit'])->name('nilai_raport.edit');[m
+[32m++        Route::put('/nilai-raport/update', [TUController::class, 'nilaiRaportUpdate'])->name('nilai_raport.update');[m
+[32m++        Route::delete('/nilai-raport/delete', [TUController::class, 'nilaiRaportDestroy'])->name('nilai_raport.destroy');[m
+[32m++[m
+[32m+         // Mutasi resource routes[m
+[32m+         Route::get('/mutasi/{mutasi}', [MutasiController::class, 'show'])->name('mutasi.show');[m
+[32m+         Route::get('/mutasi/{mutasi}/edit', [MutasiController::class, 'edit'])->name('mutasi.edit');[m
+[32m+         Route::put('/mutasi/{mutasi}', [MutasiController::class, 'update'])->name('mutasi.update');[m
+[32m+         Route::delete('/mutasi/{mutasi}', [MutasiController::class, 'destroy'])->name('mutasi.destroy');[m
+[32m+ [m
+[32m+         // Alumni[m
+[32m+         Route::get('/alumni', [AlumniController::class, 'index'])[m
+[32m+             ->name('alumni.index');[m
+[32m+         Route::get('/alumni/jurusan/{jurusanId}', [AlumniController::class, 'byJurusan'])[m
+[32m+             ->name('alumni.by-jurusan');[m
+[32m+         Route::get('/alumni/{siswa_id}/buku-induk/cetak', [AlumniController::class, 'bukuIndukCetak'])[m
+[32m+             ->name('alumni.buku-induk.cetak');[m
+[32m+         Route::get('/alumni/{siswa_id}/buku-induk', [AlumniController::class, 'bukuInduk'])[m
+[32m+             ->name('alumni.buku-induk.show');[m
+[32m+         Route::get('/alumni/{siswa_id}/raport/{semester}/{tahun}/cetak', [AlumniController::class, 'raporCetak'])[m
+[32m+             ->name('alumni.raport.cetak');[m
+[32m+         Route::get('/alumni/{siswa_id}/raport/{semester}/{tahun}', [AlumniController::class, 'raporShow'])[m
+[32m+             ->name('alumni.raport.show');[m
+[32m+         Route::get('/alumni/{siswa_id}/raport', [AlumniController::class, 'raporList'])[m
+[32m+             ->name('alumni.raport.list');[m
+[32m+         Route::get('/alumni/{id}', [AlumniController::class, 'show'])[m
+[32m+             ->name('alumni.show');[m
+[32m+ [m
+[31m -        // Kelulusan / Ijazah[m
+[32m++        // Buku Induk export[m
+[32m++        Route::get('/buku-induk/{siswa}/export', [BukuIndukController::class, 'export'])[m
+[32m++            ->name('buku-induk.export');[m
+[32m++[m
+[32m++        // Kelulusan[m
+[32m+         Route::get('/kelulusan', [KelulusanController::class, 'index'])[m
+[32m+             ->name('kelulusan.index');[m
+[32m++        Route::get('/kelulusan/rombel/{rombelId}/{tahun}', [KelulusanController::class, 'showRombel'])[m
+[32m++            ->name('kelulusan.rombel.show');[m
+[32m++[m
+[32m+     });[m
+  [m
+      /*[m
+      |--------------------------------------------------------------------------[m

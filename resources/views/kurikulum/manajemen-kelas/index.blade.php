@@ -1,644 +1,554 @@
 @extends('layouts.app')
 
-@section('title', 'Data Kelas')
+@section('title', 'Manajemen Rombel')
 
 @section('content')
 <style>
-    /* ===================== STYLE DATA KELAS ===================== */
     :root {
         --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --success-gradient: linear-gradient(135deg, #13B497 0%, #59D4A4 100%);
-        --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
         --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        --card-hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        --bg-light: #f7fafc;
         --border-radius: 16px;
         --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
-        background-color: var(--bg-light);
+        background-color: #f7fafc;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    /* ===== PAGE TITLE BAR ===== */
-    .page-title-bar {
+    main {
+        padding: 20px 15px !important;
+        overflow-x: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .container-fluid {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 10px !important;
+        overflow-x: auto !important;
+    }
+
+    .page-header {
         background: var(--primary-gradient);
         color: white;
-        padding: 1.75rem 1.5rem;
+        padding: 1.5rem 1.5rem;
         border-radius: var(--border-radius);
         margin-bottom: 1.5rem;
         box-shadow: var(--card-shadow);
         position: relative;
         overflow: hidden;
+        width: 100%;
     }
 
-    .page-title-bar::before {
+    .page-header::before {
         content: "";
         position: absolute;
         top: 0;
         right: 0;
-        width: 260px;
-        height: 260px;
-        background: rgba(255, 255, 255, 0.08);
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
         border-radius: 50%;
-        transform: translate(90px, -90px);
+        transform: translate(100px, -100px);
+        pointer-events: none;
     }
 
-    .page-title-bar .title-inner {
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        font-size: 1.3rem;
         position: relative;
         z-index: 1;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
     }
 
-    .page-title-bar h1 {
-        font-weight: 700;
-        font-size: 1.6rem;
-        margin-bottom: 0.2rem;
+    .page-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 0.9rem;
+        position: relative;
+        z-index: 1;
     }
 
-    .page-title-bar .subtitle {
-        color: rgba(255, 255, 255, 0.75);
-        font-size: 13px;
-        margin-bottom: 0;
-    }
-
-    .btn-add {
-        background: rgba(255, 255, 255, 0.2);
-        border: 1.5px solid rgba(255, 255, 255, 0.45);
+    .btn-gradient {
+        background: var(--primary-gradient);
+        border: none;
         color: white;
         font-weight: 600;
-        padding: 0.5rem 1.1rem;
-        border-radius: 10px;
-        font-size: 13.5px;
-        white-space: nowrap;
-        flex-shrink: 0;
+        padding: 0.4rem 1rem;
+        border-radius: 8px;
         transition: var(--transition);
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 6px;
+        font-size: 0.8rem;
+        white-space: nowrap;
     }
 
-    .btn-add:hover {
-        background: rgba(255, 255, 255, 0.35);
-        border-color: white;
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
         color: white;
     }
 
-    /* ===== FILTER BAR ===== */
+    .btn-outline-gradient {
+        background: transparent;
+        border: 1px solid #667eea;
+        color: #667eea;
+        font-weight: 600;
+        padding: 0.3rem 0.8rem;
+        border-radius: 8px;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+
+    .btn-outline-gradient:hover {
+        background: var(--primary-gradient);
+        color: white;
+        border-color: transparent;
+    }
+
+    .btn-edit {
+        background: #F59E0B;
+        border: none;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 0.65rem;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        white-space: nowrap;
+    }
+
+    .btn-edit:hover {
+        background: #D97706;
+        color: white;
+    }
+
+    .btn-delete {
+        background: #EF4444;
+        border: none;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 0.65rem;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
+    .btn-delete:hover {
+        background: #DC2626;
+        color: white;
+    }
+
+    .btn-detail {
+        background: #667eea;
+        border: none;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 0.65rem;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        white-space: nowrap;
+    }
+
+    .btn-detail:hover {
+        background: #5a67d8;
+        color: white;
+    }
+
     .filter-card {
         border-radius: var(--border-radius);
         border: none;
         box-shadow: var(--card-shadow);
-        background: white;
         margin-bottom: 1.5rem;
         overflow: hidden;
+        transition: var(--transition);
+        width: 100%;
+    }
+
+    .filter-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
     }
 
     .filter-card .card-body {
-        padding: 1.25rem 1.5rem;
+        padding: 1rem 1.5rem;
     }
 
-    .filter-label {
-        color: #475569;
-        font-size: 13px;
+    .filter-card .form-label {
+        font-size: 0.7rem;
         font-weight: 600;
-        margin-bottom: 0.4rem;
-        display: block;
-    }
-
-    .filter-input {
-        border: 1.5px solid #E2E8F0;
-        border-radius: 10px;
-        padding: 0.55rem 0.9rem;
-        font-size: 14px;
-        color: #334155;
-        transition: var(--transition);
-        width: 100%;
-        background: #FAFBFC;
-    }
-
-    .filter-input:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
-        background: white;
-        outline: none;
-    }
-
-    .filter-input::placeholder { color: #94A3B8; }
-
-    .input-icon-wrap {
-        position: relative;
-    }
-
-    .input-icon-wrap .icon-left {
-        position: absolute;
-        left: 11px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #94A3B8;
-        font-size: 14px;
-        pointer-events: none;
-    }
-
-    .input-icon-wrap .filter-input {
-        padding-left: 2.1rem;
-    }
-
-    .btn-filter-primary {
-        background: var(--primary-gradient);
-        border: none;
-        color: white;
-        font-weight: 600;
-        padding: 0.55rem 1.2rem;
-        border-radius: 10px;
-        font-size: 14px;
-        cursor: pointer;
-        transition: var(--transition);
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .btn-filter-primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
-    }
-
-    .btn-filter-reset {
-        background: #F1F5F9;
-        border: 1.5px solid #E2E8F0;
         color: #64748B;
-        font-weight: 600;
-        padding: 0.55rem 1.2rem;
-        border-radius: 10px;
-        font-size: 14px;
-        cursor: pointer;
-        transition: var(--transition);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
+        margin-bottom: 2px;
     }
 
-    .btn-filter-reset:hover {
-        background: #E8ECF0;
-        color: #475569;
+    .filter-card .form-control,
+    .filter-card .form-select {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.7rem;
+        border-radius: 8px;
+        border: 1px solid #E2E8F0;
+        height: 36px;
     }
 
-    /* ===== PAGINATION INFO ===== */
-    .pagination-info {
-        font-size: 13px;
-        color: #94A3B8;
-        margin-bottom: 1rem;
+    .filter-card .input-group-text {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.7rem;
+        background: white;
+        border: 1px solid #E2E8F0;
     }
 
-    /* ===== ROMBEL CARDS ===== */
-    .rombel-card {
+    .table-card {
         border-radius: var(--border-radius);
         border: none;
         box-shadow: var(--card-shadow);
-        background: white;
         overflow: hidden;
-        transition: var(--transition);
-        height: 100%;
-        display: flex;
-        flex-direction: column;
+        width: 100%;
     }
 
-    .rombel-card:hover {
-        transform: translateY(-6px);
-        box-shadow: var(--card-hover-shadow);
-    }
-
-    .rombel-card::before {
-        content: "";
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 4px;
-        background: var(--primary-gradient);
-    }
-
-    .rombel-card.card-highlighted {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-    }
-
-    .rombel-card.card-highlighted::before {
-        background: rgba(255,255,255,0.3);
-    }
-
-    .rombel-card-body {
-        padding: 1.25rem;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-    }
-
-    .rombel-card-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 8px;
-        margin-bottom: 1rem;
-    }
-
-    .rombel-card-title {
-        font-weight: 700;
-        font-size: 1.05rem;
-        color: #1E293B;
-        margin-bottom: 0;
-    }
-
-    .card-highlighted .rombel-card-title { color: white; }
-
-    .rombel-id-badge {
-        background: rgba(100, 116, 139, 0.12);
-        color: #475569;
-        font-weight: 600;
-        font-size: 11px;
-        padding: 3px 8px;
-        border-radius: 6px;
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-
-    .card-highlighted .rombel-id-badge {
-        background: rgba(255,255,255,0.2);
-        color: rgba(255,255,255,0.9);
-    }
-
-    .rombel-meta-row {
-        font-size: 13.5px;
-        color: #64748B;
-        margin-bottom: 0.35rem;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .rombel-meta-row i {
-        width: 14px;
-        text-align: center;
-        color: #94A3B8;
-        flex-shrink: 0;
-    }
-
-    .card-highlighted .rombel-meta-row { color: rgba(255,255,255,0.7); }
-    .card-highlighted .rombel-meta-row i { color: rgba(255,255,255,0.5); }
-
-    .rombel-card-footer {
-        margin-top: auto;
-        padding-top: 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .btn-detail {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        padding: 0.45rem 0.9rem;
-        border-radius: 8px;
-        border: 1.5px solid #E2E8F0;
-        color: #667eea;
-        text-decoration: none;
-        font-size: 13px;
-        font-weight: 600;
-        transition: var(--transition);
-    }
-
-    .btn-detail:hover {
-        background: #667eea;
-        border-color: #667eea;
-        color: white;
-    }
-
-    .card-highlighted .btn-detail {
-        border-color: rgba(255,255,255,0.4);
-        color: white;
-        background: rgba(255,255,255,0.15);
-    }
-
-    .card-highlighted .btn-detail:hover {
-        background: rgba(255,255,255,0.3);
-        border-color: white;
-        color: white;
-    }
-
-    /* ===== DROPDOWN ===== */
-    .btn-more {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 34px;
-        height: 34px;
-        border-radius: 8px;
-        border: 1.5px solid #E2E8F0;
+    .table-card .card-header {
         background: white;
+        border-bottom: 1px solid #E2E8F0;
+        padding: 0.7rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .table-card .card-header h5 {
+        margin: 0;
+        font-weight: 700;
+        color: #1E293B;
+        font-size: 0.95rem;
+    }
+
+    .table-card .card-header h5 i {
+        color: #667eea;
+        margin-right: 6px;
+    }
+
+    .table-card .card-header .badge {
+        font-size: 0.7rem;
+        padding: 3px 10px;
+        white-space: nowrap;
+    }
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        width: 100%;
+        min-width: 550px;
+        margin-bottom: 0;
+        font-size: 0.85rem;
+    }
+
+    .table th {
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
         color: #64748B;
-        font-size: 13px;
-        cursor: pointer;
-        transition: var(--transition);
+        padding: 0.6rem 0.8rem;
+        white-space: nowrap;
+        background-color: #F8FAFC;
+        border-bottom: none;
     }
 
-    .btn-more:hover {
-        border-color: #667eea;
-        color: #667eea;
-        background: rgba(102, 126, 234, 0.06);
-    }
-
-    .card-highlighted .btn-more {
-        border-color: rgba(255,255,255,0.4);
-        background: rgba(255,255,255,0.15);
-        color: white;
-    }
-
-    .card-highlighted .btn-more:hover {
-        background: rgba(255,255,255,0.3);
-        border-color: white;
-    }
-
-    .dropdown-menu {
-        border-radius: 12px;
-        border: none;
-        box-shadow: var(--card-hover-shadow);
-        padding: 6px;
-        min-width: 160px;
-    }
-
-    .dropdown-item {
-        border-radius: 8px;
-        padding: 0.55rem 0.85rem;
-        font-size: 14px;
-        font-weight: 500;
-        color: #334155;
-        transition: background 0.15s ease, color 0.15s ease;
-    }
-
-    .dropdown-item:hover {
-        background-color: rgba(102, 126, 234, 0.08);
-        color: #667eea;
-    }
-
-    .dropdown-item.text-danger { color: #EF4444; }
-    .dropdown-item.text-danger:hover {
-        background-color: rgba(239, 68, 68, 0.08);
-        color: #EF4444;
-    }
-
-    .dropdown-divider {
-        margin: 4px 0;
+    .table td {
+        padding: 0.6rem 0.8rem;
+        vertical-align: middle;
         border-color: #E2E8F0;
     }
 
-    /* ===== EMPTY STATE ===== */
+    .table tbody tr:hover {
+        background-color: rgba(102, 126, 234, 0.03);
+    }
+
+    .badge-tingkat {
+        background: #667eea;
+        color: white;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 500;
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    .badge-jurusan {
+        background: #13B497;
+        color: white;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 500;
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+    }
+
+    .action-buttons form {
+        margin: 0;
+        padding: 0;
+        display: inline;
+    }
+
     .empty-state {
         text-align: center;
         padding: 3rem 1rem;
-        background: white;
-        border-radius: var(--border-radius);
-        box-shadow: var(--card-shadow);
     }
 
     .empty-state i {
-        font-size: 2.5rem;
-        color: #94A3B8;
-        margin-bottom: 0.75rem;
-        display: block;
-    }
-
-    .empty-state p {
-        color: #64748B;
-        font-size: 15px;
-        margin-bottom: 0;
-    }
-
-    /* ===== PAGINATION ===== */
-    .pagination { margin-bottom: 0; }
-
-    .page-link {
-        border: none;
-        margin: 0 2px;
-        border-radius: 8px;
-        color: #64748B;
-        font-weight: 600;
-        font-size: 14px;
-        padding: 0.45rem 0.75rem;
-        transition: var(--transition);
-    }
-
-    .page-link:hover {
-        background-color: rgba(102, 126, 234, 0.08);
-        color: #667eea;
-    }
-
-    .page-item.active .page-link {
-        background: var(--primary-gradient);
-        color: white;
-        box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
-    }
-
-    .page-item.disabled .page-link {
+        font-size: 3rem;
         color: #CBD5E1;
+        display: block;
+        margin-bottom: 0.5rem;
     }
 
-    /* ===== ANIMATIONS ===== */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(12px); }
-        to   { opacity: 1; transform: translateY(0); }
+    .pagination-wrapper {
+        padding: 0.6rem 1.5rem;
+        border-top: 1px solid #E2E8F0;
     }
 
-    .rombel-card {
-        animation: fadeIn 0.45s ease-out both;
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 767.98px) {
-        .page-title-bar {
-            padding: 1.25rem 1rem;
+    @media (max-width: 992px) {
+        .filter-card .row {
+            gap: 8px;
         }
-
-        .page-title-bar h1 {
-            font-size: 1.3rem;
+        .filter-card .col-md-4,
+        .filter-card .col-md-3 {
+            width: 100%;
         }
-
-        .page-title-bar .subtitle {
-            font-size: 12px;
-        }
-
-        .btn-add {
-            padding: 0.4rem 0.8rem;
-            font-size: 13px;
-        }
-
-        .filter-card .card-body {
-            padding: 1rem;
-        }
-
-        .filter-actions {
-            flex-direction: column;
-        }
-
-        .filter-actions .btn-filter-primary,
-        .filter-actions .btn-filter-reset {
+        .filter-card .btn {
             width: 100%;
             justify-content: center;
         }
     }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1rem 1rem;
+        }
+        .page-header h3 {
+            font-size: 1.05rem;
+        }
+        .page-header .text-muted {
+            font-size: 0.75rem;
+        }
+
+        .table-card .card-header {
+            flex-wrap: wrap;
+        }
+        .table-card .card-header .btn-gradient {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .table {
+            min-width: 480px;
+            font-size: 0.75rem;
+        }
+        .table th,
+        .table td {
+            padding: 0.4rem 0.5rem;
+        }
+        .btn-edit,
+        .btn-delete,
+        .btn-detail {
+            padding: 2px 6px;
+            font-size: 0.55rem;
+        }
+        .action-buttons {
+            flex-wrap: wrap;
+            gap: 3px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .table {
+            min-width: 400px;
+            font-size: 0.65rem;
+        }
+        .table th,
+        .table td {
+            padding: 0.3rem 0.4rem;
+        }
+        .btn-edit,
+        .btn-delete,
+        .btn-detail {
+            padding: 1px 5px;
+            font-size: 0.5rem;
+        }
+        .badge-tingkat,
+        .badge-jurusan {
+            font-size: 0.5rem;
+            padding: 1px 5px;
+        }
+    }
 </style>
 
-<div class="container-fluid px-3 px-md-4 mt-3">
-
-    {{-- PAGE TITLE BAR --}}
-    <div class="page-title-bar">
-        <div class="title-inner">
+<div class="container-fluid px-4">
+    <div class="page-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap">
             <div>
-                <h1>Data Rombel</h1>
-                <p class="subtitle">Kelola rombel belajar per kelas dan jurusan</p>
+                <h3><i class="fas fa-users me-2"></i> Manajemen Rombel</h3>
+                <div class="text-muted">Kelola data rombel dan wali kelas</div>
             </div>
-            <a href="{{ route('kurikulum.kelas.create') }}" class="btn-add">
-                <i class="fas fa-plus"></i> Tambah Rombel
-            </a>
+            <div class="mt-2 mt-sm-0">
+                <a href="{{ route('kurikulum.kelas.create') }}" class="btn-gradient">
+                    <i class="fas fa-plus"></i> Tambah Rombel
+                </a>
+            </div>
         </div>
     </div>
 
-    {{-- FILTER BAR --}}
-    <div class="filter-card">
+    <div class="card filter-card">
         <div class="card-body">
-            <form action="{{ route('kurikulum.kelas.index') }}" method="GET">
-                <div class="row g-3 align-items-end">
-
-                    {{-- Search --}}
-                    <div class="col-12 col-md-5">
-                        <label class="filter-label">Cari Rombel</label>
-                        <div class="input-icon-wrap">
-                            <i class="bi bi-search icon-left"></i>
-                            <input type="text" name="search" class="filter-input" placeholder="Nama rombel, tingkat, jurusan..." value="{{ $search ?? '' }}">
-                        </div>
+            <form method="GET" action="{{ route('kurikulum.kelas.index') }}" class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label"><i class="fas fa-search me-1"></i> Cari</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" name="search" class="form-control" placeholder="Nama / Tingkat / Guru" value="{{ $search ?? '' }}">
                     </div>
-
-                    {{-- Filter Jurusan --}}
-                    <div class="col-12 col-md-4">
-                        <label class="filter-label">Jurusan</label>
-                        <select name="jurusan" class="filter-input">
-                            <option value="">-- Semua Jurusan --</option>
-                            @foreach(($allJurusans ?? collect()) as $j)
-                                <option value="{{ $j->id }}" {{ (isset($jurusan_id) && $jurusan_id == $j->id) ? 'selected' : '' }}>
-                                    {{ $j->nama }}
-                                </option>
-                            @endforeach
-                        </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label"><i class="fas fa-building me-1"></i> Jurusan</label>
+                    <select name="jurusan" class="form-select">
+                        <option value="">Semua Jurusan</option>
+                        @foreach($allJurusans as $j)
+                            <option value="{{ $j->id }}" {{ $jurusan_id == $j->id ? 'selected' : '' }}>
+                                {{ $j->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex gap-1">
+                        <button type="submit" class="btn-gradient" style="flex:1; justify-content:center; padding:0.3rem 0.8rem; font-size:0.75rem;">
+                            <i class="fas fa-search me-1"></i> Cari
+                        </button>
+                        <a href="{{ route('kurikulum.kelas.index') }}" class="btn-outline-gradient" style="flex:1; justify-content:center; padding:0.3rem 0.8rem; font-size:0.75rem;">
+                            <i class="fas fa-undo-alt"></i>
+                        </a>
                     </div>
-
-                    {{-- Buttons --}}
-                    <div class="col-12 col-md-3">
-                        <div class="d-flex gap-2 filter-actions">
-                            <button type="submit" class="btn-filter-primary">
-                                <i class="bi bi-search"></i> Cari
-                            </button>
-                            <a href="{{ route('kurikulum.kelas.index') }}" class="btn-filter-reset">
-                                <i class="bi bi-arrow-counterclockwise"></i> Reset
-                            </a>
-                        </div>
-                    </div>
-
                 </div>
             </form>
         </div>
     </div>
 
-    {{-- PAGINATION INFO --}}
-    @if($rombels->total() > 0)
-        <p class="pagination-info">
-            Menampilkan {{ $rombels->firstItem() }}–{{ $rombels->lastItem() }} dari {{ $rombels->total() }} rombel
-        </p>
-    @endif
-
-    {{-- ROMBEL CARDS --}}
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
-        @forelse($rombels as $index => $rombel)
-            <div class="col">
-                <div class="rombel-card {{ $rombel->id == 5 ? 'card-highlighted' : '' }}" style="animation-delay: {{ $index * 0.06 }}s;">
-                    <div class="rombel-card-body">
-
-                        {{-- Top: Nama + ID Badge --}}
-                        <div class="rombel-card-top">
-                            <h5 class="rombel-card-title">{{ $rombel->nama }}</h5>
-                            <span class="rombel-id-badge">ID: {{ $rombel->id }}</span>
-                        </div>
-
-                        {{-- Meta Info --}}
-                        <div class="rombel-meta-row">
-                            <i class="fas fa-school"></i>
-                            {{ $rombel->kelas->tingkat ?? '-' }} {{ $rombel->kelas->jurusan->nama ?? '-' }}
-                        </div>
-                        
-                        <div class="d-flex justify-content-between">
-                            <div class="d-flex gap-2">
-                                <a href="{{ route('kurikulum.kelas.show', $rombel->id) }}" 
-                                   class="btn {{ $rombel->id == 5 ? 'btn-light' : 'btn-outline-primary' }} btn-sm">
-                                    <i class="fas fa-info-circle me-1"></i> Detail
-                                </a>
-
-                                <a href="{{ route('kurikulum.kelas.export', $rombel->id) }}" class="btn btn-success btn-sm">
-                                    <i class="fas fa-file-excel me-1"></i> Export
-                                </a>
-                            </div>
-                            
-                            <div class="dropdown">
-                                <button class="btn-more dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="display:inline-flex;">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('kurikulum.kelas.edit', $rombel->id) }}">
-                                            <i class="fas fa-pen me-2"></i> Edit
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <form action="{{ route('kurikulum.kelas.destroy', $rombel->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus rombel ini?')">
-                                                <i class="fas fa-trash me-2"></i> Hapus
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        @empty
-            <div class="col-12">
-                <div class="empty-state">
-                    <i class="fas fa-layer-group"></i>
-                    <p>Tidak ada data rombel yang ditemukan.</p>
-                </div>
-            </div>
-        @endforelse
-    </div>
-
-    {{-- PAGINATION --}}
-    @if($rombels->hasPages())
-        <div class="d-flex justify-content-center mt-4">
-            {{ $rombels->links('pagination::bootstrap-4') }}
+    <div class="card table-card">
+        <div class="card-header">
+            <h5><i class="fas fa-list"></i> Daftar Rombel</h5>
+            <span class="badge bg-primary">{{ $rombels->total() }}</span>
         </div>
-    @endif
+        <div class="card-body p-0">
+            @if(session('success'))
+                <div class="alert alert-success m-3" id="successAlert" style="font-size:0.8rem; padding:0.5rem 1rem;">
+                    <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                </div>
+            @endif
 
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th width="5%">No</th>
+                            <th>Nama Rombel</th>
+                            <th>Tingkat</th>
+                            <th>Jurusan</th>
+                            <th>Wali Kelas</th>
+                            <th width="18%">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($rombels as $key => $r)
+                        <tr>
+                            <td>{{ $rombels->firstItem() + $key }}</td>
+                            <td><span class="fw-semibold">{{ $r->nama }}</span></td>
+                            <td><span class="badge-tingkat">Kelas {{ $r->kelas->tingkat ?? '-' }}</span></td>
+                            <td><span class="badge-jurusan">{{ optional($r->kelas->jurusan)->nama ?? '-' }}</span></td>
+                            <td>{{ optional($r->guru)->nama ?? '-' }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ route('kurikulum.kelas.show', $r->id) }}" class="btn-detail">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ route('kurikulum.kelas.edit', $r->id) }}" class="btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('kurikulum.kelas.destroy', $r->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus rombel ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <i class="fas fa-users"></i>
+                                    <h5 class="fw-bold text-muted">Belum ada data rombel</h5>
+                                    <p class="text-muted">Silakan tambah data baru melalui tombol di atas.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            @if($rombels->hasPages())
+            <div class="pagination-wrapper">
+                {{ $rombels->appends(request()->query())->links('pagination::bootstrap-4') }}
+            </div>
+            @endif
+        </div>
+    </div>
 </div>
 
+<script>
+    setTimeout(function() {
+        let alert = document.getElementById('successAlert');
+        if(alert) {
+            alert.style.transition = 'opacity 0.5s';
+            alert.style.opacity = '0';
+            setTimeout(function() { alert.remove(); }, 500);
+        }
+    }, 3000);
+</script>
 @endsection

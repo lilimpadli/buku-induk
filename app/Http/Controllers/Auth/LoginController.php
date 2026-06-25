@@ -5,14 +5,21 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
     /**
      * Tampilkan halaman login
      */
-    public function showLoginForm()
+    public function showLoginForm(Request $request)
     {
+        if (Auth::check()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
         return view('auth.login');
     }
 
@@ -21,6 +28,12 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
+        if (Auth::check()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
         // Validasi input
         $request->validate([
             'nomor_induk' => 'required',
@@ -52,7 +65,7 @@ class LoginController extends Controller
      */
     private function redirectByRole($user)
     {
-        return match ($user->role) {
+        return match ($this->normalizeRole($user->role)) {
             'siswa'        => redirect()->route('siswa.dashboard'),
             'guru'         => redirect()->route('guru.dashboard'),
             'walikelas'    => redirect()->route('walikelas.dashboard'),
@@ -64,6 +77,15 @@ class LoginController extends Controller
             'calon_siswa'  => redirect()->route('calon.dashboard'),
             default        => redirect()->route('dashboard'),
         };
+    }
+
+    private function normalizeRole($role)
+    {
+        return Str::of($role)
+            ->lower()
+            ->replace(' ', '_')
+            ->replace('-', '_')
+            ->__toString();
     }
 
     /**

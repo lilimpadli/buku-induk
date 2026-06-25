@@ -4,445 +4,554 @@
 
 @section('content')
 <style>
-    /* ===================== STYLE DAFTAR SISWA ===================== */
-    
-    :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+:root {
+    --primary-blue: #f093fb;
+    --secondary-blue: #f5576c;
+    --accent-cyan: #00D4FF;
+    --accent-pink: #FF4D6D;
+    --accent-green: #43E97B;
+    --light-bg: #F4F7FE;
+    --soft-gray: #E9EEF7;
+    --text-dark: #1E293B;
+    --text-muted: #64748B;
+    --shadow-light: 0 4px 18px rgba(15,23,42,0.06);
+    --shadow-medium: 0 12px 30px rgba(245,87,108,0.08);
+    --shadow-hover: 0 16px 40px rgba(240,147,251,0.16);
+    --radius: 24px;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--light-bg);
+}
+
+.page-header {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    border-radius: 30px;
+    padding: 32px 32px 28px;
+    margin-bottom: 28px;
+    color: white;
+    box-shadow: var(--shadow-medium);
+    animation: fadeInUp .45s ease both;
+}
+
+.page-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+.page-subtitle {
+    opacity: .88;
+    margin: 0;
+    font-size: 1rem;
+    max-width: 680px;
+    line-height: 1.7;
+}
+
+.btn-modern {
+    border: none;
+    border-radius: 18px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
+    text-decoration: none;
+    color: white;
+}
+
+.btn-primary-modern{
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+}
+
+.btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    color: white;
+}
+
+.btn-modern.btn-sm {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    font-size: 14px;
+    border-radius: 50%;
+}
+
+.btn-modern.btn-sm i {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-secondary-modern {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.btn-secondary-outline {
+    background: white;
+    color: var(--text-dark);
+    border: 1px solid rgba(15,23,42,0.12);
+}
+
+.btn-secondary-outline:hover {
+    background: #F8FAFF;
+}
+
+.toolbar-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: var(--shadow-light);
+    padding: 16px 20px;
+    margin-bottom: 24px;
+}
+
+.toolbar-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.toolbar-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.toolbar-select {
+    min-width: 240px;
+    max-width: 320px;
+    width: 100%;
+    min-height: 44px;
+    border-radius: 16px;
+    padding: 12px 14px;
+}
+
+.toolbar-icon-btn {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 16px;
+}
+
+.btn-pill {
+    border-radius: 999px;
+    padding: 10px 18px;
+    min-height: 44px;
+    border: 1px solid rgba(47,83,255,.16);
+    background: #F8FAFF;
+    color: var(--text-dark);
+    font-weight: 600;
+    transition: all .3s ease;
+}
+
+.btn-pill:hover {
+    background: #EFF6FF;
+    color: var(--text-dark);
+    box-shadow: var(--shadow-light);
+}
+
+.btn-pill.active,
+.btn-pill.active:hover {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    border-color: transparent;
+    box-shadow: var(--shadow-hover);
+}
+
+.toolbar-pill-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+@media(max-width:768px) {
+    .toolbar-row {
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    body {
-        background-color: var(--light-bg);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-
-    h3.mb-3 {
-        font-size: 28px;
-        color: #1E293B;
-        position: relative;
-        padding-left: 15px;
-        margin-bottom: 25px !important;
-    }
-
-    h3.mb-3::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 5px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 3px;
-    }
-
-    /* Card Styles */
-    .card {
-        border-radius: 16px;
-        border: none;
-        box-shadow: var(--card-shadow);
-        overflow: hidden;
-        transition: all 0.3s ease;
-    }
-
-    .card:hover {
-        box-shadow: var(--hover-shadow);
-    }
-
-    /* List Group Styles */
-    .list-group {
-        border-radius: 16px;
-    }
-
-    .list-group-flush > .list-group-item {
-        border-width: 0 0 1px;
-        border-color: #E2E8F0;
-        padding: 20px;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .list-group-flush > .list-group-item:last-child {
-        border-bottom: none;
-    }
-
-    .list-group-flush > .list-group-item::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 4px;
-        height: 100%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        transform: scaleY(0);
-        transition: transform 0.3s ease;
-        border-radius: 0 4px 4px 0;
-    }
-
-    .list-group-flush > .list-group-item:hover::before {
-        transform: scaleY(1);
-    }
-
-    /* Student Info */
-    .student-info {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        flex-wrap: wrap;
-    }
-
-    .student-avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 20px;
-        flex-shrink: 0;
-        border: 3px solid white;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
-    }
-
-    .list-group-item:hover .student-avatar {
-        transform: scale(1.1);
-    }
-
-    .student-avatar img {
+    .toolbar-actions,
+    .toolbar-pill-group {
+        justify-content: flex-start;
         width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
     }
 
-    .student-details {
-        flex: 1;
-        min-width: 0;
+    .toolbar-select {
+        min-width: 100%;
+    }
+}
+
+.filter-card,
+.data-table-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: var(--shadow-light);
+    margin-bottom: 28px;
+    overflow: hidden;
+}
+
+.filter-card .card-body,
+.data-table-card .card-body {
+    padding: 28px;
+}
+
+.form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 14px;
+    border: 2px solid var(--soft-gray);
+    padding: 12px 16px;
+    transition: .3s ease;
+    box-shadow: none;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 4px rgba(47,83,255,.1);
+}
+
+.input-group {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid var(--soft-gray);
+    display: flex;
+    align-items: center;
+    background: white;
+}
+
+.input-group .form-control {
+    border: none;
+    box-shadow: none;
+}
+
+.input-group-text {
+    border: none;
+    background: white;
+    color: var(--text-muted);
+    padding: 0 16px;
+}
+
+.table-modern {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.85rem;
+}
+
+.table-modern thead th {
+    background: #EFF6FF;
+    border: none;
+    padding: 22px 20px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+.table-modern tbody td {
+    padding: 20px;
+    vertical-align: middle;
+    border: none;
+    background: white;
+}
+
+.table-modern tbody tr {
+    transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
+    box-shadow: 0 8px 20px rgba(15,23,42,0.04);
+    border-radius: 24px;
+}
+
+.table-modern tbody tr:hover {
+    transform: translateY(-1px);
+    background: #F8FBFF;
+    box-shadow: 0 18px 35px rgba(47,83,255,0.08);
+}
+
+.table-modern th,
+.table-modern td {
+    border: none;
+    padding: 18px 20px;
+}
+
+.status-badge {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-radius: 999px;
+    padding: 8px 14px;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    margin: 3px 0;
+    box-shadow: 0 10px 25px rgba(47,83,255,0.12);
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.pill-badge {
+    background: rgba(47,83,255,.08);
+    color: var(--text-dark);
+    border-radius: 999px;
+    padding: 8px 14px;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.action-btn {
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    border: none;
+    color: white;
+    transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
+    box-shadow: var(--shadow-light);
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.action-btn.view {
+    background: linear-gradient(135deg,#06B6D4,#3B82F6);
+}
+
+.action-btn.edit {
+    background: linear-gradient(135deg,#F59E0B,#F97316);
+}
+
+.action-btn.delete {
+    background: linear-gradient(135deg,#EF4444,#DC2626);
+}
+
+.empty-state {
+    padding: 70px 20px;
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 50px;
+    margin-bottom: 16px;
+    color: var(--primary-blue);
+    opacity: .3;
+}
+
+.empty-state h5 {
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    color: var(--text-muted);
+}
+
+.pagination-container {
+    padding: 24px;
+}
+
+.pagination {
+    justify-content: center;
+}
+
+.page-link {
+    border: none;
+    border-radius: 12px !important;
+    margin: 0 4px;
+    color: var(--text-dark);
+    transition: all .3s ease;
+}
+
+.page-link:hover {
+    background: rgba(47,83,255,0.08);
+}
+
+.page-item.active .page-link {
+    background: linear-gradient(135deg,var(--primary-blue),var(--secondary-blue));
+    color: white;
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media(max-width:768px) {
+    .page-header {
+        padding: 24px;
     }
 
-    .student-details strong {
-        font-size: 16px;
-        font-weight: 600;
-        color: #1E293B;
-        display: block;
-        margin-bottom: 4px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+    .page-title {
+        font-size: 24px;
     }
 
-    .student-details small {
-        color: #64748B;
-        font-size: 14px;
-        display: block;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+    .filter-card .card-body,
+    .data-table-card .card-body {
+        padding: 20px;
     }
 
-    .student-class {
-        background-color: rgba(47, 83, 255, 0.1);
-        color: var(--primary-color);
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-    
-    .student-actions {
-        flex-shrink: 0;
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        color: #64748B;
-    }
-
-    .empty-state i {
-        font-size: 48px;
-        margin-bottom: 15px;
-        opacity: 0.5;
-    }
-
-    .empty-state h5 {
-        font-weight: 600;
-        margin-bottom: 10px;
-    }
-
-    /* Animations */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .list-group-item {
-        animation: fadeIn 0.5s ease-out;
-    }
-
-    /* Filter Section */
-    .filter-section {
-        background: white;
-        padding: 15px;
-        border-radius: 12px;
-        box-shadow: var(--card-shadow);
-        margin-bottom: 20px;
-    }
-
-    .btn-group-responsive {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .btn-group-responsive .btn {
-        flex: 1;
-        min-width: fit-content;
-    }
-
-    /* Responsive */
-    @media (max-width: 992px) {
-        .student-info {
-            gap: 10px;
-        }
-        
-        .student-details small {
-            font-size: 12px;
-        }
-    }
-
-    @media (max-width: 768px) {
-        h3.mb-3 {
-            font-size: 22px;
-            padding-left: 12px;
-        }
-
-        h3.mb-3::before {
-            width: 4px;
-        }
-        
-        .list-group-flush > .list-group-item {
-            padding: 15px 12px;
-        }
-
-        .list-group-flush > .list-group-item:hover {
-            padding-left: 17px;
-        }
-        
-        .student-avatar {
-            width: 44px;
-            height: 44px;
-            font-size: 18px;
-        }
-
-        .student-details strong {
-            font-size: 15px;
-        }
-
-        .student-details small {
-            font-size: 11px;
-            line-height: 1.4;
-        }
-
-        .student-class {
-            font-size: 11px;
-            padding: 5px 10px;
-        }
-
-        .btn-group .btn {
-            padding: 0.35rem 0.5rem;
-            font-size: 0.8rem;
-        }
-
-        .filter-section {
-            padding: 12px;
-        }
-    }
-
-    @media (max-width: 576px) {
-        h3.mb-3 {
-            font-size: 20px;
-        }
-
-        .student-info {
-            gap: 8px;
-        }
-
-        .student-avatar {
-            width: 40px;
-            height: 40px;
-            font-size: 16px;
-            border-width: 2px;
-        }
-
-        .student-details strong {
-            font-size: 14px;
-        }
-
-        .student-details small {
-            font-size: 10px;
-        }
-
-        .student-class {
-            width: 100%;
-            text-align: center;
-            order: 3;
-        }
-
-        .student-actions {
-            order: 4;
-            width: 100%;
-        }
-
-        .student-actions .btn-group {
-            width: 100%;
-            display: flex;
-        }
-
-        .student-actions .btn-group .btn,
-        .student-actions .btn-group form {
-            flex: 1;
-        }
-
-        .student-actions .btn-group .btn {
-            border-radius: 0 !important;
-        }
-
-        .student-actions .btn-group .btn:first-child {
-            border-radius: 0.25rem 0 0 0.25rem !important;
-        }
-
-        .student-actions .btn-group form:last-child .btn {
-            border-radius: 0 0.25rem 0.25rem 0 !important;
-        }
-
-        .empty-state {
-            padding: 40px 15px;
-        }
-
-        .empty-state i {
-            font-size: 36px;
-        }
-
-        .empty-state h5 {
-            font-size: 16px;
-        }
-
-        .empty-state p {
-            font-size: 14px;
-        }
-    }
-
-    /* Hide duplicate plain pagination elements */
-    nav + nav,
-    .pagination + .pagination {
+    .table-modern thead {
         display: none;
     }
+
+    .table,
+    .table tbody,
+    .table tr,
+    .table td {
+        display: block;
+        width: 100%;
+    }
+
+    .table tr {
+        margin-bottom: 16px;
+        border-bottom: 1px solid #E5E7EB;
+    }
+
+    .table td {
+        padding: 14px 18px;
+    }
+
+    .action-buttons {
+        justify-content: flex-start;
+    }
+}
 </style>
 
-<div class="container-fluid px-3 px-md-4 mt-4">
-    <!-- Header -->
-    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-3 mb-md-4 gap-2">
-        <h3 class="mb-0">Daftar Siswa</h3>
-        <a href="{{ route('super_admin.manajemen-siswa.create') }}" class="btn btn-primary btn-sm btn-md-md">
-            <i class="fas fa-plus me-1"></i> 
-            <span class="d-none d-sm-inline">Tambah </span>Siswa
-        </a>
-    </div>
-
-    <div class="mb-3 d-flex align-items-center gap-2 flex-wrap">
-        <form id="exportForm" class="d-flex align-items-center gap-2">
-            <select id="exportJurusan" class="form-select form-select-sm" style="width:240px">
-                <option value="">-- Pilih Jurusan untuk Export --</option>
-                @foreach(($allJurusans ?? collect()) as $j)
-                    <option value="{{ $j->id }}">{{ $j->nama }}</option>
-                @endforeach
-            </select>
-
-            
-            <a id="btnExportAngkatan" href="#" class="btn btn-outline-secondary btn-sm">Export Per Angkatan</a>
-        </form>
-
-        <form id="importForm" class="d-flex align-items-center gap-2">
-            <input type="file" id="importFile" name="import_file" accept=".xlsx,.xls,.csv" style="display:none;">
-            <a href="{{ route('tu.siswa.template.download') }}" class="btn btn-outline-info btn-sm" title="Download template import">
-                <i class="fas fa-download me-1"></i>Template
-            </a>
-            <button type="button" id="btnImportSiswa" class="btn btn-outline-success btn-sm">
-                <i class="fas fa-upload me-1"></i>Import Siswa
-            </button>
-        </form>
-    </div>
-
-    <div class="mb-3">
-        @php $currentTingkat = request()->query('tingkat', ''); @endphp
-        <div class="btn-group-responsive" role="group">
-            <a href="{{ request()->url() }}?tingkat=X" class="btn btn-sm {{ $currentTingkat == 'X' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                Kelas X
-            </a>
-            <a href="{{ request()->url() }}?tingkat=XI" class="btn btn-sm {{ $currentTingkat == 'XI' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                Kelas XI
-            </a>
-            <a href="{{ request()->url() }}?tingkat=XII" class="btn btn-sm {{ $currentTingkat == 'XII' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                Kelas XII
-            </a>
-            <a href="{{ route('super_admin.manajemen-siswa.index') }}" class="btn btn-sm btn-outline-secondary">
-                Semua
+<div class="container-fluid">
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-user-graduate"></i>
+                    Daftar Siswa
+                </h1>
+                <p class="page-subtitle">
+                    Kelola data siswa dengan tampilan dashboard modern dan konsisten.
+                </p>
+            </div>
+            <a href="{{ route('super_admin.manajemen-siswa.create') }}" class="btn-modern btn-primary-modern">
+                <i class="fas fa-plus"></i>
+                Tambah Siswa
             </a>
         </div>
     </div>
 
-    <!-- Filter Form -->
-    <form method="GET" action="{{ route('super_admin.manajemen-siswa.index') }}" class="mb-3">
-        <div class="row g-2">
-            <div class="col-12 col-md-5">
-                <input type="text" name="search" value="{{ $search ?? '' }}" class="form-control form-control-sm" placeholder="Cari nama / NIS / NISN">
-            </div>
-            <div class="col-12 col-md-4">
-                <select name="rombel" class="form-select form-select-sm">
-                    <option value="">-- Semua Rombel --</option>
-                    @foreach(($allRombels ?? collect()) as $r)
-                        @php
-                            $rombelNama = $r->nama ?? null;
-                            $tingkatVal = optional($r->kelas)->tingkat ?? null;
-                            $rombelWithoutTingkat = $rombelNama ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama) : null;
-                            $rombelWithoutTingkat = $rombelWithoutTingkat ? trim($rombelWithoutTingkat) : null;
-                            $formattedRombel = $rombelWithoutTingkat ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat) : ($rombelNama ?? '');
-                        @endphp
-                        <option value="{{ $r->id }}" {{ (isset($filterRombel) && $filterRombel == $r->id) ? 'selected' : '' }}>
-                            {{ $tingkatVal ? $tingkatVal . ' ' . $formattedRombel : $formattedRombel }}
-                        </option>
+    <div class="toolbar-card">
+        <div class="toolbar-row">
+            <div class="toolbar-actions">
+                <select id="exportJurusan" class="form-select toolbar-select">
+                    <option value="">-- Pilih Jurusan untuk Export --</option>
+                    @foreach(($allJurusans ?? collect()) as $j)
+                        <option value="{{ $j->id }}">{{ $j->nama }}</option>
                     @endforeach
                 </select>
+
+                <button id="btnExportJurusan" type="button" class="btn-modern btn-secondary-modern btn-sm toolbar-icon-btn" title="Export Jurusan">
+                    <i class="fas fa-file-download"></i>
+                </button>
+                <button id="btnExportAngkatan" type="button" class="btn-modern btn-secondary-modern btn-sm toolbar-icon-btn" title="Export Per Angkatan">
+                    <i class="fas fa-file-export"></i>
+                </button>
+                <button type="button" id="btnImportSiswa" class="btn-modern btn-primary-modern btn-sm toolbar-icon-btn" title="Import Siswa">
+                    <i class="fas fa-upload"></i>
+                </button>
+                <a href="{{ route('tu.siswa.template.download') }}" class="btn-modern btn-secondary-modern btn-sm toolbar-icon-btn" title="Download Template">
+                    <i class="fas fa-download"></i>
+                </a>
             </div>
-            <div class="col-12 col-md-3">
-                <div class="d-flex gap-2">
-                    <button class="btn btn-primary btn-sm flex-fill" type="submit">
-                        <i class="fas fa-filter me-1"></i>Filter
-                    </button>
-                    <a href="{{ route('super_admin.manajemen-siswa.index') }}" class="btn btn-outline-secondary btn-sm flex-fill">
-                        <i class="fas fa-redo me-1"></i>Reset
-                    </a>
-                </div>
+
+            @php $currentTingkat = request()->query('tingkat', ''); @endphp
+            <div class="toolbar-pill-group" role="group">
+                <a href="{{ request()->url() }}?tingkat=X" class="btn-pill {{ $currentTingkat == 'X' ? 'active' : '' }}">
+                    Kelas X
+                </a>
+                <a href="{{ request()->url() }}?tingkat=XI" class="btn-pill {{ $currentTingkat == 'XI' ? 'active' : '' }}">
+                    Kelas XI
+                </a>
+                <a href="{{ request()->url() }}?tingkat=XII" class="btn-pill {{ $currentTingkat == 'XII' ? 'active' : '' }}">
+                    Kelas XII
+                </a>
+                <a href="{{ route('super_admin.manajemen-siswa.index') }}" class="btn-pill {{ empty($currentTingkat) ? 'active' : '' }}">
+                    Semua
+                </a>
             </div>
         </div>
-    </form>
+    </div>
 
-    <!-- Alert -->
+    <div class="filter-card">
+        <div class="card-body">
+            <form method="GET" action="{{ route('super_admin.manajemen-siswa.index') }}" class="row g-4 align-items-end">
+                <div class="col-12 col-md-5">
+                    <label class="form-label">Cari nama / NIS / NISN</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" name="search" value="{{ $search ?? '' }}" class="form-control" placeholder="Cari nama / NIS / NISN">
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label">Rombel</label>
+                    <select name="rombel" class="form-select">
+                        <option value="">-- Semua Rombel --</option>
+                        @foreach(($allRombels ?? collect()) as $r)
+                            @php
+                                $rombelNama = $r->nama ?? null;
+                                $tingkatVal = optional($r->kelas)->tingkat ?? null;
+                                $rombelWithoutTingkat = $rombelNama ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama) : null;
+                                $rombelWithoutTingkat = $rombelWithoutTingkat ? trim($rombelWithoutTingkat) : null;
+                                $formattedRombel = $rombelWithoutTingkat ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat) : ($rombelNama ?? '');
+                            @endphp
+                            <option value="{{ $r->id }}" {{ (isset($filterRombel) && $filterRombel == $r->id) ? 'selected' : '' }}>
+                                {{ $tingkatVal ? $tingkatVal . ' ' . $formattedRombel : $formattedRombel }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-12 col-md-3 d-grid gap-2">
+                    <button class="btn-modern btn-primary-modern w-100" type="submit">
+                        <i class="fas fa-filter"></i>
+                        Filter
+                    </button>
+                    <a href="{{ route('super_admin.manajemen-siswa.index') }}" class="btn-modern btn-secondary-modern w-100">
+                        <i class="fas fa-redo"></i>
+                        Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="fas fa-check-circle me-2"></i>
@@ -451,26 +560,22 @@
         </div>
     @endif
 
-    <!-- Student List -->
-    <div class="card shadow">
-        @if($siswas->count() > 0)
-            <div class="list-group list-group-flush">
-                @foreach ($siswas as $siswa)
-                    <div class="list-group-item d-flex align-items-center justify-content-between">
-                        <a href="{{ route('super_admin.manajemen-siswa.show', $siswa->id) }}" class="text-decoration-none text-reset d-flex align-items-center" style="flex:1">
-                            <div class="student-info">
-                                <div class="student-avatar">
-                                    @if($siswa->foto)
-                                        <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}">
-                                    @else
-                                        {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
-                                    @endif
-                                </div>
-                                <div class="student-details">
-                                    <strong>{{ $siswa->nama_lengkap }}</strong>
-                                    <small>NIS: {{ $siswa->nis }} | NISN: {{ $siswa->nisn }} | Jenis Kelamin: {{ $siswa->jenis_kelamin }}</small>
-                                </div>
-
+    <div class="data-table-card">
+        <div class="card-body">
+            @if($siswas->count() > 0)
+                <div class="table-responsive">
+                    <table class="table align-middle table-modern mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 48px;">#</th>
+                                <th>Nama Siswa</th>
+                                <th>Rombel</th>
+                                <th>Informasi</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($siswas as $siswa)
                                 @php
                                     $rombel = $siswa->rombel ?? null;
                                     $rombelNama = $rombel ? ($rombel->nama ?? null) : null;
@@ -479,50 +584,77 @@
                                     $rombelWithoutTingkat = $rombelWithoutTingkat ? trim($rombelWithoutTingkat) : null;
                                     $formatted = $rombelWithoutTingkat ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat) : null;
                                 @endphp
-                                @if($rombel)
-                                    <div class="student-class">
-                                        @if($tingkatVal)
-                                            {{ $tingkatVal }} {{ $formatted }}
+                                <tr>
+                                    <td>{{ $loop->iteration + ($siswas->currentPage() - 1) * $siswas->perPage() }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="student-avatar">
+                                                @if($siswa->foto)
+                                                    <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}">
+                                                @else
+                                                    {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
+                                                @endif
+                                            </div>
+                                            <div>
+                                                <div class="fw-semibold text-dark">{{ $siswa->nama_lengkap }}</div>
+                                                <div class="text-muted small">NIS: {{ $siswa->nis }} | NISN: {{ $siswa->nisn }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if($rombel)
+                                            <span class="status-badge">
+                                                @if($tingkatVal)
+                                                    {{ $tingkatVal }} {{ $formatted }}
+                                                @else
+                                                    {{ $formatted }}
+                                                @endif
+                                            </span>
                                         @else
-                                            {{ $formatted }}
+                                            <span class="text-muted">-</span>
                                         @endif
-                                    </div>
-                                @endif
-                            </div>
-                        </a>
-
-                        <div class="student-actions ms-3">
-                            <div class="btn-group">
-                                <a href="{{ route('super_admin.manajemen-siswa.show', $siswa->id) }}" class="btn btn-sm btn-info" title="Detail">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="{{ route('super_admin.manajemen-siswa.edit', $siswa->id) }}" class="btn btn-sm btn-warning" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="{{ route('super_admin.manajemen-siswa.destroy', $siswa->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data siswa ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-            <div class="p-3">
-                @if(method_exists($siswas, 'links'))
-                    {{ $siswas->links('pagination::bootstrap-4') }}
-                @endif
-            </div>
-        @else
-            <div class="empty-state">
-                <i class="fas fa-user-graduate"></i>
-                <h5>Tidak ada data siswa</h5>
-                <p>Belum ada siswa yang terdaftar.</p>
-            </div>
-        @endif
+                                    </td>
+                                    <td>
+                                        <div class="text-muted small">
+                                            Jenis Kelamin: {{ $siswa->jenis_kelamin }}<br>
+                                            {{ optional($siswa->rombel)->nama ? 'Rombel: ' . optional($siswa->rombel)->nama : '' }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons justify-content-center">
+                                            <a href="{{ route('super_admin.manajemen-siswa.show', $siswa->id) }}" class="action-btn view" title="Detail">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ route('super_admin.manajemen-siswa.edit', $siswa->id) }}" class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form action="{{ route('super_admin.manajemen-siswa.destroy', $siswa->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data siswa ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="action-btn delete" title="Hapus">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination-container">
+                    @if(method_exists($siswas, 'links'))
+                        {{ $siswas->links('pagination::bootstrap-4') }}
+                    @endif
+                </div>
+            @else
+                <div class="empty-state">
+                    <i class="fas fa-user-graduate"></i>
+                    <h5>Tidak ada data siswa</h5>
+                    <p>Belum ada siswa yang terdaftar.</p>
+                </div>
+            @endif
+        </div>
     </div>
 </div>
 <script>
@@ -617,10 +749,10 @@ document.addEventListener('DOMContentLoaded', function(){
                         warningHtml += '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
                         warningHtml += '</div>';
                         
-                        // Insert warning before the card
+                        // Insert warning before the data table
                         const alertContainer = document.createElement('div');
                         alertContainer.innerHTML = warningHtml;
-                        document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.card'));
+                        document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.data-table-card'));
                     } else {
                         // Show pure success
                         let successHtml = '<div class="alert alert-success alert-dismissible fade show" role="alert">';
@@ -630,7 +762,7 @@ document.addEventListener('DOMContentLoaded', function(){
                         
                         const alertContainer = document.createElement('div');
                         alertContainer.innerHTML = successHtml;
-                        document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.card'));
+                        document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.data-table-card'));
                     }
 
                     // Reload page after 2 seconds
@@ -655,7 +787,7 @@ document.addEventListener('DOMContentLoaded', function(){
                     
                     const alertContainer = document.createElement('div');
                     alertContainer.innerHTML = errorHtml;
-                    document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.card'));
+                    document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.data-table-card'));
                 }
             })
             .catch(error => {
@@ -671,7 +803,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 
                 const alertContainer = document.createElement('div');
                 alertContainer.innerHTML = errorHtml;
-                document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.card'));
+                document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.data-table-card'));
             });
 
             // Reset file input

@@ -1,298 +1,796 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Siswa')
-
 @section('content')
+
 <style>
-    /* Global Dashboard Reset & Typography */
-    .dashboard-wrapper {
-        background-color: #f8fafc;
-        min-height: 100vh;
-        padding: 30px 20px;
+    /* CSS Variables untuk konsistensi */
+    :root {
+        --primary-color: #667eea;
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #13B497 0%, #59D4A4 100%);
+        --danger-gradient: linear-gradient(135deg, #F093FB 0%, #F5576C 100%);
+        --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        --text-primary: #2d3748;
+        --text-secondary: #718096;
+        --bg-light: #f7fafc;
+        --bg-white: #ffffff;
+        --border-radius: 12px;
+        --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+        --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+        --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
-    /* Hero Banner Modern */
-    .hero-banner {
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
-        border: none;
-        border-radius: 24px;
+
+    /* Reset dan base styles */
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: var(--bg-light);
+        color: var(--text-primary);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+    }
+
+    /* Utility classes */
+    .gradient-text {
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .card-hover {
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .card-hover:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    /* Header improvements */
+    .dashboard-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.2);
-    }
-    .hero-circle-1 {
-        position: absolute;
-        top: -50px;
-        right: -50px;
-        width: 250px;
-        height: 250px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 50%;
-    }
-    .hero-circle-2 {
-        position: absolute;
-        bottom: -80px;
-        right: 150px;
-        width: 180px;
-        height: 180px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 50%;
     }
 
-    /* Mini Stat Cards */
-    .stat-card {
-        border: none;
-        border-radius: 16px;
-        background: #ffffff;
-        padding: 20px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        border-left: 5px solid transparent;
+    .dashboard-header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: float 20s ease-in-out infinite;
     }
-    .stat-icon {
-        width: 48px;
-        height: 48px;
+
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        50% { transform: translate(-30px, -30px) rotate(180deg); }
+    }
+
+    .dashboard-header h2 {
+        font-weight: 700;
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .dashboard-header .subtitle {
+        opacity: 0.9;
+        font-size: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Card improvements */
+    .stat-card {
+        background: var(--bg-white);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        border: 1px solid #e5e7eb;
+    }
+
+    .stat-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+
+    .stat-card .icon-wrapper {
+        width: 60px;
+        height: 60px;
         border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;
+        font-size: 24px;
+        margin-bottom: 1rem;
+        transition: var(--transition);
     }
 
-    /* Rombak Total Navigasi Cepat Dokumen (Premium Panel) */
-    .nav-panel-card {
-        border: none;
-        background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    .stat-card:hover .icon-wrapper {
+        transform: scale(1.05);
     }
-    .quick-nav-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 20px;
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        text-decoration: none !important;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Profile card improvements */
+    .profile-card {
+        background: var(--bg-white);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        box-shadow: var(--shadow-sm);
+        text-align: center;
+        border: 1px solid #e5e7eb;
     }
-    .quick-nav-item:hover {
-        background: #f8fafc;
-        border-color: #3b82f6;
-        transform: translateY(-3px);
-        box-shadow: 0 12px 20px -5px rgba(59, 130, 246, 0.15);
-    }
-    .nav-item-left {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
-    .nav-item-icon {
-        width: 54px;
-        height: 54px;
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-        transition: all 0.2s;
-    }
-    .quick-nav-item:hover .nav-item-icon {
-        transform: scale(1.08);
-    }
-    .nav-item-title {
-        font-size: 16px;
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 2px;
-    }
-    .nav-item-desc {
-        font-size: 13px;
-        color: #64748b;
-        margin-bottom: 0;
-    }
-    .nav-item-arrow {
-        width: 32px;
-        height: 32px;
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
         border-radius: 50%;
-        background: #f1f5f9;
+        margin: 0 auto 1.5rem;
+        overflow: hidden;
+        border: 4px solid white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        position: relative;
+    }
+
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .profile-avatar .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        background: var(--primary-gradient);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #64748b;
-        transition: all 0.2s;
-    }
-    .quick-nav-item:hover .nav-item-arrow {
-        background: #3b82f6;
-        color: #ffffff;
-        transform: translateX(4px);
+        color: white;
+        font-size: 48px;
+        font-weight: 700;
     }
 
-    /* Info List Styling */
-    .info-grid {
-        background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-    }
-    .data-row {
-        display: flex;
-        justify-content: space-between;
+    /* Button improvements */
+    .btn-gradient {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: var(--transition);
+        display: inline-flex;
         align-items: center;
-        padding: 16px 20px;
-        border-bottom: 1px solid #f1f5f9;
+        gap: 0.5rem;
     }
-    .data-row:last-child {
+
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 2px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-outline:hover {
+        background: var(--primary-color);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-danger {
+        background: var(--danger-gradient);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    /* Parent contact card improvements */
+    .parent-card {
+        background: var(--bg-white);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid #e5e7eb;
+    }
+
+    .parent-section {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .parent-section:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
         border-bottom: none;
+    }
+
+    .parent-section h6 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .parent-info {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .parent-info p {
+        margin: 0.5rem 0;
+        font-size: 0.95rem;
+    }
+
+    .parent-info strong {
+        color: var(--text-primary);
+    }
+
+    /* Modal improvements */
+    .modal-content {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid #e5e7eb;
+        padding: 1.5rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #e5e7eb;
+        padding: 1.5rem;
+    }
+
+    .form-control {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 0.95rem;
+        transition: var(--transition);
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    /* Animations */
+    .fade-in {
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive improvements */
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 1.5rem;
+        }
+
+        .dashboard-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .stat-card {
+            padding: 1.25rem;
+        }
+
+        .profile-card {
+            padding: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+        }
+
+        .profile-avatar .avatar-placeholder {
+            font-size: 40px;
+        }
+
+        .btn-gradient, .btn-outline {
+            padding: 0.625rem 1.25rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    /* Loading spinner */
+    .spinner-border-sm {
+        width: 1rem;
+        height: 1rem;
+        border-width: 2px;
+    }
+
+    /* Toast notification */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1050;
+    }
+
+    .toast {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-lg);
+        padding: 1rem 1.5rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        min-width: 300px;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    .toast.success {
+        border-left: 4px solid #13B497;
+    }
+
+    .toast.error {
+        border-left: 4px solid #F5576C;
+    }
+
+    .toast.warning {
+        border-left: 4px solid #fa709a;
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-state svg {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 1rem;
+        opacity: 0.5;
     }
 </style>
 
-<div class="dashboard-wrapper">
-    <div class="card hero-banner text-white mb-4">
-        <div class="hero-circle-1"></div>
-        <div class="hero-circle-2"></div>
-        <div class="card-body p-4 p-md-5">
-            <div class="row align-items-center">
-                <div class="col-lg-8">
-                    <span class="badge bg-white text-primary fw-bold mb-3 px-3 py-2 rounded-pill shadow-sm">
-                        <i class="fas fa-graduation-cap me-1"></i> {{ $siswa->rombel->kelas->nama ?? 'Kelas Aktif' }}
-                    </span>
-                    <h1 class="fw-bold mb-2" style="letter-spacing: -0.5px;">Selamat Datang, {{ $siswa->nama_lengkap }}!</h1>
-                    <p class="text-white-50 mb-0 fs-6">Sistem monitoring Buku Induk Digital. Seluruh arsip identitas, data wali, serta rekam jejak akumulasi nilai rapor Anda tertata aman di sini.</p>
-                </div>
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="dashboard-header fade-in">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h2 class="mb-2">Selamat Datang, {{ $siswa->nama_lengkap ?? Auth::user()->name }}! 👋</h2>
+                <p class="subtitle mb-0">
+                    Kelas: 
+                    @if($siswa && $siswa->rombel)
+                        @php
+                            $rombelDisplay = $siswa->rombel->nama ?? '';
+                            if(!empty($rombelDisplay)){
+                                if(preg_match('/^([a-zA-Z]+)\s*([0-9]+)$/', $rombelDisplay, $m)){
+                                    $rombelDisplay = strtoupper($m[1]) . ' ' . $m[2];
+                                } else {
+                                    $rombelDisplay = ucwords(strtolower($rombelDisplay));
+                                }
+                            }
+                        @endphp
+                        {{ $rombelDisplay ?: '-' }}
+                    @else
+                        -
+                    @endif
+                </p>
             </div>
+           
         </div>
     </div>
 
+    <!-- Stats Section -->
     <div class="row g-3 mb-4">
-        <div class="col-md-4">
-            <div class="card stat-card" style="border-left-color: #3b82f6;">
-                <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;">
-                    <i class="fas fa-fingerprint"></i>
+        <div class="col-lg-6 col-md-6 fade-in">
+            <div class="stat-card card-hover">
+                <div class="icon-wrapper" style="background: var(--primary-gradient);">
+                    <i class="fas fa-chalkboard-teacher text-white"></i>
                 </div>
-                <div>
-                    <small class="text-muted d-block uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">NOMOR INDUK SISWA</style></small>
-                    <span class="fw-bold text-dark fs-5">{{ $siswa->nis }}</span>
-                </div>
+                <h5 class="text-muted mb-1">Wali Kelas</h5>
+                <h4 class="mb-2">{{ $siswa && $siswa->rombel && $siswa->rombel->guru ? $siswa->rombel->guru->nama : 'Belum ditentukan' }}</h4>
+                <p class="text-muted small mb-0">Guru pengampu kelas Anda</p>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card stat-card" style="border-left-color: #10b981;">
-                <div class="stat-icon" style="background: #ecfdf5; color: #10b981;">
-                    <i class="fas fa-passport"></i>
+
+        <div class="col-lg-6 col-md-6 fade-in">
+            <div class="stat-card card-hover">
+                <div class="icon-wrapper" style="background: var(--success-gradient);">
+                    <i class="fas fa-check-circle text-white"></i>
                 </div>
-                <div>
-                    <small class="text-muted d-block uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">NOMOR NISN NASIONAL</small>
-                    <span class="fw-bold text-dark fs-5">{{ $siswa->nisn ?? '-' }}</span>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card stat-card" style="border-left-color: #8b5cf6;">
-                <div class="stat-icon" style="background: #f5f3ff; color: #8b5cf6;">
-                    <i class="fas fa-school"></i>
-                </div>
-                <div>
-                    <small class="text-muted d-block uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">STATUS KESISWAAN</small>
-                    <span class="badge bg-success-subtle text-success px-2 py-1 rounded fw-bold" style="font-size: 12px;">Siswa Aktif</span>
-                </div>
+                <h5 class="text-muted mb-1">Status Profil</h5>
+                <h4 class="mb-2">
+                    @if(isset($missing) && count($missing) > 0)
+                        <span class="text-warning">{{ count($missing) }} Field Kosong</span>
+                    @else
+                        <span class="text-success">Lengkap</span>
+                    @endif
+                </h4>
+                <p class="text-muted small mb-0">
+                    @if(isset($missing) && count($missing) > 0)
+                        Masih ada {{ count($missing) }} field yang perlu diisi
+                    @else
+                        Semua data penting sudah terisi
+                    @endif
+                </p>
             </div>
         </div>
     </div>
 
+    <!-- Main Content -->
     <div class="row g-4">
-        <div class="col-lg-6">
-            <div class="card info-grid h-100 border-0">
-                <div class="card-body p-0">
-                    <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
-                        <h5 class="fw-bold text-dark mb-0">
-                            <i class="fas fa-user-check text-primary me-2"></i>Berkas Utama Terverifikasi
-                        </h5>
-                    </div>
+        <!-- Profile Card -->
+        <div class="col-lg-8 fade-in">
+            <div class="profile-card card-hover">
+                <div class="profile-avatar">
+                    @if($siswa && $siswa->foto)
+                        <img src="{{ asset('storage/' . $siswa->foto) }}" alt="Foto Profil">
+                    @else
+                        <div class="avatar-placeholder">
+                            {{ $siswa ? strtoupper(substr($siswa->nama_lengkap,0,1)) : 'S' }}
+                        </div>
+                    @endif
+                </div>
+
+                <h3 class="mb-2">{{ $siswa->nama_lengkap ?? 'Belum Lengkap' }}</h3>
+                <p class="text-muted mb-4">NIS: {{ $siswa->nis ?? '-' }} • NISN: {{ $siswa->nisn ?? '-' }}</p>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="{{ route('siswa.dataDiri.exportPDF') }}" class="btn btn-gradient" target="_blank">
+                        <i class="fas fa-download"></i> Unduh Data
+                    </a>
                     
-                    <div class="data-row">
-                        <span class="text-muted fw-medium">Nama Lengkap</span>
-                        <span class="fw-bold text-dark">{{ $siswa->nama_lengkap }}</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="text-muted fw-medium">Jenis Kelamin</span>
-                        <span class="text-secondary">{{ $siswa->jenis_kelamin }}</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="text-muted fw-medium">Tempat, Tanggal Lahir</span>
-                        <span class="text-dark">{{ $siswa->tempat_lahir }}, {{ $siswa->tanggal_lahir }}</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="text-muted fw-medium">Agama</span>
-                        <span class="text-dark">{{ $siswa->agama }}</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="text-muted fw-medium">Asal Sekolah</span>
-                        <span class="text-dark text-truncate" style="max-width: 220px;">{{ $siswa->sekolah_asal ?? '-' }}</span>
-                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-6">
-            <div class="card nav-panel-card h-100">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold text-dark mb-4">
-                        <i class="fas fa-folder-open text-warning me-2"></i>Akses Lembar Buku Induk
-                    </h5>
-                    
-                    <div class="d-flex flex-column gap-3">
-                        <a href="{{ route('siswa.bukuInduk.show', ['tab' => 'biodata']) }}" class="quick-nav-item">
-                            <div class="nav-item-left">
-                                <div class="nav-item-icon" style="background: #eff6ff; color: #2563eb;">
-                                    <i class="fas fa-id-badge"></i>
-                                </div>
-                                <div>
-                                    <h6 class="nav-item-title">Lembar Profil & Biodata</h6>
-                                    <p class="nav-item-desc">Informasi detail identitas fisik & domisili rumah</p>
-                                </div>
-                            </div>
-                            <div class="nav-item-arrow">
-                                <i class="fas fa-arrow-right small"></i>
-                            </div>
-                        </a>
-                        
-                        <a href="{{ route('siswa.bukuInduk.show', ['tab' => 'keluarga']) }}" class="quick-nav-item">
-                            <div class="nav-item-left">
-                                <div class="nav-item-icon" style="background: #fef2f2; color: #dc2626;">
-                                    <i class="fas fa-users-cog"></i>
-                                </div>
-                                <div>
-                                    <h6 class="nav-item-title">Data Orang Tua / Wali</h6>
-                                    <p class="nav-item-desc">Detail pekerjaan, nama, dan kontak penanggung jawab</p>
-                                </div>
-                            </div>
-                            <div class="nav-item-arrow">
-                                <i class="fas fa-arrow-right small"></i>
-                            </div>
-                        </a>
+        <!-- Parent Contact Card -->
+        <div class="col-lg-4 fade-in">
+            <div class="parent-card">
+                <h5 class="mb-4">Kontak Orang Tua</h5>
 
-                        <a href="{{ route('siswa.bukuInduk.show', ['tab' => 'nilai']) }}" class="quick-nav-item">
-                            <div class="nav-item-left">
-                                <div class="nav-item-icon" style="background: #f0fdf4; color: #16a34a;">
-                                    <i class="fas fa-chart-bar"></i>
-                                </div>
-                                <div>
-                                    <h6 class="nav-item-title">Transkrip Nilai Akademik</h6>
-                                    <p class="nav-item-desc font-sans">Rekapitulasi nilai capaian belajar mapel per semester</p>
-                                </div>
-                            </div>
-                            <div class="nav-item-arrow">
-                                <i class="fas fa-arrow-right small"></i>
-                            </div>
-                        </a>
+                <div class="parent-section">
+                    <h6 class="text-primary">
+                        <i class="fas fa-user-tie"></i> Data Ayah
+                    </h6>
+                    <div class="parent-info">
+                        <p><strong>Nama:</strong> {{ $siswa->ayah->nama ?? '-' }}</p>
+                        <p><strong>Telepon:</strong> {{ $siswa->ayah->telepon ?? '-' }}</p>
+                        <p><strong>Pekerjaan:</strong> {{ $siswa->ayah->pekerjaan ?? '-' }}</p>
                     </div>
-
                 </div>
+
+                <div class="parent-section">
+                    <h6 class="text-danger">
+                        <i class="fas fa-user"></i> Data Ibu
+                    </h6>
+                    <div class="parent-info">
+                        <p><strong>Nama:</strong> {{ $siswa->ibu->nama ?? '-' }}</p>
+                        <p><strong>Telepon:</strong> {{ $siswa->ibu->telepon ?? '-' }}</p>
+                        <p><strong>Pekerjaan:</strong> {{ $siswa->ibu->pekerjaan ?? '-' }}</p>
+                    </div>
+                </div>
+
+               
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modal Templates -->
+<div id="modalContainer"></div>
+
+<script>
+    // Modal Functions
+    function openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            const modalInstance = new bootstrap.Modal(modal);
+            modalInstance.show();
+        }
+    }
+
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            const modalInstance = bootstrap.Modal.getInstance(modal);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        }
+    }
+
+    // Toast Notification
+    function showToast(message, type = 'success') {
+        const toastContainer = document.getElementById('toastContainer');
+        const toastId = 'toast-' + Date.now();
+        
+        const toastHTML = `
+            <div id="${toastId}" class="toast ${type}">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <div class="flex-grow-1">${message}</div>
+                <button type="button" class="btn-close" onclick="closeToast('${toastId}')"></button>
+            </div>
+        `;
+        
+        toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+        
+        setTimeout(() => {
+            closeToast(toastId);
+        }, 5000);
+    }
+
+    function closeToast(toastId) {
+        const toast = document.getElementById(toastId);
+        if (toast) {
+            toast.remove();
+        }
+    }
+
+    // Form Submission Handler
+    document.addEventListener('submit', function(e) {
+        const form = e.target;
+        const submitButton = form.querySelector('button[type="submit"]');
+        
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Mengirim...';
+        }
+        
+        // Handle form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const action = form.action;
+            const method = form.method;
+            
+            fetch(action, {
+                method: method,
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    // Close modal if exists
+                    const modal = form.closest('.modal');
+                    if (modal) {
+                        bootstrap.Modal.getInstance(modal).hide();
+                    }
+                    // Reload page or update content as needed
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showToast(data.message || 'Terjadi kesalahan', 'error');
+                }
+            })
+            .catch(error => {
+                showToast('Terjadi kesalahan jaringan', 'error');
+            })
+            .finally(() => {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = submitButton.dataset.originalText || 'Simpan';
+                }
+            });
+        });
+    });
+
+    // Store original button text
+    document.querySelectorAll('button[type="submit"]').forEach(button => {
+        button.dataset.originalText = button.innerHTML;
+    });
+
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+</script>
+
+<!-- Modal Edit Nama -->
+<div class="modal fade" id="editNamaModal" tabindex="-1" aria-labelledby="editNamaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editNamaModalLabel">Edit Nama Lengkap</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('siswa.updateProfile') }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
+                        <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" 
+                               value="{{ $siswa->nama_lengkap ?? '' }}" required autofocus>
+                        <div class="form-text">Masukkan nama lengkap sesuai KTP</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editNamaModal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit Email -->
+<div class="modal fade" id="editEmailModal" tabindex="-1" aria-labelledby="editEmailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editEmailModalLabel">Edit Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('siswa.updateEmail') }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Baru</label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                               value="{{ Auth::user()->email }}" required>
+                        <div class="form-text">Gunakan email yang aktif untuk notifikasi</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label">Password Saat Ini</label>
+                        <input type="password" class="form-control" id="current_password" name="current_password" required>
+                        <div class="form-text">Masukkan password saat ini untuk mengubah email</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editEmailModal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit Foto -->
+<div class="modal fade" id="editFotoModal" tabindex="-1" aria-labelledby="editFotoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editFotoModalLabel">Ganti Foto Profil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('siswa.uploadPhoto') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="foto" class="form-label">Pilih Foto</label>
+                        <input type="file" class="form-control" id="foto" name="foto" accept="image/*" required>
+                        <div class="form-text">Format: JPG, JPEG, PNG. Maksimal: 2MB</div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Foto yang diunggah akan digunakan sebagai foto profil Anda.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editFotoModal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">Upload Foto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Konfirmasi Hapus Foto -->
+<div class="modal fade" id="confirmDeleteFotoModal" tabindex="-1" aria-labelledby="confirmDeleteFotoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteFotoModalLabel">Hapus Foto Profil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Peringatan!</strong> Anda yakin ingin menghapus foto profil?
+                </div>
+                <p class="mb-0">Tindakan ini tidak dapat dikembalikan. Foto Anda akan diganti dengan avatar default.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('confirmDeleteFotoModal')">Batal</button>
+                <form action="{{ route('siswa.profile.photo.delete') }}" method="POST" style="display: inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Hapus Foto</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit Password -->
+<div class="modal fade" id="editPasswordModal" tabindex="-1" aria-labelledby="editPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPasswordModalLabel">Ubah Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('siswa.updatePassword') }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label">Password Saat Ini</label>
+                        <input type="password" class="form-control" id="current_password" name="current_password" required>
+                        <div class="form-text">Masukkan password saat ini</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password Baru</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                        <div class="form-text">Minimal 8 karakter, kombinasi huruf dan angka</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password_confirmation" class="form-label">Konfirmasi Password Baru</label>
+                        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+                        <div class="form-text">Ulangi password baru</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editPasswordModal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">Ubah Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection

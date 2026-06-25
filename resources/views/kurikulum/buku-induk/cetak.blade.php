@@ -45,7 +45,6 @@
             font-weight: normal;
         }
 
-        /* --- MAIN LAYOUT: TWO COLUMNS --- */
         .main-content-wrapper {
             display: flex;
             gap: 8px;
@@ -65,9 +64,7 @@
             flex-direction: column;
             overflow: hidden;
         }
-        /* --- END OF MAIN LAYOUT --- */
 
-        /* --- Right Column: Student Data (VERTICAL) --- */
         .data-section {
             margin-bottom: 8px;
         }
@@ -97,7 +94,6 @@
             padding-bottom: 1px;
         }
         
-        /* --- Photo & Side Info Table --- */
         .photo-info-container {
             text-align: center;
             margin-bottom: 8px;
@@ -136,7 +132,6 @@
             width: 51%;
         }
 
-        /* --- Left Column: Grades Table (PANJANG) --- */
         .hasil-prestasi-title {
             text-align: center;
             font-weight: 700;
@@ -188,7 +183,6 @@
             font-size: 6px;
         }
 
-        /* --- Signature --- */
         .signature-section {
             margin-top: auto;
             padding-top: 8px;
@@ -266,7 +260,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="buku-induk-header">
             <h1>BUKU INDUK SISWA</h1>
             <h2>SMKN 1 KAWALI</h2>
@@ -274,7 +267,6 @@
         </div>
 
         <div class="main-content-wrapper">
-            <!-- KOLOM KIRI: TABEL NILAI (DIPANJANGKAN) -->
             <div class="nilai-column">
                 <div class="hasil-prestasi-title">HASIL PRESTASI PEMBELAJARAN</div>
                 <div class="table-responsive">
@@ -340,7 +332,6 @@
                                 </tr>
                             @endif
                             
-                            {{-- TAMBAHKAN BANYAK BARIS KOSONG DI SINI --}}
                             @for ($i = 0; $i < 15; $i++)
                                 <tr>
                                     <td>&nbsp;</td>
@@ -355,21 +346,17 @@
                 </div>
             </div>
 
-            <!-- KOLOM KANAN: DATA SISWA (VERTICAL) -->
             <div class="data-column">
-                <!-- Photo & Info Table -->
                 <div class="photo-info-container">
                     <div class="photo-box">
-                        @if(isset($siswa->user) && isset($siswa->user->photo))
+                        @if(isset($siswa->user) && $siswa->user->photo)
                             <img src="{{ asset('storage/' . $siswa->user->photo) }}" alt="{{ $siswa->nama_lengkap }}" onerror="this.style.display='none'">
                         @else
                             <span style="font-size: 8px; color: #999;">Photo</span>
                         @endif
                     </div>
-                    <!-- side-table removed: keeping underlined form fields only -->
                 </div>
 
-                <!-- Form Data (VERTICAL) - Tanpa Judul A dan B -->
                 <div class="data-section">
                     <div class="data-row">
                         <div class="data-label">NIS / NISN</div>
@@ -385,7 +372,7 @@
                     </div>
                     <div class="data-row">
                         <div class="data-label">Tempat/Tgl.Lahir</div>
-                        <div class="data-value">{{ $siswa->tempat_lahir ?? '-' }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->translatedFormat('d F Y') : '-' }}</div>
+                        <div class="data-value">{{ $siswa->tempat_lahir ?? '-' }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d F Y') : '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">Warganegara</div>
@@ -444,7 +431,7 @@
                     <div class="data-section-title">Diterima menjadi Siswa</div>
                     <div class="data-row">
                         <div class="data-label">a. Mulai Tanggal</div>
-                        <div class="data-value">{{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->translatedFormat('d F Y') : '-' }}</div>
+                        <div class="data-value">{{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->format('d F Y') : '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">b. Asal sekolah</div>
@@ -454,11 +441,14 @@
 
                 <div class="data-section">
                     <div class="data-section-title">Meninggalkan Sekolah</div>
+                    @php
+                        $mutasiTerakhir = $siswa->mutasis ? $siswa->mutasis->sortByDesc('id')->first() : null;
+                    @endphp
                     <div class="data-row">
                         <div class="data-label">a. Tanggal</div>
                         <div class="data-value">
-                            @if($siswa->mutasiTerakhir)
-                                {{ $siswa->mutasiTerakhir->tanggal_mutasi ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_mutasi)->translatedFormat('d F Y') : '-' }}
+                            @if($mutasiTerakhir)
+                                {{ $mutasiTerakhir->tanggal_mutasi ? \Carbon\Carbon::parse($mutasiTerakhir->tanggal_mutasi)->format('d F Y') : '-' }}
                             @else
                                 -
                             @endif
@@ -467,8 +457,8 @@
                     <div class="data-row">
                         <div class="data-label">b. Alasan</div>
                         <div class="data-value">
-                            @if($siswa->mutasiTerakhir)
-                                {{ $siswa->mutasiTerakhir->alasan_pindah ?? '-' }}
+                            @if($mutasiTerakhir)
+                                {{ $mutasiTerakhir->alasan_pindah ?? '-' }}
                             @else
                                 -
                             @endif
@@ -516,7 +506,6 @@
                     </div>
                 </div>
                 
-                <!-- Signature -->
                 <div class="signature-section">
                     <div class="signature-info">
                         <div class="signature-box-small"></div>

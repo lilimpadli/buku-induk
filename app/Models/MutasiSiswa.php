@@ -98,8 +98,8 @@ class MutasiSiswa extends Model
     {
         $labels = [
             'pindah' => 'Pindah Sekolah',
-            'do' => 'Putus Sekolah (DO)',
-            'meninggal' => 'Meninggal Dunia',
+            'do' => 'Keluar Sekolah',
+            'meninggal' => 'Meninggal',
             'naik_kelas' => 'Naik Kelas',
             'lulus' => 'Lulus',
         ];
@@ -132,6 +132,7 @@ class MutasiSiswa extends Model
             match ($this->status) {
                 'naik_kelas' => $this->handleNaikKelas(),
                 'lulus' => $this->handleLulus(),
+                'pindah', 'do', 'meninggal' => $this->handleTerminalStatus(),
                 default => null,
             };
         } catch (\Exception $e) {
@@ -141,7 +142,7 @@ class MutasiSiswa extends Model
     }
 
     /**
-     * Handle naik kelas - update rombel ke tingkat berikutnya
+     * Handle naik kelas - update rombel dan kelas ke tingkat berikutnya
      */
     private function handleNaikKelas()
     {
@@ -152,41 +153,62 @@ class MutasiSiswa extends Model
 
         $currentRombel = $siswa->rombel;
         $currentKelas = $currentRombel->kelas;
-
-        // Tentukan tingkat berikutnya
-        $nextTingkat = (int)$currentKelas->tingkat + 1;
-
-        // Jika sudah kelas 12 (XII), tidak bisa naik
-        if ($nextTingkat > 12) {
+        if (!$currentKelas) {
             return;
         }
 
-        // Cari rombel untuk kelas berikutnya dengan jurusan yang sama
-        $nextRombel = Rombel::whereHas('kelas', function ($query) use ($nextTingkat, $currentKelas) {
-            $query->where('tingkat', $nextTingkat)
-                  ->where('jurusan_id', $currentKelas->jurusan_id);
-        })
-            ->where('nama', $currentRombel->nama)  // Ambil rombel dengan nama yang sama
+        // Tentukan tingkat berikutnya dalam format yang sama seperti data kelas
+        $nextTingkat = $this->getNextTingkat($currentKelas->tingkat);
+        if (!$nextTingkat) {
+            return;
+        }
+
+        // Cari kelas tujuan dengan jurusan yang sama
+        $nextKelas = Kelas::where('jurusan_id', $currentKelas->jurusan_id)
+            ->where('tingkat', $nextTingkat)
             ->first();
 
-        // Jika tidak ada rombel dengan nama yang sama, ambil rombel pertama dari kelas berikutnya
+        if (!$nextKelas) {
+            return;
+        }
+
+        // Ambil nama rombel yang sama di kelas tujuan
+        $baseName = preg_replace('/^\s*(X|XI|XII|10|11|12)\s+/i', '', $currentRombel->nama);
+
+        $nextRombel = Rombel::where('kelas_id', $nextKelas->id)
+            ->where(function ($query) use ($currentRombel, $baseName) {
+                $query->where('nama', $currentRombel->nama)
+                    ->orWhere('nama', 'like', "%{$baseName}%");
+            })
+            ->first();
+
         if (!$nextRombel) {
-            $nextRombel = Rombel::whereHas('kelas', function ($query) use ($nextTingkat, $currentKelas) {
-                $query->where('tingkat', $nextTingkat)
-                      ->where('jurusan_id', $currentKelas->jurusan_id);
-            })->first();
+            $nextRombel = Rombel::where('kelas_id', $nextKelas->id)->first();
         }
 
         if (!$nextRombel) {
             return;
         }
 
-        // Update rombel siswa
-        $siswa->update(['rombel_id' => $nextRombel->id]);
+        $siswa->rombel_id = $nextRombel->id;
+        if (array_key_exists('kelas_id', $siswa->getAttributes())) {
+            $siswa->kelas_id = $nextKelas->id;
+        }
+        $siswa->save();
     }
 
     /**
-     * Handle lulus - create alumni record di kenaikan_kelas
+     * Handle siswa terminal status (pindah/do/meninggal)
+     * Tidak mengeluarkan siswa dari rombel agar tetap terlihat di tampilan.
+     */
+    private function handleTerminalStatus()
+    {
+        // Untuk status selain lulus, biarkan siswa tetap ada dalam rombel.
+        return;
+    }
+
+    /**
+     * Handle lulus - create alumni record di kenaikan_kelas dan kosongkan rombel/kelas
      */
     private function handleLulus()
     {
@@ -194,6 +216,16 @@ class MutasiSiswa extends Model
         if (!$siswa) {
             return;
         }
+
+        // Simpan rombel saat ini sebelum dikosongkan, untuk histori alumni
+        $previousRombelId = $siswa->rombel_id;
+
+        // Kosongkan relasi rombel/kelas agar siswa tidak lagi tampil di rombel
+        $siswa->rombel_id = null;
+        if (array_key_exists('kelas_id', $siswa->getAttributes())) {
+            $siswa->kelas_id = null;
+        }
+        $siswa->save();
 
         // Gunakan tahun_ajaran dari field jika ada, jika tidak hitung dari tanggal mutasi
         $tahunAjaran = $this->tahun_ajaran ?? $this->getTahunAjaran();
@@ -206,8 +238,26 @@ class MutasiSiswa extends Model
             'tahun_ajaran' => $tahunAjaran,
             'status' => 'Lulus',
             'catatan' => 'Lulus pada ' . \Carbon\Carbon::parse($this->tanggal_mutasi)->format('d-m-Y'),
-            'rombel_tujuan_id' => $siswa->rombel_id,
+            'rombel_tujuan_id' => $previousRombelId,
         ]);
+    }
+
+    /**
+     * Ambil tingkat berikutnya dari nilai string tingkatan
+     */
+    private function getNextTingkat($tingkat)
+    {
+        $map = [
+            'X' => 'XI',
+            'XI' => 'XII',
+            'XII' => null,
+            '10' => '11',
+            '11' => '12',
+            '12' => null,
+        ];
+
+        $clean = strtoupper(trim($tingkat));
+        return $map[$clean] ?? null;
     }
 
     /**

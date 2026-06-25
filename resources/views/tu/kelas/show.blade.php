@@ -4,490 +4,630 @@
 
 @section('content')
 <style>
-    /* ===================== STYLE DETAIL ROMBEL ===================== */
-    
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --primary: #4F46E5;
+        --primary-light: #6366F1;
+        --secondary: #7C3AED;
+        --success: #10B981;
+        --warning: #F59E0B;
+        --danger: #EF4444;
+        --info: #3B82F6;
+        --bg: #F4F7FE;
+        --card: #FFFFFF;
+        --border: #E5E7EB;
+        --text: #111827;
+        --text-light: #6B7280;
+        --shadow-sm: 0 2px 8px rgba(15,23,42,.05);
+        --shadow-md: 0 10px 25px rgba(15,23,42,.08);
+        --shadow-lg: 0 18px 35px rgba(15,23,42,.12);
+        --radius: 20px;
+        --transition: all .25s ease;
     }
 
     body {
-        background-color: var(--light-bg);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(180deg, #f8faff 0%, #eef2ff 100%);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    h2.fw-bold {
-        font-size: 28px;
-        color: #1E293B;
+    /* ================= HEADER ================= */
+
+    .page-header {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 28px;
+        padding: 32px;
+        margin-bottom: 24px;
         position: relative;
-        padding-left: 15px;
-        margin-bottom: 5px !important;
-    }
-
-    h2.fw-bold::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 5px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 3px;
-    }
-
-    .rombel-subtitle {
-        color: #64748B !important;
-        margin-left: 15px;
-    }
-
-    /* Card Styles */
-    .card {
-        border-radius: 16px;
-        border: none;
-        box-shadow: var(--card-shadow);
         overflow: hidden;
-        transition: all 0.3s ease;
+        box-shadow: var(--shadow-lg);
     }
 
-    .card:hover {
-        box-shadow: var(--hover-shadow);
+    .page-header::before {
+        content: '';
+        position: absolute;
+        width: 240px;
+        height: 240px;
+        background: rgba(255, 255, 255, .08);
+        border-radius: 50%;
+        top: -80px;
+        right: -70px;
     }
 
-    .card-header {
-        background-color: transparent;
-        border-bottom: 1px solid #E2E8F0;
-        padding: 20px 24px 15px;
+    .page-header::after {
+        content: '';
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        background: rgba(255, 255, 255, .05);
+        border-radius: 50%;
+        bottom: -60px;
+        left: -40px;
     }
 
-    .card-body {
-        padding: 20px 24px;
+    .header-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        flex-wrap: wrap;
     }
 
-    /* Info Card Styles */
-    .info-card .info-item {
-        padding: 15px;
-        border-radius: 12px;
-        background-color: rgba(47, 83, 255, 0.03);
-        transition: all 0.3s ease;
-        height: 100%;
+    .header-left {
+        flex: 1;
+        min-width: 250px;
     }
 
-    .info-card .info-item:hover {
-        background-color: rgba(47, 83, 255, 0.06);
-        transform: translateY(-3px);
+    .page-header h1 {
+        font-size: 34px;
+        font-weight: 800;
+        color: white;
+        margin: 0 0 8px 0;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, .15);
     }
 
-    .info-card .info-label {
-        font-size: 13px;
-        font-weight: 600;
-        color: #64748B;
-        margin-bottom: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .info-card .info-value {
-        font-size: 16px;
-        color: #1E293B;
-        margin-bottom: 0;
-        font-weight: 600;
-    }
-
-    /* Button Styles */
-    .btn-outline-secondary {
-        border-color: #E2E8F0;
-        color: #475569;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        padding: 8px 16px;
-    }
-
-    .btn-outline-secondary:hover {
-        background-color: #F1F5F9;
-        transform: translateY(-2px);
-        color: #334155;
-    }
-
-    /* Table Styles */
-    .table {
-        margin-bottom: 0;
-    }
-
-    .table thead th {
-        font-weight: 600;
-        color: #475569;
+    .page-header .subtitle {
         font-size: 14px;
+        color: rgba(255, 255, 255, .85);
+        margin: 0;
+    }
+
+    .page-header .meta {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+    }
+
+    .meta-badge {
+        background: rgba(255, 255, 255, .14);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, .15);
+        border-radius: 12px;
+        padding: 8px 14px;
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* ================= ACTION BUTTONS ================= */
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-modern {
+        border: 1px solid rgba(148, 163, 184, .18);
+        border-radius: 16px;
+        padding: 12px 20px;
+        font-weight: 700;
+        color: var(--text);
+        background: #ffffff;
+        box-shadow: var(--shadow-sm);
+        transition: transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        text-decoration: none;
+        white-space: nowrap;
+        font-size: 14px;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        background: #f8fafc;
+    }
+
+    .btn-modern:active,
+    .btn-modern:focus-visible {
+        transform: scale(.98);
+        box-shadow: 0 8px 16px rgba(15, 23, 42, .12);
+    }
+
+    .btn-modern-white {
+        background: white;
+        color: var(--primary);
+    }
+
+    .btn-modern-outline {
+        background: transparent;
+        color: white;
+        border: 1.5px solid rgba(255, 255, 255, .3);
+    }
+
+    .btn-modern-outline:hover {
+        background: rgba(255, 255, 255, .1);
+        border-color: rgba(255, 255, 255, .5);
+    }
+
+    /* ================= INFO CARDS ================= */
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: var(--shadow-sm);
+        transition: transform .2s ease, box-shadow .2s ease;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, .05);
+    }
+
+    .info-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--primary), var(--secondary));
+    }
+
+    .info-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .info-label {
+        font-size: 12px;
+        color: var(--text-light);
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        border-bottom: 2px solid #E2E8F0;
-        padding: 15px 20px;
+        margin-bottom: 8px;
+        font-weight: 600;
     }
 
-    .table tbody td {
-        padding: 15px 20px;
-        vertical-align: middle;
-        border-bottom: 1px solid #F1F5F9;
+    .info-value {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+        word-break: break-word;
     }
 
-    .table tbody tr {
-        transition: all 0.2s ease;
+    /* ================= STUDENT TABLE ================= */
+
+    .table-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, .05);
     }
 
-    .table tbody tr:hover {
-        background-color: rgba(47, 83, 255, 0.03);
+    .table-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
     }
 
-    .table tbody tr:last-child td {
-        border-bottom: none;
+    .table-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
-    .table-responsive {
-        border-radius: 0 0 16px 16px;
+    .table-title h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0;
+    }
+
+    .student-count {
+        background: var(--primary);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: var(--bg);
+    }
+
+    th {
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 700;
+        color: var(--text-light);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    td {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    tbody tr {
+        transition: background .2s ease;
+    }
+
+    tbody tr:hover {
+        background: #f9fafb;
+    }
+
+    .student-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
     .student-avatar {
-        flex-shrink: 0;
-    }
-
-    .student-avatar-circle {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .student-avatar-initial {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        color: white;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 700;
+        color: white;
+        font-size: 14px;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+
+    .student-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .student-name {
+        font-weight: 600;
+        color: var(--text);
         font-size: 14px;
     }
 
-    /* Empty State */
+    .badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .badge-laki {
+        background: rgba(59, 130, 246, .1);
+        color: #3B82F6;
+    }
+
+    .badge-perempuan {
+        background: rgba(236, 72, 153, .1);
+        color: #EC4899;
+    }
+
+    /* ================= EMPTY STATE ================= */
+
     .empty-state {
-        color: #64748B;
-        font-weight: 500;
-        padding: 40px 20px !important;
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-light);
     }
 
     .empty-state i {
-        color: #94a3b8;
+        font-size: 48px;
+        color: #CBD5E1;
+        margin-bottom: 16px;
     }
 
-    /* Animations */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+    .empty-state h4 {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0 0 8px 0;
     }
 
-    .card {
-        animation: fadeIn 0.5s ease-out;
+    .empty-state p {
+        margin: 0;
+        font-size: 14px;
     }
 
-    /* Responsive */
-    @media (max-width: 992px) {
-        .table thead th,
-        .table tbody td {
-            padding: 12px 15px;
-        }
-    }
+    /* ================= RESPONSIVE ================= */
 
     @media (max-width: 768px) {
-        h2.fw-bold {
-            font-size: 24px;
-            padding-left: 12px;
+        .header-content {
+            flex-direction: column;
+            align-items: flex-start;
         }
 
-        h2.fw-bold::before {
-            width: 4px;
-        }
-        
-        .rombel-subtitle {
-            margin-left: 12px;
-            font-size: 0.9rem;
-        }
-        
-        .btn-outline-secondary {
-            font-size: 0.875rem;
-            padding: 6px 12px;
+        .action-buttons {
+            width: 100%;
         }
 
-        .card-header {
-            padding: 15px 20px 12px;
+        .btn-modern {
+            flex: 1;
+            justify-content: center;
         }
 
-        .card-header h5 {
-            font-size: 1.1rem;
+        .page-header h1 {
+            font-size: 28px;
         }
 
-        .card-body {
-            padding: 15px 20px;
-        }
-        
-        .info-card .info-item {
-            margin-bottom: 12px;
-            padding: 12px;
+        .info-grid {
+            grid-template-columns: 1fr;
         }
 
-        .info-card .info-label {
-            font-size: 12px;
-            margin-bottom: 6px;
+        .table-header {
+            flex-direction: column;
+            align-items: stretch;
         }
 
-        .info-card .info-value {
-            font-size: 15px;
-        }
-        
-        .table thead th {
-            font-size: 12px;
+        th, td {
             padding: 10px 12px;
-        }
-
-        .table tbody td {
-            padding: 10px 12px;
-            font-size: 0.875rem;
-        }
-
-        .student-avatar {
-            margin-right: 10px !important;
-        }
-
-        .student-avatar-circle,
-        .student-avatar-initial {
-            width: 32px;
-            height: 32px;
             font-size: 13px;
         }
 
-        .badge {
-            font-size: 0.75rem;
-            padding: 0.3rem 0.5rem;
+        .student-avatar {
+            width: 36px;
+            height: 36px;
         }
     }
 
-    @media (max-width: 576px) {
-        h2.fw-bold {
-            font-size: 20px;
-            padding-left: 10px;
+    @media (max-width: 480px) {
+        .page-header {
+            padding: 20px;
         }
 
-        .rombel-subtitle {
-            margin-left: 10px;
-            font-size: 0.85rem;
+        .page-header h1 {
+            font-size: 24px;
         }
 
-        .header-section {
-            margin-bottom: 1rem !important;
-        }
-
-        .btn-outline-secondary {
-            width: 100%;
-            margin-top: 0.75rem;
-            font-size: 0.8rem;
-            padding: 8px 12px;
-        }
-
-        .card-header {
-            padding: 12px 15px 10px;
-        }
-
-        .card-header h5 {
-            font-size: 1rem;
-        }
-
-        .card-body {
-            padding: 12px 15px;
-        }
-
-        .info-card .info-item {
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-
-        .info-card .info-label {
-            font-size: 11px;
-        }
-
-        .info-card .info-value {
-            font-size: 14px;
-        }
-
-        /* Mobile: Hide some table columns */
-        .table thead th:nth-child(3),
-        .table tbody td:nth-child(3) {
-            display: none;
-        }
-
-        .table thead th {
-            font-size: 11px;
-            padding: 8px 10px;
-        }
-
-        .table tbody td {
-            padding: 8px 10px;
-            font-size: 0.8rem;
-        }
-
-        .student-avatar {
-            margin-right: 8px !important;
-        }
-
-        .student-avatar-circle,
-        .student-avatar-initial {
-            width: 28px;
-            height: 28px;
+        .page-header .subtitle {
             font-size: 12px;
         }
 
-        .badge {
-            font-size: 0.7rem;
-            padding: 0.25rem 0.4rem;
+        .action-buttons {
+            gap: 8px;
         }
 
-        .badge i {
-            display: none;
+        .btn-modern {
+            padding: 10px 16px;
+            font-size: 13px;
         }
 
-        .empty-state {
-            padding: 30px 15px !important;
+        .info-value {
+            font-size: 16px;
         }
 
-        .empty-state i {
-            font-size: 1.5rem !important;
+        th, td {
+            padding: 8px 10px;
+            font-size: 12px;
         }
 
-        .empty-state p {
-            font-size: 0.875rem;
+        .student-info {
+            gap: 8px;
+        }
+
+        .student-avatar {
+            width: 32px;
+            height: 32px;
         }
     }
 </style>
 
-<div class="container-fluid px-3 px-md-4 mt-3 mt-md-4">
-
-    <!-- JUDUL DAN TOMBOL KEMBALI -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 mb-md-4 header-section">
-        <div class="flex-grow-1">
-            <h2 class="fw-bold mb-1">Detail Rombel</h2>
-            <p class="rombel-subtitle mb-0">{{ $rombel->nama }}</p>
-        </div>
-        <div class="d-flex gap-2">
-            <a href="{{ route('tu.kelas.export', $rombel->id) }}" class="btn btn-success">
-                <i class="fas fa-file-excel me-2"></i> Export Rombel
-            </a>
-            <a href="{{ request()->header('referer') ?: route('tu.kelas.index') }}" class="btn btn-outline-secondary">
-                <i class="fa fa-arrow-left me-2"></i> Kembali
-            </a>
-        </div>
-    </div>
-
-    <!-- INFO ROMBEL -->
-    <div class="card shadow-sm border-0 mb-3 mb-md-4 info-card">
-        <div class="card-body">
-            <div class="row g-2 g-md-3">
-                <div class="col-12 col-md-4">
-                    <div class="info-item">
-                        <p class="info-label mb-1">
-                            <i class="fas fa-layer-group me-1 me-md-2"></i> Tingkat
-                        </p>
-                        <h6 class="info-value">{{ $rombel->kelas->tingkat ?? '-' }}</h6>
-                    </div>
+<div class="container-fluid px-3 px-md-4 py-4">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1>{{ $rombel->nama }}</h1>
+                <p class="subtitle">Detail Rombel / Kelas</p>
+                <div class="meta">
+                    @if($rombel->kelas)
+                        <span class="meta-badge">
+                            <i class="fas fa-layer-group"></i> Tingkat {{ $rombel->kelas->tingkat }}
+                        </span>
+                    @endif
+                    @if($rombel->kelas && $rombel->kelas->jurusan)
+                        <span class="meta-badge">
+                            <i class="fas fa-briefcase"></i> {{ $rombel->kelas->jurusan->nama }}
+                        </span>
+                    @endif
                 </div>
-                <div class="col-12 col-md-4">
-                    <div class="info-item">
-                        <p class="info-label mb-1">
-                            <i class="fas fa-graduation-cap me-1 me-md-2"></i> Jurusan
-                        </p>
-                        <h6 class="info-value">{{ $rombel->kelas->jurusan->nama ?? '-' }}</h6>
-                    </div>
-                </div>
-                <div class="col-12 col-md-4">
-                    <div class="info-item">
-                        <p class="info-label mb-1">
-                            <i class="fas fa-user-tie me-1 me-md-2"></i> Wali Kelas
-                        </p>
-                        <h6 class="info-value">{{ $rombel->guru->nama ?? '-' }}</h6>
-                    </div>
-                </div>
+            </div>
+            <div class="action-buttons">
+                <a href="{{ route('tu.kelas.export', $rombel->id) }}" class="btn-modern btn-modern-white">
+                    <i class="fas fa-file-excel"></i>
+                    Export
+                </a>
+                <a href="{{ route('tu.kelas.edit', $rombel->id) }}" class="btn-modern btn-modern-outline">
+                    <i class="fas fa-edit"></i>
+                    Edit
+                </a>
+                <a href="{{ request()->header('referer') ?: route('tu.kelas.index') }}" class="btn-modern btn-modern-outline">
+                    <i class="fas fa-arrow-left"></i>
+                    Kembali
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- DAFTAR SISWA -->
-    <div class="card shadow-sm border-0">
-        <div class="card-header">
-            <h5 class="fw-bold mb-0">
-                <i class="fas fa-users me-2"></i>
-                Daftar Siswa
-                <span class="badge bg-primary ms-2">{{ $rombel->siswa->count() }}</span>
-            </h5>
+    <!-- Info Cards -->
+    <div class="info-grid">
+        <div class="info-card">
+            <p class="info-label">Nama Kelas</p>
+            <p class="info-value">{{ $rombel->nama }}</p>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 50px;">NO</th>
-                            <th>Nama Siswa</th>
-                            <th>NIS</th>
-                            <th>Jenis Kelamin</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($rombel->siswa as $siswa)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="student-avatar me-2 me-md-3">
-                                            @if($siswa->foto)
-                                                <img src="{{ asset('storage/' . $siswa->foto) }}" 
-                                                     alt="{{ $siswa->nama_lengkap }}" 
-                                                     class="student-avatar-circle">
-                                            @else
-                                                <div class="student-avatar-initial">
-                                                    {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
-                                                </div>
-                                            @endif
-                                        </div>
-                                        <span class="student-name">{{ $siswa->nama_lengkap }}</span>
+        <div class="info-card">
+            <p class="info-label">Jurusan</p>
+            <p class="info-value">{{ $rombel->kelas->jurusan->nama ?? '-' }}</p>
+        </div>
+        <div class="info-card">
+            <p class="info-label">Wali Kelas</p>
+            <p class="info-value">{{ $rombel->guru->nama ?? '-' }}</p>
+        </div>
+        <div class="info-card">
+            <p class="info-label">Jumlah Siswa</p>
+            <p class="info-value">{{ $rombel->siswa->count() }}</p>
+        </div>
+    </div>
+
+    <!-- Student Table -->
+    <div class="table-container">
+        <div class="table-header">
+            <div class="table-title">
+                <h3>Daftar Siswa</h3>
+                <span class="student-count">{{ $rombel->siswa->count() }} Siswa</span>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nama Siswa</th>
+                        <th>NIS</th>
+                        <th>Jenis Kelamin</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTableBody">
+                    @forelse($rombel->siswa as $siswa)
+                        <tr data-name="{{ strtolower($siswa->nama_lengkap) }}" data-nis="{{ strtolower($siswa->nis) }}">
+                            <td>{{ $loop->iteration }}</td>
+                            <td>
+                                <div class="student-info">
+                                    <div class="student-avatar">
+                                        @if($siswa->foto)
+                                            <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}">
+                                        @else
+                                            {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
+                                        @endif
                                     </div>
-                                </td>
-                                <td>{{ $siswa->nis }}</td>
-                                <td>
-                                    <span class="badge {{ $siswa->jenis_kelamin == 'L' ? 'bg-info' : 'bg-danger' }} bg-opacity-10 text-dark">
-                                        <i class="fas fa-{{ $siswa->jenis_kelamin == 'L' ? 'mars' : 'venus' }} me-1"></i>
-                                        <span class="d-none d-sm-inline">{{ $siswa->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</span>
-                                        <span class="d-sm-none">{{ $siswa->jenis_kelamin }}</span>
-                                    </span>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="text-center empty-state">
-                                    <i class="fas fa-user-graduate fa-2x mb-3"></i>
-                                    <p class="mb-0">Belum ada siswa di rombel ini.</p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                                    <span class="student-name">{{ $siswa->nama_lengkap }}</span>
+                                </div>
+                            </td>
+                            <td>{{ $siswa->nis }}</td>
+                            <td>
+                                <span class="badge badge-{{ $siswa->jenis_kelamin == 'L' ? 'laki' : 'perempuan' }}">
+                                    <i class="fas fa-{{ $siswa->jenis_kelamin == 'L' ? 'mars' : 'venus' }}"></i>
+                                    {{ $siswa->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}
+                                </span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4">
+                                <div class="empty-state">
+                                    <i class="fas fa-user-graduate"></i>
+                                    <h4>Belum ada siswa</h4>
+                                    <p>Belum ada data siswa untuk rombel ini.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
-
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add smooth interaction effects to cards
+        document.querySelectorAll('.info-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transition = 'transform .3s ease, box-shadow .3s ease';
+            });
+        });
+
+        // Add ripple effect to modern buttons
+        document.querySelectorAll('.btn-modern').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('btn-ripple');
+
+                this.appendChild(ripple);
+
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+    });
+</script>
+
+<style>
+    /* Button ripple effect */
+    .btn-modern {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .5);
+        transform: scale(0);
+        animation: ripple-effect .6s ease-out;
+        pointer-events: none;
+    }
+
+    @keyframes ripple-effect {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+</style>
 @endsection

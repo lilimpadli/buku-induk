@@ -1,86 +1,295 @@
 @extends('layouts.app')
 
-@section('title', 'Form Tambah Kelas')
+@section('title', 'Tambah Rombel')
 
 @section('content')
-<div class="container-fluid" style="background-color: #f8f9fa; min-height: 100vh;">
-    <div class="row justify-content-center align-items-center" style="min-height: 100vh;">
-        <div class="col-lg-6 col-md-8">
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-            <!-- KONTAINER FORM (GAYA MODAL) -->
-            <div class="card shadow-lg border-0" style="border-radius: 15px;">
-                <div class="card-body p-4 p-md-5">
+    main {
+        padding: 20px 15px !important;
+        overflow-x: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
 
-                    <!-- JUDUL FORM -->
-                    <h4 class="fw-bold text-center mb-1">Form Tambah Kelas</h4>
-                    <p class="text-muted text-center mb-4">Isi data untuk menambah kelas baru.</p>
+    .container-fluid {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 10px !important;
+        overflow-x: auto !important;
+    }
 
-                    <form action="{{ route('kurikulum.kelas.store') }}" method="POST">
-                        @csrf
+    .page-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 1.5rem 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+    }
 
-                        <!-- TINGKAT -->
-                        <div class="mb-3">
-                            <label for="tingkat" class="form-label fw-semibold">TINGKAT <span class="text-danger">*</span></label>
-                            <select name="tingkat" id="tingkat" class="form-control form-control-lg" required>
-                                <option value="" disabled selected>-- Pilih Tingkat --</option>
-                                @foreach($tingkats as $t)
-                                    <option value="{{ $t }}">Kelas {{ $t }}</option>
-                                @endforeach
-                            </select>
-                            @error('tingkat')
-                                <div class="text-danger small mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
+    .page-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(100px, -100px);
+        pointer-events: none;
+    }
 
-                        <!-- KONSENTRASI KEAHLIAN -->
-                        <div class="mb-3">
-                            <label for="jurusan_id" class="form-label fw-semibold">KONSENTRASI KEAHLIAN <span class="text-danger">*</span></label>
-                            <select name="jurusan_id" id="jurusan_id" class="form-control form-control-lg" required>
-                                <option value="" disabled selected>-- Pilih Konsentrasi Keahlian --</option>
-                                @foreach($jurusans as $j)
-                                    <option value="{{ $j->id }}">{{ $j->nama }}</option>
-                                @endforeach
-                            </select>
-                            @error('jurusan_id')
-                                <div class="text-danger small mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        font-size: 1.3rem;
+        position: relative;
+        z-index: 1;
+    }
 
-                        <!-- NAMA KELAS -->
-                        <div class="mb-4">
-                            <label for="nama" class="form-label fw-semibold">NAMA KELAS <span class="text-danger">*</span></label>
-                            <input type="text" name="nama" id="nama" class="form-control form-control-lg" placeholder="Contoh: 1, 2, 3"
-                                value="{{ old('nama') }}" required>
-                            @error('nama')
-                                <div class="text-danger small mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
+    .page-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 0.9rem;
+        position: relative;
+        z-index: 1;
+    }
 
-                        <!-- WALI KELAS (DIPINDAHKAN KE BAWAH) -->
-                        <div class="mb-4">
-                            <label for="guru_id" class="form-label fw-semibold">Wali Kelas</label>
-                            <select name="guru_id" id="guru_id" class="form-control form-control-lg" required>
-                                <option value="" disabled selected>-- Pilih Wali Kelas --</option>
-                                @foreach($gurus as $guru)
-                                    <option value="{{ $guru->id }}">{{ $guru->nama }}</option>
-                                @endforeach
-                            </select>
-                            @error('guru_id')
-                                <div class="text-danger small mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
+    .btn-back {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.4rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
 
-                        <!-- TOMBOL AKSI -->
-                        <div class="d-flex justify-content-between gap-2 mt-4">
-                            <a href="{{ route('kurikulum.kelas.index') }}" class="btn btn-light btn-lg flex-fill">Tutup</a>
-                            <button type="submit" class="btn btn-primary btn-lg flex-fill">Simpan Data</button>
-                        </div>
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        transform: translateY(-2px);
+    }
 
-                    </form>
+    .form-card {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        width: 100%;
+    }
 
-                </div>
+    .form-card .card-header {
+        background: white;
+        border-bottom: 1px solid #E2E8F0;
+        padding: 0.8rem 1.5rem;
+    }
+
+    .form-card .card-header h5 {
+        margin: 0;
+        font-weight: 700;
+        color: #1E293B;
+        font-size: 1rem;
+    }
+
+    .form-card .card-header h5 i {
+        color: #667eea;
+        margin-right: 6px;
+    }
+
+    .form-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .form-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #1E293B;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        border: 1px solid #E2E8F0;
+        padding: 0.5rem 0.9rem;
+        transition: var(--transition);
+        font-size: 0.9rem;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn-save {
+        background: var(--primary-gradient);
+        border: none;
+        padding: 0.5rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: var(--transition);
+        color: white;
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        color: white;
+    }
+
+    .btn-cancel {
+        background: #64748B;
+        border: none;
+        padding: 0.5rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: var(--transition);
+        color: white;
+    }
+
+    .btn-cancel:hover {
+        background: #475569;
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1rem 1rem;
+        }
+        .page-header h3 {
+            font-size: 1.1rem;
+        }
+        .page-header .text-muted {
+            font-size: 0.75rem;
+        }
+
+        .form-card .card-body {
+            padding: 1rem;
+        }
+
+        .btn-save,
+        .btn-cancel {
+            width: 100%;
+            margin-bottom: 8px;
+            justify-content: center;
+        }
+
+        .border-top {
+            text-align: center;
+        }
+
+        .row {
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .col-md-6 {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+    }
+</style>
+
+<div class="container-fluid px-4">
+    <div class="page-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap">
+            <div>
+                <h3><i class="fas fa-plus-circle me-2"></i> Tambah Rombel</h3>
+                <div class="text-muted">Isi form berikut untuk menambahkan rombel baru</div>
             </div>
+            <div>
+                <a href="{{ route('kurikulum.kelas.index') }}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+            </div>
+        </div>
+    </div>
 
+    <div class="card form-card">
+        <div class="card-header">
+            <h5><i class="fas fa-pen"></i> Form Tambah Rombel</h5>
+        </div>
+        <div class="card-body">
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $e)
+                            <li>{{ $e }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form action="{{ route('kurikulum.kelas.store') }}" method="POST">
+                @csrf
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-layer-group text-primary me-1"></i> Tingkat <span class="text-danger">*</span></label>
+                        <select name="tingkat" class="form-select" required>
+                            <option value="">-- Pilih Tingkat --</option>
+                            @foreach($tingkats as $t)
+                                <option value="{{ $t }}" {{ old('tingkat') == $t ? 'selected' : '' }}>
+                                    Kelas {{ $t }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-building text-primary me-1"></i> Jurusan <span class="text-danger">*</span></label>
+                        <select name="jurusan_id" class="form-select" required>
+                            <option value="">-- Pilih Jurusan --</option>
+                            @foreach($jurusans as $j)
+                                <option value="{{ $j->id }}" {{ old('jurusan_id') == $j->id ? 'selected' : '' }}>
+                                    {{ $j->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-tag text-primary me-1"></i> Nama Rombel <span class="text-danger">*</span></label>
+                        <input type="text" name="nama" class="form-control" value="{{ old('nama') }}" placeholder="Contoh: X RPL 1" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-user-tie text-primary me-1"></i> Wali Kelas <span class="text-danger">*</span></label>
+                        <select name="guru_id" class="form-select" required>
+                            <option value="">-- Pilih Wali Kelas --</option>
+                            @foreach($gurus as $g)
+                                <option value="{{ $g->id }}" {{ old('guru_id') == $g->id ? 'selected' : '' }}>
+                                    {{ $g->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top">
+                    <button type="submit" class="btn btn-save">
+                        <i class="fas fa-save me-2"></i> Simpan
+                    </button>
+                    <a href="{{ route('kurikulum.kelas.index') }}" class="btn btn-cancel">
+                        <i class="fas fa-arrow-left me-2"></i> Batal
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </div>

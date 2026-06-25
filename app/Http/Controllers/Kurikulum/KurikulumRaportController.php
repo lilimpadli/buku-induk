@@ -18,12 +18,32 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class KurikulumRaportController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $siswas = DataSiswa::orderBy('nama_lengkap')->get();
-        return view('kurikulum.siswa.rapor.index', compact('siswas'));
-    }
+        $search = $request->query('q');
+        $rombelId = $request->query('rombel_id');
 
+        $rombels = Rombel::orderBy('nama')->get();
+
+        $siswas = DataSiswa::with(['rombel.kelas'])
+            ->when($search, function($query) use ($search) {
+                return $query->where('nama_lengkap', 'like', '%' . $search . '%')
+                            ->orWhere('nis', 'like', '%' . $search . '%')
+                            ->orWhere('nisn', 'like', '%' . $search . '%');
+            })
+            ->when($rombelId, function($query) use ($rombelId) {
+                return $query->where('rombel_id', $rombelId);
+            })
+            ->orderBy('nama_lengkap')
+            ->paginate(15);
+
+        // 🔥 STATISTIK TOTAL
+        $totalSiswa = DataSiswa::count();
+        $lakiCount = DataSiswa::where('jenis_kelamin', 'Laki-laki')->count();
+        $perempuanCount = DataSiswa::where('jenis_kelamin', 'Perempuan')->count();
+
+        return view('kurikulum.siswa.rapor.index', compact('siswas', 'search', 'rombels', 'rombelId', 'totalSiswa', 'lakiCount', 'perempuanCount'));
+    }
     public function show($id)
     {
         $siswa = DataSiswa::findOrFail($id);

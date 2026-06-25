@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Rombel;
 use App\Models\DataSiswa;
+use Illuminate\Support\Str;
 
 
 /**
@@ -100,5 +101,17 @@ public function waliKelas()
 {
     return $this->hasMany(WaliKelas::class, 'user_id');
 }
+
+    /**
+     * Get normalized role (lowercase, underscores) for consistent checks in views/middleware.
+     */
+    public function getNormalizedRoleAttribute()
+    {
+        return Str::of($this->role ?? '')
+            ->lower()
+            ->replace(' ', '_')
+            ->replace('-', '_')
+            ->__toString();
+    }
 
 }

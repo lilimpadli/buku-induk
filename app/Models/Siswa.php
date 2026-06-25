@@ -23,6 +23,18 @@ class Siswa extends Model
         'nama_ibu',
         'pekerjaan_ayah',
         'pekerjaan_ibu',
+        'kelas_id',
+        'rombel_id',
+        'pkl_nilai',
+        'pkl_sertifikat',
+        'pkl_nama_industri',
+        'pkl_alamat',
+        'ijazah_nomor',
+        'ijazah_tanggal',
+        'transkip_nomor',
+        'transkip_tanggal',
+        'tanggal_lulus',
+        'status_kelulusan',
     ];
 
     public function user()

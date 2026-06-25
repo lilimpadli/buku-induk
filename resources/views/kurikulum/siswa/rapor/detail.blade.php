@@ -4,60 +4,168 @@
 
 @section('content')
 <style>
-    /* ===================== STYLE REVIEW RAPOR ===================== */
-    
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #13B497 0%, #59D4A4 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    body {
-        background-color: var(--light-bg);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    body { background-color: #f7fafc; font-family: 'Inter', sans-serif; }
+
+    main {
+        padding: 20px 15px !important;
+        overflow-x: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
-    .container {
-        max-width: 1200px;
+    .container-fluid {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 10px !important;
+        overflow-x: auto !important;
     }
 
-    h3 {
-        font-size: 28px;
-        color: #1E293B;
+    .page-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 1.5rem 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
         position: relative;
-        padding-left: 15px;
-        margin-bottom: 20px !important;
+        overflow: hidden;
+        width: 100%;
     }
 
-    h3::before {
+    .page-header::before {
         content: "";
         position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 5px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 3px;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(100px, -100px);
+        pointer-events: none;
     }
 
-    /* Header Buttons */
-    .d-flex.justify-content-between {
-        margin-bottom: 30px !important;
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        font-size: 1.3rem;
+        position: relative;
+        z-index: 1;
     }
 
-    /* Table Styles */
-    .table {
-        margin-bottom: 25px;
-        border-radius: 12px;
-        overflow: hidden;
+    .page-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 0.9rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-gradient {
+        background: var(--primary-gradient);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.5rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        color: white;
+    }
+
+    .btn-outline-gradient {
+        background: transparent;
+        border: 2px solid #667eea;
+        color: #667eea;
+        font-weight: 600;
+        padding: 0.4rem 1rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .btn-outline-gradient:hover {
+        background: var(--primary-gradient);
+        color: white;
+        border-color: transparent;
+        transform: translateY(-2px);
+    }
+
+    .btn-pdf {
+        background: var(--success-gradient);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.5rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .btn-pdf:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(19, 180, 151, 0.5);
+        color: white;
+    }
+
+    .table-card {
+        border-radius: var(--border-radius);
+        border: none;
         box-shadow: var(--card-shadow);
-        background-color: white;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        background: white;
+    }
+
+    .table-card .card-header {
+        background: #f8fafc;
+        padding: 0.8rem 1.5rem;
+        border-bottom: 2px solid #667eea;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #1E293B;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .table-card .card-header i {
+        color: #667eea;
+    }
+
+    .table-card .card-body {
+        padding: 0;
+    }
+
+    .table {
+        margin-bottom: 0;
     }
 
     .table-bordered {
@@ -67,323 +175,383 @@
     .table-bordered th,
     .table-bordered td {
         border: 1px solid #E2E8F0;
-        padding: 12px 15px;
+        padding: 10px 15px;
     }
 
     .table thead th {
         background-color: #F8FAFC;
         color: #475569;
         font-weight: 600;
-        font-size: 14px;
-        padding: 15px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 0.7rem 1rem;
     }
 
     .table tbody td {
         color: #334155;
-        font-size: 14px;
+        font-size: 0.85rem;
+        vertical-align: middle;
     }
 
     .table tbody tr:hover {
-        background-color: rgba(47, 83, 255, 0.02);
+        background-color: rgba(102, 126, 234, 0.03);
     }
 
-    .text-center {
-        text-align: center;
-    }
-
-    /* Section Headers */
-    h5.fw-bold {
-        font-size: 18px;
-        color: #1E293B;
+    .badge-semester {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
         font-weight: 600;
-        margin: 30px 0 15px 0;
-        position: relative;
-        padding-left: 15px;
+        display: inline-block;
     }
 
-    h5.fw-bold::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 4px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 2px;
-    }
-
-    /* Button Styles */
-    .btn {
-        border-radius: 8px;
+    .badge-status {
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
         font-weight: 600;
-        padding: 0.5rem 1.2rem;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
+        display: inline-block;
     }
 
-    .btn:hover {
-        transform: translateY(-2px);
+    .badge-status.naik { background: var(--success-gradient); color: white; }
+    .badge-status.tidak { background: linear-gradient(135deg, #F093FB 0%, #F5576C 100%); color: white; }
+    .badge-status.lulus { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+    .badge-status.belum { background: #E2E8F0; color: #64748B; }
+
+    .info-row {
+        display: flex;
+        padding: 6px 0;
+        border-bottom: 1px solid #f1f5f9;
     }
 
-    .btn-outline-secondary {
-        color: #64748B;
-        border-color: #E2E8F0;
+    .info-row:last-child {
+        border-bottom: none;
     }
 
-    .btn-outline-secondary:hover {
-        background-color: #F1F5F9;
-        border-color: #CBD5E1;
-    }
-
-    .btn-primary {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-    }
-
-    .btn-primary:hover {
-        background-color: var(--secondary-color);
-        border-color: var(--secondary-color);
-    }
-
-    .btn-warning {
-        background-color: var(--warning-color);
-        border-color: var(--warning-color);
-    }
-
-    .btn-warning:hover {
-        background-color: #D97706;
-        border-color: #D97706;
-    }
-
-    /* Signature Section */
-    .row.mt-5 {
-        margin-top: 50px !important;
-    }
-
-    .row.mt-5 p {
-        margin-bottom: 10px;
+    .info-label {
+        width: 150px;
+        font-weight: 600;
         color: #475569;
-        font-weight: 500;
+        flex-shrink: 0;
+        font-size: 0.8rem;
     }
 
-    .row.mt-5 b {
+    .info-value {
+        flex: 1;
         color: #1E293B;
-        font-weight: 600;
+        font-size: 0.85rem;
     }
 
-    .row.mt-5 br {
-        content: "";
+    .empty-state {
+        text-align: center;
+        padding: 2rem 1rem;
+        color: #94A3B8;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+        color: #CBD5E1;
         display: block;
-        margin-bottom: 15px;
+        margin-bottom: 0.5rem;
     }
 
-    /* Text Styles */
-    .text-muted {
-        color: #64748B !important;
-    }
-
-    b {
-        color: #334155;
-    }
-
-    /* Animations */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .table, h5.fw-bold {
-        animation: fadeIn 0.5s ease-out;
-    }
-
-    /* Responsive */
     @media (max-width: 768px) {
-        h3 {
-            font-size: 24px;
+        .page-header {
+            padding: 1rem 1rem;
         }
-        
-        .d-flex.justify-content-between {
-            flex-direction: column;
-            gap: 15px;
+        .page-header h3 {
+            font-size: 1.1rem;
         }
-        
-        .d-flex.justify-content-between div {
+
+        .btn-gradient, .btn-outline-gradient, .btn-pdf {
             width: 100%;
-            display: flex;
-            gap: 10px;
-        }
-        
-        .btn {
-            flex: 1;
             justify-content: center;
         }
-        
+
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-row {
+            flex-direction: column;
+            padding: 8px 0;
+        }
+
+        .info-label {
+            width: 100%;
+            font-size: 0.7rem;
+            margin-bottom: 2px;
+        }
+
+        .info-value {
+            font-size: 0.8rem;
+        }
+
         .table-bordered th,
         .table-bordered td {
-            padding: 8px 10px;
-            font-size: 13px;
+            padding: 6px 8px;
+            font-size: 0.7rem;
         }
-        
-        h5.fw-bold {
-            font-size: 16px;
+
+        .table-card .card-header {
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
         }
     }
 </style>
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>Review Rapor</h3>
-        <div>
-            <a href="{{ route('kurikulum.rapor.show', $siswa->id) }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left"></i> Kembali
-            </a>
-            <a href="{{ route('kurikulum.rapor.cetak', [
-                $siswa->id,
-                $semester,
-                str_replace('/', '-', $tahun)
-            ]) }}" class="btn btn-primary" target="_blank">
-                <i class="fas fa-print"></i> Cetak PDF
-            </a>
+<div class="container-fluid px-4">
+    <div class="page-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap">
+            <div>
+                <h3><i class="fas fa-file-alt me-2"></i> Review Rapor</h3>
+                <div class="text-muted">{{ $siswa->nama_lengkap }} - Semester {{ $semester }} - {{ $tahun }}</div>
+            </div>
+            <div class="d-flex gap-2 mt-2 mt-sm-0 flex-wrap">
+                <a href="{{ route('kurikulum.rapor.show', $siswa->id) }}" class="btn-outline-gradient">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+                <a href="{{ route('kurikulum.rapor.cetak', [$siswa->id, $semester, str_replace('/', '-', $tahun)]) }}" 
+                   class="btn-pdf" target="_blank">
+                    <i class="fas fa-print"></i> Cetak PDF
+                </a>
+            </div>
         </div>
     </div>
 
-    {{-- Identitas --}}
-    <table class="table table-bordered mb-4">
-        <tr>
-            <th width="30%">Nama Peserta Didik</th>
-            <td>{{ strtoupper($siswa->nama_lengkap) }}</td>
-            <th width="30%">Kelas</th>
-            <td>{{ $rombelRaport->nama ?? '-' }}</td>
-        </tr>
-        <tr>
-            <th>NISN</th>
-            <td>{{ $siswa->nisn }}</td>
-            <th>Semester</th>
-            <td>{{ $semester }}</td>
-        </tr>
-        <tr>
-            <th>Sekolah</th>
-            <td>SMK NEGERI 1 X</td>
-            <th>Tahun Pelajaran</th>
-            <td>{{ $tahun }}</td>
-        </tr>
-    </table>
+    <div class="table-card">
+        <div class="card-header">
+            <i class="fas fa-id-card"></i> Identitas Peserta Didik
+        </div>
+        <div class="card-body">
+            <div class="p-3">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="info-row">
+                            <div class="info-label">Nama</div>
+                            <div class="info-value"><strong>{{ $siswa->nama_lengkap }}</strong></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-row">
+                            <div class="info-label">NISN</div>
+                            <div class="info-value">{{ $siswa->nisn }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-row">
+                            <div class="info-label">Kelas</div>
+                            <div class="info-value">{{ $rombelRaport->nama ?? '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-row">
+                            <div class="info-label">Semester</div>
+                            <div class="info-value"><span class="badge-semester">{{ $semester }}</span></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-row">
+                            <div class="info-label">Tahun</div>
+                            <div class="info-value">{{ $tahun }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-row">
+                            <div class="info-label">Sekolah</div>
+                            <div class="info-value">SMK NEGERI 1 KAWALI</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    {{-- A. Kelompok A --}}
-    <h5 class="fw-bold mt-4">A. Kelompok Mata Pelajaran Umum</h5>
-    <table class="table table-bordered">
-        <thead class="text-center">
-            <tr>
-                <th>No</th>
-                <th>Mata Pelajaran</th>
-                <th>Nilai Akhir</th>
-                <th>Capaian Kompetensi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @php $groupA = $nilaiRaports->filter(fn($n) => $n->mapel && $n->mapel->kelompok == 'A'); @endphp
-            @if($groupA->isEmpty())
-                <tr>
-                    <td colspan="4" class="text-center text-muted">Tidak ada data</td>
-                </tr>
-            @else
-                @foreach($groupA as $n)
-                    <tr>
-                        <td class="text-center">{{ $n->mapel->urutan }}</td>
-                        <td>{{ $n->mapel->nama }}</td>
-                        <td class="text-center">{{ $n->nilai_akhir }}</td>
-                        <td>{{ $n->deskripsi }}</td>
-                    </tr>
-                @endforeach
-            @endif
-        </tbody>
-    </table>
+    <div class="table-card">
+        <div class="card-header">
+            <i class="fas fa-book"></i> A. Kelompok Mata Pelajaran Umum
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th width="5%">No</th>
+                            <th width="40%">Mata Pelajaran</th>
+                            <th width="15%">Nilai</th>
+                            <th width="40%">Capaian Kompetensi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php $groupA = $nilaiRaports->filter(fn($n) => $n->mapel && $n->mapel->kelompok == 'A'); @endphp
+                        @if($groupA->isEmpty())
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">Tidak ada data</td>
+                            </tr>
+                        @else
+                            @foreach($groupA as $n)
+                                <tr>
+                                    <td class="text-center">{{ $n->mapel->urutan }}</td>
+                                    <td>{{ $n->mapel->nama }}</td>
+                                    <td class="text-center"><span class="badge-semester">{{ $n->nilai_akhir }}</span></td>
+                                    <td>{{ $n->deskripsi }}</td>
+                                </tr>
+                            @endforeach
+                        @endif
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-    {{-- B. Kelompok B --}}
-    <h5 class="fw-bold mt-4">B. Kelompok Mata Pelajaran Kejuruan</h5>
-    <table class="table table-bordered">
-        <thead class="text-center">
-            <tr>
-                <th>No</th>
-                <th>Mata Pelajaran</th>
-                <th>Nilai Akhir</th>
-                <th>Capaian Kompetensi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @php $groupB = $nilaiRaports->filter(fn($n) => $n->mapel && $n->mapel->kelompok == 'B'); @endphp
-            @if($groupB->isEmpty())
-                <tr>
-                    <td colspan="4" class="text-center text-muted">Tidak ada data</td>
-                </tr>
-            @else
-                @foreach($groupB as $n)
-                    <tr>
-                        <td class="text-center">{{ $n->mapel->urutan }}</td>
-                        <td>{{ $n->mapel->nama }}</td>
-                        <td class="text-center">{{ $n->nilai_akhir }}</td>
-                        <td>{{ $n->deskripsi }}</td>
-                    </tr>
-                @endforeach
-            @endif
-        </tbody>
-    </table>
+    <div class="table-card">
+        <div class="card-header">
+            <i class="fas fa-laptop-code"></i> B. Kelompok Mata Pelajaran Kejuruan
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th width="5%">No</th>
+                            <th width="40%">Mata Pelajaran</th>
+                            <th width="15%">Nilai</th>
+                            <th width="40%">Capaian Kompetensi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php $groupB = $nilaiRaports->filter(fn($n) => $n->mapel && $n->mapel->kelompok == 'B'); @endphp
+                        @if($groupB->isEmpty())
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">Tidak ada data</td>
+                            </tr>
+                        @else
+                            @foreach($groupB as $n)
+                                <tr>
+                                    <td class="text-center">{{ $n->mapel->urutan }}</td>
+                                    <td>{{ $n->mapel->nama }}</td>
+                                    <td class="text-center"><span class="badge-semester">{{ $n->nilai_akhir }}</span></td>
+                                    <td>{{ $n->deskripsi }}</td>
+                                </tr>
+                            @endforeach
+                        @endif
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-    {{-- Ekstrakurikuler --}}
-    <h5 class="fw-bold mt-4">C. Kegiatan Ekstrakurikuler</h5>
-    <table class="table table-bordered">
-        <thead class="text-center">
-            <tr>
-                <th>No</th>
-                <th>Nama Ekstrakurikuler</th>
-                <th>Predikat</th>
-                <th>Keterangan</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($ekstra as $i => $e)
-                <tr>
-                    <td class="text-center">{{ $i + 1 }}</td>
-                    <td>{{ $e->nama_ekstra }}</td>
-                    <td class="text-center">{{ $e->predikat ?? '-' }}</td>
-                    <td>{{ $e->keterangan ?? '-' }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="4" class="text-center text-muted">Tidak ada data</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+    <div class="table-card">
+        <div class="card-header">
+            <i class="fas fa-futbol"></i> C. Ekstrakurikuler
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th width="5%">No</th>
+                            <th width="40%">Nama Ekstrakurikuler</th>
+                            <th width="20%">Predikat</th>
+                            <th width="35%">Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($ekstra as $i => $e)
+                            <tr>
+                                <td class="text-center">{{ $i + 1 }}</td>
+                                <td>{{ $e->nama_ekstra }}</td>
+                                <td class="text-center">{{ $e->predikat ?? '-' }}</td>
+                                <td>{{ $e->keterangan ?? '-' }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">Tidak ada data</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-    {{-- Kehadiran --}}
-    <h5 class="fw-bold mt-4">D. Ketidakhadiran</h5>
-    <table class="table table-bordered" style="width: 50%">
-        <tr>
-            <th>Sakit</th>
-            <td>{{ $kehadiran->sakit ?? 0 }} hari</td>
-        </tr>
-        <tr>
-            <th>Izin</th>
-            <td>{{ $kehadiran->izin ?? 0 }} hari</td>
-        </tr>
-        <tr>
-            <th>Tanpa Keterangan</th>
-            <td>{{ $kehadiran->tanpa_keterangan ?? 0 }} hari</td>
-        </tr>
-    </table>
+    <div class="table-card">
+        <div class="card-header">
+            <i class="fas fa-calendar-check"></i> D. Ketidakhadiran
+        </div>
+        <div class="card-body">
+            <div class="p-3">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="info-row">
+                            <div class="info-label">Sakit</div>
+                            <div class="info-value"><strong>{{ $kehadiran->sakit ?? 0 }}</strong> hari</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-row">
+                            <div class="info-label">Izin</div>
+                            <div class="info-value"><strong>{{ $kehadiran->izin ?? 0 }}</strong> hari</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-row">
+                            <div class="info-label">Tanpa Keterangan</div>
+                            <div class="info-value"><strong>{{ $kehadiran->tanpa_keterangan ?? 0 }}</strong> hari</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    {{-- Kenaikan --}}
     @if(strtolower($semester) !== 'ganjil')
-        <h5 class="fw-bold mt-4">E. Kenaikan Kelas</h5>
-        <p><b>Status:</b> {{ $kenaikan->status ?? 'Belum Ditentukan' }}</p>
-        @if(isset($kenaikan->rombelTujuan))
-            <p><b>Ke Kelas:</b> {{ $kenaikan->rombelTujuan->nama }}</p>
-        @endif
-        <p><b>Catatan:</b> {{ $kenaikan->catatan ?? '-' }}</p>
+    <div class="table-card">
+        <div class="card-header">
+            <i class="fas fa-arrow-up"></i> E. Kenaikan Kelas
+        </div>
+        <div class="card-body">
+            <div class="p-3">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="info-row">
+                            <div class="info-label">Status</div>
+                            <div class="info-value">
+                                @php
+                                    $status = $kenaikan->status ?? 'Belum Ditentukan';
+                                    $statusClass = match(strtolower($status)) {
+                                        'naik kelas' => 'naik',
+                                        'tidak naik' => 'tidak',
+                                        'lulus' => 'lulus',
+                                        default => 'belum'
+                                    };
+                                @endphp
+                                <span class="badge-status {{ $statusClass }}">{{ $status }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    @if(isset($kenaikan->rombelTujuan))
+                    <div class="col-md-4">
+                        <div class="info-row">
+                            <div class="info-label">Ke Kelas</div>
+                            <div class="info-value">{{ $kenaikan->rombelTujuan->nama }}</div>
+                        </div>
+                    </div>
+                    @endif
+                    <div class="col-md-4">
+                        <div class="info-row">
+                            <div class="info-label">Catatan</div>
+                            <div class="info-value">{{ $kenaikan->catatan ?? '-' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     @endif
-
 </div>
 @endsection

@@ -91,7 +91,10 @@ class SiswaController extends Controller
 
         return view('siswa.dashboard', compact('siswa','raportYears','missing'));
     }
-
+    public function index()
+{
+    return redirect()->route('siswa.dashboard');
+}
     public function create()
     {
         return view('siswa.data-diri-create');
@@ -191,112 +194,158 @@ class SiswaController extends Controller
             ->with('success', 'Data diri berhasil disimpan.');
     }
 
-    /**
-     * TAMPILKAN FORM EDIT (Mendukung Multi-Role Siswa & TU)
-     */
-    public function edit($id = null)
+    public function edit()
     {
-        // Jika tidak ada ID di URL, berarti ini siswa yang coba-coba masuk ke halaman edit
-        if (!$id) {
-            return redirect()->route('siswa.dashboard')->with('error', 'Siswa tidak memiliki hak akses untuk mengubah data Buku Induk.');
-        }
-
-        // Jika ada ID, berarti Admin/TU yang sedang mengakses data siswa tersebut
-        $siswa = DataSiswa::find($id);
+        $siswa = $this->getSiswaLogin();
+        // Load relasi orang tua
+        $siswa->load(['ayah', 'ibu', 'wali']);
 
         if (!$siswa) {
-            return redirect()->back()->with('error', 'Data siswa tidak ditemukan.');
+            return redirect()->route('siswa.dataDiri.create')
+                ->with('error', 'Data siswa tidak ditemukan.');
         }
 
-        // Arahkan Admin/TU ke halaman edit khusus admin
-        return view('admin.siswa.edit', compact('siswa'));
+        return view('siswa.data-diri-edit', compact('siswa'));
     }
 
-    /**
-     * PROSES SIMPAN EDIT DATA SISWA & ORANG TUA
-     */
-    public function update(Request $request, $id = null)
+    public function update(Request $request)
     {
-        // 1. Tentukan siapa yang sedang di-update (TU atau Siswa sendiri)
-        if ($id) {
-            // Jika ada ID, berarti yang nge-edit adalah TU
-            $siswa = DataSiswa::findOrFail($id);
-        } else {
-            // Jika tidak ada ID, berarti siswa sedang nge-edit datanya sendiri via dashboard siswa
-            $siswa = $this->getSiswaLogin();
-        }
+        $siswa = $this->getSiswaLogin();
 
-        // 2. Jalankan Validasi yang fleksibel (nullable) agar tidak saling mengunci
         $request->validate([
+            // Data siswa
             'nama_lengkap'     => 'required|string|max:255',
-            'nis'              => 'nullable|string|max:50',
-            'nisn'             => 'nullable|string|max:20|unique:data_siswa,nisn,' . $siswa->id,
-            'jenis_kelamin'    => 'nullable|in:Laki-laki,Perempuan',
-            'tempat_lahir'     => 'nullable|string|max:255',
-            'tanggal_lahir'    => 'nullable|date',
-            'agama'            => 'nullable|string|max:50',
-            'no_hp'            => 'nullable|string|max:20',
-            'alamat'           => 'nullable|string',
-            'tanggal_diterima' => 'nullable|date',
-            'email'            => 'nullable|email',
+            'nisn'             => 'required|string|max:20|unique:data_siswa,nisn,' . $siswa->id,
+            'jenis_kelamin'    => 'required|in:Laki-laki,Perempuan',
+            'tempat_lahir'     => 'required|string|max:255',
+            'tanggal_lahir'    => 'required|date',
+            'agama'            => 'required|string|max:50',
+            'kewarganegaraan'  => 'required|string|max:100',
+            'status_keluarga'  => 'required|string|max:50',
+            'anak_ke'          => 'required|integer|min:1',
+            'sekolah_asal'     => 'required|string|max:255',
+            'tanggal_diterima' => 'required|date',
+            'dusun'            => 'required|string|max:255',
+            'rt'               => 'required|string|max:10',
+            'rw'               => 'required|string|max:10',
+            'kelurahan'        => 'required|string|max:255',
+            'kecamatan'        => 'required|string|max:255',
+            'kode_pos'         => 'required|string|max:10',
+            'no_hp'            => 'required|string|max:20',
 
-            // Data orang tua dari form
-            'ayah_nama'        => 'nullable|string|max:255',
-            'ayah_pekerjaan'   => 'nullable|string|max:255',
-            'ayah_telepon'     => 'nullable|string|max:20',
+            // Data Ayah
+            'nama_ayah'        => 'required|string|max:255',
+            'pekerjaan_ayah'   => 'required|string|max:255',
+            'telepon_ayah'     => 'nullable|string|max:20',
+            'alamat_ayah'      => 'required|string',
 
-            'ibu_nama'         => 'nullable|string|max:255',
-            'ibu_pekerjaan'    => 'nullable|string|max:255',
-            'ibu_telepon'      => 'nullable|string|max:20',
+            // Data Ibu
+            'nama_ibu'         => 'required|string|max:255',
+            'pekerjaan_ibu'    => 'required|string|max:255',
+            'telepon_ibu'      => 'nullable|string|max:20',
+            'alamat_ibu'       => 'required|string',
 
-            'wali_nama'        => 'nullable|string|max:255',
-            'wali_pekerjaan'   => 'nullable|string|max:255',
-            'wali_telepon'     => 'nullable|string|max:20',
-            'wali_alamat'      => 'nullable|string',
+            // Data Wali (opsional)
+            'nama_wali'        => 'nullable|string|max:255',
+            'pekerjaan_wali'   => 'nullable|string|max:255',
+            'telepon_wali'     => 'nullable|string|max:20',
+            'alamat_wali'      => 'nullable|string',
         ]);
 
-        // 3. Eksekusi Update ke satu tabel tunggal (data_siswa)
+        // Update data siswa
         $siswa->update([
-            'nama_lengkap'     => $request->nama_lengkap,
-            'nis'              => $request->nis,
-            'nisn'             => $request->nisn,
-            'jenis_kelamin'    => $request->jenis_kelamin,
-            'tempat_lahir'     => $request->tempat_lahir,
-            'tanggal_lahir'    => $request->tanggal_lahir,
-            'agama'            => $request->agama,
-            'no_hp'            => $request->no_hp,
-            'alamat'           => $request->alamat,
+            'nama_lengkap' => $request->nama_lengkap,
+            'nisn' => $request->nisn,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'tempat_lahir' => $request->tempat_lahir,
+            'tanggal_lahir' => $request->tanggal_lahir,
+            'agama' => $request->agama,
+            'kewarganegaraan' => $request->kewarganegaraan,
+            'status_keluarga' => $request->status_keluarga,
+            'anak_ke' => $request->anak_ke,
+            'sekolah_asal' => $request->sekolah_asal,
             'tanggal_diterima' => $request->tanggal_diterima,
-            'email'            => $request->email,
-
-            // Simpan langsung ke kolom tabel data_siswa kamu yang asli
-            'nama_ayah'        => $request->ayah_nama,
-            'pekerjaan_ayah'   => $request->ayah_pekerjaan,
-            'telepon_ayah'     => $request->ayah_telepon,
-
-            'nama_ibu'         => $request->ibu_nama,
-            'pekerjaan_ibu'    => $request->ibu_pekerjaan,
-            'telepon_ibu'      => $request->ibu_telepon,
-
-            'nama_wali'        => $request->wali_nama,
-            'pekerjaan_wali'   => $request->wali_pekerjaan,
-            'telepon_wali'     => $request->wali_telepon,
-            'alamat_wali'      => $request->wali_alamat,
+            'dusun' => $request->dusun,
+            'rt' => $request->rt,
+            'rw' => $request->rw,
+            'kelurahan' => $request->kelurahan,
+            'kecamatan' => $request->kecamatan,
+            'kode_pos' => $request->kode_pos,
+            'no_hp' => $request->no_hp,
         ]);
 
-        // 4. Redirect cerdas berdasarkan siapa yang melakukan update
-        if ($id) {
-            // Kalau TU yang ubah, balikkan ke detail siswa di menu TU
-            return redirect()->to('/tu/siswa/' . $siswa->id)
-                ->with('success', 'Data siswa dan orang tua berhasil diperbarui oleh TU.');
+        // Update data ayah
+        if ($siswa->ayah_id) {
+            $ayah = Ayah::find($siswa->ayah_id);
+            $ayah->update([
+                'nama' => $request->nama_ayah,
+                'pekerjaan' => $request->pekerjaan_ayah,
+                'telepon' => $request->telepon_ayah,
+                'alamat' => $request->alamat_ayah,
+            ]);
+        } else {
+            $ayah = Ayah::create([
+                'nama' => $request->nama_ayah,
+                'pekerjaan' => $request->pekerjaan_ayah,
+                'telepon' => $request->telepon_ayah,
+                'alamat' => $request->alamat_ayah,
+            ]);
+            $siswa->ayah_id = $ayah->id;
+            $siswa->save();
         }
 
-        // Kalau siswa yang ubah diri sendiri, balikkan ke halaman data diri siswa
+        // Update data ibu
+        if ($siswa->ibu_id) {
+            $ibu = Ibu::find($siswa->ibu_id);
+            $ibu->update([
+                'nama' => $request->nama_ibu,
+                'pekerjaan' => $request->pekerjaan_ibu,
+                'telepon' => $request->telepon_ibu,
+                'alamat' => $request->alamat_ibu,
+            ]);
+        } else {
+            $ibu = Ibu::create([
+                'nama' => $request->nama_ibu,
+                'pekerjaan' => $request->pekerjaan_ibu,
+                'telepon' => $request->telepon_ibu,
+                'alamat' => $request->alamat_ibu,
+            ]);
+            $siswa->ibu_id = $ibu->id;
+            $siswa->save();
+        }
+
+        // Update data wali jika ada
+        if ($request->filled('nama_wali')) {
+            if ($siswa->wali_id) {
+                $wali = Wali::find($siswa->wali_id);
+                $wali->update([
+                    'nama' => $request->nama_wali,
+                    'pekerjaan' => $request->pekerjaan_wali,
+                    'telepon' => $request->telepon_wali,
+                    'alamat' => $request->alamat_wali,
+                ]);
+            } else {
+                $wali = Wali::create([
+                    'nama' => $request->nama_wali,
+                    'pekerjaan' => $request->pekerjaan_wali,
+                    'telepon' => $request->telepon_wali,
+                    'alamat' => $request->alamat_wali,
+                ]);
+                $siswa->wali_id = $wali->id;
+                $siswa->save();
+            }
+        } elseif ($siswa->wali_id) {
+            // Hapus data wali jika ada sebelumnya tapi sekarang dikosongkan
+            Wali::destroy($siswa->wali_id);
+            $siswa->wali_id = null;
+            $siswa->save();
+        }
+
         return redirect()->route('siswa.dataDiri')
             ->with('success', 'Data diri berhasil diperbarui.');
     }
 
-   /**
+    /**
      * Upload / update foto profil siswa
      */
     public function uploadPhoto(Request $request)
@@ -311,37 +360,33 @@ class SiswaController extends Controller
             'foto' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        if ($request->hasFile('foto')) {
-            // 1. HAPUS FOTO LAMA TERLEBIH DAHULU (Sebelum ditimpa path baru)
-            if ($siswa->foto && Storage::disk('public')->exists($siswa->foto)) {
-                Storage::disk('public')->delete($siswa->foto);
-            }
+        // Simpan pada disk `public` di folder `siswa_photos`
 
-            // 2. BARU SIMPAN FOTO BARU KE STORAGE
-            $path = $request->file('foto')->store('siswa_photos', 'public');
+        $path = $request->file('foto')->store('siswa_photos', 'public');
 
-            // 3. SIMPAN PATH BARU KE MODEL SISWA
-            $siswa->foto = $path;
-            $siswa->save();
-
-            // 4. SINKRONKAN KE TABEL USERS (Untuk Sidebar)
-            $user = Auth::user();
-            if ($user) {
-                // Hapus foto lama di user jika ada dan berbeda
-                if (!empty($user->photo) && $user->photo !== $path && Storage::disk('public')->exists($user->photo)) {
-                    Storage::disk('public')->delete($user->photo);
-                }
-
-                $user->photo = $path;
-                $user->save();
-            }
-
-            return redirect()->back()->with('success', 'Foto profil berhasil diperbarui.');
+        // Hapus foto lama jika ada (pada table siswa)
+        if ($siswa->foto && Storage::disk('public')->exists($siswa->foto)) {
+            Storage::disk('public')->delete($siswa->foto);
         }
 
-        return redirect()->back()->with('error', 'Gagal memproses file foto.');
-    }
+        // Simpan path pada model DataSiswa
+        $siswa->foto = $path;
+        $siswa->save();
 
+        // Juga sinkronkan ke kolom `photo` pada tabel users agar sidebar menampilkan foto
+        $user = Auth::user();
+        if ($user) {
+            // Hapus foto lama pada users jika berbeda dan ada
+            if (!empty($user->photo) && $user->photo !== $path && Storage::disk('public')->exists($user->photo)) {
+                Storage::disk('public')->delete($user->photo);
+            }
+
+            $user->photo = $path;
+            $user->save();
+        }
+
+        return redirect()->back()->with('success', 'Foto profil berhasil diperbarui.');
+    }
 
     /**
      * Hapus foto profil siswa
@@ -553,138 +598,170 @@ class SiswaController extends Controller
     /**
      * Menampilkan Buku Induk Siswa (untuk siswa sendiri)
      */
-   public function bukuIndukShow()
-{
-    $siswa = $this->getSiswaLogin();
+    public function bukuIndukShow()
+    {
+        $siswa = $this->getSiswaLogin();
 
-    $siswa->load([
-        'user', 
-        'rombel.kelas.jurusan',
-        'mutasis',
-        'ayah',
-        'ibu',
-        'wali',
-        'nilaiRaports' => function($query) {
-            // Kita urutkan tahun DESC agar tahun paling baru (2025) ada di urutan pertama
-            $query->with('mapel')->orderBy('tahun_ajaran', 'desc')->orderBy('semester');
-        }
-    ]);
-    
-    // Ambil daftar tahun yang unik dari nilai siswa
-    $daftarTahun = $siswa->nilaiRaports->pluck('tahun_ajaran')->unique()->values();
-    
-    $nilaiByKelompok = $this->groupNilaiByKelompok($siswa);
-    
-    return view('siswa.buku-induk-show', compact('siswa', 'nilaiByKelompok', 'daftarTahun'));
-}
+        // Load relasi yang diperlukan untuk buku induk
+        $siswa->load([
+            'user', 
+            'rombel.kelas.jurusan',
+            'mutasis',
+            'ayah',
+            'ibu',
+            'wali',
+            'nilaiRaports' => function($query) {
+                $query->with('mapel')
+                      ->orderBy('tahun_ajaran')
+                      ->orderBy('semester');
+            }
+        ]);
+        
+        // Group nilai by kelompok and nama mata pelajaran
+        $nilaiByKelompok = $this->groupNilaiByKelompok($siswa);
+        
+        return view('siswa.buku-induk-show', compact('siswa', 'nilaiByKelompok'));
+    }
+
     /**
      * Helper function untuk group nilai by kelompok
      */
     private function groupNilaiByKelompok($siswa)
-{
-    $nilaiByKelompok = [];
-    $semesterMap = ['Ganjil' => 1, 'Genap' => 2, 1 => 1, 2 => 2];
-    
-    // PERBAIKAN: Ambil daftar tahun dari database dan urutkan dari tahun masuk (paling lama)
-    $tahunAjaranList = $siswa->nilaiRaports
-        ->pluck('tahun_ajaran')
-        ->unique()
-        ->sort() // Mengurutkan dari tahun lama ke baru (2023 -> 2024 -> 2025)
-        ->values()
-        ->toArray();
-    
-    $mapelByKelompok = $this->getMataPelajaranByJurusan($siswa);
-    
-    foreach ($mapelByKelompok as $kelompok => $mapels) {
-        if (!isset($nilaiByKelompok[$kelompok])) {
-            $nilaiByKelompok[$kelompok] = [];
-        }
+    {
+        $nilaiByKelompok = [];
+        $tahunAjaranList = [];
+        $semesterMap = ['Ganjil' => 1, 'Genap' => 2, 1 => 1, 2 => 2];
         
-        foreach ($mapels as $mapel) {
-            $mapelNama = $mapel['nama'];
-            $nilaiByKelompok[$kelompok][$mapelNama] = [
-                'nama' => $mapelNama,
-                'urutan' => $mapel['urutan'],
-                'nilai' => []
-            ];
+        // Get tahun ajaran list
+        $tahunAjaranList = $this->getTahunAjaranList($siswa);
+        
+        // Get mata pelajaran from database
+        $mapelByKelompok = $this->getMataPelajaranByJurusan($siswa);
+        
+        // Initialize structure with mata pelajaran from database
+        foreach ($mapelByKelompok as $kelompok => $mapels) {
+            if (!isset($nilaiByKelompok[$kelompok])) {
+                $nilaiByKelompok[$kelompok] = [];
+            }
             
-            foreach ($tahunAjaranList as $tahunAjaran) {
-                $nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran] = [1 => null, 2 => null];
+            foreach ($mapels as $mapel) {
+                $mapelNama = $mapel['nama'];
+                if (!isset($nilaiByKelompok[$kelompok][$mapelNama])) {
+                    $nilaiByKelompok[$kelompok][$mapelNama] = [
+                        'nama' => $mapelNama,
+                        'urutan' => $mapel['urutan'],
+                        'nilai' => []
+                    ];
+                    
+                    // Initialize all tahun ajaran with empty values
+                    foreach ($tahunAjaranList as $tahunAjaran) {
+                        $nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran] = [
+                            1 => null,
+                            2 => null
+                        ];
+                    }
+                }
             }
         }
-    }
-    
-    foreach ($siswa->nilaiRaports as $nilai) {
-        $kelompok = trim($nilai->mapel->kelompok ?? 'Lainnya');
-        $mapelNama = trim($nilai->mapel->nama ?? 'Tidak Diketahui');
-        $tahunAjaran = $nilai->tahun_ajaran;
-        $semester = $semesterMap[$nilai->semester] ?? $nilai->semester;
         
-        if (!isset($nilaiByKelompok[$kelompok][$mapelNama])) {
-            $nilaiByKelompok[$kelompok][$mapelNama] = [
-                'nama' => $mapelNama,
-                'urutan' => $nilai->mapel->urutan ?? 999,
-                'nilai' => []
-            ];
+        // Fill in actual nilai from database
+        foreach ($siswa->nilaiRaports as $nilai) {
+            $kelompok = trim($nilai->mapel->kelompok ?? 'Lainnya');
+            $mapelNama = trim($nilai->mapel->nama ?? 'Tidak Diketahui');
+            $tahunAjaran = $nilai->tahun_ajaran;
+            $semester = $semesterMap[$nilai->semester] ?? $nilai->semester;
+            
+            // Initialize if not exists
+            if (!isset($nilaiByKelompok[$kelompok])) {
+                $nilaiByKelompok[$kelompok] = [];
+            }
+            if (!isset($nilaiByKelompok[$kelompok][$mapelNama])) {
+                $nilaiByKelompok[$kelompok][$mapelNama] = [
+                    'nama' => $mapelNama,
+                    'urutan' => $nilai->mapel->urutan ?? 999,
+                    'nilai' => []
+                ];
+            }
+            if (!isset($nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran])) {
+                $nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran] = [
+                    1 => null,
+                    2 => null
+                ];
+            }
+            
+            // Store nilai
+            $nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran][$semester] = $nilai->nilai_akhir;
         }
         
-        if (!isset($nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran])) {
-            $nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran] = [1 => null, 2 => null];
+        // Sort kelompok: A dulu, B kedua
+        $sortedKelompok = [];
+        foreach (['A', 'B'] as $k) {
+            if (isset($nilaiByKelompok[$k])) {
+                $sortedKelompok[$k] = $nilaiByKelompok[$k];
+            }
+        }
+        foreach ($nilaiByKelompok as $k => $v) {
+            if (!isset($sortedKelompok[$k])) {
+                $sortedKelompok[$k] = $v;
+            }
         }
         
-        $nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran][$semester] = $nilai->nilai_akhir;
+        // Sort mata pelajaran dalam setiap kelompok berdasarkan urutan
+        foreach ($sortedKelompok as &$mapelGroup) {
+            uasort($mapelGroup, function ($a, $b) {
+                if ($a['urutan'] == $b['urutan']) {
+                    return strcmp($a['nama'], $b['nama']);
+                }
+                return $a['urutan'] - $b['urutan'];
+            });
+        }
+        
+        return [
+            'byKelompok' => $sortedKelompok,
+            'tahunAjaranList' => $tahunAjaranList
+        ];
     }
-    
-    $sortedKelompok = [];
-    foreach (['A', 'B'] as $k) {
-        if (isset($nilaiByKelompok[$k])) { $sortedKelompok[$k] = $nilaiByKelompok[$k]; }
-    }
-    foreach ($nilaiByKelompok as $k => $v) {
-        if (!isset($sortedKelompok[$k])) { $sortedKelompok[$k] = $v; }
-    }
-    
-    foreach ($sortedKelompok as &$mapelGroup) {
-        uasort($mapelGroup, function ($a, $b) {
-            if ($a['urutan'] == $b['urutan']) return strcmp($a['nama'], $b['nama']);
-            return $a['urutan'] - $b['urutan'];
-        });
-    }
-    
-    return [
-        'byKelompok' => $sortedKelompok,
-        'tahunAjaranList' => $tahunAjaranList
-    ];
-}
 
     /**
      * Get tahun ajaran list based on student's class level
      */
-  private function getTahunAjaranList($siswa)
-{
-    // 1. Tentukan tahun ajaran saat ini
-    $currentMonth = date('n');
-    $currentYear = date('Y');
-    $tahunSekarang = $currentMonth < 7 ? $currentYear - 1 : $currentYear;
-    
-    // 2. Ambil tingkat siswa (10, 11, atau 12)
-    $tingkat = $siswa->rombel && $siswa->rombel->kelas ? intval($siswa->rombel->kelas->tingkat) : 10;
-    
-    // 3. HITUNG TAHUN MASUK SECARA MATEMATIS
-    // Jika kelas 10, tahun masuk = tahunSekarang.
-    // Jika kelas 11, tahun masuk = tahunSekarang - 1.
-    // Jika kelas 12, tahun masuk = tahunSekarang - 2.
-    $tahunMasuk = $tahunSekarang - ($tingkat - 10);
-    
-    // 4. Generate 3 Tahun Ajaran (Mulai dari tahun masuk)
-    $tahunAjaranList = [];
-    for ($i = 0; $i < 3; $i++) {
-        $startYear = $tahunMasuk + $i;
-        $endYear = $startYear + 1;
-        $tahunAjaranList[] = "{$startYear}/{$endYear}";
+    private function getTahunAjaranList($siswa)
+    {
+        // Get current year and month
+        $currentMonth = date('n');
+        $currentYear = date('Y');
+        
+        // Determine tahun ajaran saat ini
+        // Jika bulan < 7 (sebelum Juli), tahun ajaran adalah tahun lalu
+        $tahunAjaranSekarang = $currentMonth < 7 ? $currentYear - 1 : $currentYear;
+        
+        // Get student's class level (tingkat)
+        $tingkat = $siswa->rombel && $siswa->rombel->kelas ? 
+                   intval($siswa->rombel->kelas->tingkat) : 10;
+        
+        // Get tahun masuk from nilaiRaports or estimate
+        $tahunMasuk = null;
+        if ($siswa->nilaiRaports->count() > 0) {
+            $tahunMasukStr = $siswa->nilaiRaports->first()->tahun_ajaran;
+            $tahunMasuk = intval(explode('/', $tahunMasukStr)[0]);
+        }
+        
+        // If no nilai found, estimate from current tahun ajaran and tingkat
+        // Kelas 10 masuk tahun ini, Kelas 11 masuk tahun lalu, Kelas 12 2 tahun lalu
+        if (!$tahunMasuk) {
+            $tahunMasuk = $tahunAjaranSekarang - ($tingkat - 10);
+        }
+        
+        // Generate tahun ajaran list for 3 years (Kelas 10, 11, 12)
+        $tahunAjaranList = [];
+        for ($i = 0; $i < 3; $i++) {
+            $startYear = $tahunMasuk + $i;
+            $endYear = $startYear + 1;
+            $tahunAjaranList[] = "{$startYear}/{$endYear}";
+        }
+        
+        return $tahunAjaranList;
     }
-    
-    return $tahunAjaranList;
-}
 
     /**
      * Get mata pelajaran by jurusan and kelompok
@@ -827,31 +904,18 @@ class SiswaController extends Controller
         
         return $sortedKelompok;
     }
-public function exportPDF() // Atau apapun nama fungsinya
-{
-    // 1. Ambil data siswa yang sedang login
-    $siswa = $this->getSiswaLogin();
-    if (!$siswa) {
-        return "Error: Data siswa tidak ditemukan.";
+
+    public function exportPDF()
+    {
+        $siswa = $this->getSiswaLogin();
+        // Load relasi yang diperlukan untuk export PDF
+        $siswa->load(['user', 'ayah', 'ibu', 'wali', 'rombel.kelas.jurusan']);
+
+        $pdf = Pdf::loadView('siswa.pdf', compact('siswa'))
+            ->setPaper('A4', 'portrait');
+
+        return $pdf->stream('Data Diri - ' . $siswa->nama_lengkap . '.pdf');
     }
-
-    // 2. Load relasi yang diperlukan (pastikan nilaiRaports dan mapel di-load)
-    $siswa->load(['nilaiRaports.mapel']);
-
-    // 3. PANGGIL FUNGSI DINAMIS (Ini kuncinya!)
-    // Fungsi ini sudah otomatis menghitung tahun ajaran berdasarkan data riwayat siswa
-    $dataNilai = $this->groupNilaiByKelompok($siswa);
-
-    // 4. Masukkan ke PDF
-    // Kita kirim $dataNilai['byKelompok'] dan $dataNilai['tahunAjaranList']
-    $pdf = Pdf::loadView('siswa.pdf', [
-        'siswa' => $siswa,
-        'nilaiByKelompok' => $dataNilai['byKelompok'],
-        'tahunAjaranList' => $dataNilai['tahunAjaranList'] // Sekarang tahunnya dinamis!
-    ]);
-
-    return $pdf->stream('Buku_Induk_' . $siswa->nis . '.pdf');
-}
 
     /**
  * Update profil siswa (nama)
@@ -947,24 +1011,4 @@ public function bukuIndukCetak()
     
     return view('siswa.buku-induk-cetak', compact('siswa', 'nilaiByKelompok'));
 }
-
-// ... baris-baris kode fungsi kamu yang lama (misal: exportPDF, dll) ...
-
-    // TARUH COPIAN KODE INDEX DI SINI (Sebelum tanda kurung kurawal penutup class)
-    public function index()
-    {
-        // Ambil data siswa yang sedang login beserta seluruh relasi pentingnya
-        $siswa = DataSiswa::with(['rombel.guru', 'ayah', 'ibu', 'wali'])
-                    ->where('user_id', Auth::id())
-                    ->orWhere('nis', Auth::user()->username)
-                    ->first();
-
-        if (!$siswa) {
-            return redirect()->back()->with('error', 'Data profil siswa tidak ditemukan.');
-        }
-
-        return view('siswa.dashboard', compact('siswa'));
-    }
-
-} // <--- Ini kurung kurawal penutup akhir file controller, pastikan fungsi index ada di atasnya
-
+}

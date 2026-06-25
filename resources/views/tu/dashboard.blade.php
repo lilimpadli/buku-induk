@@ -1,3 +1,5 @@
+{{-- resources/views/tu/dashboard.blade.php --}}
+
 @extends('layouts.app')
 
 @section('title', 'Dashboard Tata Usaha')
@@ -5,739 +7,528 @@
 @section('content')
 
 <style>
-    :root{
-        --primary:#4F46E5;
-        --primary-hover:#4338CA;
-        --success:#10B981;
-        --info:#0EA5E9;
-        --warning:#F59E0B;
+:root{
+    --primary:#3B82F6;
+    --secondary:#6366F1;
+    --success:#10B981;
+    --warning:#F59E0B;
+    --danger:#EF4444;
 
-        --bg:#F8FAFC;
-        --card:#FFFFFF;
-        --text:#1E293B;
-        --text-light:#64748B;
+    --bg:#F4F7FE;
+    --card:#FFFFFF;
 
-        --radius:18px;
+    --text:#0F172A;
+    --muted:#64748B;
 
-        --shadow:
-        0 4px 12px rgba(15,23,42,.05);
+    --shadow-sm:0 8px 25px rgba(15,23,42,.05);
+    --shadow-md:0 15px 40px rgba(15,23,42,.08);
+    --shadow-lg:0 25px 60px rgba(59,130,246,.15);
 
-        --shadow-hover:
-        0 10px 25px rgba(15,23,42,.08);
+    --radius-xl:30px;
+    --radius-lg:24px;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(
+        180deg,
+        #F8FAFF 0%,
+        #F4F7FE 100%
+    );
+}
+
+/* ================= HEADER ================= */
+
+.page-header{
+    position:relative;
+    overflow:hidden;
+
+    background:linear-gradient(
+        135deg,
+        #2563EB 0%,
+        #4F46E5 55%,
+        #7C3AED 100%
+    );
+
+    border-radius:32px;
+    padding:40px;
+    margin-bottom:32px;
+
+    color:white;
+    box-shadow:var(--shadow-md);
+}
+
+.page-header::before{
+    content:'';
+    position:absolute;
+
+    width:320px;
+    height:320px;
+
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+
+    top:-120px;
+    right:-90px;
+}
+
+.page-header::after{
+    content:'';
+    position:absolute;
+
+    width:250px;
+    height:250px;
+
+    border-radius:50%;
+    background:rgba(255,255,255,.05);
+
+    bottom:-130px;
+    left:-80px;
+}
+
+.page-title{
+    position:relative;
+    z-index:2;
+
+    font-size:2.2rem;
+    font-weight:800;
+
+    display:flex;
+    align-items:center;
+    gap:18px;
+
+    margin-bottom:10px;
+}
+
+.page-title i{
+    width:62px;
+    height:62px;
+
+    border-radius:20px;
+
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(10px);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.page-subtitle{
+    position:relative;
+    z-index:2;
+
+    margin:0;
+    opacity:.92;
+    font-size:15px;
+}
+
+/* ================= STATS ================= */
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:22px;
+    margin-bottom:32px;
+}
+
+.stat-card{
+    position:relative;
+    overflow:hidden;
+
+    border-radius:28px;
+    padding:26px;
+
+    color:white;
+
+    transition:.35s ease;
+    box-shadow:var(--shadow-sm);
+
+    animation:floating 4s ease-in-out infinite;
+}
+
+.stat-card:hover{
+    transform:translateY(-8px);
+    box-shadow:var(--shadow-lg);
+}
+
+.stat-card::before{
+    content:'';
+
+    position:absolute;
+
+    width:180px;
+    height:180px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.12);
+
+    top:-70px;
+    right:-50px;
+}
+
+.stat-card::after{
+    content:'';
+
+    position:absolute;
+
+    width:120px;
+    height:120px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.08);
+
+    bottom:-40px;
+    right:20px;
+}
+
+.stat-card.primary{
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #60A5FA
+    );
+}
+
+.stat-card.success{
+    background:linear-gradient(
+        135deg,
+        #059669,
+        #34D399
+    );
+}
+
+.stat-card.warning{
+    background:linear-gradient(
+        135deg,
+        #D97706,
+        #FBBF24
+    );
+}
+
+.stat-card.danger{
+    background:linear-gradient(
+        135deg,
+        #DC2626,
+        #F87171
+    );
+}
+
+.stat-icon{
+    position:relative;
+    z-index:2;
+
+    width:65px;
+    height:65px;
+
+    border-radius:22px;
+
+    background:rgba(255,255,255,.18);
+
+    backdrop-filter:blur(8px);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:1.5rem;
+
+    margin-bottom:18px;
+}
+
+.stat-number{
+    position:relative;
+    z-index:2;
+
+    font-size:2.3rem;
+    font-weight:800;
+}
+
+.stat-label{
+    position:relative;
+    z-index:2;
+
+    margin-top:8px;
+    opacity:.95;
+}
+
+/* ================= DASHBOARD CARD ================= */
+
+.dashboard-card{
+    background:white;
+    border-radius:32px;
+    padding:32px;
+
+    box-shadow:var(--shadow-sm);
+    border:1px solid rgba(226,232,240,.6);
+}
+
+.card-header-modern{
+    margin-bottom:26px;
+}
+
+.card-header-modern h3{
+    font-size:1.4rem;
+    font-weight:700;
+    color:var(--text);
+}
+
+.card-header-modern p{
+    margin-top:6px;
+    color:var(--muted);
+}
+
+/* ================= MENU ================= */
+
+.menu-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:20px;
+}
+
+.menu-item{
+    position:relative;
+    overflow:hidden;
+
+    text-decoration:none;
+
+    background:white;
+
+    border:1px solid #E8EEF7;
+    border-radius:24px;
+
+    padding:24px;
+
+    transition:.35s ease;
+
+    color:var(--text);
+}
+
+.menu-item::before{
+    content:'';
+
+    position:absolute;
+
+    inset:0;
+
+    opacity:0;
+
+    transition:.35s ease;
+
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #7C3AED
+    );
+}
+
+.menu-item:hover::before{
+    opacity:1;
+}
+
+.menu-item>*{
+    position:relative;
+    z-index:2;
+}
+
+.menu-item i{
+    width:60px;
+    height:60px;
+
+    border-radius:18px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#EFF6FF;
+    color:#2563EB;
+
+    font-size:1.4rem;
+
+    margin-bottom:15px;
+}
+
+.menu-item h6{
+    font-size:1rem;
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+.menu-item span{
+    color:var(--muted);
+    font-size:.88rem;
+    line-height:1.6;
+}
+
+.menu-item:hover{
+    transform:translateY(-8px);
+    box-shadow:var(--shadow-lg);
+}
+
+.menu-item:hover h6,
+.menu-item:hover span,
+.menu-item:hover i{
+    color:white;
+}
+
+.menu-item:hover i{
+    background:rgba(255,255,255,.15);
+}
+
+/* ================= FLOATING ================= */
+
+@keyframes floating{
+
+    0%{
+        transform:translateY(0);
     }
 
-    body{
-        background:var(--bg);
-        font-family:'Segoe UI',sans-serif;
-        color:var(--text);
+    50%{
+        transform:translateY(-4px);
     }
 
-    /* ================= HEADER ================= */
+    100%{
+        transform:translateY(0);
+    }
 
-    .dashboard-header{
-        background:linear-gradient(135deg,#4F46E5,#6366F1);
-        border-radius:var(--radius);
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:768px){
+
+    .page-header{
         padding:28px;
-        margin-bottom:24px;
-        color:white;
-        position:relative;
-        overflow:hidden;
-        box-shadow:var(--shadow);
     }
 
-    .dashboard-header::before{
-        content:'';
-        position:absolute;
-        width:250px;
-        height:250px;
-        border-radius:50%;
-        background:rgba(255,255,255,.08);
-        right:-80px;
-        top:-80px;
+    .page-title{
+        font-size:1.7rem;
     }
-
-    .dashboard-header h2{
-        font-size:30px;
-        font-weight:700;
-        margin-bottom:6px;
-        position:relative;
-        z-index:2;
-    }
-
-    .dashboard-header p{
-        margin:0;
-        color:rgba(255,255,255,.8);
-        position:relative;
-        z-index:2;
-    }
-
-    /* ================= CARD ================= */
 
     .dashboard-card{
-        border:none;
-        border-radius:var(--radius);
-        background:var(--card);
-        box-shadow:var(--shadow);
-        transition:.3s;
-        height:100%;
-    }
-
-    .dashboard-card:hover{
-        transform:translateY(-4px);
-        box-shadow:var(--shadow-hover);
-    }
-
-    .dashboard-card .card-body{
         padding:22px;
     }
 
-    /* ================= STAT CARD ================= */
-
-    .stat-card{
-        position:relative;
-        overflow:hidden;
+    .menu-grid{
+        grid-template-columns:1fr;
     }
 
-    .stat-icon{
-        width:60px;
-        height:60px;
-        border-radius:16px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        color:white;
-        font-size:24px;
-        flex-shrink:0;
-    }
-
-    .bg-primary-gradient{
-        background:linear-gradient(135deg,#4F46E5,#6366F1);
-    }
-
-    .bg-success-gradient{
-        background:linear-gradient(135deg,#10B981,#34D399);
-    }
-
-    .bg-info-gradient{
-        background:linear-gradient(135deg,#0EA5E9,#38BDF8);
-    }
-
-    .bg-warning-gradient{
-        background:linear-gradient(135deg,#F59E0B,#FBBF24);
-    }
-
-    .stat-title{
-        color:var(--text-light);
-        font-size:14px;
-        margin-bottom:4px;
-    }
-
-    .stat-value{
-        font-size:28px;
-        font-weight:700;
-        color:var(--text);
-    }
-
-    /* ================= BUTTON ================= */
-
-    .btn-primary-custom{
-        background:linear-gradient(135deg,#4F46E5,#6366F1);
-        color:white;
-        border:none;
-        border-radius:12px;
-        padding:10px 18px;
-        font-weight:600;
-        transition:.3s;
-        text-decoration:none;
-    }
-
-    .btn-primary-custom:hover{
-        transform:translateY(-2px);
-        color:white;
-    }
-
-    .btn-outline-custom{
-        border:1px solid #DDE3EC;
-        border-radius:12px;
-        padding:9px 16px;
-        color:var(--text);
-        background:white;
-        font-weight:600;
-        transition:.3s;
-        text-decoration:none;
-    }
-
-    .btn-outline-custom:hover{
-        background:#F8FAFC;
-        color:var(--text);
-    }
-
-    /* ================= SECTION TITLE ================= */
-
-    .section-title{
-        font-size:20px;
-        font-weight:700;
-    }
-
-    /* ================= SISWA ================= */
-
-    .student-item{
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        gap:16px;
-        padding:16px;
-        border:1px solid #EEF2F7;
-        border-radius:16px;
-        margin-bottom:14px;
-        transition:.3s;
-    }
-
-    .student-item:hover{
-        background:#FAFBFF;
-    }
-
-    .student-left{
-        display:flex;
-        align-items:center;
-        gap:14px;
-    }
-
-    .student-avatar{
-        width:54px;
-        height:54px;
-        border-radius:50%;
-        background:linear-gradient(135deg,#4F46E5,#6366F1);
-        color:white;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-weight:700;
-        font-size:20px;
-        overflow:hidden;
-        flex-shrink:0;
-    }
-
-    .student-avatar img{
-        width:100%;
-        height:100%;
-        object-fit:cover;
-    }
-
-    .student-name{
-        font-weight:700;
-        margin-bottom:3px;
-    }
-
-    .student-info{
-        font-size:13px;
-        color:var(--text-light);
-    }
-
-    /* ================= TABLE ================= */
-
-    .table{
-        margin-bottom:0;
-    }
-
-    .table thead th{
-        background:#F8FAFC;
-        border-bottom:1px solid #E5E7EB;
-        font-size:14px;
-        font-weight:700;
-        color:var(--text);
-        padding:14px;
-    }
-
-    .table tbody td{
-        padding:14px;
-        vertical-align:middle;
-        border-bottom:1px solid #F1F5F9;
-        font-size:14px;
-    }
-
-    .table tbody tr:hover{
-        background:#FAFBFF;
-    }
-
-    /* ================= QUICK ACTION ================= */
-
-    .quick-btn{
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        gap:8px;
-        padding:16px;
-        border-radius:16px;
-        font-weight:600;
-        text-decoration:none;
-        transition:.3s;
-        border:none;
-    }
-
-    .quick-btn:hover{
-        transform:translateY(-3px);
-    }
-
-    /* ================= EMPTY ================= */
-
-    .empty-state{
-        text-align:center;
-        padding:40px 20px;
-        color:var(--text-light);
-    }
-
-    .empty-state i{
-        font-size:42px;
-        margin-bottom:14px;
-    }
-
-    /* ================= RESPONSIVE ================= */
-
-    @media(max-width:768px){
-
-        .dashboard-header{
-            padding:22px;
-        }
-
-        .dashboard-header h2{
-            font-size:24px;
-        }
-
-        .student-item{
-            flex-direction:column;
-            align-items:flex-start;
-        }
-
-        .quick-btn{
-            font-size:14px;
-        }
-
-        .stat-value{
-            font-size:24px;
-        }
-    }
+}
 </style>
 
 <div class="container-fluid py-4">
 
     <!-- HEADER -->
-    <div class="dashboard-header">
+    <div class="page-header">
 
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <h1 class="page-title">
+            <i class="fas fa-building"></i>
+            Dashboard Tata Usaha
+        </h1>
 
-            <div>
-                <h2>Dashboard TU Kesiswaan 👋</h2>
-
-                <p>
-                    Kelola data siswa, wali kelas, dan kelas dengan lebih cepat dan rapi
-                </p>
-            </div>
-
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-
-                <button type="submit" class="btn btn-outline-light">
-                    Logout
-                </button>
-            </form>
-
-        </div>
+        <p class="page-subtitle">
+            Selamat datang, <strong>{{ Auth::user()->name }}</strong>
+        </p>
 
     </div>
 
     <!-- STATISTIK -->
-    <div class="row g-4 mb-4">
+    <div class="stats-grid">
 
-        <div class="col-xl-3 col-md-6">
-
-            <div class="card dashboard-card stat-card">
-
-                <div class="card-body">
-
-                    <div class="d-flex align-items-center gap-3">
-
-                        <div class="stat-icon bg-primary-gradient">
-                            <i class="fas fa-users"></i>
-                        </div>
-
-                        <div>
-                            <div class="stat-title">Total Siswa</div>
-
-                            <div class="stat-value">
-                                {{ number_format($totalSiswa ?? 0) }}
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-
+        <div class="stat-card primary">
+            <div class="stat-icon">
+                <i class="fas fa-user-graduate"></i>
             </div>
 
+            <div class="stat-number">
+                {{ $totalSiswa ?? 0 }}
+            </div>
+
+            <div class="stat-label">
+                Total Siswa
+            </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
-
-            <div class="card dashboard-card stat-card">
-
-                <div class="card-body">
-
-                    <div class="d-flex align-items-center gap-3">
-
-                        <div class="stat-icon bg-success-gradient">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                        </div>
-
-                        <div>
-                            <div class="stat-title">Wali Kelas</div>
-
-                            <div class="stat-value">
-                                {{ number_format($totalWaliKelas ?? 0) }}
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-
+        <div class="stat-card success">
+            <div class="stat-icon">
+                <i class="fas fa-book"></i>
             </div>
 
+            <div class="stat-number">
+                {{ $totalAdministrasi ?? 0 }}
+            </div>
+
+            <div class="stat-label">
+                Administrasi
+            </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
-
-            <div class="card dashboard-card stat-card">
-
-                <div class="card-body">
-
-                    <div class="d-flex align-items-center gap-3">
-
-                        <div class="stat-icon bg-info-gradient">
-                            <i class="fas fa-school"></i>
-                        </div>
-
-                        <div>
-                            <div class="stat-title">Total Kelas</div>
-
-                            <div class="stat-value">
-                                {{ number_format($totalKelas ?? 0) }}
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-
+        <div class="stat-card warning">
+            <div class="stat-icon">
+                <i class="fas fa-random"></i>
             </div>
 
+            <div class="stat-number">
+                {{ $totalMutasi ?? 0 }}
+            </div>
+
+            <div class="stat-label">
+                Mutasi
+            </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
-
-            <div class="card dashboard-card stat-card">
-
-                <div class="card-body">
-
-                    <div class="d-flex align-items-center gap-3">
-
-                        <div class="stat-icon bg-warning-gradient">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-
-                        <div>
-                            <div class="stat-title">Nilai Terinput</div>
-
-                            <div class="stat-value">
-                                {{ number_format($totalNilai ?? 0) }}
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-
+        <div class="stat-card danger">
+            <div class="stat-icon">
+                <i class="fas fa-user-check"></i>
             </div>
 
+            <div class="stat-number">
+                {{ $totalAlumni ?? 0 }}
+            </div>
+
+            <div class="stat-label">
+                Alumni
+            </div>
         </div>
 
     </div>
 
-    <!-- CONTENT -->
-    <div class="row g-4">
+    <!-- MENU -->
+    <div class="dashboard-card">
 
-        <!-- SISWA TERBARU -->
-        <div class="col-xl-6">
-
-            <div class="card dashboard-card h-100">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-
-                        <div class="section-title">
-                            Siswa Terbaru
-                        </div>
-
-                        <a href="{{ route('tu.siswa.index') }}"
-                        class="btn-outline-custom">
-                            Lihat Semua
-                        </a>
-
-                    </div>
-
-                    @if(!empty($siswaBaru) && $siswaBaru->count() > 0)
-
-                        @foreach($siswaBaru as $siswa)
-
-                            <div class="student-item">
-
-                                <div class="student-left">
-
-                                    @if($siswa->foto)
-
-                                        <div class="student-avatar">
-                                            <img src="{{ asset('storage/' . $siswa->foto) }}">
-                                        </div>
-
-                                    @else
-
-                                        <div class="student-avatar">
-                                            {{ strtoupper(substr($siswa->nama_lengkap,0,1)) }}
-                                        </div>
-
-                                    @endif
-
-                                    <div>
-
-                                        <div class="student-name">
-                                            {{ $siswa->nama_lengkap }}
-                                        </div>
-
-                                        <div class="student-info">
-                                            NIS : {{ $siswa->nis ?? '-' }}
-                                            •
-                                            {{ $siswa->kelas ?? '-' }}
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                                <a href="{{ route('tu.siswa.detail', $siswa->id) }}"
-                                class="btn-primary-custom">
-                                    Detail
-                                </a>
-
-                            </div>
-
-                        @endforeach
-
-                    @else
-
-                        <div class="empty-state">
-                            <i class="fas fa-user-graduate"></i>
-                            <p>Belum ada siswa terbaru.</p>
-                        </div>
-
-                    @endif
-
-                </div>
-
-            </div>
-
+        <div class="card-header-modern">
+            <h3>Menu Tata Usaha</h3>
+            <p>Akses cepat ke seluruh fitur utama Tata Usaha</p>
         </div>
 
-        <!-- RINGKASAN KELAS -->
-        <div class="col-xl-6">
-
-            <div class="card dashboard-card h-100">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-
-                        <div class="section-title">
-                            Ringkasan Kelas
-                        </div>
-
-                        <a href="{{ route('tu.kelas.index') }}"
-                        class="btn-outline-custom">
-                            Lihat Semua
-                        </a>
-
-                    </div>
-
-                    @if(!empty($kelasLimit) && $kelasLimit->count() > 0)
-
-                        <div class="table-responsive">
-
-                            <table class="table">
-
-                                <thead>
-                                    <tr>
-                                        <th>Tingkat</th>
-                                        <th>Jurusan</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-
-                                    @foreach ($kelasLimit as $k)
-
-                                        <tr>
-                                            <td>{{ $k->tingkat }}</td>
-                                            <td>{{ $k->jurusan->nama ?? '-' }}</td>
-                                        </tr>
-
-                                    @endforeach
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-
-                    @else
-
-                        <div class="empty-state">
-                            <i class="fas fa-school"></i>
-                            <p>Belum ada data kelas.</p>
-                        </div>
-
-                    @endif
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- RINGKASAN WALI KELAS -->
-        <div class="col-12">
-
-            <div class="card dashboard-card">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-
-                        <div class="section-title">
-                            Ringkasan Wali Kelas
-                        </div>
-
-                        <a href="{{ route('tu.wali-kelas') }}"
-                        class="btn-outline-custom">
-                            Lihat Semua
-                        </a>
-
-                    </div>
-
-                    @if(!empty($waliKelasLimit) && $waliKelasLimit->count() > 0)
-
-                        <div class="table-responsive">
-
-                            <table class="table">
-
-                                <thead>
-                                    <tr>
-                                        <th>Nama</th>
-                                        <th>Nomor Induk</th>
-                                        <th>Email</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-
-                                    @foreach ($waliKelasLimit as $wk)
-
-                                        <tr>
-                                            <td>{{ $wk->name }}</td>
-                                            <td>{{ $wk->nomor_induk }}</td>
-                                            <td>{{ $wk->email }}</td>
-                                        </tr>
-
-                                    @endforeach
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-
-                    @else
-
-                        <div class="empty-state">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                            <p>Belum ada data wali kelas.</p>
-                        </div>
-
-                    @endif
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- QUICK ACTION -->
-    <div class="row mt-4">
-
-        <div class="col-12">
-
-            <div class="card dashboard-card">
-
-                <div class="card-body">
-
-                    <div class="section-title mb-4">
-                        Aksi Cepat
-                    </div>
-
-                    <div class="row g-3">
-
-                        <div class="col-lg-4 col-md-6">
-
-                            <a href="{{ route('tu.siswa.index') }}"
-                            class="quick-btn btn btn-outline-primary w-100">
-
-                                <i class="fas fa-users"></i>
-                                Kelola Siswa
-
-                            </a>
-
-                        </div>
-
-                        <div class="col-lg-4 col-md-6">
-
-                            <a href="{{ route('tu.kelas.index') }}"
-                            class="quick-btn btn btn-outline-info w-100">
-
-                                <i class="fas fa-school"></i>
-                                Kelola Kelas
-
-                            </a>
-
-                        </div>
-
-                        <div class="col-lg-4 col-md-12">
-
-                            <a href="{{ route('tu.wali-kelas') }}"
-                            class="quick-btn btn btn-outline-success w-100">
-
-                                <i class="fas fa-chalkboard-teacher"></i>
-                                Kelola Wali Kelas
-
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
+        <div class="menu-grid">
+
+            <a href="{{ route('tu.siswa.index') }}" class="menu-item">
+                <i class="fas fa-user-graduate"></i>
+                <h6>Data Siswa</h6>
+                <span>Kelola seluruh data siswa sekolah</span>
+            </a>
+
+            <a href="{{ route('tu.buku-induk.index') }}" class="menu-item">
+                <i class="fas fa-book"></i>
+                <h6>Administrasi</h6>
+                <span>Kelola buku induk dan administrasi siswa</span>
+            </a>
+
+            <a href="{{ route('tu.mutasi.index') }}" class="menu-item">
+                <i class="fas fa-random"></i>
+                <h6>Mutasi</h6>
+                <span>Kelola data mutasi masuk dan keluar</span>
+            </a>
+
+            <a href="{{ route('tu.alumni.index') }}" class="menu-item">
+                <i class="fas fa-user-check"></i>
+                <h6>Alumni</h6>
+                <span>Kelola data alumni sekolah</span>
+            </a>
 
         </div>
 

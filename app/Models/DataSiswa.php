@@ -15,8 +15,9 @@ class DataSiswa extends Model
         'nisn',
         'tempat_lahir',
         'tanggal_lahir',
-        'jenis_kelamin',
-        'agama',
+        'jenis_kelamin_id',
+        'agama_id',
+        'agama_lainnya',
         'kewarganegaraan',
         'status_keluarga',
         'anak_ke',
@@ -91,6 +92,16 @@ class DataSiswa extends Model
     public function wali()
     {
         return $this->belongsTo(Wali::class, 'wali_id');
+    }
+
+    public function jenisKelamin()
+    {
+        return $this->belongsTo(JenisKelamin::class, 'jenis_kelamin_id');
+    }
+
+    public function agama()
+    {
+        return $this->belongsTo(Agama::class, 'agama_id');
     }
 
     /* ================================

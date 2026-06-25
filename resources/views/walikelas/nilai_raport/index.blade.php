@@ -4,409 +4,401 @@
 
 @section('content')
 <style>
-    /* ===================== STYLE NILAI RAPORT ===================== */
-    
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
-        background-color: var(--light-bg);
+        background-color: #f7fafc;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    h3 {
-        font-size: 28px;
-        color: #1E293B;
+    .page-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 2rem 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+        box-shadow: var(--card-shadow);
         position: relative;
-        padding-left: 15px;
-        margin-bottom: 10px !important;
+        overflow: hidden;
     }
 
-    h3::before {
+    .page-header::before {
         content: "";
         position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 5px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 3px;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(100px, -100px);
     }
 
-    h3.mb-0 {
-        font-size: 28px;
-        color: #1E293B;
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
         position: relative;
-        padding-left: 15px;
-        margin-bottom: 0 !important;
+        z-index: 1;
     }
 
-    h3.mb-0::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 5px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 3px;
+    .page-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        position: relative;
+        z-index: 1;
     }
 
-    p {
-        color: #64748B;
-        margin-left: 20px;
-        margin-bottom: 25px;
-    }
-
-    /* Card Styles */
-    .card {
-        border-radius: 16px;
+    .search-card {
+        border-radius: var(--border-radius);
         border: none;
         box-shadow: var(--card-shadow);
-        overflow: hidden;
-        transition: all 0.3s ease;
+        margin-bottom: 2rem;
+        transition: var(--transition);
     }
 
-    .card:hover {
-        box-shadow: var(--hover-shadow);
+    .search-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
     }
 
-    /* List Group Styles */
-    .list-group {
-        border-radius: 16px;
-    }
-
-    .list-group-flush > .list-group-item {
-        border-width: 0 0 1px;
-        border-color: #E2E8F0;
-        padding: 20px;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .list-group-flush > .list-group-item:last-child {
-        border-bottom: none;
-    }
-
-    .list-group-flush > .list-group-item::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 4px;
+    .student-card {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        cursor: pointer;
+        text-decoration: none;
+        display: block;
         height: 100%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        transform: scaleY(0);
-        transition: transform 0.3s ease;
-        border-radius: 0 4px 4px 0;
     }
 
-    .list-group-flush > .list-group-item:hover {
-        background-color: rgba(47, 83, 255, 0.03);
-        padding-left: 25px;
-    }
-
-    .list-group-flush > .list-group-item:hover::before {
-        transform: scaleY(1);
-    }
-
-    /* Student Info */
-    .student-info {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        flex: 1;
+    .student-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 35px rgba(0, 0, 0, 0.2);
     }
 
     .student-avatar {
-        width: 50px;
-        height: 50px;
+        width: 80px;
+        height: 80px;
         border-radius: 50%;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        color: white;
+        object-fit: cover;
+        border: 3px solid white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: var(--transition);
+    }
+
+    .student-card:hover .student-avatar {
+        transform: scale(1.05);
+    }
+
+    .student-avatar-placeholder {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 32px;
         font-weight: 700;
-        font-size: 20px;
-        flex-shrink: 0;
-        border: 3px solid white;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
+        background: var(--primary-gradient);
+        color: white;
+        margin: 0 auto;
     }
 
-    .list-group-item:hover .student-avatar {
-        transform: scale(1.1);
-    }
-
-    .student-avatar img {
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .student-details {
-        flex: 1;
-    }
-
-    .student-details strong {
-        font-size: 16px;
+    .btn-gradient {
+        background: var(--primary-gradient);
+        border: none;
+        color: white;
         font-weight: 600;
-        color: #1E293B;
-        display: block;
-        margin-bottom: 4px;
-    }
-
-    .student-details small {
-        color: #64748B;
-        font-size: 14px;
-        display: block;
-    }
-
-    /* Button Styles */
-    .btn {
-        border-radius: 8px;
-        font-weight: 600;
-        padding: 0.5rem 1.2rem;
-        transition: all 0.2s ease;
+        padding: 0.6rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
         display: inline-flex;
         align-items: center;
+        gap: 8px;
     }
 
-    .btn:hover {
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        color: white;
+    }
+
+    .btn-outline-gradient {
+        background: transparent;
+        border: 2px solid #667eea;
+        color: #667eea;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-outline-gradient:hover {
+        background: var(--primary-gradient);
+        color: white;
+        border-color: transparent;
         transform: translateY(-2px);
     }
 
-    .btn-secondary {
-        background-color: #64748B;
-        border-color: #64748B;
-    }
-
-    .btn-secondary:hover {
-        background-color: #475569;
-        border-color: #475569;
-    }
-
-    .btn-sm {
-        padding: 0.4rem 1rem;
-        font-size: 14px;
-    }
-
-    /* Badge Styles */
-    .badge {
-        padding: 6px 10px;
-        font-size: 12px;
+    .btn-success-gradient {
+        background: linear-gradient(135deg, #13B497 0%, #59D4A4 100%);
+        border: none;
+        color: white;
         font-weight: 600;
-        border-radius: 20px;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        transition: all 0.3s ease;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .list-group-item:hover .badge {
-        transform: scale(1.05);
-        box-shadow: 0 4px 8px rgba(47, 83, 255, 0.3);
+    .btn-success-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(19, 180, 151, 0.4);
+        color: white;
     }
 
-    /* Empty State */
+    .rombel-header {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        padding-left: 1rem;
+        border-left: 4px solid #667eea;
+    }
+
+    .rombel-header i {
+        color: #667eea;
+        margin-right: 8px;
+    }
+
     .empty-state {
         text-align: center;
-        padding: 60px 20px;
-        color: #64748B;
+        padding: 4rem 2rem;
     }
 
     .empty-state i {
-        font-size: 48px;
-        margin-bottom: 15px;
-        opacity: 0.5;
+        font-size: 4rem;
+        color: #cbd5e1;
+        margin-bottom: 1rem;
     }
 
-    .empty-state h5 {
-        font-weight: 600;
-        margin-bottom: 10px;
+    /* Pagination */
+    .pagination {
+        justify-content: center;
+        margin-top: 1rem;
     }
 
-    /* Animations */
+    .page-link {
+        border-radius: 8px;
+        margin: 0 3px;
+        color: #667eea;
+        border: none;
+        padding: 0.5rem 1rem;
+        transition: var(--transition);
+        background: white;
+    }
+
+    .page-link:hover {
+        background: var(--primary-gradient);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .page-item.active .page-link {
+        background: var(--primary-gradient);
+        border: none;
+        color: white;
+    }
+
+    .page-item.disabled .page-link {
+        color: #cbd5e1;
+        background: #f1f5f9;
+    }
+
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
+        from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
-    .list-group-item {
+    .fade-in {
         animation: fadeIn 0.5s ease-out;
     }
 
-    /* Responsive */
+    /* Modal */
+    .modal-content {
+        border-radius: var(--border-radius);
+        border: none;
+    }
+
+    .modal-header {
+        background: var(--primary-gradient);
+        color: white;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+
+    .modal-header .btn-close {
+        filter: brightness(0) invert(1);
+    }
+
     @media (max-width: 768px) {
-        h3.mb-0 {
+        .page-header {
+            padding: 1.5rem 1rem;
+        }
+        
+        .page-header h3 {
+            font-size: 1.5rem;
+        }
+        
+        .student-avatar, .student-avatar-placeholder {
+            width: 60px;
+            height: 60px;
             font-size: 24px;
         }
         
-        p {
-            margin-left: 0;
-            margin-bottom: 20px;
+        .btn-gradient, .btn-outline-gradient, .btn-success-gradient {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
         }
         
-        .list-group-flush > .list-group-item {
-            padding: 15px;
-        }
-        
-        .student-info {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
-        }
-        
-        .text-end {
-            margin-top: 15px;
-            align-self: flex-start;
+        .page-link {
+            padding: 0.35rem 0.7rem;
+            font-size: 0.75rem;
         }
     }
-
-    /* Kelas Header */
-    .kelas-header {
-        font-size: 18px;
-        font-weight: 600;
-        color: var(--primary-color);
-        margin-bottom: 15px;
-        padding: 10px 20px;
-        background: linear-gradient(135deg, rgba(47, 83, 255, 0.1), rgba(99, 102, 241, 0.1));
-        border-radius: 12px;
-        border-left: 4px solid var(--primary-color);
-    }
-
-    .kelas-section {
-        margin-bottom: 30px;
-    }
-
-    .kelas-section:last-child {
-        margin-bottom: 0;
-    }
-
 </style>
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container-fluid py-4">
+    <div class="page-header fade-in">
         <div>
-            <h3 class="mb-0">Nilai Raport Siswa</h3>
-            <p class="text-muted mb-0" style="font-size: 14px; margin-top: 4px;">Pilih siswa untuk melihat daftar raport berdasarkan semester.</p>
+            <h3 class="mb-1">
+                <i class="fas fa-chart-bar me-2"></i> Nilai Raport Siswa
+            </h3>
+            <div class="text-muted">Pilih siswa untuk melihat dan mengelola nilai raport</div>
         </div>
     </div>
 
-    <form method="GET" class="mb-3 d-flex gap-2" action="">
-        <input type="text" name="q" value="{{ request('q', $search ?? '') }}" class="form-control" placeholder="Cari nama / NIS / NISN">
-        <button class="btn btn-primary" type="submit">Cari</button>
-        <a href="{{ route('walikelas.nilai_raport.index') }}" class="btn btn-outline-secondary">Reset</a>
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalExportExcel">
-            <i class="fas fa-download me-1"></i> Export Excel
-        </button>
-    </form>
-
-    <div class="card shadow">
-        @if($siswas->count() > 0)
-            @foreach($siswas as $kelas => $siswaList)
-                <div class="kelas-section mb-4">
-                    <h5 class="kelas-header">{{ $kelas }}</h5>
-                    <div class="list-group list-group-flush">
-                        @foreach ($siswaList as $siswa)
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                <div class="student-info">
-                                    <div class="student-avatar">
-                                        @if($siswa->foto)
-                                            <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}">
-                                        @else
-                                            {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
-                                        @endif
-                                    </div>
-                                    <div class="student-details">
-                                        <strong>{{ $siswa->nama_lengkap }}</strong>
-                                        <small>
-                                            NIS: {{ $siswa->nis }} |
-                                            NISN: {{ $siswa->nisn }}
-                                        </small>
-                                    </div>
-                                </div>
-
-                                <div class="text-end">
-                                    {{-- Tombol List Raport --}}
-                                    <a href="{{ route('walikelas.nilai_raport.list', $siswa->id) }}"
-                                       class="btn btn-secondary btn-sm">
-                                        <i class="fas fa-file-alt me-1"></i> Semua Raport
-                                    </a>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
+    <div class="card search-card fade-in">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold text-muted small">
+                        <i class="fas fa-search me-1"></i> Cari Siswa
+                    </label>
+                    <form method="GET" class="d-flex gap-2">
+                        <input type="text" name="q" value="{{ request('q', $search ?? '') }}" 
+                               class="form-control" placeholder="Nama / NIS / NISN">
+                        <button class="btn btn-gradient" type="submit">
+                            <i class="fas fa-search"></i> Cari
+                        </button>
+                        <a href="{{ route('walikelas.nilai_raport.index') }}" class="btn btn-outline-gradient">
+                            <i class="fas fa-undo-alt"></i> Reset
+                        </a>
+                        <button type="button" class="btn btn-success-gradient" data-bs-toggle="modal" data-bs-target="#modalExportExcel">
+                            <i class="fas fa-download"></i> Export Excel
+                        </button>
+                    </form>
                 </div>
-            @endforeach
-        @else
-            <div class="empty-state">
-                <i class="fas fa-clipboard-list"></i>
-                <h5>Tidak ada siswa</h5>
-                <p>Belum ada siswa yang terdaftar di kelas Anda.</p>
             </div>
-        @endif
+        </div>
     </div>
 
-    <!-- Pagination Links -->
-    @if(isset($queryResults) && $queryResults instanceof \Illuminate\Pagination\LengthAwarePaginator && $queryResults->hasPages())
-        <div class="p-3">
-            {{ $queryResults->appends(request()->query())->links('pagination::bootstrap-4') }}
+    @if(isset($siswas) && $siswas->count() > 0)
+        @foreach($siswas as $rombel => $siswaList)
+            <div class="fade-in" style="animation-delay: {{ $loop->index * 0.1 }}s">
+                <div class="rombel-header">
+                    <i class="fas fa-graduation-cap"></i> {{ $rombel }}
+                    <span class="badge bg-primary ms-2">{{ $siswaList->count() }} Siswa</span>
+                </div>
+                <div class="row g-4 mb-5">
+                    @foreach($siswaList as $siswa)
+                        <div class="col-md-4 col-lg-3">
+                            <a href="{{ route('walikelas.nilai_raport.list', $siswa->id) }}" class="student-card">
+                                <div class="card h-100 text-center">
+                                    <div class="card-body">
+                                        @if($siswa->foto)
+                                            <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}" class="student-avatar mb-3">
+                                        @else
+                                            <div class="student-avatar-placeholder mb-3">
+                                                {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
+                                            </div>
+                                        @endif
+                                        <h6 class="fw-bold mb-1">{{ $siswa->nama_lengkap }}</h6>
+                                        <small class="text-muted">NIS: {{ $siswa->nis ?? '-' }}</small>
+                                        <div class="mt-2">
+                                            <span class="badge bg-primary px-3 py-2">
+                                                <i class="fas fa-chart-bar me-1"></i> Lihat Nilai
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endforeach
+
+        <!-- Pagination -->
+        @if(isset($queryResults) && $queryResults instanceof \Illuminate\Pagination\LengthAwarePaginator && $queryResults->hasPages())
+            <div class="p-3 border-top">
+                {{ $queryResults->appends(request()->query())->links('pagination::bootstrap-4') }}
+            </div>
+        @endif
+    @else
+        <div class="empty-state">
+            <i class="fas fa-clipboard-list"></i>
+            <h5>Tidak ada data siswa</h5>
+            <p class="text-muted">Belum ada siswa yang terdaftar di kelas Anda.</p>
         </div>
     @endif
 </div>
 
 <!-- Modal Export Excel -->
-<div class="modal fade" id="modalExportExcel" tabindex="-1" aria-labelledby="modalExportExcelLabel" aria-hidden="true">
+<div class="modal fade" id="modalExportExcel" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalExportExcelLabel">
-                    <i class="fas fa-download me-2"></i> Export Ledger Nilai Raport
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title"><i class="fas fa-download me-2"></i> Export Ledger Nilai Raport</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="GET" action="{{ route('walikelas.nilai_raport.export_excel') }}">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="exportSemester" class="form-label">Semester <span class="text-danger">*</span></label>
-                        <select class="form-select" id="exportSemester" name="semester" required>
+                        <label class="form-label fw-semibold">Semester <span class="text-danger">*</span></label>
+                        <select class="form-select" name="semester" required>
                             <option value="">-- Pilih Semester --</option>
                             @forelse($semesterList ?? [] as $semester)
                                 <option value="{{ $semester }}">Semester {{ $semester }}</option>
                             @empty
-                                <option value="">Tidak ada data semester</option>
+                                <option value="">Tidak ada data</option>
                             @endforelse
                         </select>
                     </div>
-
                     <div class="mb-3">
-                        <label for="exportTahun" class="form-label">Tahun Ajaran <span class="text-danger">*</span></label>
-                        <select class="form-select" id="exportTahun" name="tahun_ajaran" required>
+                        <label class="form-label fw-semibold">Tahun Ajaran <span class="text-danger">*</span></label>
+                        <select class="form-select" name="tahun_ajaran" required>
                             <option value="">-- Pilih Tahun Ajaran --</option>
                             @forelse($tahunAjaranList ?? [] as $tahun)
                                 <option value="{{ $tahun }}">{{ $tahun }}</option>
                             @empty
-                                <option value="">Tidak ada data tahun ajaran</option>
+                                <option value="">Tidak ada data</option>
                             @endforelse
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-download me-1"></i> Export Excel
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success-gradient">
+                        <i class="fas fa-download me-2"></i> Export Excel
                     </button>
                 </div>
             </form>

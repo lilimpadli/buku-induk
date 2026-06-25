@@ -1,667 +1,546 @@
 @extends('layouts.app')
 
-@section('title', 'Input Rapor')
+@section('title', 'Input Rapor - ' . ($siswa->nama_lengkap ?? ''))
 
 @section('content')
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-ban me-2"></i>
+        {!! session('error') !!}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        {!! session('success') !!}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
 <style>
-    /* ===================== STYLE INPUT RAPOR ===================== */
-    
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --info-color: #3B82F6;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #13B497 0%, #59D4A4 100%);
+        --danger-gradient: linear-gradient(135deg, #F093FB 0%, #F5576C 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
-        background-color: var(--light-bg);
+        background-color: #f7fafc;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    /* Responsive Container */
-    .report-container {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 0 1rem;
-    }
-
-    h3.mb-4 {
-        font-size: 28px;
-        color: #1E293B;
+    .page-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 2rem 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+        box-shadow: var(--card-shadow);
         position: relative;
-        padding-left: 15px;
-        margin-bottom: 25px !important;
-    }
-
-    h3.mb-4::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 5px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 3px;
-    }
-
-    /* Section Headers */
-    h5.mt-3, h5.mt-4 {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 20px !important;
-        position: relative;
-        padding-left: 15px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #E2E8F0;
-    }
-
-    h5.mt-3::before, h5.mt-4::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 4px;
-        height: 70%;
-        border-radius: 2px;
-    }
-
-    h5.text-primary {
-        color: var(--primary-color) !important;
-    }
-
-    h5.text-primary::before {
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-    }
-
-    h5.text-success {
-        color: var(--success-color) !important;
-    }
-
-    h5.text-success::before {
-        background: linear-gradient(to bottom, #10B981, #059669);
-    }
-
-    h5.text-warning {
-        color: var(--warning-color) !important;
-    }
-
-    h5.text-warning::before {
-        background: linear-gradient(to bottom, #F59E0B, #D97706);
-    }
-
-    h5.text-danger {
-        color: var(--danger-color) !important;
-    }
-
-    h5.text-danger::before {
-        background: linear-gradient(to bottom, #EF4444, #DC2626);
-    }
-
-    h5.text-info {
-        color: var(--info-color) !important;
-    }
-
-    h5.text-info::before {
-        background: linear-gradient(to bottom, #3B82F6, #2563EB);
-    }
-
-    /* Form Styles */
-    .form-control, .form-select {
-        border-radius: 8px;
-        border: 1px solid #E2E8F0;
-        padding: 10px 12px;
-        font-size: 14px;
-        transition: all 0.2s ease;
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(47, 83, 255, 0.1);
-    }
-
-    /* Table Styles */
-    .table {
-        margin-bottom: 20px;
-        border-radius: 8px;
         overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    .table-bordered {
-        border: 1px solid #E2E8F0;
+    .page-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(100px, -100px);
     }
 
-    .table-bordered th,
-    .table-bordered td {
-        border: 1px solid #E2E8F0;
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
     }
 
-    .table thead th {
-        background-color: #F8FAFC;
-        color: #475569;
+    .page-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-card {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-card .card-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        font-weight: 700;
+        font-size: 1.1rem;
+        border-bottom: 2px solid #667eea;
+        padding: 1rem 1.5rem;
+    }
+
+    .form-card .card-header i {
+        color: #667eea;
+        margin-right: 8px;
+    }
+
+    .form-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .info-student {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-student .info-row {
+        display: flex;
+        padding: 0.5rem 0;
+    }
+
+    .info-student .info-label {
+        width: 120px;
         font-weight: 600;
-        font-size: 14px;
-        padding: 12px 15px;
+        color: #4a5568;
     }
 
-    .table tbody td {
-        padding: 12px 15px;
+    .info-student .info-value {
+        flex: 1;
+        color: #2d3748;
+    }
+
+    .table-nilai {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1rem;
+    }
+
+    .table-nilai th,
+    .table-nilai td {
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem;
         vertical-align: middle;
     }
 
-    .table tbody tr:hover {
-        background-color: rgba(47, 83, 255, 0.02);
+    .table-nilai th {
+        background: #f8fafc;
+        font-weight: 600;
+        font-size: 0.875rem;
     }
 
-    /* Button Styles */
-    .btn {
+    .table-nilai td {
+        font-size: 0.875rem;
+    }
+
+    .table-nilai input,
+    .table-nilai textarea,
+    .table-nilai select {
+        width: 100%;
+        border: 1px solid #e2e8f0;
         border-radius: 8px;
+        padding: 0.5rem;
+        font-size: 0.875rem;
+        transition: var(--transition);
+    }
+
+    .table-nilai input:focus,
+    .table-nilai textarea:focus,
+    .table-nilai select:focus {
+        border-color: #667eea;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .table-nilai input.is-invalid,
+    .table-nilai textarea.is-invalid {
+        border-color: #dc3545;
+        background-color: rgba(220, 53, 69, 0.05);
+    }
+
+    .btn-gradient {
+        background: var(--primary-gradient);
+        border: none;
+        color: white;
         font-weight: 600;
-        padding: 0.6rem 1.5rem;
-        transition: all 0.2s ease;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        transition: var(--transition);
         display: inline-flex;
         align-items: center;
+        gap: 8px;
     }
 
-    .btn:hover {
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        color: white;
+    }
+
+    .btn-outline-gradient {
+        background: transparent;
+        border: 2px solid #667eea;
+        color: #667eea;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-outline-gradient:hover {
+        background: var(--primary-gradient);
+        color: white;
+        border-color: transparent;
         transform: translateY(-2px);
     }
 
-    .btn-success {
-        background-color: var(--success-color);
-        border-color: var(--success-color);
+    .required-star {
+        color: #dc3545;
+        font-size: 0.875rem;
     }
 
-    .btn-success:hover {
-        background-color: #059669;
-        border-color: #059669;
-    }
-
-    /* Label Styles */
-    .fw-bold {
-        color: #475569;
-        font-weight: 600;
-        margin-bottom: 8px;
-        font-size: 14px;
-    }
-
-    /* Animations */
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
+        from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
-    .table, .row > div {
+    .fade-in {
         animation: fadeIn 0.5s ease-out;
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
-        h3.mb-4 {
-            font-size: 22px;
-            margin-bottom: 1.5rem !important;
+        .page-header {
+            padding: 1.5rem 1rem;
         }
         
-        h5.mt-3, h5.mt-4 {
-            font-size: 15px;
-            margin-top: 1rem !important;
-            margin-bottom: 0.75rem !important;
+        .page-header h3 {
+            font-size: 1.5rem;
         }
         
-        .btn {
-            padding: 0.6rem 1rem;
-            font-size: 13px;
-            width: 100%;
-            display: block;
-            text-align: center;
-            white-space: normal;
-            margin: 0.5rem 0 !important;
+        .form-card .card-body {
+            padding: 1rem;
         }
         
-        .form-control, .form-select {
-            padding: 8px 10px;
-            font-size: 13px;
+        .table-nilai {
+            font-size: 0.75rem;
         }
         
-        .table {
-            font-size: 12px;
+        .table-nilai th,
+        .table-nilai td {
+            padding: 0.5rem;
         }
-
-        .table thead th,
-        .table tbody td {
-            padding: 8px 10px;
-            word-wrap: break-word;
-            word-break: break-all;
+        
+        .table-nilai input,
+        .table-nilai textarea,
+        .table-nilai select {
+            font-size: 0.75rem;
+            padding: 0.4rem;
         }
-
-        .report-container {
-            padding: 0 0.5rem;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-            display: block;
-        }
-
-        .row.mb-4 {
-            margin-bottom: 1rem !important;
-        }
-
-        .col-md-3, .col-md-4, .col-md-6, .col-md-12 {
-            flex: 0 0 100%;
-            max-width: 100%;
-            margin-bottom: 0.75rem;
-        }
-
-        .d-grid.gap-2 {
-            display: flex !important;
+        
+        .info-student .info-row {
             flex-direction: column;
-            gap: 0.75rem !important;
         }
-
-        .d-grid.gap-2 .btn {
-            margin: 0 !important;
+        
+        .info-student .info-label {
+            width: 100%;
+            margin-bottom: 0.25rem;
+        }
+        
+        .btn-gradient,
+        .btn-outline-gradient {
+            padding: 0.6rem 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .d-flex.justify-content-between {
+            flex-direction: column-reverse;
+            gap: 0.75rem;
+        }
+        
+        .d-flex.justify-content-between .btn {
+            width: 100%;
+            justify-content: center;
         }
     }
 </style>
 
-<div class="container-fluid mt-4">
-    <div class="report-container">
-
-    <h3 class="mb-4">Input Rapor — {{ $siswa->nama_lengkap }}</h3>
-
-    <form action="{{ route('walikelas.input_nilai_raport.store', $siswa->id) }}" method="POST" id="formRapor">
-        @csrf
-
-        {{-- ================== SEMESTER & TAHUN ================== --}}
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <label class="fw-bold">Semester</label>
-                <select id="semesterSelect" name="semester" class="form-control" required>
-                    <option value="Ganjil">Ganjil</option>
-                    <option value="Genap">Genap</option>
-                </select>
-            </div>
-
-            <div class="col-md-3">
-                <label class="fw-bold">Tahun Ajaran</label>
-                <input type="text" name="tahun_ajaran" placeholder="2024/2025"
-                       class="form-control" required>
-            </div>
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="page-header fade-in">
+        <div>
+            <h3 class="mb-1">📝 Input Rapor</h3>
+            <div class="text-muted">Isi nilai raport untuk siswa</div>
         </div>
+    </div>
 
-        {{-- ================== NILAI MAPEL KELOMPOK A ================== --}}
-        <h5 class="mt-3 text-primary">A. Kelompok Mata Pelajaran Umum</h5>
-
-        <table class="table table-bordered">
-            <thead class="text-center">
-                <tr>
-                    <th width="5%">No</th>
-                    <th>Mata Pelajaran</th>
-                    <th width="10%">Nilai Akhir <span class="text-danger">*</span></th>
-                    <th>Capaian Kompetensi <span class="text-danger">*</span></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($kelompokA as $m)
-                <tr>
-                    <td class="text-center">{{ $m->urutan }}</td>
-                    <td>{{ $m->nama }}</td>
-                    <td>
-                        <input type="number" name="nilai[{{ $m->id }}][nilai_akhir]"
-                               min="0" max="100" class="form-control nilai-required" required>
-                    </td>
-                    <td>
-                        <textarea name="nilai[{{ $m->id }}][deskripsi]"
-                                  rows="2" class="form-control deskripsi-required" required></textarea>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        {{-- ================== NILAI MAPEL KELOMPOK B ================== --}}
-        <h5 class="mt-3 text-primary">B. Kelompok Mata Pelajaran Kejuruan</h5>
-
-        <table class="table table-bordered">
-            <thead class="text-center">
-                <tr>
-                    <th width="5%">No</th>
-                    <th>Mata Pelajaran</th>
-                    <th width="10%">Nilai Akhir <span class="text-danger">*</span></th>
-                    <th>Capaian Kompetensi <span class="text-danger">*</span></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($kelompokB as $m)
-                <tr>
-                    <td class="text-center">{{ $m->urutan }}</td>
-                    <td>{{ $m->nama }}</td>
-                    <td>
-                        <input type="number" name="nilai[{{ $m->id }}][nilai_akhir]"
-                               min="0" max="100" class="form-control nilai-required" required>
-                    </td>
-                    <td>
-                        <textarea name="nilai[{{ $m->id }}][deskripsi]"
-                                  rows="2" class="form-control deskripsi-required" required></textarea>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        {{-- ================== EKSTRA ================== --}}
-        <h5 class="mt-4 text-success">C. Catatan Ekstrakurikuler <span class="text-danger">*</span></h5>
-
-        <table class="table table-bordered">
-            <thead class="text-center">
-                <tr>
-                    <th width="5%">No</th>
-                    <th>Nama Ekstrakurikuler <span class="text-danger">*</span></th>
-                    <th width="10%">Predikat</th>
-                    <th>Keterangan</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for($i=0;$i<3;$i++)
-                <tr>
-                    <td class="text-center">{{ $i+1 }}</td>
-
-                    {{-- nama ekstra --}}
-                    <td>
-                        <input type="text" class="form-control ekstra-required"
-                               name="ekstra[{{ $i }}][nama_ekstra]"
-                               placeholder="Contoh: Pramuka">
-                    </td>
-
-                    {{-- predikat --}}
-                    <td>
-                        <select name="ekstra[{{ $i }}][predikat]" class="form-control">
-                            <option value="">-</option>
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
-                        </select>
-                    </td>
-
-                    {{-- keterangan --}}
-                    <td>
-                        <textarea class="form-control" rows="2"
-                                  name="ekstra[{{ $i }}][keterangan]"></textarea>
-                    </td>
-                </tr>
-                @endfor
-            </tbody>
-        </table>
-
-        {{-- ================== KEHADIRAN ================== --}}
-        <h5 class="mt-4 text-warning">D. Ketidakhadiran <span class="text-danger">*</span></h5>
-
-        <div class="row">
-            <div class="col-md-3">
-                <label>Sakit <span class="text-danger">*</span></label>
-                <input type="number" class="form-control hadir-required" name="hadir[sakit]" min="0" required>
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Info Siswa -->
+            <div class="info-student fade-in">
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center text-md-start mb-3 mb-md-0">
+                        @if($siswa->foto)
+                            <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}" 
+                                 style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #667eea;">
+                        @else
+                            <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--primary-gradient); 
+                                        display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 32px; font-weight: 700;">
+                                {{ strtoupper(substr($siswa->nama_lengkap, 0, 1)) }}
+                            </div>
+                        @endif
+                    </div>
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-row">
+                                    <div class="info-label">Nama Lengkap</div>
+                                    <div class="info-value"><strong>{{ $siswa->nama_lengkap }}</strong></div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">NIS / NISN</div>
+                                    <div class="info-value">{{ $siswa->nis ?? '-' }} / {{ $siswa->nisn ?? '-' }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-row">
+                                    <div class="info-label">Rombel</div>
+                                    <div class="info-value">{{ $siswa->rombel->nama ?? '-' }}</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">Jenis Kelamin</div>
+                                    <div class="info-value">{{ $siswa->jenis_kelamin ?? '-' }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-3">
-                <label>Izin <span class="text-danger">*</span></label>
-                <input type="number" class="form-control hadir-required" name="hadir[izin]" min="0" required>
-            </div>
-            <div class="col-md-3">
-                <label>Tanpa Keterangan <span class="text-danger">*</span></label>
-                <input type="number" class="form-control hadir-required" name="hadir[alpa]" min="0" required>
-            </div>
+
+            <form action="{{ route('walikelas.input_nilai_raport.store', $siswa->id) }}" method="POST" id="formRapor">
+                @csrf
+
+                <!-- Semester & Tahun Ajaran -->
+                <div class="form-card fade-in">
+                    <div class="card-header">
+                        <i class="fas fa-calendar-alt"></i> Semester & Tahun Ajaran
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">
+                                    Semester <span class="required-star">*</span>
+                                </label>
+                                <select id="semesterSelect" name="semester" class="form-select" required>
+                                    <option value="Ganjil">Ganjil</option>
+                                    <option value="Genap">Genap</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">
+                                    Tahun Ajaran <span class="required-star">*</span>
+                                </label>
+                                <input type="text" name="tahun_ajaran" class="form-control" placeholder="2024/2025" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kelompok A -->
+                <div class="form-card fade-in">
+                    <div class="card-header">
+                        <i class="fas fa-book-open"></i> A. Kelompok Mata Pelajaran Umum
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table-nilai">
+                                <thead>
+                                    <tr><th width="5%">No</th><th>Mata Pelajaran</th><th width="15%">Nilai Akhir <span class="required-star">*</span></th><th>Capaian Kompetensi <span class="required-star">*</span></th></tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($kelompokA as $m)
+                                    <tr><td class="text-center">{{ $m->urutan }}</td><td>{{ $m->nama }}</td>
+                                    <td><input type="number" name="nilai[{{ $m->id }}][nilai_akhir]" min="0" max="100" class="nilai-required" required></td>
+                                    <td><textarea name="nilai[{{ $m->id }}][deskripsi]" rows="2" class="deskripsi-required" required></textarea></td></tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kelompok B -->
+                <div class="form-card fade-in">
+                    <div class="card-header">
+                        <i class="fas fa-laptop-code"></i> B. Kelompok Mata Pelajaran Kejuruan
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table-nilai">
+                                <thead>
+                                    <tr><th width="5%">No</th><th>Mata Pelajaran</th><th width="15%">Nilai Akhir <span class="required-star">*</span></th><th>Capaian Kompetensi <span class="required-star">*</span></th></tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($kelompokB as $m)
+                                    <tr><td class="text-center">{{ $m->urutan }}</td><td>{{ $m->nama }}</td>
+                                    <td><input type="number" name="nilai[{{ $m->id }}][nilai_akhir]" min="0" max="100" class="nilai-required" required></td>
+                                    <td><textarea name="nilai[{{ $m->id }}][deskripsi]" rows="2" class="deskripsi-required" required></textarea></td></tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ekstrakurikuler -->
+                <div class="form-card fade-in">
+                    <div class="card-header">
+                        <i class="fas fa-futbol"></i> C. Catatan Ekstrakurikuler
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table-nilai">
+                                <thead>
+                                    <tr><th width="5%">No</th><th>Nama Ekstrakurikuler <span class="required-star">*</span></th><th width="15%">Predikat</th><th>Keterangan</th></tr>
+                                </thead>
+                                <tbody>
+                                    @for($i=1; $i<=3; $i++)
+                                    <tr><td class="text-center">{{ $i }}</td>
+                                    <td><input type="text" name="ekstra[{{ $i }}][nama_ekstra]" class="ekstra-required" placeholder="Contoh: Pramuka"></td>
+                                    <td><select name="ekstra[{{ $i }}][predikat]" class="form-select"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option></select></td>
+                                    <td><textarea name="ekstra[{{ $i }}][keterangan]" rows="2"></textarea></td></tr>
+                                    @endfor
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kehadiran -->
+                <div class="form-card fade-in">
+                    <div class="card-header">
+                        <i class="fas fa-calendar-check"></i> D. Ketidakhadiran
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Sakit <span class="required-star">*</span></label><input type="number" name="hadir[sakit]" class="form-control hadir-required" min="0" value="0" required></div>
+                            <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Izin <span class="required-star">*</span></label><input type="number" name="hadir[izin]" class="form-control hadir-required" min="0" value="0" required></div>
+                            <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Tanpa Keterangan <span class="required-star">*</span></label><input type="number" name="hadir[alpa]" class="form-control hadir-required" min="0" value="0" required></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kenaikan Kelas -->
+                <div class="form-card fade-in" id="kenaikanSection" style="display: none;">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line"></i> E. Kenaikan Kelas
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold">Status</label>
+                                <select name="kenaikan[status]" class="form-select" id="statusSelect">
+                                    <option value="Naik Kelas">Naik Kelas</option>
+                                    <option value="Tidak Naik">Tidak Naik</option>
+                                    <option value="Lulus" {{ isset($siswa->rombel->kelas->tingkat) && $siswa->rombel->kelas->tingkat == 12 ? '' : 'disabled' }}>Lulus</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3" id="rombelTujuanGroup">
+                                <label class="form-label fw-semibold">Rombel Tujuan</label>
+                                <select name="kenaikan[rombel_tujuan_id]" class="form-select" id="rombelSelect">
+                                    <option value="">-- Pilih Rombel --</option>
+                                    @foreach($rombels as $r)
+                                        <option value="{{ $r->id }}">{{ $r->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BUTTON ACTION: Kembali + Simpan -->
+                <div class="d-flex justify-content-between align-items-center mt-4 gap-3">
+                    <a href="{{ route('walikelas.input_nilai_raport.index') }}" class="btn btn-outline-gradient">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Daftar
+                    </a>
+                    <button type="submit" class="btn btn-gradient" id="btnSimpan">
+                        <i class="fas fa-save"></i> Simpan Semua Data
+                    </button>
+                </div>
+
+            </form>
         </div>
-
-        {{-- ================== KENAIKAN KELAS ================== --}}
-        <div id="kenaikan-section" style="display:none;">
-            <h5 class="mt-4 text-danger">E. Kenaikan Kelas</h5>
-
-            <div class="row mt-2">
-            <div class="col-md-3">
-                <label>Status</label>
-                <select class="form-control" name="kenaikan[status]" id="statusSelect">
-                    <option value="Naik Kelas">Naik Kelas</option>
-                    <option value="Tidak Naik">Tidak Naik</option>
-                    <option value="Lulus" @php echo (isset($siswa) && isset($siswa->rombel) && isset($siswa->rombel->kelas) && $siswa->rombel->kelas->tingkat == 12) ? '' : 'disabled'; @endphp>Lulus</option>
-                </select>
-                @php
-                    $currentTingkat = (isset($siswa) && isset($siswa->rombel) && isset($siswa->rombel->kelas)) ? $siswa->rombel->kelas->tingkat : null;
-                @endphp
-                @if($currentTingkat != 12)
-                    <small class="text-muted">* Lulus hanya tersedia untuk Kelas 12</small>
-                @endif
-            </div>
-
-            <div class="col-md-3">
-                <label>Jurusan</label>
-                <select id="jurusanSelect" class="form-control" disabled>
-                    <option value="">-- Jurusan Siswa --</option>
-                    @if(isset($jurusans))
-                        @foreach($jurusans as $j)
-                            <option value="{{ $j->id }}" {{ isset($currentJurusanId) && $currentJurusanId == $j->id ? 'selected' : '' }}>{{ $j->nama }}</option>
-                        @endforeach
-                    @endif
-                </select>
-            </div>
-
-            <div class="col-md-4" id="rombelTujuanGroup">
-                <label>Rombel Tujuan</label>
-                <select name="kenaikan[rombel_tujuan_id]" class="form-control" id="rombelSelect">
-                    <option value="">-- Pilih Rombel --</option>
-                    @php
-                        $source = (isset($rombelsFiltered) && $rombelsFiltered->count() > 0) ? $rombelsFiltered : $rombels;
-                    @endphp
-                    @foreach($source as $r)
-                        <option value="{{ $r->id }}">{{ $r->nama }} @if($r->kelas) ({{ $r->kelas->tingkat }} - {{ $r->kelas->jurusan->nama ?? '' }}) @endif</option>
-                    @endforeach
-                </select>
-                @if(isset($targetTingkat) && $targetTingkat)
-                    <small class="text-muted">Menampilkan rombel untuk tingkat: {{ $targetTingkat }}</small>
-                @endif
-            </div>
-            </div>
-        </div>
-
-        <button class="btn btn-success mt-4" type="submit" id="btnSimpan">Simpan Semua Data</button>
-
-    </form>
-
     </div>
 </div>
-@endsection
 
 @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const semesterEl = document.getElementById('semesterSelect');
-            const kenaikanSection = document.getElementById('kenaikan-section');
-            const statusSelect = document.getElementById('statusSelect');
-            const rombelTujuanGroup = document.getElementById('rombelTujuanGroup');
-            const formRapor = document.getElementById('formRapor');
-            const btnSimpan = document.getElementById('btnSimpan');
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const semesterEl = document.getElementById('semesterSelect');
+        const kenaikanSection = document.getElementById('kenaikanSection');
+        const statusSelect = document.getElementById('statusSelect');
+        const rombelTujuanGroup = document.getElementById('rombelTujuanGroup');
+        const formRapor = document.getElementById('formRapor');
 
-            // Toggle kenaikan section berdasarkan semester
-            const updateVisibility = () => {
-                if (!semesterEl || !kenaikanSection) return;
-                const val = (semesterEl.value || '').toString().toLowerCase();
-                if (val === 'genap') {
-                    kenaikanSection.style.display = '';
-                } else {
-                    kenaikanSection.style.display = 'none';
-                }
-            };
-            semesterEl?.addEventListener('change', updateVisibility);
-            updateVisibility();
+        const updateVisibility = () => {
+            if (!semesterEl || !kenaikanSection) return;
+            const val = (semesterEl.value || '').toString().toLowerCase();
+            kenaikanSection.style.display = val === 'genap' ? '' : 'none';
+        };
+        semesterEl?.addEventListener('change', updateVisibility);
+        updateVisibility();
 
-            // Toggle rombel selection berdasarkan status
-            const updateRombelVisibility = () => {
-                if (!statusSelect || !rombelTujuanGroup) return;
-                const status = statusSelect.value;
-                if (status === 'Lulus') {
-                    rombelTujuanGroup.style.display = 'none';
-                    // Clear rombel selection jika Lulus dipilih
-                    document.getElementById('rombelSelect').value = '';
-                } else {
-                    rombelTujuanGroup.style.display = '';
-                }
-            };
-            statusSelect?.addEventListener('change', updateRombelVisibility);
-            updateRombelVisibility();
+        const updateRombelVisibility = () => {
+            if (!statusSelect || !rombelTujuanGroup) return;
+            rombelTujuanGroup.style.display = statusSelect.value === 'Lulus' ? 'none' : '';
+        };
+        statusSelect?.addEventListener('change', updateRombelVisibility);
+        updateRombelVisibility();
 
-            // Validasi semua table harus diisi sebelum submit
-            formRapor?.addEventListener('submit', function(e) {
-                let allFilled = true;
-                let firstEmpty = null;
-                let errorMsg = '';
+        formRapor?.addEventListener('submit', function(e) {
+            let allFilled = true;
+            let firstEmpty = null;
 
-                // Validasi nilai (semua mata pelajaran)
-                const nilaiInputs = document.querySelectorAll('input.nilai-required');
-                nilaiInputs.forEach((input) => {
-                    if (!input.value || input.value.trim() === '') {
-                        allFilled = false;
-                        input.classList.add('is-invalid');
-                        input.style.borderColor = '#dc3545';
-                        if (!firstEmpty) {
-                            firstEmpty = input;
-                            errorMsg = '❌ NILAI MATA PELAJARAN HARUS DIISI!';
-                        }
-                    } else {
-                        input.classList.remove('is-invalid');
-                        input.style.borderColor = '';
-                    }
-                });
-
-                // Validasi deskripsi (Capaian Kompetensi)
-                const deskripsiInputs = document.querySelectorAll('textarea.deskripsi-required');
-                deskripsiInputs.forEach((textarea) => {
-                    if (!textarea.value || textarea.value.trim() === '') {
-                        allFilled = false;
-                        textarea.classList.add('is-invalid');
-                        textarea.style.borderColor = '#dc3545';
-                        if (!firstEmpty) {
-                            firstEmpty = textarea;
-                            errorMsg = '❌ CAPAIAN KOMPETENSI HARUS DIISI!';
-                        }
-                    } else {
-                        textarea.classList.remove('is-invalid');
-                        textarea.style.borderColor = '';
-                    }
-                });
-
-                // Validasi minimal 1 ekstrakurikuler harus diisi
-                const ekstraInputs = document.querySelectorAll('input.ekstra-required');
-                let ekstraCount = 0;
-                ekstraInputs.forEach((input) => {
-                    if (input.value && input.value.trim() !== '') {
-                        ekstraCount++;
-                    }
-                });
-                if (ekstraCount === 0) {
+            document.querySelectorAll('.nilai-required, .deskripsi-required, .hadir-required').forEach(el => {
+                if (!el.value || el.value.trim() === '') {
                     allFilled = false;
-                    if (!firstEmpty) {
-                        firstEmpty = ekstraInputs[0];
-                        errorMsg = '❌ MINIMAL 1 EKSTRAKURIKULER HARUS DIISI!';
-                    }
-                }
-
-                // Validasi kehadiran harus diisi
-                const hadir_inputs = document.querySelectorAll('input.hadir-required');
-                hadir_inputs.forEach((input) => {
-                    if (input.value === '' || input.value === null) {
-                        allFilled = false;
-                        input.classList.add('is-invalid');
-                        input.style.borderColor = '#dc3545';
-                        if (!firstEmpty) {
-                            firstEmpty = input;
-                            errorMsg = '❌ DATA KETIDAKHADIRAN HARUS DIISI!';
-                        }
-                    } else {
-                        input.classList.remove('is-invalid');
-                        input.style.borderColor = '';
-                    }
-                });
-
-                if (!allFilled) {
-                    e.preventDefault();
-                    alert('⚠️ SEMUA TABLE WAJIB DIISI!\n\n' + errorMsg + '\n\nMohon lengkapi semua data sebelum menyimpan.');
-                    if (firstEmpty) {
-                        firstEmpty.focus();
-                        firstEmpty.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                    return false;
+                    el.classList.add('is-invalid');
+                    if (!firstEmpty) firstEmpty = el;
+                } else {
+                    el.classList.remove('is-invalid');
                 }
             });
 
-            // Visual feedback saat user mengetik
-            document.querySelectorAll('input.nilai-required').forEach((input) => {
-                input.addEventListener('input', function() {
-                    if (this.value && this.value.trim() !== '') {
-                        this.classList.remove('is-invalid');
-                        this.style.borderColor = '';
-                        this.style.borderColor = '#28a745';
-                    }
-                });
-                input.addEventListener('blur', function() {
-                    if (!this.value || this.value.trim() === '') {
-                        this.classList.add('is-invalid');
-                        this.style.borderColor = '#dc3545';
-                    }
-                });
+            let ekstraCount = 0;
+            document.querySelectorAll('.ekstra-required').forEach(el => {
+                if (el.value && el.value.trim() !== '') ekstraCount++;
             });
 
-            // Visual feedback untuk deskripsi (Capaian Kompetensi)
-            document.querySelectorAll('textarea.deskripsi-required').forEach((textarea) => {
-                textarea.addEventListener('input', function() {
-                    if (this.value && this.value.trim() !== '') {
-                        this.classList.remove('is-invalid');
-                        this.style.borderColor = '';
-                        this.style.borderColor = '#28a745';
-                    }
-                });
-                textarea.addEventListener('blur', function() {
-                    if (!this.value || this.value.trim() === '') {
-                        this.classList.add('is-invalid');
-                        this.style.borderColor = '#dc3545';
-                    }
-                });
-            });
+            if (ekstraCount === 0) {
+                allFilled = false;
+                alert('⚠️ Minimal 1 ekstrakurikuler harus diisi!');
+                e.preventDefault();
+                return false;
+            }
 
-            // Visual feedback untuk ekstrakurikuler
-            document.querySelectorAll('input.ekstra-required').forEach((input) => {
-                input.addEventListener('input', function() {
-                    if (this.value && this.value.trim() !== '') {
-                        this.style.borderColor = '#28a745';
-                    }
-                });
-                input.addEventListener('blur', function() {
-                    if (!this.value || this.value.trim() === '') {
-                        this.style.borderColor = '';
-                    }
-                });
-            });
-
-            // Visual feedback untuk kehadiran
-            document.querySelectorAll('input.hadir-required').forEach((input) => {
-                input.addEventListener('change', function() {
-                    if (this.value !== '' && this.value !== null) {
-                        this.classList.remove('is-invalid');
-                        this.style.borderColor = '#28a745';
-                    }
-                });
-                input.addEventListener('blur', function() {
-                    if (this.value === '' || this.value === null) {
-                        this.classList.add('is-invalid');
-                        this.style.borderColor = '#dc3545';
-                    }
-                });
-            });
+            if (!allFilled) {
+                alert('⚠️ Semua data wajib diisi!');
+                e.preventDefault();
+                if (firstEmpty) firstEmpty.focus();
+                return false;
+            }
         });
-    </script>
+    });
+</script>
 @endpush
+@endsection

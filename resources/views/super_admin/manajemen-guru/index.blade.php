@@ -3,701 +3,683 @@
 @section('title', 'Daftar Guru')
 
 @section('content')
+
 <style>
-    /* ===================== STYLE DAFTAR GURU ===================== */
-    
-    :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+:root {
+    --primary-blue: #4facfe;
+    --secondary-blue: #00f2fe;
+    --accent-cyan: #00D4FF;
+    --accent-pink: #FF4D6D;
+    --accent-green: #43E97B;
+    --light-bg: #F4F7FE;
+    --soft-gray: #E9EEF7;
+    --text-dark: #1E293B;
+    --text-muted: #64748B;
+
+    --shadow-light: 0 4px 18px rgba(15,23,42,0.06);
+    --shadow-medium: 0 12px 30px rgba(15,23,42,0.08);
+    --shadow-hover: 0 16px 40px rgba(47,83,255,0.16);
+
+    --radius: 24px;
+}
+
+body{
+    font-family: 'Poppins', sans-serif;
+    background: var(--light-bg);
+}
+
+/* ================= HEADER ================= */
+
+.page-header{
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    border-radius: 30px;
+    padding: 36px 36px 32px;
+    margin-bottom: 30px;
+    color: white;
+    box-shadow: var(--shadow-medium);
+    animation: fadeInUp .45s ease both;
+}
+
+.page-title{
+    font-size: 2.25rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+.page-subtitle{
+    opacity: .88;
+    margin: 0;
+    font-size: 1rem;
+    max-width: 640px;
+    line-height: 1.7;
+}
+
+/* ================= BUTTON ================= */
+
+.btn-modern{
+    border: none;
+    border-radius: 999px;
+    padding: 12px 20px;
+    min-height: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: transform .3s ease, box-shadow .3s ease, background .3s ease, color .3s ease;
+    text-decoration: none;
+    color: white;
+    box-shadow: 0 10px 24px rgba(47,83,255,0.12);
+}
+
+.btn-modern i,
+.btn-modern svg{
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-modern:hover{
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-hover);
+    color: white;
+}
+
+.header-actions{
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.header-actions > a,
+.header-actions > .mobile-menu-toggle,
+.header-actions .btn-modern{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-actions .btn-modern{
+    min-height: 50px;
+    padding: 14px 22px;
+}
+
+.header-actions > .mobile-menu-toggle{
+    display: none;
+    position: relative;
+}
+
+.btn-primary-modern{
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+}
+
+.btn-secondary-modern{
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+}
+
+.btn-export-modern{
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+}
+
+/* ================= FILTER ================= */
+
+.filter-card{
+    background: white;
+    border-radius: 24px;
+    box-shadow: var(--shadow-light);
+    margin-bottom: 28px;
+    overflow: hidden;
+}
+
+.filter-card .card-body{
+    padding: 28px;
+}
+
+.form-label{
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+.form-control,
+.form-select{
+    border-radius: 14px;
+    border: 2px solid var(--soft-gray);
+    padding: 12px 16px;
+    transition: .3s ease;
+    box-shadow: none;
+}
+
+.form-control:focus,
+.form-select:focus{
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 4px rgba(47,83,255,.1);
+}
+
+.input-group-text{
+    border-radius: 14px 0 0 14px;
+    border: 2px solid var(--soft-gray);
+    background: white;
+}
+
+/* ================= TABLE ================= */
+
+.data-table-card{
+    background: white;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: var(--shadow-light);
+    animation: fadeInUp .45s ease both;
+}
+
+.table{
+    margin-bottom: 0;
+}
+
+.table-modern thead th{
+    background: #EFF6FF;
+    border: none;
+    padding: 22px 20px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+.table-modern tbody td{
+    padding: 22px 20px;
+    vertical-align: middle;
+    border-top: 1px solid #EEF2F7;
+    background: white;
+}
+
+.table-modern tbody tr{
+    transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
+}
+
+.table-modern tbody tr:hover{
+    transform: translateY(-1px);
+    background: #F8FBFF;
+    box-shadow: 0 18px 35px rgba(47,83,255,0.08);
+}
+
+/* WIDTH */
+.table-modern td:first-child,
+.table-modern th:first-child{
+    width: 6%;
+}
+
+.table-modern td:nth-child(2),
+.table-modern th:nth-child(2){
+    width: 24%;
+}
+
+.table-modern td:last-child{
+    width: 16%;
+}
+
+/* ================= NUMBER BADGE ================= */
+
+.number-badge{
+    width: 38px;
+    height: 38px;
+    border-radius: 14px;
+    background: linear-gradient(135deg,var(--primary-blue),var(--secondary-blue));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 10px 24px rgba(79,172,254,.18);
+}
+
+/* ================= AVATAR ================= */
+
+.teacher-avatar-table{
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg,var(--primary-blue),var(--secondary-blue));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    box-shadow: var(--shadow-light);
+    flex-shrink: 0;
+}
+
+.teacher-avatar-table img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.teacher-name{
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+}
+
+.teacher-nip{
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.teacher-role{
+    color: var(--primary-blue);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* ================= BADGE ================= */
+
+.class-badge{
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    color: white;
+    border-radius: 999px;
+    padding: 8px 14px;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    margin: 3px 3px 3px 0;
+    box-shadow: 0 10px 25px rgba(47,83,255,0.12);
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.class-badge:hover{
+    transform: translateY(-1px);
+}
+
+.jurusan-badge {
+    color: #fff;
+    border-radius: 999px;
+    padding: 8px 14px;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    margin: 3px 0;
+    box-shadow: 0 10px 25px rgba(15,23,42,0.12);
+    transition: transform .3s ease, box-shadow .3s ease, filter .3s ease;
+    background: linear-gradient(135deg, #2563EB 0%, #38BDF8 100%);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+
+.jurusan-badge:hover {
+    transform: translateY(-1px);
+}
+
+.jurusan-badge[data-jurusan-code="RPL" i],
+.jurusan-badge[data-jurusan-code="PPLG" i] {
+    background: linear-gradient(135deg, #F59E0B 0%, #FCD34D 100%);
+}
+
+.jurusan-badge[data-jurusan-code="MP" i] {
+    background: linear-gradient(135deg, #7F1D1D 0%, #991B1B 100%);
+}
+
+.jurusan-badge[data-jurusan-code="AK" i],
+.jurusan-badge[data-jurusan-code="AKL" i] {
+    background: linear-gradient(135deg, #F97316 0%, #FB923C 100%);
+}
+
+.jurusan-badge[data-jurusan-code="TJKT" i] {
+    background: linear-gradient(135deg, #38BDF8 0%, #7DD3FC 100%);
+}
+
+.jurusan-badge[data-jurusan-code="TKRO" i],
+.jurusan-badge[data-jurusan-code="TO" i] {
+    background: linear-gradient(135deg, #1D4ED8 0%, #3B82F6 100%);
+}
+
+.jurusan-badge[data-jurusan-code="DPIB" i] {
+    background: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
+}
+
+.jurusan-badge[data-jurusan-code="SP" i],
+.jurusan-badge[data-jurusan-code="SK" i] {
+    background: linear-gradient(135deg, #0F172A 0%, #374151 100%);
+}
+
+/* ================= ACTION ================= */
+
+.action-buttons{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.action-btn{
+    width: 44px;
+    height: 44px;
+    border-radius: 16px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
+    color: white;
+    font-size: 0.95rem;
+}
+
+.action-btn:hover{
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.action-btn.view{
+    background: linear-gradient(135deg,#06B6D4,#3B82F6);
+}
+
+.action-btn.edit{
+    background: linear-gradient(135deg,#F59E0B,#F97316);
+}
+
+.action-btn.delete{
+    background: linear-gradient(135deg,#EF4444,#DC2626);
+}
+
+.empty-state{
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.empty-state i{
+    font-size: 60px;
+    margin-bottom: 16px;
+    color: var(--primary-blue);
+    opacity: .3;
+}
+
+.empty-state h5{
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.empty-state p{
+    color: var(--text-muted);
+}
+
+.pagination-container{
+    padding: 24px;
+}
+
+.pagination{
+    justify-content: center;
+}
+
+.page-link{
+    border: none;
+    border-radius: 12px !important;
+    margin: 0 4px;
+    color: var(--text-dark);
+}
+
+.page-item.active .page-link{
+    background: linear-gradient(135deg,var(--primary-blue),var(--secondary-blue));
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media(max-width:768px){
+
+    .page-header{
+        padding: 24px;
     }
 
-    body {
-        background-color: var(--light-bg);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-
-    h3.mb-3 {
-        font-size: 28px;
-        color: #1E293B;
-        position: relative;
-        padding-left: 15px;
-        margin-bottom: 25px !important;
-    }
-
-    h3.mb-3::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 5px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 3px;
-    }
-
-    /* Card Styles */
-    .card {
-        border-radius: 16px;
-        border: none;
-        box-shadow: var(--card-shadow);
-        overflow: hidden;
-        transition: all 0.3s ease;
-    }
-
-    .card:hover {
-        box-shadow: var(--hover-shadow);
-    }
-
-    /* List Group Styles */
-    .list-group {
-        border-radius: 16px;
-    }
-
-    .list-group-flush > .list-group-item {
-        border-width: 0 0 1px;
-        border-color: #E2E8F0;
-        padding: 20px;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .list-group-flush > .list-group-item:last-child {
-        border-bottom: none;
-    }
-
-    .list-group-flush > .list-group-item::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 4px;
-        height: 100%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        transform: scaleY(0);
-        transition: transform 0.3s ease;
-        border-radius: 0 4px 4px 0;
-    }
-
-    .list-group-flush > .list-group-item:hover {
-        background-color: rgba(47, 83, 255, 0.03);
-        padding-left: 25px;
-    }
-
-    .list-group-flush > .list-group-item:hover::before {
-        transform: scaleY(1);
-    }
-
-    /* Teacher Info */
-    .teacher-info {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .teacher-avatar {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
+    .page-title{
         font-size: 24px;
-        flex-shrink: 0;
-        border: 3px solid white;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
     }
 
-    .list-group-item:hover .teacher-avatar {
-        transform: scale(1.1);
+    .filter-card .card-body{
+        padding: 20px;
     }
 
-    .teacher-avatar img {
+    .table thead{
+        display: none;
+    }
+
+    .table,
+    .table tbody,
+    .table tr,
+    .table td{
+        display: block;
         width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
     }
 
-    .teacher-details {
-        flex-grow: 1;
+    .table tr{
+        margin-bottom: 16px;
+        border-bottom: 1px solid #E5E7EB;
     }
 
-    .teacher-details strong {
-        font-size: 18px;
-        font-weight: 600;
-        color: #1E293B;
-        display: block;
-        margin-bottom: 4px;
+    .table td{
+        padding: 14px 18px;
     }
 
-    .teacher-details small {
-        color: #64748B;
-        font-size: 14px;
-        display: block;
-        margin-bottom: 2px;
+    .table-modern tbody td:first-child{
+        padding-bottom: 0;
     }
 
-    .teacher-classes {
-        margin-top: 8px;
+    .number-badge{
+        width: 34px;
+        height: 34px;
+        font-size: 13px;
     }
 
-    .teacher-classes .badge {
-        margin-right: 5px;
-        margin-bottom: 5px;
-        font-size: 12px;
-        padding: 5px 10px;
-        border-radius: 20px;
-        background-color: rgba(47, 83, 255, 0.1);
-        color: var(--primary-color);
+    .action-buttons{
+        justify-content: start;
     }
 
-    .teacher-actions {
-        margin-left: auto;
-        display: flex;
-        align-items: center;
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        color: #64748B;
-    }
-
-    .empty-state i {
-        font-size: 48px;
-        margin-bottom: 15px;
-        opacity: 0.5;
-    }
-
-    .empty-state h5 {
-        font-weight: 600;
-        margin-bottom: 10px;
-    }
-
-    /* Header Actions */
-    .header-actions {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        position: relative;
-    }
-
-    .header-actions .btn {
-        white-space: nowrap;
-    }
-
-    /* Mobile Menu Dropdown */
-    .mobile-menu-toggle {
+    .header-actions > a{
         display: none;
-        position: relative;
     }
 
-    .mobile-menu-toggle .btn {
-        width: 40px;
-        height: 40px;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 8px;
+    .header-actions > .mobile-menu-toggle{
+        display: inline-flex;
     }
 
-    .mobile-dropdown {
-        display: none;
-        position: absolute;
-        right: 0;
-        top: 48px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-        min-width: 200px;
-        z-index: 1000;
-        overflow: hidden;
+    .mobile-menu-toggle{
+        display: inline-flex;
     }
-
-    .mobile-dropdown.show {
-        display: block;
-    }
-
-    .mobile-dropdown a {
-        display: block;
-        padding: 12px 16px;
-        color: #1E293B;
-        text-decoration: none;
-        border-bottom: 1px solid #E2E8F0;
-        transition: background-color 0.2s;
-    }
-
-    .mobile-dropdown a:last-child {
-        border-bottom: none;
-    }
-
-    .mobile-dropdown a:hover {
-        background-color: #F8FAFC;
-    }
-
-    .mobile-dropdown a i {
-        margin-right: 8px;
-        width: 20px;
-        display: inline-block;
-    }
-
-    /* Animations */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .list-group-item {
-        animation: fadeIn 0.5s ease-out;
-    }
-
-    /* ===================== RESPONSIVE STYLES ===================== */
-    
-    /* Tablet (768px - 991px) */
-    @media (max-width: 991px) {
-        h3.mb-3 {
-            font-size: 26px;
-        }
-
-        .teacher-avatar {
-            width: 55px;
-            height: 55px;
-            font-size: 22px;
-        }
-
-        .teacher-details strong {
-            font-size: 16px;
-        }
-    }
-
-    /* Mobile Large (576px - 767px) */
-    @media (max-width: 767px) {
-        .container {
-            padding-left: 12px;
-            padding-right: 12px;
-        }
-
-        h3.mb-3 {
-            font-size: 20px;
-            padding-left: 12px;
-        }
-
-        h3.mb-3::before {
-            width: 4px;
-        }
-
-        /* Header with mobile menu */
-        .d-flex.justify-content-between {
-            align-items: center;
-        }
-
-        .d-flex.justify-content-between h3 {
-            margin-bottom: 0 !important;
-            flex: 1;
-        }
-
-        /* Hide desktop menu, show mobile menu */
-        .header-actions > a,
-        .header-actions > .btn {
-            display: none !important;
-        }
-
-        .mobile-menu-toggle {
-            display: block;
-        }
-
-        /* Filter Card */
-        .card-body {
-            padding: 12px !important;
-        }
-
-        .form-label {
-            font-size: 12px !important;
-            margin-bottom: 6px;
-            font-weight: 600 !important;
-        }
-
-        .form-control, .form-select {
-            font-size: 14px;
-            padding: 10px 12px;
-            height: auto;
-        }
-
-        .input-group-text {
-            padding: 10px 12px;
-        }
-
-        /* Ensure form fields take full width */
-        .row.g-3 > div {
-            padding-left: 8px;
-            padding-right: 8px;
-        }
-
-        /* Filter Buttons */
-        .col-md-2 {
-            width: 100%;
-        }
-
-        .col-md-2.d-flex {
-            margin-top: 8px;
-            gap: 8px !important;
-        }
-
-        .col-md-2.d-flex .btn {
-            font-size: 14px;
-            padding: 10px 16px;
-        }
-
-        /* List Items */
-        .list-group-flush > .list-group-item {
-            padding: 15px 12px;
-        }
-
-        .list-group-flush > .list-group-item:hover {
-            padding-left: 16px;
-        }
-
-        .teacher-info {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .teacher-avatar {
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
-            border-width: 2px;
-        }
-
-        .teacher-details {
-            width: 100%;
-        }
-
-        .teacher-details strong {
-            font-size: 16px;
-        }
-
-        .teacher-details small {
-            font-size: 13px;
-        }
-
-        .teacher-classes .badge {
-            font-size: 11px;
-            padding: 4px 8px;
-        }
-
-        .teacher-actions {
-            margin-left: 0;
-            margin-top: 8px;
-            width: 100%;
-            justify-content: center;
-        }
-
-        .teacher-actions .btn-group {
-            width: 100%;
-        }
-
-        .teacher-actions .btn-group .btn {
-            flex: 1;
-        }
-
-        /* Empty State */
-        .empty-state {
-            padding: 40px 15px;
-        }
-
-        .empty-state i {
-            font-size: 40px;
-        }
-
-        .empty-state h5 {
-            font-size: 16px;
-        }
-
-        .empty-state p {
-            font-size: 14px;
-        }
-    }
-
-    /* Mobile Small (max 575px) */
-    @media (max-width: 575px) {
-        h3.mb-3 {
-            font-size: 18px;
-        }
-
-        .teacher-details strong {
-            font-size: 15px;
-        }
-
-        .teacher-details small {
-            font-size: 12px;
-        }
-
-        .btn-sm {
-            font-size: 12px;
-            padding: 5px 10px;
-        }
-    }
-
-    /* Desktop Large (1200px+) */
-    @media (min-width: 1200px) {
-        .container {
-            max-width: 1140px;
-        }
-
-        h3.mb-3 {
-            font-size: 30px;
-        }
-
-        .teacher-avatar {
-            width: 65px;
-            height: 65px;
-            font-size: 26px;
-        }
-
-        .teacher-details strong {
-            font-size: 19px;
-        }
-
-        .list-group-flush > .list-group-item {
-            padding: 24px;
-        }
-    }
-
-    /* Improve button group on mobile */
-    @media (max-width: 767px) {
-        .btn-group {
-            display: flex;
-            width: 100%;
-        }
-
-        .btn-group .btn {
-            border-radius: 6px !important;
-            margin: 0 2px;
-        }
-
-        .btn-group .btn:first-child {
-            margin-left: 0;
-        }
-
-        .btn-group .btn:last-child {
-            margin-right: 0;
-        }
-
-        .btn-group form {
-            flex: 1;
-            display: flex;
-        }
-
-        .btn-group form button {
-            width: 100%;
-        }
-    }
-
-    /* Pagination responsive */
-    @media (max-width: 575px) {
-        .pagination {
-            font-size: 14px;
-        }
-
-        .pagination .page-link {
-            padding: 6px 10px;
-        }
-    }
+}
 </style>
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="mb-3">Daftar Guru</h3>
-        
-        <!-- Desktop Menu -->
-        <div class="header-actions">
-            <a href="{{ route('super_admin.manajemen-guru.importForm') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-file-import"></i> Import
-            </a>
-            <a href="{{ route('super_admin.manajemen-guru.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Tambah Guru
-            </a>
-            
-            <!-- Mobile Menu Toggle -->
-            <div class="mobile-menu-toggle">
-                <button class="btn btn-outline-secondary" type="button" onclick="toggleMobileMenu()">
-                    <i class="fas fa-ellipsis-v"></i>
-                </button>
-                <div class="mobile-dropdown" id="mobileMenuDropdown">
-                    <a href="{{ route('super_admin.manajemen-guru.export', request()->only(['search','jurusan'])) }}">
-                        <i class="fas fa-file-export"></i> Export Excel
-                    </a>
-                    <a href="{{ route('super_admin.manajemen-guru.importForm') }}">
-                        <i class="fas fa-file-import"></i> Import Excel
-                    </a>
-                    <a href="{{ route('super_admin.manajemen-guru.create') }}">
-                        <i class="fas fa-plus"></i> Tambah Guru
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="container-fluid">
 
-    <!-- FILTER CARD -->
-    <div class="card mb-3" style="border-radius: 16px; border: none; box-shadow: var(--card-shadow);">
-        <div class="card-body" style="background-color: #F8FAFC;">
-            <form method="GET" action="{{ route('super_admin.manajemen-guru.index') }}" class="row g-3 align-items-end">
-                <!-- Search -->
-                <div class="col-md-4 col-12">
-                    <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Cari Guru</label>
-                    <div class="input-group">
-                        <span class="input-group-text" style="background:white;border:1px solid #E2E8F0;"><i class="bi bi-search"></i></span>
-                        <input type="text" name="search" class="form-control" placeholder="Nama, NIP, email..." value="{{ $search ?? '' }}" style="border:1px solid #E2E8F0;">
-                    </div>
-                </div>
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 
-                <!-- Filter Jurusan -->
-                <div class="col-md-3 col-sm-6 col-12">
-                    <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Jurusan</label>
-                    <select name="jurusan" class="form-select" style="border:1px solid #E2E8F0;">
-                        <option value="">-- Semua Jurusan --</option>
-                        @foreach(($allJurusans ?? collect()) as $j)
-                            <option value="{{ $j->id }}" {{ (isset($jurusan_id) && $jurusan_id == $j->id) ? 'selected' : '' }}>
-                                {{ $j->nama }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <!-- Filter Role -->
-                <div class="col-md-3 col-sm-6 col-12">
-                    <label class="form-label fw-semibold" style="color: #475569; font-size: 14px;">Role</label>
-                    <select name="role" class="form-select" style="border:1px solid #E2E8F0;">
-                        <option value="">-- Semua Role --</option>
-                        <option value="tu" {{ (isset($role) && $role == 'tu') ? 'selected' : '' }}>Tu</option>
-                        <option value="kurikulum" {{ (isset($role) && $role == 'kurikulum') ? 'selected' : '' }}>Kurikulum</option>
-                        @foreach(($allRoles ?? collect()) as $r)
-                            <option value="{{ $r }}" {{ (isset($role) && $role == $r) ? 'selected' : '' }}>
-                                {{ ucfirst(str_replace('_', ' ', $r)) }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <!-- Buttons -->
-                <div class="col-md-2 col-12 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-search"></i> Cari
-                    </button>
-                    <a href="{{ route('super_admin.manajemen-guru.index') }}" class="btn btn-outline-secondary w-100">
-                        <i class="bi bi-arrow-counterclockwise"></i> Reset
-                    </a>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="card shadow">
-        @if($gurus->count() > 0)
-            <div class="list-group list-group-flush">
-                @forelse($gurus as $g)
-                    <div class="list-group-item">
-                        <div class="teacher-info">
-                            <div class="teacher-avatar">
-                                @if($g->foto)
-                                    <img src="{{ asset('storage/' . $g->foto) }}" alt="{{ $g->nama }}">
-                                @else
-                                    {{ strtoupper(substr($g->nama, 0, 1)) }}
-                                @endif
-                            </div>
-                            <div class="teacher-details">
-                                <strong>{{ $g->nama }}</strong>
-                                <small>{{ $g->nip }}</small>
-                                @if($g->user?->role)
-                                    <small style="color: #2F53FF; font-weight: 500;">
-                                        Role: {{ ucfirst(str_replace('_', ' ', $g->user->role)) }}
-                                    </small>
-                                @endif
-                                
-                                @if($g->rombels && $g->rombels->count())
-                                    <div class="teacher-classes">
-                                        @foreach($g->rombels as $r)
-                                            @php
-                                                $kelas = $r->kelas;
-                                            @endphp
-                                            <span class="badge">
-                                                {{ $kelas?->tingkat ? $kelas->tingkat . ' - ' . ($kelas->jurusan->nama ?? '') : '-' }} / {{ $r->nama }}
-                                            </span>
-                                        @endforeach
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="teacher-actions">
-                                <div class="btn-group" role="group">
-                                    <a href="{{ route('super_admin.manajemen-guru.show', $g->id) }}" class="btn btn-sm btn-info" title="Detail">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ route('super_admin.manajemen-guru.edit', $g->id) }}" class="btn btn-sm btn-warning" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('super_admin.manajemen-guru.destroy', $g->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus guru ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="empty-state">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                        <h5>Belum ada guru</h5>
-                        <p>Belum ada data guru yang tersedia.</p>
-                    </div>
-                @endforelse
-            </div>
-            
-            <div class="d-flex justify-content-center mt-3 p-3">
-                {{ $gurus->links('pagination::bootstrap-4') }}
-            </div>
-        @else
-            <div class="empty-state">
+        <div>
+            <h1 class="page-title">
                 <i class="fas fa-chalkboard-teacher"></i>
-                <h5>Belum ada guru</h5>
-                <p>Belum ada data guru yang tersedia.</p>
-            </div>
-        @endif
+                Manajemen Guru
+            </h1>
+
+            <p class="page-subtitle">
+                Kelola data guru, kelas, dan informasi akademik
+            </p>
+        </div>
+
     </div>
 </div>
 
-<script>
-function toggleMobileMenu() {
-    const dropdown = document.getElementById('mobileMenuDropdown');
-    dropdown.classList.toggle('show');
-}
+<div class="data-table-card">
 
-// Close dropdown when clicking outside
-document.addEventListener('click', function(event) {
-    const toggle = document.querySelector('.mobile-menu-toggle');
-    const dropdown = document.getElementById('mobileMenuDropdown');
-    
-    if (toggle && dropdown && !toggle.contains(event.target)) {
-        dropdown.classList.remove('show');
-    }
-});
-</script>
+    @if($gurus->count() > 0)
+
+        <div class="table-responsive">
+
+            <table class="table align-middle table-modern">
+
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Guru</th>
+                        <th>Informasi</th>
+                        <th>Kelas Mengajar</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                @foreach($gurus as $g)
+
+                    <tr>
+
+                        <td>
+                            <div class="number-badge">
+                                {{ $gurus->firstItem() + $loop->index }}
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+
+                                <div class="teacher-avatar-table">
+
+                                    @if($g->foto)
+                                        <img src="{{ asset('storage/' . $g->foto) }}"
+                                             alt="{{ $g->nama }}">
+                                    @else
+                                        {{ strtoupper(substr($g->nama,0,1)) }}
+                                    @endif
+
+                                </div>
+
+                                <div>
+                                    <div class="teacher-name">
+                                        {{ $g->nama }}
+                                    </div>
+
+                                    <div class="teacher-nip">
+                                        {{ $g->nip }}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </td>
+
+                        <td>
+
+                            @if($g->user?->role)
+                                <div class="teacher-role">
+                                    <i class="fas fa-user-tag me-1"></i>
+                                    {{ ucfirst(str_replace('_',' ',$g->user->role)) }}
+                                </div>
+                            @endif
+
+                        </td>
+
+                        <td>
+
+                            @if($g->rombels && $g->rombels->count())
+
+                                @foreach($g->rombels as $r)
+
+                                    @php
+                                        $kelas = $r->kelas;
+                                    @endphp
+
+                                    <span class="class-badge jurusan-badge" data-jurusan-code="{{ $kelas?->jurusan->kode ?? '' }}">
+                                        {{ $kelas?->tingkat ? $kelas->tingkat . ' - ' . ($kelas->jurusan->nama ?? '') : '-' }}
+                                        / {{ $r->nama }}
+                                    </span>
+
+                                @endforeach
+
+                            @else
+                                <span class="text-muted">
+                                    Belum ada kelas
+                                </span>
+                            @endif
+
+                        </td>
+
+                        <td>
+
+                            <div class="action-buttons">
+
+                                <a href="{{ route('super_admin.manajemen-guru.show',$g->id) }}"
+                                   class="action-btn view">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+
+                                <a href="{{ route('super_admin.manajemen-guru.edit',$g->id) }}"
+                                   class="action-btn edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
+                                <form action="{{ route('super_admin.manajemen-guru.destroy',$g->id) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('Hapus guru ini?')">
+
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button type="submit"
+                                            class="action-btn delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                @endforeach
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="pagination-container">
+            {{ $gurus->links('pagination::bootstrap-4') }}
+        </div>
+
+    @else
+
+        <div class="empty-state">
+
+            <i class="fas fa-chalkboard-teacher"></i>
+
+            <h5>Belum ada data guru</h5>
+
+            <p>
+                Silakan tambahkan data guru terlebih dahulu
+            </p>
+
+        </div>
+
+    @endif
+
+</div>
+
+</div>
+
 @endsection

@@ -1,347 +1,380 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Data Pribadi Saya')
+@section('title', 'Edit Data Pribadi')
 
 @section('content')
 <style>
-    /* ===================== STYLE EDIT DATA PRIBADI KURIKULUM ===================== */
-    
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
-        background-color: var(--light-bg);
+        background-color: #f7fafc;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    /* Card Styles */
-    .card {
-        border-radius: 16px;
-        border: none;
-        box-shadow: var(--card-shadow);
-        overflow: hidden;
-        transition: all 0.3s ease;
+    main {
+        padding: 20px 15px !important;
+        overflow-x: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
-    .card:hover {
-        box-shadow: var(--hover-shadow);
+    .container-fluid {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 10px !important;
+        overflow-x: auto !important;
     }
 
-    .card-body {
-        padding: 2rem;
-    }
-
-    .card-title {
-        font-size: 22px;
-        color: #1E293B;
-        font-weight: 600;
+    .page-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 1.5rem 1.5rem;
+        border-radius: var(--border-radius);
         margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
         position: relative;
-        padding-left: 15px;
+        overflow: hidden;
+        width: 100%;
     }
 
-    .card-title::before {
+    .page-header::before {
         content: "";
         position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 4px;
-        height: 70%;
-        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        border-radius: 2px;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(100px, -100px);
+        pointer-events: none;
     }
 
-    /* Form Styles */
-    .form-label {
-        color: #475569;
-        font-weight: 600;
-        margin-bottom: 8px;
-        font-size: 14px;
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        font-size: 1.3rem;
+        position: relative;
+        z-index: 1;
     }
 
-    .form-control, .form-select {
-        border-radius: 8px;
-        border: 1px solid #E2E8F0;
-        padding: 12px 15px;
-        font-size: 14px;
-        transition: all 0.2s ease;
+    .page-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 0.9rem;
+        position: relative;
+        z-index: 1;
     }
 
-    .form-control:focus, .form-select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(47, 83, 255, 0.1);
-    }
-
-    textarea.form-control {
-        min-height: 100px;
-        resize: vertical;
-    }
-
-    /* Alert Styles */
-    .alert {
-        border-radius: 8px;
+    .btn-back {
+        background: rgba(255, 255, 255, 0.2);
         border: none;
-        font-size: 14px;
-        margin-bottom: 1.5rem;
-        padding: 12px 15px;
-    }
-
-    .alert-success {
-        background-color: rgba(16, 185, 129, 0.1);
-        color: var(--success-color);
-    }
-
-    .alert-danger {
-        background-color: rgba(239, 68, 68, 0.1);
-        color: var(--danger-color);
-    }
-
-    .alert ul {
-        margin-bottom: 0;
-        padding-left: 20px;
-    }
-
-    /* Buttons */
-    .btn {
-        border-radius: 8px;
+        color: white;
         font-weight: 600;
-        padding: 0.6rem 1.5rem;
-        transition: all 0.2s ease;
+        padding: 0.4rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        text-decoration: none;
         display: inline-flex;
         align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
     }
 
-    .btn:hover {
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
         transform: translateY(-2px);
     }
 
-    .btn-primary {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
+    .form-card {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        width: 100%;
     }
 
-    .btn-primary:hover {
-        background-color: var(--secondary-color);
-        border-color: var(--secondary-color);
+    .form-card .card-header {
+        background: white;
+        border-bottom: 1px solid #E2E8F0;
+        padding: 0.8rem 1.5rem;
     }
 
-    .btn-secondary {
-        background-color: #64748B;
-        border-color: #64748B;
+    .form-card .card-header h5 {
+        margin: 0;
+        font-weight: 700;
+        color: #1E293B;
+        font-size: 1rem;
     }
 
-    .btn-secondary:hover {
-        background-color: #475569;
-        border-color: #475569;
+    .form-card .card-header h5 i {
+        color: #667eea;
+        margin-right: 6px;
     }
 
-    /* Text Styles */
-    .text-muted {
-        color: #64748B !important;
-        font-size: 13px;
+    .form-card .card-body {
+        padding: 1.5rem;
     }
 
-    /* Responsive */
+    .form-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #1E293B;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        border: 1px solid #E2E8F0;
+        padding: 0.5rem 0.9rem;
+        transition: var(--transition);
+        font-size: 0.9rem;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn-save {
+        background: var(--primary-gradient);
+        border: none;
+        padding: 0.5rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: var(--transition);
+        color: white;
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        color: white;
+    }
+
+    .btn-cancel {
+        background: #64748B;
+        border: none;
+        padding: 0.5rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: var(--transition);
+        color: white;
+    }
+
+    .btn-cancel:hover {
+        background: #475569;
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    .section-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #1E293B;
+        margin-top: 1.5rem;
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.3rem;
+        border-bottom: 2px solid #E2E8F0;
+    }
+
+    .section-title:first-of-type {
+        margin-top: 0;
+    }
+
     @media (max-width: 768px) {
-        .card-body {
-            padding: 1.5rem;
+        .page-header {
+            padding: 1rem 1rem;
         }
-        
-        .card-title {
-            font-size: 20px;
+        .page-header h3 {
+            font-size: 1.1rem;
         }
-        
-        .btn {
-            padding: 0.5rem 1.2rem;
-            font-size: 14px;
+        .page-header .text-muted {
+            font-size: 0.75rem;
         }
-        
-        .form-control, .form-select {
-            padding: 10px 12px;
+
+        .form-card .card-body {
+            padding: 1rem;
+        }
+
+        .btn-save,
+        .btn-cancel {
+            width: 100%;
+            margin-bottom: 8px;
+            justify-content: center;
+        }
+
+        .border-top {
+            text-align: center;
+        }
+
+        .row {
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .col-md-6 {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        .btn-back {
+            width: 100%;
+            justify-content: center;
         }
     }
 </style>
 
-<div class="container mt-4 mb-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="d-flex align-items-start justify-content-between mb-4">
-                <div>
-                    <h2 class="fw-bold mb-1">Edit Data Pribadi Saya</h2>
-                    <p class="text-muted">{{ $guru->nama }}</p>
-                </div>
+<div class="container-fluid px-4">
+    <div class="page-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap">
+            <div>
+                <h3><i class="fas fa-user-edit me-2"></i> Edit Data Pribadi</h3>
+                <div class="text-muted">Perbarui informasi profil Anda</div>
             </div>
-
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong><i class="fas fa-exclamation-circle"></i> Terjadi Kesalahan!</strong>
-                    <ul class="mb-0 mt-2">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Edit Data Pribadi</h5>
-                    <form action="{{ route('kurikulum.data-pribadi.update') }}" method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
-
-                        <!-- Informasi Dasar -->
-                        <h6 class="fw-bold mb-3">Informasi Dasar</h6>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="nama" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('nama') is-invalid @enderror" 
-                                       id="nama" name="nama" value="{{ old('nama', $guru->nama) }}" required>
-                                @error('nama')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label for="nip" class="form-label">NIP</label>
-                                <input type="text" class="form-control @error('nip') is-invalid @enderror" 
-                                       id="nip" name="nip" value="{{ old('nip', $guru->nip) }}">
-                                @error('nip')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                                       id="email" name="email" value="{{ old('email', $guru->email) }}">
-                                @error('email')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label for="telepon" class="form-label">Telepon</label>
-                                <input type="text" class="form-control @error('telepon') is-invalid @enderror" 
-                                       id="telepon" name="telepon" value="{{ old('telepon', $guru->telepon) }}" 
-                                       placeholder="Contoh: 082xxxxxxxx">
-                                @error('telepon')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- Data Pribadi -->
-                        <hr class="my-4">
-                        <h6 class="fw-bold mb-3">Data Pribadi</h6>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="tempat_lahir" class="form-label">Tempat Lahir</label>
-                                <input type="text" class="form-control @error('tempat_lahir') is-invalid @enderror" 
-                                       id="tempat_lahir" name="tempat_lahir" value="{{ old('tempat_lahir', $guru->tempat_lahir) }}">
-                                @error('tempat_lahir')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label for="tanggal_lahir" class="form-label">Tanggal Lahir</label>
-                                <input type="date" class="form-control @error('tanggal_lahir') is-invalid @enderror" 
-                                       id="tanggal_lahir" name="tanggal_lahir" 
-                                       value="{{ old('tanggal_lahir') ?? ($guru->tanggal_lahir && is_object($guru->tanggal_lahir) ? $guru->tanggal_lahir->format('Y-m-d') : ($guru->tanggal_lahir ?? '')) }}">
-                                @error('tanggal_lahir')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="jenis_kelamin" class="form-label">Jenis Kelamin <span class="text-danger">*</span></label>
-                                <select class="form-select @error('jenis_kelamin') is-invalid @enderror" 
-                                        id="jenis_kelamin" name="jenis_kelamin" required>
-                                    <option value="">-- Pilih --</option>
-                                    <option value="L" @selected(old('jenis_kelamin', $guru->jenis_kelamin) == 'L')>Laki-laki</option>
-                                    <option value="P" @selected(old('jenis_kelamin', $guru->jenis_kelamin) == 'P')>Perempuan</option>
-                                </select>
-                                @error('jenis_kelamin')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <label for="alamat" class="form-label">Alamat</label>
-                                <textarea class="form-control @error('alamat') is-invalid @enderror" 
-                                          id="alamat" name="alamat" rows="4">{{ old('alamat', $guru->alamat) }}</textarea>
-                                @error('alamat')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Foto Profil (opsional)</label>
-                            <input type="file" name="photo" accept="image/*" class="form-control">
-                            @if(isset($user) && $user->photo)
-                                <small class="text-muted">Foto saat ini: <a href="{{ asset('storage/' . $user->photo) }}" target="_blank">Lihat</a></small>
-                            @endif
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Password Baru (opsional)</label>
-                            <input type="password" name="password" class="form-control" autocomplete="new-password" placeholder="Kosongkan jika tidak ingin mengubah password">
-                            <small class="text-muted">Biarkan kosong jika tidak ingin mengubah password.</small>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Konfirmasi Password</label>
-                            <input type="password" name="password_confirmation" class="form-control" autocomplete="new-password" placeholder="Konfirmasi password baru">
-                        </div>
-
-                        <!-- Tombol Aksi -->
-                        <div class="row mt-5">
-                            <div class="col-12 d-flex justify-content-end gap-2">
-                                <a href="{{ route('kurikulum.data-pribadi.index') }}" class="btn btn-secondary">
-                                    <i class="fas fa-arrow-left"></i> Batal
-                                </a>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Simpan
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+            <div>
+                <a href="{{ route('kurikulum.data-pribadi.index') }}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    // Form validation
-    document.addEventListener('DOMContentLoaded', function() {
-        const forms = document.querySelectorAll('.needs-validation');
-        Array.from(forms).forEach(form => {
-            form.addEventListener('submit', event => {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
-            }, false);
-        });
-    });
-</script>
+    <div class="card form-card">
+        <div class="card-header">
+            <h5><i class="fas fa-pen"></i> Form Edit Data Pribadi</h5>
+        </div>
+        <div class="card-body">
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <strong><i class="fas fa-exclamation-circle me-2"></i> Terjadi Kesalahan!</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach($errors->all() as $e)
+                            <li>{{ $e }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form action="{{ route('kurikulum.data-pribadi.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+
+                <div class="section-title">Informasi Dasar</div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-user text-primary me-1"></i> Nama Lengkap <span class="text-danger">*</span></label>
+                        <input type="text" name="nama" class="form-control @error('nama') is-invalid @enderror" value="{{ old('nama', $guru->nama) }}" required>
+                        @error('nama')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-id-card text-primary me-1"></i> NIP</label>
+                        <input type="text" name="nip" class="form-control @error('nip') is-invalid @enderror" value="{{ old('nip', $guru->nip) }}">
+                        @error('nip')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-envelope text-primary me-1"></i> Email</label>
+                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', $guru->email) }}">
+                        @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-phone text-primary me-1"></i> Telepon</label>
+                        <input type="text" name="telepon" class="form-control @error('telepon') is-invalid @enderror" value="{{ old('telepon', $guru->telepon) }}" placeholder="Contoh: 082xxxxxxxx">
+                        @error('telepon')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="section-title">Data Pribadi</div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-map-marker-alt text-primary me-1"></i> Tempat Lahir</label>
+                        <input type="text" name="tempat_lahir" class="form-control @error('tempat_lahir') is-invalid @enderror" value="{{ old('tempat_lahir', $guru->tempat_lahir) }}">
+                        @error('tempat_lahir')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-calendar-alt text-primary me-1"></i> Tanggal Lahir</label>
+                        <input type="date" name="tanggal_lahir" class="form-control @error('tanggal_lahir') is-invalid @enderror" 
+                               value="{{ old('tanggal_lahir', $guru->tanggal_lahir ? \Carbon\Carbon::parse($guru->tanggal_lahir)->format('Y-m-d') : '') }}">
+                        @error('tanggal_lahir')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-venus-mars text-primary me-1"></i> Jenis Kelamin <span class="text-danger">*</span></label>
+                        <select name="jenis_kelamin" class="form-select @error('jenis_kelamin') is-invalid @enderror" required>
+                            <option value="">-- Pilih --</option>
+                            <option value="L" {{ old('jenis_kelamin', $guru->jenis_kelamin) == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                            <option value="P" {{ old('jenis_kelamin', $guru->jenis_kelamin) == 'P' ? 'selected' : '' }}>Perempuan</option>
+                        </select>
+                        @error('jenis_kelamin')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-home text-primary me-1"></i> Alamat</label>
+                        <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" rows="3">{{ old('alamat', $guru->alamat) }}</textarea>
+                        @error('alamat')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="section-title">Keamanan & Foto</div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-image text-primary me-1"></i> Foto Profil</label>
+                        <input type="file" name="photo" accept="image/*" class="form-control">
+                        @if(isset($user) && $user->photo)
+                            <small class="text-muted">Foto saat ini: <a href="{{ asset('storage/' . $user->photo) }}" target="_blank">Lihat</a></small>
+                        @endif
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-lock text-primary me-1"></i> Password Baru</label>
+                        <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah">
+                        <small class="text-muted">Minimal 8 karakter</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-check-circle text-primary me-1"></i> Konfirmasi Password</label>
+                        <input type="password" name="password_confirmation" class="form-control" placeholder="Konfirmasi password baru">
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top">
+                    <button type="submit" class="btn btn-save">
+                        <i class="fas fa-save me-2"></i> Simpan
+                    </button>
+                    <a href="{{ route('kurikulum.data-pribadi.index') }}" class="btn btn-cancel">
+                        <i class="fas fa-arrow-left me-2"></i> Batal
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection

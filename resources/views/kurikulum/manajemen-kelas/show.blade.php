@@ -1,461 +1,472 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Rombel: ' . $rombel->nama)
+@section('title', 'Detail Rombel')
 
 @section('content')
 <style>
-    /* ===================== STYLE DETAIL ROMBEL ===================== */
     :root {
         --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        --card-hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        --bg-light: #f7fafc;
         --border-radius: 16px;
         --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
-        background-color: var(--bg-light);
+        background-color: #f7fafc;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    /* ===== PAGE TITLE BAR ===== */
-    .page-title-bar {
+    main {
+        padding: 20px 15px !important;
+        overflow-x: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .container-fluid {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 10px !important;
+        overflow-x: auto !important;
+    }
+
+    .page-header {
         background: var(--primary-gradient);
         color: white;
-        padding: 1.75rem 1.5rem;
+        padding: 1.5rem 1.5rem;
         border-radius: var(--border-radius);
         margin-bottom: 1.5rem;
         box-shadow: var(--card-shadow);
         position: relative;
         overflow: hidden;
+        width: 100%;
     }
 
-    .page-title-bar::before {
+    .page-header::before {
         content: "";
         position: absolute;
-        top: 0; right: 0;
-        width: 260px; height: 260px;
-        background: rgba(255, 255, 255, 0.08);
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
         border-radius: 50%;
-        transform: translate(90px, -90px);
+        transform: translate(100px, -100px);
+        pointer-events: none;
     }
 
-    .page-title-bar .title-inner {
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        font-size: 1.3rem;
         position: relative;
         z-index: 1;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
     }
 
-    .page-title-bar h1 {
-        font-weight: 700;
-        font-size: 1.6rem;
-        margin-bottom: 0.2rem;
-    }
-
-    .page-title-bar .subtitle {
-        color: rgba(255, 255, 255, 0.75);
-        font-size: 13px;
-        margin-bottom: 0;
+    .page-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 0.9rem;
+        position: relative;
+        z-index: 1;
     }
 
     .btn-back {
         background: rgba(255, 255, 255, 0.2);
-        border: 1.5px solid rgba(255, 255, 255, 0.45);
+        border: none;
         color: white;
         font-weight: 600;
-        padding: 0.5rem 1.1rem;
+        padding: 0.4rem 1.2rem;
         border-radius: 10px;
-        font-size: 13.5px;
-        white-space: nowrap;
-        flex-shrink: 0;
         transition: var(--transition);
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
     }
 
     .btn-back:hover {
-        background: rgba(255, 255, 255, 0.35);
-        border-color: white;
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-export {
+        background: #13B497;
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.4rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .btn-export:hover {
+        background: #0e9a7e;
+        transform: translateY(-2px);
         color: white;
     }
 
-    /* ===== INFO CARD ===== */
     .info-card {
         border-radius: var(--border-radius);
         border: none;
         box-shadow: var(--card-shadow);
-        background: white;
         overflow: hidden;
+        width: 100%;
         margin-bottom: 1.5rem;
     }
 
-    .info-card-body {
-        padding: 1.5rem;
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.5rem;
-    }
-
-    .info-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .info-icon {
-        width: 42px;
-        height: 42px;
-        border-radius: 10px;
-        background: rgba(102, 126, 234, 0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #667eea;
-        font-size: 18px;
-        flex-shrink: 0;
-    }
-
-    .info-label {
-        color: #94A3B8;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.4px;
-        margin-bottom: 0.2rem;
-    }
-
-    .info-value {
-        color: #1E293B;
-        font-size: 15px;
-        font-weight: 700;
-    }
-
-    /* ===== SECTION CARD (TABLE) ===== */
-    .section-card {
-        border-radius: var(--border-radius);
-        border: none;
-        box-shadow: var(--card-shadow);
-        overflow: hidden;
+    .info-card .card-header {
         background: white;
-    }
-
-    .section-card-header {
-        padding: 1.25rem 1.5rem;
         border-bottom: 1px solid #E2E8F0;
+        padding: 0.8rem 1.5rem;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        gap: 0.75rem;
+        gap: 10px;
     }
 
-    .section-card-header h5 {
+    .info-card .card-header h5 {
         margin: 0;
         font-weight: 700;
         color: #1E293B;
-        font-size: 1.05rem;
+        font-size: 1rem;
     }
 
-    .total-badge {
-        background: rgba(102, 126, 234, 0.1);
+    .info-card .card-header h5 i {
         color: #667eea;
-        font-weight: 700;
-        font-size: 12px;
-        padding: 0.3rem 0.7rem;
-        border-radius: 6px;
+        margin-right: 6px;
     }
 
-    /* Desktop Table */
-    .section-card .table { margin-bottom: 0; }
+    .info-card .card-body {
+        padding: 1.2rem 1.5rem;
+    }
 
-    .section-card thead { background-color: #F8FAFC; }
+    .info-row {
+        display: flex;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #F1F5F9;
+    }
 
-    .section-card th {
-        color: #94A3B8;
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        width: 180px;
         font-weight: 600;
-        font-size: 11.5px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border: none;
-        padding: 0.9rem 1.2rem;
+        color: #64748B;
+        font-size: 0.85rem;
+        flex-shrink: 0;
     }
 
-    .section-card td {
-        padding: 0.85rem 1.2rem;
-        border-color: #E2E8F0;
-        font-size: 14px;
-        color: #334155;
-        vertical-align: middle;
+    .info-value {
+        flex: 1;
+        color: #1E293B;
+        font-size: 0.9rem;
     }
 
-    .section-card tbody tr:hover {
-        background-color: rgba(102, 126, 234, 0.03);
+    .badge-tingkat {
+        background: #667eea;
+        color: white;
+        padding: 3px 12px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: inline-block;
+        white-space: nowrap;
     }
 
-    .td-no {
-        color: #94A3B8;
-        font-weight: 600;
-        font-size: 13px;
+    .badge-jurusan {
+        background: #13B497;
+        color: white;
+        padding: 3px 12px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: inline-block;
+        white-space: nowrap;
     }
 
     .badge-gender {
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 500;
         display: inline-block;
-        font-size: 12px;
-        font-weight: 600;
-        padding: 0.25rem 0.65rem;
-        border-radius: 6px;
+        white-space: nowrap;
     }
 
     .badge-gender.laki {
-        background: rgba(102, 126, 234, 0.1);
-        color: #667eea;
+        background: #DBEAFE;
+        color: #2563EB;
     }
 
     .badge-gender.perempuan {
-        background: rgba(236, 72, 153, 0.1);
-        color: #EC4899;
+        background: #FCE7F3;
+        color: #DB2777;
     }
 
-    /* ===== MOBILE CARD LIST ===== */
-    .mobile-item {
-        padding: 14px 16px;
-        border-bottom: 1px solid #E2E8F0;
-        transition: background 0.2s ease;
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
-    .mobile-item:last-child { border-bottom: none; }
-    .mobile-item:active { background-color: rgba(102, 126, 234, 0.04); }
-
-    .mobile-item .mobile-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
+    .table {
+        width: 100%;
+        min-width: 400px;
+        margin-bottom: 0;
+        font-size: 0.85rem;
     }
 
-    .mobile-item .mobile-name {
+    .table th {
         font-weight: 600;
-        color: #1E293B;
-        font-size: 15px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        min-width: 0;
-    }
-
-    .mobile-item .mobile-meta {
-        margin-top: 6px;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 10px;
-        font-size: 13px;
-        color: #64748B;
-    }
-
-    .mobile-item .mobile-meta .meta-label {
-        color: #94A3B8;
-        font-size: 11px;
+        font-size: 0.7rem;
         text-transform: uppercase;
         letter-spacing: 0.3px;
-        font-weight: 600;
+        color: #64748B;
+        padding: 0.6rem 0.8rem;
+        white-space: nowrap;
+        background-color: #F8FAFC;
+        border-bottom: none;
     }
 
-    .mobile-empty {
-        padding: 2.5rem 1rem;
+    .table td {
+        padding: 0.6rem 0.8rem;
+        vertical-align: middle;
+        border-color: #E2E8F0;
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(102, 126, 234, 0.03);
+    }
+
+    .badge-siswa {
+        background: #F8FAFC;
+        color: #475569;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 500;
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    .empty-state {
         text-align: center;
+        padding: 2rem 1rem;
         color: #94A3B8;
     }
 
-    .mobile-empty i {
-        font-size: 1.8rem;
+    .empty-state i {
+        font-size: 2rem;
+        color: #CBD5E1;
         display: block;
         margin-bottom: 0.5rem;
     }
 
-    /* ===== ANIMATIONS ===== */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(14px); }
-        to   { opacity: 1; transform: translateY(0); }
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 1rem;
     }
 
-    .fade-in   { animation: fadeIn 0.5s ease-out; }
-    .fade-in-1 { animation: fadeIn 0.5s ease-out 0.1s both; }
-    .fade-in-2 { animation: fadeIn 0.5s ease-out 0.2s both; }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 767.98px) {
-        .page-title-bar {
-            padding: 1.25rem 1rem;
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1rem 1rem;
+        }
+        .page-header h3 {
+            font-size: 1.1rem;
+        }
+        .page-header .text-muted {
+            font-size: 0.75rem;
         }
 
-        .page-title-bar h1 {
-            font-size: 1.3rem;
+        .info-row {
+            flex-direction: column;
+            padding: 0.6rem 0;
         }
 
-        .page-title-bar .subtitle {
-            font-size: 12px;
+        .info-label {
+            width: 100%;
+            font-size: 0.75rem;
+            margin-bottom: 2px;
+        }
+
+        .info-value {
+            font-size: 0.85rem;
+        }
+
+        .info-card .card-header {
+            padding: 0.6rem 1rem;
+        }
+
+        .info-card .card-body {
+            padding: 0.8rem 1rem;
+        }
+
+        .table {
+            min-width: 350px;
+            font-size: 0.75rem;
+        }
+        .table th,
+        .table td {
+            padding: 0.4rem 0.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+        .action-buttons .btn {
+            width: 100%;
+            justify-content: center;
         }
 
         .btn-back {
-            padding: 0.4rem 0.8rem;
-            font-size: 13px;
+            width: 100%;
+            justify-content: center;
         }
-
-        .info-card-body {
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            padding: 1rem;
+        .btn-export {
+            width: 100%;
+            justify-content: center;
         }
+    }
 
-        .section-card-header {
-            padding: 1rem;
+    @media (max-width: 576px) {
+        .table {
+            min-width: 300px;
+            font-size: 0.65rem;
+        }
+        .table th,
+        .table td {
+            padding: 0.3rem 0.4rem;
+        }
+        .badge-tingkat,
+        .badge-jurusan,
+        .badge-gender {
+            font-size: 0.55rem;
+            padding: 2px 6px;
+        }
+        .badge-siswa {
+            font-size: 0.55rem;
+            padding: 2px 6px;
         }
     }
 </style>
 
-<div class="container-fluid px-3 px-md-4 mt-3">
-
-    {{-- PAGE TITLE BAR --}}
-    <div class="page-title-bar fade-in">
-        <div class="title-inner">
+<div class="container-fluid px-4">
+    <div class="page-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap">
             <div>
-                <h1>Detail Rombel</h1>
-                <p class="subtitle">{{ $rombel->nama }}</p>
+                <h3><i class="fas fa-users me-2"></i> Detail Rombel</h3>
+                <div class="text-muted">{{ $rombel->nama }}</div>
             </div>
-            <a href="{{ request()->header('referer') ?: route('kurikulum.kelas.index') }}" class="btn-back">
-                <i class="fas fa-arrow-left"></i>
-                <span class="d-none d-sm-inline">Kembali</span>
-            </a>
-        </div>
-        <div class="d-flex gap-2">
-            <a href="{{ route('kurikulum.kelas.export', $rombel->id) }}" class="btn btn-success">
-                <i class="fas fa-file-excel me-2"></i> Export Rombel
-            </a>
-            <a href="{{ request()->header('referer') ?: route('kurikulum.kelas.index') }}" class="btn btn-outline-secondary">
-                <i class="fa fa-arrow-left me-2"></i> Kembali
-            </a>
+            <div class="d-flex gap-2">
+                <a href="{{ route('kurikulum.kelas.export', $rombel->id) }}" class="btn-export">
+                    <i class="fas fa-file-excel"></i> Export
+                </a>
+                <a href="{{ route('kurikulum.kelas.index') }}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+            </div>
         </div>
     </div>
 
-    {{-- INFO ROMBEL --}}
-    <div class="info-card fade-in-1">
-        <div class="info-card-body">
-
-            <div class="info-item">
-                <div class="info-icon">
-                    <i class="fas fa-layer-group"></i>
-                </div>
-                <div>
-                    <p class="info-label">Tingkat</p>
-                    <p class="info-value">{{ $rombel->kelas->tingkat ?? '-' }}</p>
+    <!-- INFO ROMBEL -->
+    <div class="info-card">
+        <div class="card-header">
+            <h5><i class="fas fa-id-card"></i> Informasi Rombel</h5>
+        </div>
+        <div class="card-body">
+            <div class="info-row">
+                <div class="info-label">Nama Rombel</div>
+                <div class="info-value"><strong>{{ $rombel->nama }}</strong></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Tingkat</div>
+                <div class="info-value">
+                    <span class="badge-tingkat">Kelas {{ $rombel->kelas->tingkat ?? '-' }}</span>
                 </div>
             </div>
-
-            <div class="info-item">
-                <div class="info-icon">
-                    <i class="fas fa-graduation-cap"></i>
-                </div>
-                <div>
-                    <p class="info-label">Jurusan</p>
-                    <p class="info-value">{{ $rombel->kelas->jurusan->nama ?? '-' }}</p>
+            <div class="info-row">
+                <div class="info-label">Jurusan</div>
+                <div class="info-value">
+                    <span class="badge-jurusan">{{ optional($rombel->kelas->jurusan)->nama ?? '-' }}</span>
                 </div>
             </div>
-
-            <div class="info-item">
-                <div class="info-icon">
-                    <i class="fas fa-user-tie"></i>
-                </div>
-                <div>
-                    <p class="info-label">Wali Kelas</p>
-                    <p class="info-value">{{ $rombel->guru->nama ?? '-' }}</p>
+            <div class="info-row">
+                <div class="info-label">Wali Kelas</div>
+                <div class="info-value">{{ optional($rombel->guru)->nama ?? '-' }}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Total Siswa</div>
+                <div class="info-value">
+                    <span class="badge-siswa">{{ $rombel->siswa->count() }}</span>
                 </div>
             </div>
-
         </div>
     </div>
 
-    {{-- DAFTAR SISWA --}}
-    <div class="section-card fade-in-2">
-        <div class="section-card-header">
-            <h5>Daftar Siswa</h5>
-            <span class="total-badge">
-                <i class="fas fa-users me-1"></i>
-                {{ count($rombel->siswa) }} Siswa
-            </span>
+    <!-- DAFTAR SISWA -->
+    <div class="info-card">
+        <div class="card-header">
+            <h5><i class="fas fa-user-graduate"></i> Daftar Siswa</h5>
+            <span class="badge bg-primary ms-auto">{{ $rombel->siswa->count() }}</span>
         </div>
-
-        {{-- DESKTOP TABLE --}}
-        <div class="table-responsive d-none d-md-block">
-            <table class="table table-hover mb-0">
-                <thead>
-                    <tr>
-                        <th style="width: 56px;">No</th>
-                        <th>Nama Siswa</th>
-                        <th>NIS</th>
-                        <th>Jenis Kelamin</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($rombel->siswa as $siswa)
-                        <tr>
-                            <td class="td-no">{{ $loop->iteration }}</td>
-                            <td class="fw-medium">{{ $siswa->nama_lengkap }}</td>
-                            <td class="text-muted">{{ $siswa->nis }}</td>
-                            <td>
-                                @php
-                                    $gender = strtolower($siswa->jenis_kelamin ?? '');
-                                    $isLaki = str_contains($gender, 'laki');
-                                @endphp
-                                <span class="badge-gender {{ $isLaki ? 'laki' : 'perempuan' }}">
-                                    {{ $siswa->jenis_kelamin ?? '-' }}
-                                </span>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-4">
-                                <i class="fas fa-users fa-2x mb-2 d-block" style="color:#CBD5E1;"></i>
-                                Belum ada siswa di rombel ini.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        {{-- MOBILE CARD LIST --}}
-        <div class="d-md-none">
-            @forelse($rombel->siswa as $siswa)
-                @php
-                    $gender = strtolower($siswa->jenis_kelamin ?? '');
-                    $isLaki = str_contains($gender, 'laki');
-                @endphp
-                <div class="mobile-item">
-                    <div class="mobile-top">
-                        <div class="mobile-name">{{ $siswa->nama_lengkap }}</div>
-                        <span class="badge-gender {{ $isLaki ? 'laki' : 'perempuan' }} flex-shrink-0">
-                            {{ $siswa->jenis_kelamin ?? '-' }}
-                        </span>
-                    </div>
-                    <div class="mobile-meta">
-                        <span><span class="meta-label">NIS</span> {{ $siswa->nis }}</span>
-                        <span><span class="meta-label">No</span> {{ $loop->iteration }}</span>
-                    </div>
+        <div class="card-body p-0">
+            @if($rombel->siswa->count() > 0)
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th width="5%">No</th>
+                                <th>Nama Siswa</th>
+                                <th>NIS</th>
+                                <th>Jenis Kelamin</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($rombel->siswa as $key => $siswa)
+                                <tr>
+                                    <td>{{ $key + 1 }}</td>
+                                    <td><span class="fw-semibold">{{ $siswa->nama_lengkap }}</span></td>
+                                    <td>{{ $siswa->nis ?? '-' }}</td>
+                                    <td>
+                                        @php
+                                            $gender = strtolower($siswa->jenis_kelamin ?? '');
+                                            $isLaki = str_contains($gender, 'laki');
+                                        @endphp
+                                        <span class="badge-gender {{ $isLaki ? 'laki' : 'perempuan' }}">
+                                            {{ $siswa->jenis_kelamin ?? '-' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
-            @empty
-                <div class="mobile-empty">
-                    <i class="fas fa-users"></i>
-                    Belum ada siswa di rombel ini.
+            @else
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p>Belum ada siswa di rombel ini</p>
                 </div>
-            @endforelse
+            @endif
         </div>
     </div>
 
+    <!-- ACTION BUTTONS -->
+    <div class="action-buttons">
+        <a href="{{ route('kurikulum.kelas.edit', $rombel->id) }}" class="btn btn-warning" style="font-weight:600; padding:0.4rem 1.2rem; border-radius:10px;">
+            <i class="fas fa-edit"></i> Edit Rombel
+        </a>
+    </div>
 </div>
 @endsection

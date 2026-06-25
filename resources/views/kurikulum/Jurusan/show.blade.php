@@ -1,576 +1,404 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Jurusan - ' . $jurusan->nama)
+@section('title', 'Detail Jurusan')
 
 @section('content')
 <style>
-    /* ===================== STYLE DETAIL JURUSAN - RESPONSIVE ===================== */
-    
     :root {
-        --primary-color: #2F53FF;
-        --secondary-color: #6366F1;
-        --success-color: #10B981;
-        --warning-color: #F59E0B;
-        --danger-color: #EF4444;
-        --light-bg: #F8FAFC;
-        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
-        background-color: var(--light-bg);
+        background-color: #f7fafc;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    /* Page Header */
-    h2.fw-bold {
-        font-size: 28px;
-        color: #1E293B;
-        font-weight: 700;
-        margin-bottom: 0.25rem !important;
+    main {
+        padding: 20px 15px !important;
+        overflow-x: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
-    p.text-muted {
-        color: #64748B !important;
-        font-size: 15px;
-        margin-bottom: 1.5rem !important;
+    .container-fluid {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 10px !important;
+        overflow-x: auto !important;
     }
 
-    /* Card Styles */
-    .card {
-        border-radius: 15px !important;
-        border: none;
+    .page-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 1.5rem 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 1.5rem;
         box-shadow: var(--card-shadow);
-        transition: all 0.3s ease;
-        margin-bottom: 1.5rem;
-    }
-
-    .card:hover {
-        box-shadow: var(--hover-shadow);
-    }
-
-    .card-body {
-        padding: 2rem;
-    }
-
-    .card-body h5 {
-        font-weight: 600;
-        color: #1E293B;
-        font-size: 18px;
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 2px solid #E2E8F0;
-    }
-
-    /* Table Styles */
-    .table-borderless {
-        margin-bottom: 0;
-    }
-
-    .table-borderless tr {
-        transition: background-color 0.2s ease;
-    }
-
-    .table-borderless tr:hover {
-        background-color: rgba(47, 83, 255, 0.03);
-    }
-
-    .table-borderless td {
-        padding: 12px 8px;
-        vertical-align: top;
-        font-size: 15px;
-        color: #334155;
-    }
-
-    .table-borderless td:first-child {
-        font-weight: 500;
-        color: #64748B;
-        width: 150px;
-    }
-
-    .table-borderless td:last-child {
-        color: #1E293B;
-        font-weight: 400;
-    }
-
-    /* Table Hover */
-    .table-responsive {
-        border-radius: 12px;
+        position: relative;
         overflow: hidden;
+        width: 100%;
     }
 
-    .table-hover thead {
-        background-color: #F8FAFC;
+    .page-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(100px, -100px);
+        pointer-events: none;
     }
 
-    .table-hover thead th {
-        color: #475569;
-        font-weight: 600;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 2px solid #E2E8F0;
-        padding: 1rem;
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        font-size: 1.3rem;
+        position: relative;
+        z-index: 1;
     }
 
-    .table-hover tbody tr {
-        transition: all 0.2s ease;
-        border-bottom: 1px solid #F1F5F9;
+    .page-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 0.9rem;
+        position: relative;
+        z-index: 1;
     }
 
-    .table-hover tbody tr:hover {
-        background-color: rgba(47, 83, 255, 0.03);
-        transform: scale(1.01);
-    }
-
-    .table-hover tbody td {
-        padding: 1rem;
-        vertical-align: middle;
-        color: #334155;
-        font-size: 14px;
-    }
-
-    /* Action Buttons */
-    .action-buttons {
-        display: flex;
-        gap: 10px;
-        margin-top: 1.5rem;
-        flex-wrap: wrap;
-    }
-
-    .btn {
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-weight: 500;
-        font-size: 14px;
-        transition: all 0.3s ease;
+    .btn-back {
+        background: rgba(255, 255, 255, 0.2);
         border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.4rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
     }
 
-    .btn-secondary {
-        background-color: #E2E8F0;
-        color: #475569;
-    }
-
-    .btn-secondary:hover {
-        background-color: #CBD5E1;
-        color: #334155;
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
         transform: translateY(-2px);
     }
 
-    .btn-primary {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    .btn-edit {
+        background: #F59E0B;
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.4rem 1.2rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .btn-edit:hover {
+        background: #D97706;
+        transform: translateY(-2px);
         color: white;
     }
 
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(47, 83, 255, 0.4);
+    .info-card {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        width: 100%;
+        margin-bottom: 1.5rem;
     }
 
-    /* Empty State */
+    .info-card .card-header {
+        background: white;
+        border-bottom: 1px solid #E2E8F0;
+        padding: 0.8rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .info-card .card-header h5 {
+        margin: 0;
+        font-weight: 700;
+        color: #1E293B;
+        font-size: 1rem;
+    }
+
+    .info-card .card-header h5 i {
+        color: #667eea;
+        margin-right: 6px;
+    }
+
+    .info-card .card-body {
+        padding: 1.2rem 1.5rem;
+    }
+
+    .info-row {
+        display: flex;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #F1F5F9;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        width: 180px;
+        font-weight: 600;
+        color: #64748B;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
+
+    .info-value {
+        flex: 1;
+        color: #1E293B;
+        font-size: 0.9rem;
+    }
+
+    .badge-kode {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 3px 12px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    .badge-jumlah {
+        background: #13B497;
+        color: white;
+        padding: 3px 12px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        width: 100%;
+        min-width: 400px;
+        margin-bottom: 0;
+        font-size: 0.85rem;
+    }
+
+    .table th {
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: #64748B;
+        padding: 0.6rem 0.8rem;
+        white-space: nowrap;
+        background-color: #F8FAFC;
+        border-bottom: none;
+    }
+
+    .table td {
+        padding: 0.6rem 0.8rem;
+        vertical-align: middle;
+        border-color: #E2E8F0;
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(102, 126, 234, 0.03);
+    }
+
     .empty-state {
         text-align: center;
-        padding: 2rem;
-        color: #64748B;
+        padding: 2rem 1rem;
+        color: #94A3B8;
     }
 
-    /* Animations */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .empty-state i {
+        font-size: 2rem;
+        color: #CBD5E1;
+        display: block;
+        margin-bottom: 0.5rem;
     }
 
-    .card {
-        animation: fadeIn 0.4s ease-out;
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 1rem;
     }
 
-    .card:nth-child(1) { animation-delay: 0.05s; }
-    .card:nth-child(2) { animation-delay: 0.1s; }
-
-    /* ===================== RESPONSIVE STYLES ===================== */
-
-    /* Tablet (max-width: 991px) */
-    @media (max-width: 991px) {
-        h2.fw-bold {
-            font-size: 24px;
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1rem 1rem;
+        }
+        .page-header h3 {
+            font-size: 1.1rem;
+        }
+        .page-header .text-muted {
+            font-size: 0.75rem;
         }
 
-        p.text-muted {
-            font-size: 14px;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .card-body h5 {
-            font-size: 17px;
-        }
-
-        .table-borderless td:first-child {
-            width: 140px;
-        }
-
-        .table-hover thead th,
-        .table-hover tbody td {
-            font-size: 13px;
-            padding: 0.75rem;
-        }
-    }
-
-    /* Mobile (max-width: 767px) */
-    @media (max-width: 767px) {
-        .container-fluid {
-            padding-left: 15px;
-            padding-right: 15px;
-        }
-
-        /* Page Header */
-        h2.fw-bold {
-            font-size: 22px;
-            margin-bottom: 0.5rem !important;
-        }
-
-        p.text-muted {
-            font-size: 14px;
-            margin-bottom: 1.25rem !important;
-        }
-
-        /* Card */
-        .card {
-            border-radius: 12px !important;
-            margin-bottom: 1.25rem;
-        }
-
-        .card-body {
-            padding: 1.25rem;
-        }
-
-        .card-body h5 {
-            font-size: 16px;
-            margin-bottom: 1.25rem;
-            padding-bottom: 0.5rem;
-        }
-
-        /* Info Section - Stack columns */
-        .row > .col-md-6 {
-            margin-bottom: 1.5rem;
-        }
-
-        .row > .col-md-6:last-child {
-            margin-bottom: 0;
-        }
-
-        /* Table Borderless - Vertical Layout */
-        .table-borderless tr {
-            display: flex;
+        .info-row {
             flex-direction: column;
-            padding: 10px 0;
-            border-bottom: 1px solid #F1F5F9;
+            padding: 0.6rem 0;
         }
 
-        .table-borderless tr:last-child {
-            border-bottom: none;
+        .info-label {
+            width: 100%;
+            font-size: 0.75rem;
+            margin-bottom: 2px;
         }
 
-        .table-borderless td {
-            padding: 4px 0;
-            width: 100% !important;
+        .info-value {
+            font-size: 0.85rem;
         }
 
-        .table-borderless td:first-child {
-            font-size: 13px;
-            color: #64748B;
-            margin-bottom: 4px;
+        .info-card .card-header {
+            padding: 0.6rem 1rem;
         }
 
-        .table-borderless td:last-child {
-            font-size: 14px;
-            color: #1E293B;
-            padding-left: 0;
+        .info-card .card-body {
+            padding: 0.8rem 1rem;
         }
 
-        /* Table Hover - Responsive */
-        .table-responsive {
-            margin: -1rem;
-            padding: 1rem;
+        .table {
+            min-width: 350px;
+            font-size: 0.75rem;
+        }
+        .table th,
+        .table td {
+            padding: 0.4rem 0.5rem;
         }
 
-        .table-hover {
-            font-size: 13px;
-        }
-
-        .table-hover thead {
-            display: none; /* Hide header on mobile */
-        }
-
-        .table-hover tbody tr {
-            display: block;
-            margin-bottom: 1rem;
-            border: 1px solid #E2E8F0;
-            border-radius: 8px;
-            padding: 1rem;
-        }
-
-        .table-hover tbody tr:hover {
-            transform: none;
-        }
-
-        .table-hover tbody td {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            border: none;
-        }
-
-        .table-hover tbody td::before {
-            content: attr(data-label);
-            font-weight: 600;
-            color: #64748B;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Add data-label attribute via inline styles won't work, 
-           so we'll use nth-child selectors */
-        .table-hover tbody td:nth-child(1)::before {
-            content: "No";
-        }
-
-        .table-hover tbody td:nth-child(2)::before {
-            content: "Tingkat";
-        }
-
-        .table-hover tbody td:nth-child(3)::before {
-            content: "Nama Kelas";
-        }
-
-        .table-hover tbody td:nth-child(4)::before {
-            content: "Total Rombel";
-        }
-
-        /* Empty state */
-        .table-hover tbody tr td[colspan] {
-            display: block;
-            text-align: center;
-            padding: 1.5rem;
-        }
-
-        .table-hover tbody tr td[colspan]::before {
-            display: none;
-        }
-
-        /* Action Buttons */
         .action-buttons {
             flex-direction: column;
-            gap: 8px;
-            margin-top: 1.25rem;
         }
-
         .action-buttons .btn {
             width: 100%;
             justify-content: center;
         }
     }
 
-    /* Small Mobile (max-width: 480px) */
-    @media (max-width: 480px) {
-        h2.fw-bold {
-            font-size: 20px;
+    @media (max-width: 576px) {
+        .table {
+            min-width: 300px;
+            font-size: 0.65rem;
         }
-
-        p.text-muted {
-            font-size: 13px;
+        .table th,
+        .table td {
+            padding: 0.3rem 0.4rem;
         }
-
-        .card-body {
-            padding: 1rem;
-        }
-
-        .card-body h5 {
-            font-size: 15px;
-            margin-bottom: 1rem;
-        }
-
-        .table-borderless td:first-child {
-            font-size: 12px;
-        }
-
-        .table-borderless td:last-child {
-            font-size: 13px;
-        }
-
-        .table-hover {
-            font-size: 12px;
-        }
-
-        .table-hover tbody tr {
-            padding: 0.875rem;
-        }
-
-        .table-hover tbody td {
-            padding: 0.4rem 0;
-            font-size: 13px;
-        }
-
-        .table-hover tbody td::before {
-            font-size: 11px;
-        }
-
-        .btn {
-            font-size: 13px;
-            padding: 9px 16px;
-        }
-    }
-
-    /* Desktop (min-width: 1200px) */
-    @media (min-width: 1200px) {
-        .container-fluid {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        h2.fw-bold {
-            font-size: 30px;
-        }
-
-        p.text-muted {
-            font-size: 16px;
-        }
-
-        .card-body {
-            padding: 2.5rem;
-        }
-
-        .card-body h5 {
-            font-size: 19px;
-        }
-
-        .table-borderless td {
-            font-size: 16px;
-            padding: 14px 10px;
-        }
-
-        .table-borderless td:first-child {
-            width: 180px;
-        }
-
-        .table-hover thead th,
-        .table-hover tbody td {
-            padding: 1.25rem;
-            font-size: 15px;
-        }
-    }
-
-    /* Print Styles */
-    @media print {
-        .action-buttons {
-            display: none !important;
-        }
-
-        .card {
-            box-shadow: none;
-            border: 1px solid #ddd;
-            page-break-inside: avoid;
-        }
-
-        .card-body {
-            padding: 1rem;
-        }
-
-        .table-hover tbody tr:hover {
-            transform: none;
-            background-color: transparent;
+        .badge-kode,
+        .badge-jumlah {
+            font-size: 0.6rem;
+            padding: 2px 8px;
         }
     }
 </style>
 
-<div class="container-fluid">
-    <h2 class="fw-bold mb-1">Detail Jurusan</h2>
-    <p class="text-muted mb-4">{{ $jurusan->nama }}</p>
-
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>Informasi Jurusan</h5>
-                    <table class="table table-borderless">
-                        <tbody>
-                            <tr>
-                                <td>ID Jurusan</td>
-                                <td>: {{ $jurusan->id }}</td>
-                            </tr>
-                            <tr>
-                                <td>Kode Jurusan</td>
-                                <td>: {{ $jurusan->kode }}</td>
-                            </tr>
-                            <tr>
-                                <td>Nama Jurusan</td>
-                                <td>: {{ $jurusan->nama }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <h5>Statistik</h5>
-                    <table class="table table-borderless">
-                        <tbody>
-                            <tr>
-                                <td>Total Kelas</td>
-                                <td>: {{ $jurusan->kelas->count() }} kelas</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+<div class="container-fluid px-4">
+    <div class="page-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap">
+            <div>
+                <h3><i class="fas fa-building me-2"></i> Detail Jurusan</h3>
+                <div class="text-muted">Informasi lengkap jurusan</div>
+            </div>
+            <div>
+                <a href="{{ route('kurikulum.jurusan.index') }}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
             </div>
         </div>
     </div>
 
-    <div class="card shadow-sm border-0">
+    <!-- INFO JURUSAN -->
+    <div class="info-card">
+        <div class="card-header">
+            <h5><i class="fas fa-id-card"></i> Informasi Jurusan</h5>
+        </div>
         <div class="card-body">
-            <h5>Daftar Kelas</h5>
-            
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Tingkat</th>
-                            <th>Nama Kelas</th>
-                            <th>Total Rombel</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($jurusan->kelas as $kelas)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $kelas->tingkat }}</td>
-                                <td>{{ $kelas->tingkat }} {{ $jurusan->nama }}</td>
-                                <td>{{ $kelas->rombels->count() }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="text-center empty-state">
-                                    Belum ada kelas di jurusan ini.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+            <div class="info-row">
+                <div class="info-label">Kode Jurusan</div>
+                <div class="info-value"><span class="badge-kode">{{ $jurusan->kode }}</span></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Nama Jurusan</div>
+                <div class="info-value"><strong>{{ $jurusan->nama }}</strong></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Total Kelas</div>
+                <div class="info-value"><span class="badge-jumlah">{{ $jurusan->kelas->count() }} Kelas</span></div>
             </div>
         </div>
     </div>
 
+    <!-- DAFTAR KELAS -->
+    <div class="info-card">
+        <div class="card-header">
+            <h5><i class="fas fa-school"></i> Daftar Kelas</h5>
+        </div>
+        <div class="card-body p-0">
+            @if($jurusan->kelas->count() > 0)
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th width="5%">No</th>
+                                <th>Tingkat</th>
+                                <th>Nama Kelas</th>
+                                <th class="text-center">Total Rombel</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($jurusan->kelas as $key => $kelas)
+                                <tr>
+                                    <td>{{ $key + 1 }}</td>
+                                    <td><span class="fw-semibold">Kelas {{ $kelas->tingkat }}</span></td>
+                                    <td>{{ $kelas->tingkat }} {{ $jurusan->nama }}</td>
+                                    <td class="text-center">
+                                        <span class="badge-jumlah">{{ $kelas->rombels->count() }}</span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p>Belum ada kelas di jurusan ini</p>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- ACTION BUTTONS -->
     <div class="action-buttons">
-        <a href="{{ route('kurikulum.jurusan.index') }}" class="btn btn-secondary">Kembali</a>
-        <a href="{{ route('kurikulum.jurusan.edit', $jurusan->id) }}" class="btn btn-primary">Edit Jurusan</a>
+        <a href="{{ route('kurikulum.jurusan.edit', $jurusan->id) }}" class="btn-edit">
+            <i class="fas fa-edit"></i> Edit Jurusan
+        </a>
     </div>
 </div>
 @endsection

@@ -184,6 +184,15 @@ class GuruImport implements ToModel, WithStartRow, SkipsEmptyRows, WithHeadingRo
             $rombel_id = !empty($normalizedRow['rombel_id']) ? (int)$normalizedRow['rombel_id'] : null;
             $jurusan_id = !empty($normalizedRow['jurusan_id']) ? (int)$normalizedRow['jurusan_id'] : null;
 
+                $nomor_induk = trim($normalizedRow['nomor_induk'] ?? '');
+    
+    // CEK APAKAH NOMOR INDUK MILIK SUPER ADMIN
+    $superAdmin = User::where('nomor_induk', $nomor_induk)->where('role', 'super_admin')->first();
+    if ($superAdmin) {
+        $this->errors[] = "SKIP: Nomor induk {$nomor_induk} milik SUPER ADMIN, tidak bisa diimport!";
+        return null;
+    }
+
             // Validate and normalize role - map to valid enum values
             $validRoles = ['siswa', 'guru', 'walikelas', 'kaprog', 'tu', 'kurikulum', 'calon_siswa'];
             $normalizedRole = $this->normalizeRole($role);
@@ -215,26 +224,32 @@ class GuruImport implements ToModel, WithStartRow, SkipsEmptyRows, WithHeadingRo
                 $email = strtolower(str_replace(' ', '', $nama)) . "." . time() . "@smkn1x.sch.id";
             }
 
-            // Check if user already exists
-            $existingUser = User::where('nomor_induk', $nomor_induk)->first();
-            if ($existingUser) {
-                // Update existing user
-                $user = $existingUser;
-                $user->update([
-                    'name' => $nama,
-                    'email' => $email,
-                    'role' => $role,
-                ]);
-            } else {
-                // Create new user
-                $user = User::create([
-                    'name' => $nama,
-                    'nomor_induk' => $nomor_induk,
-                    'email' => $email,
-                    'password' => Hash::make($this->defaultPassword),
-                    'role' => $role,
-                ]);
-            }
+// Check if user already exists
+$existingUser = User::where('nomor_induk', $nomor_induk)->first();
+if ($existingUser) {
+    // ✅ TAMBAHKAN PENGECUALIAN UNTUK SUPER ADMIN
+    if ($existingUser->role === 'super_admin') {
+        $this->errors[] = "SKIP: User {$nama} dengan nomor induk {$nomor_induk} adalah SUPER ADMIN, tidak bisa diupdate via import guru!";
+        return null; // LEWATI, JANGAN UPDATE
+    }
+    
+    // Update existing user (kecuali super admin)
+    $user = $existingUser;
+    $user->update([
+        'name' => $nama,
+        'email' => $email,
+        'role' => $role,
+    ]);
+} else {
+    // Create new user (kode tetap sama)
+    $user = User::create([
+        'name' => $nama,
+        'nomor_induk' => $nomor_induk,
+        'email' => $email,
+        'password' => Hash::make($this->defaultPassword),
+        'role' => $role,
+    ]);
+}
 
             // Check if guru already exists
             $guru = Guru::where('nip', $nomor_induk)->first();

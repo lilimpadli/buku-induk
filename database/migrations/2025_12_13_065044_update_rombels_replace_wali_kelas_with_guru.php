@@ -10,7 +10,7 @@ return new class extends Migration
 {
     Schema::table('rombels', function (Blueprint $table) {
         // pastikan kolom nullable
-        $table->unsignedBigInteger('guru_id')->nullable()->change();
+        $table->renameColumn('wali_kelas_id', 'guru_id');
     });
 
     // bersihkan data lama yang tidak valid

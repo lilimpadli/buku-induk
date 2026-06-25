@@ -5,54 +5,61 @@ namespace App\Http\Controllers\Kurikulum;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\KonsentrasiKeahlian;
-use App\Models\BidangKeahlian;
 
 class KonsentrasiKeahlianController extends Controller
 {
     public function index()
     {
-        $konsentrasi = KonsentrasiKeahlian::with('bidang')->get();
+        $konsentrasi = KonsentrasiKeahlian::all();
         return view('kurikulum.konsentrasi_keahlian.index', compact('konsentrasi'));
     }
 
     public function create()
     {
-        $bidang = BidangKeahlian::all();
-        return view('kurikulum.konsentrasi_keahlian.create', compact('bidang'));
+        return view('kurikulum.konsentrasi_keahlian.create');
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'nama_konsentrasi' => 'required',
-            'id_bidang' => 'required|exists:bidang_keahlian,id',
         ]);
-        KonsentrasiKeahlian::create($request->only('nama_konsentrasi', 'id_bidang'));
-        return redirect()->route('kurikulum.konsentrasi-keahlian.index')->with('success', 'Konsentrasi Keahlian berhasil ditambahkan');
+
+        KonsentrasiKeahlian::create([
+            'nama_konsentrasi' => $request->nama_konsentrasi,
+        ]);
+
+        return redirect()->route('kurikulum.konsentrasi-keahlian.index')
+            ->with('success', 'Konsentrasi Keahlian berhasil ditambahkan');
     }
 
     public function edit($id)
     {
         $konsentrasi = KonsentrasiKeahlian::findOrFail($id);
-        $bidang = BidangKeahlian::all();
-        return view('kurikulum.konsentrasi_keahlian.edit', compact('konsentrasi', 'bidang'));
+        return view('kurikulum.konsentrasi_keahlian.edit', compact('konsentrasi'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
             'nama_konsentrasi' => 'required',
-            'id_bidang' => 'required|exists:bidang_keahlian,id',
         ]);
+
         $konsentrasi = KonsentrasiKeahlian::findOrFail($id);
-        $konsentrasi->update($request->only('nama_konsentrasi', 'id_bidang'));
-        return redirect()->route('kurikulum.konsentrasi-keahlian.index')->with('success', 'Konsentrasi Keahlian berhasil diupdate');
+        $konsentrasi->update([
+            'nama_konsentrasi' => $request->nama_konsentrasi,
+        ]);
+
+        return redirect()->route('kurikulum.konsentrasi-keahlian.index')
+            ->with('success', 'Konsentrasi Keahlian berhasil diperbarui');
     }
 
     public function destroy($id)
     {
         $konsentrasi = KonsentrasiKeahlian::findOrFail($id);
         $konsentrasi->delete();
-        return redirect()->route('kurikulum.konsentrasi-keahlian.index')->with('success', 'Konsentrasi Keahlian berhasil dihapus');
+
+        return redirect()->route('kurikulum.konsentrasi-keahlian.index')
+            ->with('success', 'Konsentrasi Keahlian berhasil dihapus');
     }
 }

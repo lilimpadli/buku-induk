@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class RoleMiddleware
 {
@@ -15,36 +16,44 @@ class RoleMiddleware
         }
 
         $user = Auth::user();
-        $userRole = strtolower(trim($user->role));
-        
-        // --- PERBAIKAN: Menambahkan logika "alias" ---
-        // Jika user adalah 'tu_kepegawaian', kita perlakukan seolah-olah dia memiliki role 'tu'
-        if ($userRole === 'tu_kepegawaian') {
-            $userRole = 'tu';
-        }
-        // ---------------------------------------------
+        $userRole = $this->normalizeRole($user->role);
 
-        $allowedRoles = array_map(function($role) {
-            return strtolower(trim($role));
+        // Normalize allowed roles passed to middleware
+        $normalizedRoles = array_map(function($r) {
+            return $this->normalizeRole($r);
         }, $roles);
 
-        if (!in_array($userRole, $allowedRoles)) {
-            abort(403, 'Akses ditolak! Role Anda saat ini adalah: "' . $user->role . '" sedangkan yang diizinkan adalah: ' . implode(', ', $allowedRoles));
+        if (!in_array($userRole, $normalizedRoles)) {
+            abort(403, 'Anda tidak punya akses.');
         }
 
-        // Validasi role-specific records
-        if (in_array('guru', $allowedRoles) && $userRole === 'guru') {
+        // Validasi role-specific records di database
+        // Role guru harus punya record di tabel gurus
+        if (in_array('guru', $normalizedRoles) && $userRole === 'guru') {
             if (!$user->guru) {
                 abort(403, 'Anda bukan guru.');
             }
         }
 
-        if (in_array('walikelas', $allowedRoles) && $userRole === 'walikelas') {
+        // Role walikelas harus punya record di tabel gurus dengan status wali kelas
+        if (in_array('walikelas', $normalizedRoles) && $userRole === 'walikelas') {
             if (!$user->guru) {
                 abort(403, 'Anda bukan wali kelas.');
             }
         }
 
         return $next($request);
+    }
+
+    /**
+     * Normalize role string to a canonical form (lowercase, underscores)
+     */
+    private function normalizeRole($role)
+    {
+        return Str::of($role)
+            ->lower()
+            ->replace(' ', '_')
+            ->replace('-', '_')
+            ->__toString();
     }
 }
