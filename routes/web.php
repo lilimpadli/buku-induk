@@ -495,7 +495,9 @@ Route::prefix('tu')
         Route::get('/dashboard', [TUController::class, 'dashboard'])
             ->name('dashboard');
 
-        // Data Siswa
+        // ============================================================
+        // DATA SISWA
+        // ============================================================
         Route::get('/siswa', [TUController::class, 'siswa'])->name('siswa.index');
         Route::get('/siswa/export', [TUController::class, 'exportSiswaExcel'])->name('siswa.export');
         Route::get('/siswa/export/kelas', [TUController::class, 'exportSiswaByKelas'])->name('siswa.exportByKelas');
@@ -503,7 +505,6 @@ Route::prefix('tu')
         Route::get('/siswa/export/aktif', [TUController::class, 'exportSiswaAktif'])->name('siswa.exportAktif');
         Route::get('/siswa/template', [TUController::class, 'downloadTemplate'])->name('siswa.template');
         Route::post('/siswa/import', [TUController::class, 'importSiswa'])->name('siswa.import');
-        // TU: tambah siswa
         Route::get('/siswa/create', [TUController::class, 'siswaCreate'])->name('siswa.create');
         Route::post('/siswa', [TUController::class, 'siswaStore'])->name('siswa.store');
         Route::get('/siswa/{id}', [TUController::class, 'siswaDetail'])->name('siswa.detail');
@@ -511,7 +512,10 @@ Route::prefix('tu')
         Route::put('/siswa/{id}', [TUController::class, 'siswaUpdate'])->name('siswa.update');
         Route::delete('/siswa/{id}', [TUController::class, 'siswaDestroy'])->name('siswa.destroy');
         Route::get('/siswa/{id}/export', [TUController::class, 'siswaExportPDF'])->name('siswa.exportPDF');
-        // Data Pribadi
+
+        // ============================================================
+        // DATA PRIBADI
+        // ============================================================
         Route::get('/data-pribadi', [DataPribadiController::class, 'index'])
             ->name('data-pribadi.index');
         Route::get('/data-pribadi/edit', [DataPribadiController::class, 'edit'])
@@ -519,7 +523,9 @@ Route::prefix('tu')
         Route::put('/data-pribadi', [DataPribadiController::class, 'update'])
             ->name('data-pribadi.update');
 
-        // Kelas TU
+        // ============================================================
+        // KELAS TU
+        // ============================================================
         Route::get('/kelas', [TUController::class, 'kelas'])->name('kelas.index');
         Route::get('/kelas/create', [TUController::class, 'kelasCreate'])->name('kelas.create');
         Route::post('/kelas', [TUController::class, 'kelasStore'])->name('kelas.store');
@@ -532,41 +538,42 @@ Route::prefix('tu')
         Route::put('/kelas/{id}', [TUController::class, 'kelasUpdate'])->name('kelas.update');
         Route::delete('/kelas/{id}', [TUController::class, 'kelasDestroy'])->name('kelas.destroy');
 
-        // Buku Induk
-        Route::get('/buku-induk', [BukuIndukController::class, 'index'])
-            ->name('buku-induk.index');
-        Route::get('/buku-induk/export/siswa', [BukuIndukController::class, 'exportSiswa'])
-            ->name('buku-induk.export.siswa');
-        Route::get('/buku-induk/export/nilai', [BukuIndukController::class, 'exportNilai'])
-            ->name('buku-induk.export.nilai');
-        Route::get('/buku-induk/export/pkl', [BukuIndukController::class, 'exportPkl'])
-            ->name('buku-induk.export.pkl');
-        Route::post('/buku-induk/import/siswa', [BukuIndukController::class, 'importSiswa'])
-            ->name('buku-induk.import.siswa');
-        Route::post('/buku-induk/import/nilai', [BukuIndukController::class, 'importNilai'])
-            ->name('buku-induk.import.nilai');
-        Route::post('/buku-induk/import/pkl', [BukuIndukController::class, 'importPkl'])
-            ->name('buku-induk.import.pkl');
-        Route::get('/buku-induk/template/siswa', [BukuIndukController::class, 'downloadTemplateSiswa'])
-            ->name('buku-induk.template.siswa');
-        Route::get('/buku-induk/template/nilai', [BukuIndukController::class, 'downloadTemplateNilai'])
-            ->name('buku-induk.template.nilai');
-        Route::get('/buku-induk/template/pkl', [BukuIndukController::class, 'downloadTemplatePkl'])
-            ->name('buku-induk.template.pkl');
-        Route::get('/buku-induk/template/pkl-ijazah', [BukuIndukController::class, 'downloadTemplatePklIjazah'])
-            ->name('buku-induk.template.pkl-ijazah');
-        Route::post('/buku-induk/template/nilai-filtered', [BukuIndukController::class, 'downloadTemplateNilaiFiltered'])
-            ->name('buku-induk.template.nilai.filtered');
-        Route::get('/buku-induk/{siswa}', [BukuIndukController::class, 'show'])
-            ->name('buku-induk.show');
-        Route::get('/buku-induk/{siswa}/edit', [BukuIndukController::class, 'edit'])
-            ->name('buku-induk.edit');
-        Route::put('/buku-induk/{siswa}', [BukuIndukController::class, 'update'])
-            ->name('buku-induk.update');
-        Route::get('/buku-induk/{siswa}/cetak', [BukuIndukController::class, 'cetak'])
-            ->name('buku-induk.cetak');
+        // ============================================================
+        // BUKU INDUK (FULL)
+        // ============================================================
+        Route::prefix('buku-induk')->name('buku-induk.')->group(function () {
 
-        // Mutasi
+            // INDEX & SHOW
+            Route::get('/', [BukuIndukController::class, 'index'])->name('index');
+            Route::get('/{siswa}', [BukuIndukController::class, 'show'])->name('show');
+            Route::get('/{siswa}/edit', [BukuIndukController::class, 'edit'])->name('edit');
+            Route::put('/{siswa}', [BukuIndukController::class, 'update'])->name('update');
+            Route::get('/{siswa}/cetak', [BukuIndukController::class, 'cetak'])->name('cetak');
+            Route::get('/{siswa}/export', [BukuIndukController::class, 'export'])->name('export');
+
+            // EXPORT (3 jenis)
+            Route::get('/export/siswa', [BukuIndukController::class, 'exportSiswa'])->name('export.siswa');
+            Route::get('/export/nilai', [BukuIndukController::class, 'exportNilai'])->name('export.nilai');
+            Route::get('/export/pkl', [BukuIndukController::class, 'exportPkl'])->name('export.pkl');
+
+            // IMPORT (3 jenis)
+            Route::post('/import/siswa', [BukuIndukController::class, 'importSiswa'])->name('import.siswa');
+            Route::post('/import/nilai', [BukuIndukController::class, 'importNilai'])->name('import.nilai');
+            Route::post('/import/pkl', [BukuIndukController::class, 'importPkl'])->name('import.pkl');
+
+            // TEMPLATE (3 jenis)
+            Route::get('/template/siswa', [BukuIndukController::class, 'downloadTemplateSiswa'])->name('template.siswa');
+            Route::get('/template/nilai', [BukuIndukController::class, 'downloadTemplateNilai'])->name('template.nilai');
+            Route::get('/template/pkl', [BukuIndukController::class, 'downloadTemplatePkl'])->name('template.pkl');
+            Route::get('/template/pkl-ijazah', [BukuIndukController::class, 'downloadTemplatePklIjazah'])->name('template.pkl-ijazah');
+
+            // FILTERED TEMPLATE
+            Route::post('/template/nilai-filtered', [BukuIndukController::class, 'downloadTemplateNilaiFiltered'])->name('template.nilai.filtered');
+        });
+
+        // ============================================================
+        // MUTASI
+        // ============================================================
         Route::get('/mutasi', [MutasiController::class, 'index'])->name('mutasi.index');
         Route::get('/mutasi/create', [MutasiController::class, 'create'])->name('mutasi.create');
         Route::post('/mutasi', [MutasiController::class, 'store'])->name('mutasi.store');
@@ -575,12 +582,16 @@ Route::prefix('tu')
         Route::post('/mutasi/bulk', [MutasiController::class, 'bulk'])->name('mutasi.bulk');
         Route::post('/mutasi/up-all', [MutasiController::class, 'upAll'])->name('mutasi.up-all');
         Route::get('/mutasi/laporan', [MutasiController::class, 'laporan'])->name('mutasi.laporan');
-
-        // Mutasi kelas/rombel
         Route::get('/mutasi/kelas/{id}', [MutasiController::class, 'kelasByJurusan'])->name('mutasi.kelas');
         Route::get('/mutasi/kelas/show/{rombel}', [MutasiController::class, 'showRombel'])->name('mutasi.kelas.show');
+        Route::get('/mutasi/{mutasi}', [MutasiController::class, 'show'])->name('mutasi.show');
+        Route::get('/mutasi/{mutasi}/edit', [MutasiController::class, 'edit'])->name('mutasi.edit');
+        Route::put('/mutasi/{mutasi}', [MutasiController::class, 'update'])->name('mutasi.update');
+        Route::delete('/mutasi/{mutasi}', [MutasiController::class, 'destroy'])->name('mutasi.destroy');
 
-        // Nilai Raport (TU) - mimic walikelas routes for TU role
+        // ============================================================
+        // NILAI RAPORT
+        // ============================================================
         Route::get('/nilai-raport', [TUController::class, 'nilaiRaportIndex'])->name('nilai_raport.index');
         Route::get('/nilai-raport/list/{id}', [TUController::class, 'siswaRaport'])->name('nilai_raport.list');
         Route::get('/nilai-raport/show', [TUController::class, 'nilaiRaportShow'])->name('nilai_raport.show');
@@ -588,39 +599,23 @@ Route::prefix('tu')
         Route::put('/nilai-raport/update', [TUController::class, 'nilaiRaportUpdate'])->name('nilai_raport.update');
         Route::delete('/nilai-raport/delete', [TUController::class, 'nilaiRaportDestroy'])->name('nilai_raport.destroy');
 
-        // Mutasi resource routes
-        Route::get('/mutasi/{mutasi}', [MutasiController::class, 'show'])->name('mutasi.show');
-        Route::get('/mutasi/{mutasi}/edit', [MutasiController::class, 'edit'])->name('mutasi.edit');
-        Route::put('/mutasi/{mutasi}', [MutasiController::class, 'update'])->name('mutasi.update');
-        Route::delete('/mutasi/{mutasi}', [MutasiController::class, 'destroy'])->name('mutasi.destroy');
+        // ============================================================
+        // ALUMNI
+        // ============================================================
+        Route::get('/alumni', [AlumniController::class, 'index'])->name('alumni.index');
+        Route::get('/alumni/jurusan/{jurusanId}', [AlumniController::class, 'byJurusan'])->name('alumni.by-jurusan');
+        Route::get('/alumni/{siswa_id}/buku-induk/cetak', [AlumniController::class, 'bukuIndukCetak'])->name('alumni.buku-induk.cetak');
+        Route::get('/alumni/{siswa_id}/buku-induk', [AlumniController::class, 'bukuInduk'])->name('alumni.buku-induk.show');
+        Route::get('/alumni/{siswa_id}/raport/{semester}/{tahun}/cetak', [AlumniController::class, 'raporCetak'])->name('alumni.raport.cetak');
+        Route::get('/alumni/{siswa_id}/raport/{semester}/{tahun}', [AlumniController::class, 'raporShow'])->name('alumni.raport.show');
+        Route::get('/alumni/{siswa_id}/raport', [AlumniController::class, 'raporList'])->name('alumni.raport.list');
+        Route::get('/alumni/{id}', [AlumniController::class, 'show'])->name('alumni.show');
 
-        // Alumni
-        Route::get('/alumni', [AlumniController::class, 'index'])
-            ->name('alumni.index');
-        Route::get('/alumni/jurusan/{jurusanId}', [AlumniController::class, 'byJurusan'])
-            ->name('alumni.by-jurusan');
-        Route::get('/alumni/{siswa_id}/buku-induk/cetak', [AlumniController::class, 'bukuIndukCetak'])
-            ->name('alumni.buku-induk.cetak');
-        Route::get('/alumni/{siswa_id}/buku-induk', [AlumniController::class, 'bukuInduk'])
-            ->name('alumni.buku-induk.show');
-        Route::get('/alumni/{siswa_id}/raport/{semester}/{tahun}/cetak', [AlumniController::class, 'raporCetak'])
-            ->name('alumni.raport.cetak');
-        Route::get('/alumni/{siswa_id}/raport/{semester}/{tahun}', [AlumniController::class, 'raporShow'])
-            ->name('alumni.raport.show');
-        Route::get('/alumni/{siswa_id}/raport', [AlumniController::class, 'raporList'])
-            ->name('alumni.raport.list');
-        Route::get('/alumni/{id}', [AlumniController::class, 'show'])
-            ->name('alumni.show');
-
-        // Buku Induk export
-        Route::get('/buku-induk/{siswa}/export', [BukuIndukController::class, 'export'])
-            ->name('buku-induk.export');
-
-        // Kelulusan
-        Route::get('/kelulusan', [KelulusanController::class, 'index'])
-            ->name('kelulusan.index');
-        Route::get('/kelulusan/rombel/{rombelId}/{tahun}', [KelulusanController::class, 'showRombel'])
-            ->name('kelulusan.rombel.show');
+        // ============================================================
+        // KELULUSAN
+        // ============================================================
+        Route::get('/kelulusan', [KelulusanController::class, 'index'])->name('kelulusan.index');
+        Route::get('/kelulusan/rombel/{rombelId}/{tahun}', [KelulusanController::class, 'showRombel'])->name('kelulusan.rombel.show');
 
     });
 

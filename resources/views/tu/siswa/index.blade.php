@@ -637,175 +637,144 @@ body{
         </div>
 
     </div>
+<!-- FILTER TINGKAT -->
+<div class="class-filter">
+    <a href="{{ request()->url() }}?tingkat=X{{ request()->getQueryString() ? '&' . http_build_query(array_diff_key(request()->query(), ['tingkat' => ''])) : '' }}"
+       class="filter-pill {{ $currentTingkat == 'X' ? 'active' : '' }}">
+        <i class="fas fa-layer-group"></i> Kelas X
+    </a>
+    <a href="{{ request()->url() }}?tingkat=XI{{ request()->getQueryString() ? '&' . http_build_query(array_diff_key(request()->query(), ['tingkat' => ''])) : '' }}"
+       class="filter-pill {{ $currentTingkat == 'XI' ? 'active' : '' }}">
+        <i class="fas fa-layer-group"></i> Kelas XI
+    </a>
+    <a href="{{ request()->url() }}?tingkat=XII{{ request()->getQueryString() ? '&' . http_build_query(array_diff_key(request()->query(), ['tingkat' => ''])) : '' }}"
+       class="filter-pill {{ $currentTingkat == 'XII' ? 'active' : '' }}">
+        <i class="fas fa-layer-group"></i> Kelas XII
+    </a>
+    <a href="{{ route('tu.siswa.index') }}"
+       class="filter-pill {{ !$currentTingkat ? 'active' : '' }}">
+        <i class="fas fa-globe"></i> Semua
+    </a>
+</div>
 
-    <!-- FILTER TINGKAT -->
-    <div class="class-filter">
-
-        <a href="{{ request()->url() }}?tingkat=X{{ request()->getQueryString() ? '&' . http_build_query(array_diff_key(request()->query(), ['tingkat' => ''])) : '' }}"
-           class="filter-pill {{ $currentTingkat == 'X' ? 'active' : '' }}">
-            <i class="fas fa-layer-group"></i>
-            Kelas X
-        </a>
-
-        <a href="{{ request()->url() }}?tingkat=XI{{ request()->getQueryString() ? '&' . http_build_query(array_diff_key(request()->query(), ['tingkat' => ''])) : '' }}"
-           class="filter-pill {{ $currentTingkat == 'XI' ? 'active' : '' }}">
-            <i class="fas fa-layer-group"></i>
-            Kelas XI
-        </a>
-
-        <a href="{{ request()->url() }}?tingkat=XII{{ request()->getQueryString() ? '&' . http_build_query(array_diff_key(request()->query(), ['tingkat' => ''])) : '' }}"
-           class="filter-pill {{ $currentTingkat == 'XII' ? 'active' : '' }}">
-            <i class="fas fa-layer-group"></i>
-            Kelas XII
-        </a>
-
-        <a href="{{ route('tu.siswa.index') }}"
-           class="filter-pill {{ !$currentTingkat ? 'active' : '' }}">
-            <i class="fas fa-globe"></i>
-            Semua
-        </a>
-
+<!-- FILTER -->
+<div class="glass-card">
+    <div class="card-header-modern">
+        <h5 class="card-title-modern">
+            <i class="fas fa-filter"></i> Filter Data
+        </h5>
     </div>
 
-    <!-- FILTER -->
-    <div class="glass-card">
+    <div class="card-body-modern">
+        <!-- FORM FILTER UTAMA -->
+        <form method="GET" action="{{ route('tu.siswa.index') }}">
+            <div class="filter-grid">
+                <input type="text"
+                       name="search"
+                       value="{{ $search ?? '' }}"
+                       class="form-control-modern"
+                       placeholder="Cari nama / NIS / NISN">
 
-        <div class="card-header-modern">
-            <h5 class="card-title-modern">
-                <i class="fas fa-filter"></i>
-                Filter Data
-            </h5>
-        </div>
+                <select name="rombel" class="form-select-modern">
+                    <option value="">Semua Rombel</option>
+                    @foreach(($allRombels ?? collect()) as $r)
+                        @php
+                            $rombelNama = $r->nama ?? null;
+                            $tingkatVal = optional($r->kelas)->tingkat ?? null;
+                            $rombelWithoutTingkat = $rombelNama
+                                ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama)
+                                : null;
+                            $rombelWithoutTingkat = $rombelWithoutTingkat
+                                ? trim($rombelWithoutTingkat)
+                                : null;
+                            $formattedRombel = $rombelWithoutTingkat
+                                ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat)
+                                : ($rombelNama ?? '');
+                        @endphp
+                        <option value="{{ $r->id }}"
+                            {{ (isset($filterRombel) && $filterRombel == $r->id) ? 'selected' : '' }}>
+                            {{ $tingkatVal ? $tingkatVal . ' ' . $formattedRombel : $formattedRombel }}
+                        </option>
+                    @endforeach
+                </select>
 
-        <div class="card-body-modern">
-
-            <form method="GET" action="{{ route('tu.siswa.index') }}">
-
-                <div class="filter-grid">
-
-                    <input type="text"
-                           name="search"
-                           value="{{ $search ?? '' }}"
-                           class="form-control-modern"
-                           placeholder="Cari nama / NIS / NISN">
-
-                    <select name="rombel" class="form-select-modern">
-
-                        <option value="">Semua Rombel</option>
-
-                        @foreach(($allRombels ?? collect()) as $r)
-
-                            @php
-                                $rombelNama = $r->nama ?? null;
-                                $tingkatVal = optional($r->kelas)->tingkat ?? null;
-
-                                $rombelWithoutTingkat = $rombelNama
-                                    ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama)
-                                    : null;
-
-                                $rombelWithoutTingkat = $rombelWithoutTingkat
-                                    ? trim($rombelWithoutTingkat)
-                                    : null;
-
-                                $formattedRombel = $rombelWithoutTingkat
-                                    ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat)
-                                    : ($rombelNama ?? '');
-                            @endphp
-
-                            <option value="{{ $r->id }}"
-                                {{ (isset($filterRombel) && $filterRombel == $r->id) ? 'selected' : '' }}>
-                                {{ $tingkatVal ? $tingkatVal . ' ' . $formattedRombel : $formattedRombel }}
-                            </option>
-
-                        @endforeach
-
-                    </select>
-
-                    <div class="d-flex gap-2">
-
-                        <button type="submit"
-                                class="btn-modern btn-outline-modern">
-                            <i class="fas fa-search"></i>
-                            Filter
-                        </button>
-
-                        <a href="{{ route('tu.siswa.index') }}"
-                           class="btn-modern btn-outline-modern">
-                            <i class="fas fa-rotate-right"></i>
-                            Reset
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </form>
-
-            <form method="GET" action="{{ route('tu.siswa.exportByKelas') }}">
-                <div class="filter-grid" style="margin-top: 16px;">
-                    <select name="rombel" class="form-select-modern">
-                        <option value="">Pilih Kelas untuk Export</option>
-                        @foreach(($allRombels ?? collect()) as $r)
-                            @php
-                                $rombelNama = $r->nama ?? null;
-                                $tingkatVal = optional($r->kelas)->tingkat ?? null;
-                                $rombelWithoutTingkat = $rombelNama
-                                    ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama)
-                                    : null;
-                                $rombelWithoutTingkat = $rombelWithoutTingkat
-                                    ? trim($rombelWithoutTingkat)
-                                    : null;
-                                $formattedRombel = $rombelWithoutTingkat
-                                    ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat)
-                                    : ($rombelNama ?? '');
-                            @endphp
-                            <option value="{{ $r->id }}"
-                                {{ (isset($filterRombel) && $filterRombel == $r->id) ? 'selected' : '' }}>
-                                {{ $tingkatVal ? $tingkatVal . ' ' . $formattedRombel : $formattedRombel }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    <button type="submit" class="btn-modern btn-success-modern">
-                        <i class="fas fa-file-excel"></i>
-                        Export Per Kelas
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn-modern btn-outline-modern">
+                        <i class="fas fa-search"></i> Filter
                     </button>
+                    <a href="{{ route('tu.siswa.index') }}" class="btn-modern btn-outline-modern">
+                        <i class="fas fa-rotate-right"></i> Reset
+                    </a>
                 </div>
-            <form method="GET" action="{{ route('tu.siswa.exportByJurusan') }}">
-                <div class="filter-grid" style="margin-top: 16px;">
-                    <select name="jurusan" class="form-select-modern">
-                        <option value="">Pilih Jurusan untuk Export</option>
-                        @foreach(($allJurusans ?? collect()) as $j)
-                            <option value="{{ $j->id }}">{{ $j->nama }}</option>
-                        @endforeach
-                    </select>
+            </div>
+        </form>
 
-                    <button type="submit" class="btn-modern btn-success-modern">
-                        <i class="fas fa-file-excel"></i>
-                        Export Per Jurusan
-                    </button>
-                </div>
-            <form method="GET" action="{{ route('tu.siswa.exportAktif') }}">
-                <div class="filter-grid" style="margin-top: 16px;">
-                    <button type="submit" class="btn-modern btn-success-modern" style="grid-column: 1 / -1;">
-                        <i class="fas fa-file-excel"></i>
-                        Export Siswa Aktif
-                    </button>
-                </div>
-            </form>
+        <!-- FORM EXPORT PER KELAS -->
+        <form method="GET" action="{{ route('tu.siswa.exportByKelas') }}" style="margin-top: 16px;">
+            <div class="filter-grid">
+                <select name="rombel" class="form-select-modern" required>
+                    <option value="">Pilih Kelas untuk Export</option>
+                    @foreach(($allRombels ?? collect()) as $r)
+                        @php
+                            $rombelNama = $r->nama ?? null;
+                            $tingkatVal = optional($r->kelas)->tingkat ?? null;
+                            $rombelWithoutTingkat = $rombelNama
+                                ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama)
+                                : null;
+                            $rombelWithoutTingkat = $rombelWithoutTingkat
+                                ? trim($rombelWithoutTingkat)
+                                : null;
+                            $formattedRombel = $rombelWithoutTingkat
+                                ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat)
+                                : ($rombelNama ?? '');
+                        @endphp
+                        <option value="{{ $r->id }}">
+                            {{ $tingkatVal ? $tingkatVal . ' ' . $formattedRombel : $formattedRombel }}
+                        </option>
+                    @endforeach
+                </select>
 
-        </div>
+                <button type="submit" class="btn-modern btn-success-modern">
+                    <i class="fas fa-file-excel"></i> Export Per Kelas
+                </button>
+            </div>
+        </form>
+
+        <!-- FORM EXPORT PER JURUSAN -->
+        <form method="GET" action="{{ route('tu.siswa.exportByJurusan') }}" style="margin-top: 16px;">
+            <div class="filter-grid">
+                <select name="jurusan" class="form-select-modern" required>
+                    <option value="">Pilih Jurusan untuk Export</option>
+                    @foreach(($allJurusans ?? collect()) as $j)
+                        <option value="{{ $j->id }}">{{ $j->nama }}</option>
+                    @endforeach
+                </select>
+
+                <button type="submit" class="btn-modern btn-success-modern">
+                    <i class="fas fa-file-excel"></i> Export Per Jurusan
+                </button>
+            </div>
+        </form>
+
+        <!-- FORM EXPORT SISWA AKTIF -->
+        <form method="GET" action="{{ route('tu.siswa.exportAktif') }}" style="margin-top: 16px;">
+            <div class="filter-grid">
+                <button type="submit" class="btn-modern btn-success-modern" style="grid-column: 1 / -1;">
+                    <i class="fas fa-file-excel"></i> Export Siswa Aktif
+                </button>
+            </div>
+        </form>
 
     </div>
+</div>
 
-    <!-- ALERT -->
-    @if(session('success'))
-        <div class="alert-modern alert-success-modern">
-            <i class="fas fa-circle-check"></i>
-            {{ session('success') }}
-        </div>
-    @endif
-
+<!-- ALERT -->
+@if(session('success'))
+    <div class="alert-modern alert-success-modern">
+        <i class="fas fa-circle-check"></i>
+        {{ session('success') }}
+    </div>
+@endif
     <!-- TABLE -->
     @if($siswas->count() > 0)
 
