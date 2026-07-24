@@ -54,6 +54,12 @@ class Guru extends Model
         return $this->belongsTo(Rombel::class, 'rombel_id');
     }
 
+    // Relasi ke Rombel yang Diampu (HasMany)
+    public function rombels()
+    {
+        return $this->hasMany(Rombel::class, 'guru_id');
+    }
+
     // Relasi ke Tugas Tambahan
     public function tugasTambahans()
     {

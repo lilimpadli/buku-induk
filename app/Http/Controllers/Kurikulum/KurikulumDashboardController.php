@@ -25,8 +25,8 @@ class KurikulumDashboardController extends Controller
         $totalJurusan = Jurusan::count();
 
         // Jenis Kelamin
-        $siswaLaki = DataSiswa::where('jenis_kelamin', 'Laki-laki')->count();
-        $siswaPerempuan = DataSiswa::where('jenis_kelamin', 'Perempuan')->count();
+        $siswaLaki = DataSiswa::filterByJenisKelamin('Laki-laki')->count();
+        $siswaPerempuan = DataSiswa::filterByJenisKelamin('Perempuan')->count();
 
         // Siswa per Tingkat
         $siswaX = DataSiswa::whereHas('rombel.kelas', function($q) {
@@ -78,3 +78,4 @@ class KurikulumDashboardController extends Controller
         ));
     }
 }
+

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('mutasi_pegawais', function (Blueprint $table) {
             $table->id();
             $table->foreignId('guru_id')->constrained('gurus')->onDelete('cascade');
-            $table->enum('jenis', ['Masuk', 'Keluar']);
+            $table->enum('jenis', ['Masuk', 'Keluar', 'Meninggal', 'Pindah Tugas']);
             $table->date('tanggal');
             $table->text('keterangan')->nullable();
             $table->timestamps();

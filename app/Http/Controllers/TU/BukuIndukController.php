@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\TU;
 
 use App\Http\Controllers\Controller;
-use App\Models\Siswa;
+use App\Models\DataSiswa as Siswa;
 use App\Models\Rombel;
 use App\Models\Jurusan;
 use App\Models\MataPelajaran;
@@ -54,7 +54,7 @@ class BukuIndukController extends Controller
 
         // Filter berdasarkan jenis kelamin
         if ($request->filled('jenis_kelamin')) {
-            $query->where('jenis_kelamin', $request->jenis_kelamin);
+            $query->filterByJenisKelamin($request->jenis_kelamin);
         }
 
         // Only include students currently assigned to a rombel

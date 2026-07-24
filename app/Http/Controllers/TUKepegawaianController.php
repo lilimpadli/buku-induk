@@ -15,10 +15,16 @@ use App\Exports\GuruTemplateExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\Facades\Excel;
 
 class TUKepegawaianController extends Controller
 {
+    private function riwayatTableAvailable(): bool
+    {
+        return Schema::hasTable('riwayat_kerjas');
+    }
+
     protected static $guruTemplateFields = [
         'nama' => 'Nama',
         'nip' => 'NIP',
@@ -230,16 +236,97 @@ class TUKepegawaianController extends Controller
     }
 
     // --- DATA TU ---
-    public function tuIndex() { $tu = User::whereIn('role', ['tu', 'tu_kepegawaian'])->paginate(10); return view('tu_kepegawaian.tu.index', compact('tu')); }
-    public function tuDestroy($id) { User::findOrFail($id)->delete(); return back()->with('success', 'Data dihapus'); }
+    public function tuIndex() 
+    { 
+        $tu = User::whereIn('role', ['tu', 'tu_kepegawaian'])->paginate(10); 
+        return view('tu_kepegawaian.tu.index', compact('tu')); 
+    }
+
+    public function tuCreate()
+    {
+        return view('tu_kepegawaian.tu.create');
+    }
+
+    public function tuStore(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'nomor_induk' => 'required|string|unique:users',
+            'email' => 'nullable|email|unique:users',
+            'password' => 'required|string|min:6|confirmed',
+            'role' => 'required|in:tu,tu_kepegawaian',
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'nomor_induk' => $request->nomor_induk,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'role' => $request->role ?? 'tu',
+        ]);
+
+        return redirect()->route('tu_kepegawaian.tu.index')->with('success', 'Akun TU berhasil ditambahkan');
+    }
+
+    public function tuShow($id)
+    {
+        $user = User::findOrFail($id);
+        return view('tu_kepegawaian.tu.show', compact('user'));
+    }
+
+    public function tuEdit($id)
+    {
+        $user = User::findOrFail($id);
+        return view('tu_kepegawaian.tu.edit', compact('user'));
+    }
+
+    public function tuUpdate(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string',
+            'nomor_induk' => 'required|string|unique:users,nomor_induk,' . $id,
+            'email' => 'nullable|email|unique:users,email,' . $id,
+            'role' => 'required|in:tu,tu_kepegawaian',
+            'password' => 'nullable|string|min:6|confirmed',
+        ]);
+
+        $data = $request->only(['name', 'nomor_induk', 'email', 'role']);
+        
+        if ($request->filled('password')) {
+            $data['password'] = bcrypt($request->password);
+        }
+
+        $user->update($data);
+
+        return redirect()->route('tu_kepegawaian.tu.index')->with('success', 'Akun TU berhasil diupdate');
+    }
+
+    public function tuDestroy($id) 
+    { 
+        User::findOrFail($id)->delete(); 
+        return back()->with('success', 'Data dihapus'); 
+    }
 
     // --- PENUGASAN ---
     public function dokumen() { $dokumens = Dokumen::all(); return view('tu_kepegawaian.dokumen.index', compact('dokumens')); }
     
     // --- RIWAYAT ---
-    public function riwayat() { $riwayat = RiwayatKerja::all(); return view('tu_kepegawaian.riwayat.index', compact('riwayat')); }
+    public function riwayat()
+    {
+        $riwayat = $this->riwayatTableAvailable() ? RiwayatKerja::all() : collect();
+
+        return view('tu_kepegawaian.riwayat.index', compact('riwayat'));
+    }
+
     public function riwayatStore(Request $request)
     {
+        if (!$this->riwayatTableAvailable()) {
+            return redirect()->route('tu_kepegawaian.riwayat.index')
+                ->with('error', 'Tabel riwayat kerja belum tersedia. Jalankan migrasi database terlebih dahulu.');
+        }
+
         $request->validate(['instansi' => 'required', 'jabatan' => 'required', 'mulai' => 'required|date']);
         RiwayatKerja::create($request->all());
         return redirect()->back()->with('success', 'Data berhasil ditambahkan!');
@@ -311,19 +398,28 @@ class TUKepegawaianController extends Controller
     // -- Riwayat Kerja Pegawai --
     public function riwayatIndex()
     {
-        $riwayat = \App\Models\RiwayatKerja::all(); 
-        
+        $riwayat = $this->riwayatTableAvailable() ? \App\Models\RiwayatKerja::all() : collect();
+
         return view('tu_kepegawaian.riwayat.index', compact('riwayat'));
     }
 
     public function riwayatEdit($id)
     {
+        if (!$this->riwayatTableAvailable()) {
+            abort(404, 'Riwayat kerja belum tersedia.');
+        }
+
         $riwayat = \App\Models\RiwayatKerja::findOrFail($id);
         return view('tu_kepegawaian.riwayat.edit', compact('riwayat'));
     }
 
     public function riwayatUpdate(Request $request, $id)
     {
+        if (!$this->riwayatTableAvailable()) {
+            return redirect()->route('tu_kepegawaian.riwayat.index')
+                ->with('error', 'Tabel riwayat kerja belum tersedia.');
+        }
+
         $riwayat = \App\Models\RiwayatKerja::findOrFail($id);
         $riwayat->update($request->all());
 
@@ -333,6 +429,11 @@ class TUKepegawaianController extends Controller
 
     public function riwayatDestroy($id)
     {
+        if (!$this->riwayatTableAvailable()) {
+            return redirect()->route('tu_kepegawaian.riwayat.index')
+                ->with('error', 'Tabel riwayat kerja belum tersedia.');
+        }
+
         $riwayat = \App\Models\RiwayatKerja::findOrFail($id);
         $riwayat->delete();
 

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Daftar Siswa')
 
@@ -612,7 +612,7 @@ body{
                     Export Excel
                 </a>
 
-                <a href="{{ route('tu.siswa.template') }}"
+                <a href="{{ route('tu.siswa.template.download') }}"
                    class="btn-modern btn-warning-modern">
                     <i class="fas fa-download"></i>
                     Download Template
@@ -1035,3 +1035,4 @@ body{
     </div>
 </div>
 @endsection
+

@@ -57,7 +57,7 @@ public function index(Request $request)
     }
     
     if ($jenisKelamin && in_array($jenisKelamin, ['Laki-laki', 'Perempuan'])) {
-        $query->where('jenis_kelamin', $jenisKelamin);
+        $query->filterByJenisKelamin($jenisKelamin);
     }
     
     $siswa = $query->orderBy('nama_lengkap')->paginate(15);
@@ -104,8 +104,8 @@ public function dashboard()
     $total = DataSiswa::where('rombel_id', $rombel->id)->count();
     
     $byGender = [
-        'Laki-laki' => DataSiswa::where('rombel_id', $rombel->id)->where('jenis_kelamin', 'Laki-laki')->count(),
-        'Perempuan' => DataSiswa::where('rombel_id', $rombel->id)->where('jenis_kelamin', 'Perempuan')->count()
+        'Laki-laki' => DataSiswa::where('rombel_id', $rombel->id)->filterByJenisKelamin('Laki-laki')->count(),
+        'Perempuan' => DataSiswa::where('rombel_id', $rombel->id)->filterByJenisKelamin('Perempuan')->count()
     ];
     
     $recent = DataSiswa::with('rombel')
@@ -215,3 +215,5 @@ public function dashboard()
         return Excel::download(new WaliKelasSiswaExport($rombel->id, $rombel->nama), 'Daftar_Siswa_' . $rombel->nama . '.xlsx');
     }
 }
+
+

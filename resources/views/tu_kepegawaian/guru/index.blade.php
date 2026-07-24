@@ -153,7 +153,7 @@
     {{-- FORM FILTER --}}
     <div class="card mb-4 border-0 shadow-sm">
         <div class="card-body">
-            <form method="GET" action="{{ route('tu_kepegawaian.data-guru.index') }}">
+            <form method="GET" action="{{ route('tu_kepegawaian.guru.index') }}">
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label class="form-label">Cari Guru</label>
@@ -185,7 +185,7 @@
                         <button type="submit" class="btn btn-primary flex-grow-1">
                             <i class="fas fa-search"></i> Terapkan Filter
                         </button>
-                        <a href="{{ route('tu_kepegawaian.data-guru.index') }}" class="btn btn-outline-danger">
+                        <a href="{{ route('tu_kepegawaian.guru.index') }}" class="btn btn-outline-danger">
                             <i class="fas fa-rotate-right"></i> Reset
                         </a>
                     </div>
@@ -243,7 +243,7 @@
                             <td>{{ $guru->gelar_depan ?? '-' }}</td>
                             <td>{{ $guru->gelar_belakang ?? '-' }}</td>
                             <td>
-                                <a href="{{ route('tu_kepegawaian.data-guru.show', $guru->id) }}" 
+                                <a href="{{ route('tu_kepegawaian.guru.show', $guru->id) }}" 
                                    class="btn btn-sm btn-info text-white" 
                                    data-bs-toggle="tooltip" 
                                    title="Lihat Detail">

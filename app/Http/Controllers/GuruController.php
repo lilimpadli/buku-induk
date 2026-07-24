@@ -35,8 +35,8 @@ class GuruController extends Controller
         
         $rekap = [
             'Total' => $dataUntukRekap->count(),
-            'L' => $dataUntukRekap->where('jenis_kelamin', 'L')->count(),
-            'P' => $dataUntukRekap->where('jenis_kelamin', 'P')->count(),
+            'L' => $dataUntukRekap->filterByJenisKelamin('L')->count(),
+            'P' => $dataUntukRekap->filterByJenisKelamin('P')->count(),
             'D4' => $dataUntukRekap->where('pendidikan', 'D4')->count(),
             'S1' => $dataUntukRekap->where('pendidikan', 'S1')->count(),
             'S2' => $dataUntukRekap->where('pendidikan', 'S2')->count(),
@@ -69,3 +69,4 @@ class GuruController extends Controller
         return back()->with('success', 'Data berhasil diperbarui');
     }
 }
+

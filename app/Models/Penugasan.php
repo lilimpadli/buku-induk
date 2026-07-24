@@ -8,7 +8,17 @@ class Penugasan extends Model
 {
     protected $table = 'penugasans'; 
 
-    protected $fillable = ['guru_id', 'mapel_id'];
+    protected $fillable = [
+        'guru_id',
+        'mapel_id',
+        'kategori',
+        'detail_objek',
+        'jumlah_jam',
+        'tahun_ajaran',
+        'semester',
+        'kelas',
+        'keterangan',
+    ];
 
 
     public function guru()

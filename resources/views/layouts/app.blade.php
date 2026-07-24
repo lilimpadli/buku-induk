@@ -548,13 +548,14 @@
                             @endif
 
                           {{-- ROLE: TU KEPEGAWAIAN --}}
+                           @if(Auth::user()->role == 'tu_kepegawaian')
                             <div class="nav-section-title">KEPEGAWAIAN</div>
 
                             <a href="{{ route('tu_kepegawaian.dashboard') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.dashboard') ? 'active' : '' }}">
                                 <i class="fas fa-home"></i> <span>Dashboard</span>
                             </a>
 
-                            <a href="{{ route('tu_kepegawaian.data-guru.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.data-guru.*') ? 'active bg-primary text-white' : 'text-dark' }}">
+                            <a href="{{ route('tu_kepegawaian.guru.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.guru.*') ? 'active bg-primary text-white' : 'text-dark' }}">
                                 <i class="fas fa-user-graduate me-2"></i> <span>Data Guru</span>
                             </a>
 
@@ -573,7 +574,7 @@
                           <a href="{{ route('tu_kepegawaian.mutasi.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.mutasi*') ? 'active' : '' }}">
                               <i class="fas fa-exchange-alt"></i> <span>Mutasi Pegawai</span>
                           </a>
-
+                            @endif
                             {{-- ROLE: SUPER ADMIN --}}
                             @if(Auth::user()->role == 'super_admin')
                                 <a href="{{ route('super_admin.dashboard') }}" class="nav-link {{ request()->routeIs('super_admin.dashboard') ? 'active' : '' }}">

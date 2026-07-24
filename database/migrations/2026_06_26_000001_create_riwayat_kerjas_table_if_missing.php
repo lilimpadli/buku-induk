@@ -9,11 +9,15 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
+        if (Schema::hasTable('riwayat_kerjas')) {
+            return;
+        }
+
         Schema::create('riwayat_kerjas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('guru_id')->constrained('gurus')->onDelete('cascade');
+            $table->foreignId('guru_id')->nullable()->constrained('gurus')->onDelete('cascade');
             $table->string('instansi');
             $table->string('jabatan');
             $table->date('mulai');

@@ -53,43 +53,6 @@ use App\Http\Controllers\SiswaResetPasswordController;
 use App\Http\Controllers\Kaprog\KaprogDashboardController;
 use App\Http\Controllers\PegawaiController;
 
-use App\Http\Controllers\DokumenController;
-
-
-// --- TU Kepegawaian ---
-Route::prefix('tu_kepegawaian')->name('tu_kepegawaian.')->middleware(['auth'])->group(function () {
-    
-    // Dashboard & Umum
-    Route::get('/dashboard', [App\Http\Controllers\TUKepegawaianController::class, 'dashboard'])->name('dashboard');
-    Route::get('/guru', [App\Http\Controllers\TUKepegawaianController::class, 'guruIndex'])->name('guru.index');
-    Route::get('/tu', [App\Http\Controllers\TUKepegawaianController::class, 'tuIndex'])->name('tu.index');
-    Route::resource('data-guru', App\Http\Controllers\GuruController::class);
-    Route::delete('/tu/{id}', [App\Http\Controllers\TUKepegawaianController::class, 'tuDestroy'])->name('tu.destroy');
-
-    // Dokumen
-    Route::get('/dokumen', [App\Http\Controllers\TUKepegawaianController::class, 'dokumen'])->name('dokumen.index');
-    Route::post('/dokumen/store', [App\Http\Controllers\TUKepegawaianController::class, 'dokumenStore'])->name('dokumen.store');
-    Route::get('/dokumen/create', [DokumenController::class, 'create'])->name('tu_kepegawaian.dokumen.create');
-    Route::post('/dokumen/store', [DokumenController::class, 'store'])->name('tu_kepegawaian.dokumen.store');
-    Route::post('/dokumen/store', [DokumenController::class, 'store'])->name('dokumen.store');
-
-    // Riwayat Kerja
-    Route::get('/riwayat', [App\Http\Controllers\TUKepegawaianController::class, 'riwayatIndex'])->name('riwayat.index');
-    Route::post('/riwayat', [App\Http\Controllers\TUKepegawaianController::class, 'riwayatStore'])->name('riwayat.store');
-    Route::put('/riwayat/{id}', [App\Http\Controllers\TUKepegawaianController::class, 'riwayatUpdate'])->name('riwayat.update');
-    Route::delete('/riwayat/{id}', [App\Http\Controllers\TUKepegawaianController::class, 'riwayatDestroy'])->name('riwayat.destroy');
-
-    // Mutasi
-    Route::get('/mutasi', [App\Http\Controllers\TUKepegawaianController::class, 'mutasiIndex'])->name('mutasi.index');
-    Route::get('/mutasi/create', [App\Http\Controllers\TUKepegawaianController::class, 'mutasiCreate'])->name('mutasi.create');
-    Route::post('/mutasi', [App\Http\Controllers\TUKepegawaianController::class, 'mutasiStore'])->name('mutasi.store');
-    Route::get('/mutasi/laporan', [App\Http\Controllers\TUKepegawaianController::class, 'mutasiLaporan'])->name('mutasi.laporan');
-    Route::get('/mutasi/{id}/edit', [App\Http\Controllers\TUKepegawaianController::class, 'mutasiEdit'])->name('mutasi.edit');
-    Route::put('/mutasi/{id}', [App\Http\Controllers\TUKepegawaianController::class, 'mutasiUpdate'])->name('mutasi.update');
-    Route::delete('/mutasi/{id}', [App\Http\Controllers\TUKepegawaianController::class, 'mutasiDestroy'])->name('mutasi.destroy');
-
-    Route::resource('penugasan', App\Http\Controllers\PenugasanController::class);
-});
 /*
 |--------------------------------------------------------------------------
 | ROUTE RAPOR GLOBAL
@@ -126,6 +89,12 @@ Route::prefix('rapor')->group(function () {
 |--------------------------------------------------------------------------
 */
 
+Route::get('/', function () {
+    return view('welcome');
+})->name('home');
+
+Route::get('/ppdb', [App\Http\Controllers\TU\PpdbController::class, 'index'])->name('ppdb.index');
+
 // Reset password siswa
 Route::get('/siswa/reset-password', [SiswaResetPasswordController::class, 'showResetForm'])->name('siswa.password.reset.form');
 Route::post('/siswa/reset-password', [SiswaResetPasswordController::class, 'reset'])->name('siswa.password.reset');
@@ -137,7 +106,6 @@ Route::middleware('guest')->group(function () {
 });
 
 // Logout
-Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
 Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
 
 /*
@@ -446,6 +414,10 @@ Route::group([], function () {
 
             // Route untuk siswa
             Route::get('/siswa', [TUController::class, 'siswa'])->name('siswa.index');
+            Route::get('/siswa/export', [TUController::class, 'exportSiswa'])->name('siswa.export');
+            Route::get('/siswa/export/kelas', [TUController::class, 'exportByKelas'])->name('siswa.exportByKelas');
+            Route::get('/siswa/export/jurusan', [TUController::class, 'exportByJurusan'])->name('siswa.exportByJurusan');
+            Route::get('/siswa/export/aktif', [TUController::class, 'exportAktif'])->name('siswa.exportAktif');
             Route::get('/siswa/export/jurusan/{jurusanId}', [TUController::class, 'exportSiswaByJurusan'])->name('siswa.export.jurusan');
             Route::get('/siswa/export/angkatan/{jurusanId}', [TUController::class, 'exportSiswaByAngkatan'])->name('siswa.export.angkatan');
             Route::get('/siswa/{id}/export-pdf', [TUController::class, 'siswaExportPdf'])->name('siswa.exportPDF');
@@ -454,6 +426,11 @@ Route::group([], function () {
             Route::get('/siswa/create', [TUController::class, 'siswaCreate'])->name('siswa.create');
             Route::post('/siswa', [TUController::class, 'siswaStore'])->name('siswa.store');
             Route::get('/siswa/{id}', [TUController::class, 'siswaDetail'])->name('siswa.detail');
+
+            // Route untuk manajemen kelas
+            Route::get('/kelas/export-all', [TUController::class, 'exportKelasAll'])->name('kelas.exportAll');
+            Route::get('/kelas/template', [TUController::class, 'downloadKelasTemplate'])->name('kelas.template');
+            Route::post('/kelas/import', [TUController::class, 'importKelas'])->name('kelas.import');
             Route::get('/siswa/{id}/raport', [TUController::class, 'siswaRaport'])->name('siswa.raport');
             Route::get('/siswa/{id}/edit', [TUController::class, 'siswaEdit'])->name('siswa.edit');
             Route::put('/siswa/{id}', [TUController::class, 'siswaUpdate'])->name('siswa.update');
@@ -495,15 +472,32 @@ Route::group([], function () {
 
             // Mutasi Siswa (TU)
             Route::get('/mutasi/laporan', [MutasiController::class, 'laporan'])->name('mutasi.laporan');
+            Route::get('/mutasi/search', [MutasiController::class, 'searchStudents'])->name('mutasi.search');
             Route::post('/mutasi/bulk', [MutasiController::class, 'bulk'])->name('mutasi.bulk');
             Route::post('/mutasi/up-all', [MutasiController::class, 'upAll'])->name('mutasi.up-all');
+            Route::get('/mutasi/kelas/{id}', [MutasiController::class, 'kelasByJurusan'])->name('mutasi.kelas');
+            Route::get('/mutasi/kelas/show/{rombel}', [MutasiController::class, 'showRombel'])->name('mutasi.kelas.show');
+            Route::post('/mutasi/siswa/update', [MutasiController::class, 'updateSiswa'])->name('mutasi.siswa.update');
             Route::resource('/mutasi', MutasiController::class)->names('mutasi');
 
             // Buku Induk (TU)
             Route::get('/buku-induk', [BukuIndukController::class, 'index'])->name('buku-induk.index');
+            Route::get('/buku-induk/{siswa}/edit', [BukuIndukController::class, 'edit'])->name('buku-induk.edit');
+            Route::put('/buku-induk/{siswa}', [BukuIndukController::class, 'update'])->name('buku-induk.update');
             Route::get('/buku-induk/{siswa}', [BukuIndukController::class, 'show'])->name('buku-induk.show');
             Route::get('/buku-induk/{siswa}/cetak', [BukuIndukController::class, 'cetak'])->name('buku-induk.cetak');
             Route::get('/buku-induk/{siswa}/export', [BukuIndukController::class, 'export'])->name('buku-induk.export');
+            Route::get('/buku-induk/export/siswa', [BukuIndukController::class, 'exportSiswa'])->name('buku-induk.export.siswa');
+            Route::get('/buku-induk/export/nilai', [BukuIndukController::class, 'exportNilai'])->name('buku-induk.export.nilai');
+            Route::get('/buku-induk/export/pkl', [BukuIndukController::class, 'exportPkl'])->name('buku-induk.export.pkl');
+            Route::post('/buku-induk/import/siswa', [BukuIndukController::class, 'importSiswa'])->name('buku-induk.import.siswa');
+            Route::post('/buku-induk/import/nilai', [BukuIndukController::class, 'importNilai'])->name('buku-induk.import.nilai');
+            Route::post('/buku-induk/import/pkl', [BukuIndukController::class, 'importPkl'])->name('buku-induk.import.pkl');
+            Route::get('/buku-induk/template/siswa', [BukuIndukController::class, 'downloadTemplateSiswa'])->name('buku-induk.template.siswa');
+            Route::get('/buku-induk/template/nilai', [BukuIndukController::class, 'downloadTemplateNilai'])->name('buku-induk.template.nilai');
+            Route::post('/buku-induk/template/nilai-filtered', [BukuIndukController::class, 'downloadTemplateNilaiFiltered'])->name('buku-induk.template.nilai.filtered');
+            Route::get('/buku-induk/template/pkl', [BukuIndukController::class, 'downloadTemplatePkl'])->name('buku-induk.template.pkl');
+            Route::get('/buku-induk/template/pkl-ijazah', [BukuIndukController::class, 'downloadTemplatePklIjazah'])->name('buku-induk.template.pkl-ijazah');
 
             // Kelulusan & Alumni (TU)
             Route::get('/kelulusan', [KelulusanController::class, 'index'])->name('kelulusan.index');
@@ -573,6 +567,52 @@ Route::group([], function () {
             Route::get('/mata-pelajaran/{id}/edit', [TUKepegawaianController::class, 'mataPelajaranEdit'])->name('mata-pelajaran.edit');
             Route::put('/mata-pelajaran/{id}', [TUKepegawaianController::class, 'mataPelajaranUpdate'])->name('mata-pelajaran.update');
             Route::delete('/mata-pelajaran/{id}', [TUKepegawaianController::class, 'mataPelajaranDestroy'])->name('mata-pelajaran.destroy');
+
+            // Dokumen
+            Route::get('/dokumen', [TUKepegawaianController::class, 'dokumen'])->name('dokumen.index');
+            Route::get('/dokumen/create', [TUKepegawaianController::class, 'dokumenCreate'])->name('dokumen.create');
+            Route::post('/dokumen/store', [TUKepegawaianController::class, 'dokumenStore'])->name('dokumen.store');
+
+            // Riwayat Kerja
+            Route::get('/riwayat', [TUKepegawaianController::class, 'riwayatIndex'])->name('riwayat.index');
+            Route::post('/riwayat', [TUKepegawaianController::class, 'riwayatStore'])->name('riwayat.store');
+            Route::put('/riwayat/{id}', [TUKepegawaianController::class, 'riwayatUpdate'])->name('riwayat.update');
+            Route::delete('/riwayat/{id}', [TUKepegawaianController::class, 'riwayatDestroy'])->name('riwayat.destroy');
+
+            // Mutasi
+            Route::get('/mutasi', [TUKepegawaianController::class, 'mutasiIndex'])->name('mutasi.index');
+            Route::get('/mutasi/create', [TUKepegawaianController::class, 'mutasiCreate'])->name('mutasi.create');
+            Route::post('/mutasi', [TUKepegawaianController::class, 'mutasiStore'])->name('mutasi.store');
+            Route::get('/mutasi/laporan', [TUKepegawaianController::class, 'mutasiLaporan'])->name('mutasi.laporan');
+            Route::get('/mutasi/{id}/edit', [TUKepegawaianController::class, 'mutasiEdit'])->name('mutasi.edit');
+            Route::put('/mutasi/{id}', [TUKepegawaianController::class, 'mutasiUpdate'])->name('mutasi.update');
+            Route::delete('/mutasi/{id}', [TUKepegawaianController::class, 'mutasiDestroy'])->name('mutasi.destroy');
+
+            // Penugasan
+            Route::resource('penugasan', App\Http\Controllers\PenugasanController::class)->names('penugasan');
+
+            // Dokumen
+            Route::get('/dokumen', [TUKepegawaianController::class, 'dokumen'])->name('dokumen.index');
+            Route::get('/dokumen/create', [TUKepegawaianController::class, 'dokumenCreate'])->name('dokumen.create');
+            Route::post('/dokumen/store', [TUKepegawaianController::class, 'dokumenStore'])->name('dokumen.store');
+
+            // Riwayat Kerja
+            Route::get('/riwayat', [TUKepegawaianController::class, 'riwayatIndex'])->name('riwayat.index');
+            Route::post('/riwayat', [TUKepegawaianController::class, 'riwayatStore'])->name('riwayat.store');
+            Route::put('/riwayat/{id}', [TUKepegawaianController::class, 'riwayatUpdate'])->name('riwayat.update');
+            Route::delete('/riwayat/{id}', [TUKepegawaianController::class, 'riwayatDestroy'])->name('riwayat.destroy');
+
+            // Mutasi
+            Route::get('/mutasi', [TUKepegawaianController::class, 'mutasiIndex'])->name('mutasi.index');
+            Route::get('/mutasi/create', [TUKepegawaianController::class, 'mutasiCreate'])->name('mutasi.create');
+            Route::post('/mutasi', [TUKepegawaianController::class, 'mutasiStore'])->name('mutasi.store');
+            Route::get('/mutasi/laporan', [TUKepegawaianController::class, 'mutasiLaporan'])->name('mutasi.laporan');
+            Route::get('/mutasi/{id}/edit', [TUKepegawaianController::class, 'mutasiEdit'])->name('mutasi.edit');
+            Route::put('/mutasi/{id}', [TUKepegawaianController::class, 'mutasiUpdate'])->name('mutasi.update');
+            Route::delete('/mutasi/{id}', [TUKepegawaianController::class, 'mutasiDestroy'])->name('mutasi.destroy');
+
+            // Penugasan
+            Route::resource('penugasan', App\Http\Controllers\PenugasanController::class)->names('penugasan');
 
             // Tugas Tambahan
             Route::resource('tugas_tambahan', \App\Http\Controllers\TugaTambahanController::class, ['names' => 'tugas_tambahan']);
@@ -927,3 +967,6 @@ Route::group([], function () {
     });
 }
 });
+
+
+

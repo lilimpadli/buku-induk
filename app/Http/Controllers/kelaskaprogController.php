@@ -66,7 +66,7 @@ class KelaskaprogController extends Controller
 
         // Apply jenis kelamin filter
         if ($filterJenisKelamin) {
-            $siswaQuery->where('jenis_kelamin', $filterJenisKelamin);
+            $siswaQuery->filterByJenisKelamin($filterJenisKelamin);
         }
 
         $siswa = $siswaQuery->orderBy('nama_lengkap')->get();

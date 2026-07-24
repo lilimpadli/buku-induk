@@ -39,8 +39,8 @@ class KurikulumRaportController extends Controller
 
         // 🔥 STATISTIK TOTAL
         $totalSiswa = DataSiswa::count();
-        $lakiCount = DataSiswa::where('jenis_kelamin', 'Laki-laki')->count();
-        $perempuanCount = DataSiswa::where('jenis_kelamin', 'Perempuan')->count();
+        $lakiCount = DataSiswa::filterByJenisKelamin('Laki-laki')->count();
+        $perempuanCount = DataSiswa::filterByJenisKelamin('Perempuan')->count();
 
         return view('kurikulum.siswa.rapor.index', compact('siswas', 'search', 'rombels', 'rombelId', 'totalSiswa', 'lakiCount', 'perempuanCount'));
     }
@@ -213,3 +213,4 @@ class KurikulumRaportController extends Controller
         return view('kurikulum.siswa.rapor.show', compact('siswa', 'raports'));
     }
 }
+

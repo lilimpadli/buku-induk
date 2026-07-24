@@ -45,8 +45,8 @@ class DashboardController extends Controller
         $total = $siswaQuery->count();
         
         $byGender = [
-            'Laki-laki' => (clone $siswaQuery)->where('jenis_kelamin', 'Laki-laki')->count(),
-            'Perempuan' => (clone $siswaQuery)->where('jenis_kelamin', 'Perempuan')->count()
+            'Laki-laki' => (clone $siswaQuery)->filterByJenisKelamin('Laki-laki')->count(),
+            'Perempuan' => (clone $siswaQuery)->filterByJenisKelamin('Perempuan')->count()
         ];
         
         // Ambil 10 siswa terbaru

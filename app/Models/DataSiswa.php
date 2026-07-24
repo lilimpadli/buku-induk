@@ -39,15 +39,11 @@ class DataSiswa extends Model
         'kurikulum_id',
     ];
 
-    /* ================================
-     |  RELASI RAPOR
-     ================================= */
     public function nilai()
     {
         return $this->hasMany(NilaiRaport::class, 'siswa_id');
     }
 
-    // Tambahan untuk fix error: alias dari nilai()
     public function nilaiRaports()
     {
         return $this->hasMany(NilaiRaport::class, 'siswa_id');
@@ -68,17 +64,11 @@ class DataSiswa extends Model
         return $this->hasOne(RaporInfo::class, 'siswa_id');
     }
 
-    /* ================================
-     |  RELASI USER
-     ================================= */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /* ================================
-     |  RELASI ORANG TUA
-     ================================= */
     public function ayah()
     {
         return $this->belongsTo(Ayah::class, 'ayah_id');
@@ -104,33 +94,21 @@ class DataSiswa extends Model
         return $this->belongsTo(Agama::class, 'agama_id');
     }
 
-    /* ================================
-     |  RELASI ROMBEL
-     ================================= */
     public function rombel()
     {
         return $this->belongsTo(Rombel::class);
     }
 
-    /* ================================
-     |  RELASI KURIKULUM
-     ================================= */
     public function kurikulum()
     {
         return $this->belongsTo(Kurikulum::class);
     }
 
-    /* ================================
-     |  RELASI KENAIKAN KELAS
-     ================================= */
     public function kenaikanKelas()
     {
         return $this->hasMany(KenaikanKelas::class, 'siswa_id');
     }
 
-    /* ================================
-     |  RELASI MUTASI SISWA
-     ================================= */
     public function mutasis()
     {
         return $this->hasMany(MutasiSiswa::class, 'siswa_id');
@@ -140,4 +118,22 @@ class DataSiswa extends Model
     {
         return $this->hasOne(MutasiSiswa::class, 'siswa_id')->latestOfMany();
     }
+
+    public function getJenisKelaminAttribute()
+    {
+        if (!empty($this->jenis_kelamin_id)) {
+            return optional($this->jenisKelamin()->first())->nama;
+        }
+
+        return $this->attributes['jenis_kelamin'] ?? null;
+    }
+
+    public function scopeFilterByJenisKelamin($query, $value)
+    {
+        if (is_null($value) || $value === '') return $query;
+        $map = ['L' => 'Laki-laki', 'P' => 'Perempuan'];
+        $nama = $map[$value] ?? $value;
+        return $query->whereHas('jenisKelamin', function($qq) use ($nama) { $qq->where('nama', $nama); });
+    }
 }
+
