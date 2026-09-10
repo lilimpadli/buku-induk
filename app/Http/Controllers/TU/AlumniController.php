@@ -4,48 +4,91 @@ namespace App\Http\Controllers\TU;
 use App\Http\Controllers\Controller;
 use App\Models\KenaikanKelas;
 use App\Models\DataSiswa;
+use App\Models\Jurusan;
+use App\Models\NilaiRaport;
+use App\Models\EkstrakurikulerSiswa;
+use App\Models\Kehadiran;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AlumniController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // Ambil semua jurusan
-        $allJurusan = \App\Models\Jurusan::orderBy('nama')->get();
+        $allJurusan = Jurusan::orderBy('nama')->get();
 
-        // Ambil daftar alumni dengan relasi lengkap
-        $query = KenaikanKelas::where('status', 'lulus')
-            ->with([
-                'siswa' => function($q) {
-                    $q->with(['rombel' => function($r) {
-                        $r->with('kelas.jurusan');
-                    }]);
-                },
-                'rombelTujuan.kelas.jurusan'
-            ]);
+        // Filter tahun
+        $tahunSearch = $request->tahun_ajaran;
 
-        // Filter berdasarkan tahun ajaran jika ada request
-        $tahunSearch = request('tahun_ajaran');
+        // ============================================================
+        // 🔥 FIX 1: Ambil data alumni dengan handling jurusan_id NULL
+        // ============================================================
+        $query = KenaikanKelas::where('status', 'Lulus')
+            ->with(['siswa', 'jurusan']);
+
         if ($tahunSearch) {
             $query->where('tahun_ajaran', $tahunSearch);
         }
 
-        $kelulusan = $query->orderBy('tahun_ajaran', 'desc')->get();
+        $alumni = $query->orderBy('tahun_ajaran', 'desc')->get();
 
-        // Group data berdasarkan tahun ajaran dan jurusan (untuk card view)
+        Log::info("Total alumni di controller: " . $alumni->count());
+
+        // ============================================================
+        // 🔥 FIX 2: Tambahkan data alumni dengan jurusan_id NULL ke group
+        // ============================================================
         $groupedAlumniCard = [];
-        
-        foreach ($kelulusan as $k) {
-            $siswa = $k->siswa;
-            $rombel = $k->rombelTujuan ?? $siswa->rombel;
-            $kelas = $rombel?->kelas;
-            $jurusan = $kelas?->jurusan;
-            
-            $tahun = $k->tahun_ajaran;
-            $namaJurusan = $jurusan?->nama ?? 'Jurusan Tidak Diketahui';
-            $idJurusan = $jurusan?->id;
-            
-            // Group untuk card view: tahun > jurusan
+        $alumniWithoutJurusan = [];
+
+        foreach ($alumni as $item) {
+            // Skip jika tidak ada siswa
+            if (!$item->siswa) {
+                Log::warning("Alumni ID {$item->id} tidak punya siswa");
+                continue;
+            }
+
+            // Ambil jurusan dari relasi kenaikan_kelas
+            $jurusan = $item->jurusan;
+
+            // 🔥 FIX: Jika jurusan null, coba ambil dari sumber lain
+            if (!$jurusan) {
+                // Coba dari rombel_tujuan_id
+                if ($item->rombel_tujuan_id) {
+                    $rombel = \App\Models\Rombel::with('kelas.jurusan')->find($item->rombel_tujuan_id);
+                    if ($rombel && $rombel->kelas && $rombel->kelas->jurusan) {
+                        $jurusan = $rombel->kelas->jurusan;
+                        // Update data alumni
+                        $item->jurusan_id = $jurusan->id;
+                        $item->save();
+                        Log::info("✅ Fix jurusan dari rombel_tujuan: Alumni ID {$item->id} -> jurusan_id={$jurusan->id}");
+                    }
+                }
+
+                // Jika masih null, coba dari siswa
+                if (!$jurusan && $item->siswa && $item->siswa->rombel && $item->siswa->rombel->kelas) {
+                    $jurusan = $item->siswa->rombel->kelas->jurusan;
+                    if ($jurusan) {
+                        $item->jurusan_id = $jurusan->id;
+                        $item->save();
+                        Log::info("✅ Fix jurusan dari siswa: Alumni ID {$item->id} -> jurusan_id={$jurusan->id}");
+                    }
+                }
+            }
+
+            // Jika masih tidak ada jurusan, masukkan ke group khusus
+            if (!$jurusan) {
+                $alumniWithoutJurusan[] = $item;
+                Log::warning("Alumni ID {$item->id} TIDAK PUNYA JURUSAN, siswa: " . ($item->siswa ? $item->siswa->nama_lengkap : 'null'));
+                continue;
+            }
+
+            $idJurusan = $jurusan->id;
+            $namaJurusan = $jurusan->nama;
+            $tahun = $item->tahun_ajaran;
+
             $cardKey = $tahun . '_' . $idJurusan;
+
             if (!isset($groupedAlumniCard[$cardKey])) {
                 $groupedAlumniCard[$cardKey] = [
                     'tahun' => $tahun,
@@ -57,215 +100,196 @@ class AlumniController extends Controller
             $groupedAlumniCard[$cardKey]['count']++;
         }
 
-        // Ambil daftar tahun ajaran yang tersedia
-        $tahunAjaranList = KenaikanKelas::where('status', 'lulus')
+        // ============================================================
+        // 🔥 FIX 3: Tambahkan jurusan yang tidak punya alumni (count 0)
+        // ============================================================
+        $allJurusanCards = [];
+
+        foreach ($allJurusan as $jurusan) {
+            $totalCount = 0;
+            $tahunDisplay = $tahunSearch ?? 'Semua Tahun';
+
+            foreach ($groupedAlumniCard as $group) {
+                if ($group['jurusan_id'] == $jurusan->id) {
+                    $totalCount += $group['count'];
+                    $tahunDisplay = $group['tahun'];
+                }
+            }
+
+            $allJurusanCards[] = [
+                'jurusan_id' => $jurusan->id,
+                'jurusan' => $jurusan->nama,
+                'tahun' => $tahunDisplay,
+                'count' => $totalCount,
+            ];
+        }
+
+        // ============================================================
+        // 🔥 FIX 4: Tambahkan card untuk alumni tanpa jurusan
+        // ============================================================
+        if (count($alumniWithoutJurusan) > 0) {
+            $allJurusanCards[] = [
+                'jurusan_id' => null,
+                'jurusan' => '⚠️ Belum Teridentifikasi',
+                'tahun' => 'Semua Tahun',
+                'count' => count($alumniWithoutJurusan),
+                'is_unknown' => true
+            ];
+        }
+
+        foreach ($allJurusanCards as &$card) {
+            if ($card['jurusan_id'] === null || $card['jurusan_id'] === 0) {
+                $card['jurusan_id'] = 0;
+                $card['jurusan'] = $card['jurusan'] ?? '⚠️ Belum Teridentifikasi';
+            }
+        }
+
+        // Ambil daftar tahun ajaran untuk filter
+        $tahunAjaranList = KenaikanKelas::where('status', 'Lulus')
             ->distinct()
             ->orderBy('tahun_ajaran', 'desc')
             ->pluck('tahun_ajaran');
 
-        // Buat card untuk semua jurusan (dengan atau tanpa data)
-        $allJurusanCards = [];
-        foreach ($allJurusan as $jurusan) {
-            $cardKey = ($tahunSearch ?? 'all') . '_' . $jurusan->id;
-            $count = 0;
-
-            // Hitung alumni untuk jurusan ini (sesuai tahun filter jika ada)
-            if ($tahunSearch) {
-                $count = collect($groupedAlumniCard)->filter(function($card) use ($tahunSearch, $jurusan) {
-                    return $card['tahun'] == $tahunSearch && $card['jurusan_id'] == $jurusan->id;
-                })->sum('count');
-            } else {
-                $count = collect($groupedAlumniCard)->filter(function($card) use ($jurusan) {
-                    return $card['jurusan_id'] == $jurusan->id;
-                })->sum('count');
-            }
-
-            $allJurusanCards[$cardKey] = [
-                'tahun' => $tahunSearch ?? 'Semua Tahun',
-                'jurusan' => $jurusan->nama,
-                'jurusan_id' => $jurusan->id,
-                'count' => $count,
-            ];
-        }
-
         return view('tu.alumni.index', compact('allJurusanCards', 'tahunAjaranList', 'tahunSearch'));
     }
 
-    public function byJurusan($jurusanId)
+    public function byJurusan($jurusanId = null, Request $request)
     {
-        $jurusanId = (int) $jurusanId;
-        $tahun = trim(request('tahun', 'Semua Tahun')); // Read from query string
-        
-        // Ambil daftar tahun ajaran yang tersedia untuk jurusan ini
-        $tahunAjaranList = KenaikanKelas::where('status', 'lulus')
-            ->with(['siswa.rombel.kelas.jurusan', 'rombelTujuan.kelas.jurusan'])
-            ->get()
-            ->filter(function($k) use ($jurusanId) {
-                $siswa = $k->siswa;
-                $rombel = $k->rombelTujuan ?? $siswa->rombel;
-                $kelas = $rombel?->kelas;
-                $jurusan = $kelas?->jurusan;
-                return $jurusan && (int) $jurusan->id === $jurusanId;
-            })
-            ->pluck('tahun_ajaran')
-            ->unique()
-            ->sort()
-            ->reverse()
-            ->values();
-        
-        // Ambil data alumni berdasarkan tahun dan jurusan
-        $query = KenaikanKelas::where('status', 'lulus');
-        
-        // Filter tahun jika bukan "Semua Tahun"
+        // Jika jurusanId null atau 0, tampilkan semua
+        if ($jurusanId === null || $jurusanId == 0) {
+            $jurusanId = 0;
+            $namaJurusan = '⚠️ Belum Teridentifikasi';
+            
+            $query = KenaikanKelas::where('status', 'Lulus')
+                ->whereNull('jurusan_id')
+                ->with(['siswa', 'jurusan']);
+        } else {
+            $jurusan = Jurusan::find($jurusanId);
+            if (!$jurusan) {
+                abort(404, 'Jurusan tidak ditemukan');
+            }
+            $namaJurusan = $jurusan->nama;
+
+            $query = KenaikanKelas::where('status', 'Lulus')
+                ->where(function($q) use ($jurusanId) {
+                    $q->where('jurusan_id', $jurusanId)
+                      ->orWhereHas('siswa.rombel.kelas.jurusan', function($jq) use ($jurusanId) {
+                          $jq->where('id', $jurusanId);
+                      });
+                })
+                ->with(['siswa', 'jurusan']);
+        }
+
+        $tahun = trim($request->tahun ?? 'Semua Tahun');
         if ($tahun !== 'Semua Tahun' && !empty($tahun)) {
             $query->where('tahun_ajaran', $tahun);
         }
-        
-        $kelulusan = $query->with([
-                'siswa' => function($q) {
-                    $q->with(['rombel' => function($r) {
-                        $r->with('kelas.jurusan');
-                    }]);
-                },
-                'rombelTujuan.kelas.jurusan'
-            ])
-            ->orderBy('tahun_ajaran', 'desc')
-            ->get();
 
-        // Filter berdasarkan jurusan dan group berdasarkan kelas + rombel
+        $alumni = $query->orderBy('tahun_ajaran', 'desc')->get();
+
+        // Group berdasarkan rombel/kelas
         $groupedAlumni = [];
-        $namaJurusan = '';
-        
-        foreach ($kelulusan as $k) {
-            $siswa = $k->siswa;
-            $rombel = $k->rombelTujuan ?? $siswa->rombel;
-            $kelas = $rombel?->kelas;
-            $jurusan = $kelas?->jurusan;
-            
-            if ($jurusan && (int) $jurusan->id === $jurusanId) {
-                $namaJurusan = $jurusan->nama;
-                
-                // Composite key untuk grouping berdasarkan kelas + rombel
-                $kelasId = $kelas?->id ?? 0;
-                $rombelId = $rombel?->id ?? 0;
-                $compositeKey = $kelasId . '_' . $rombelId;
-                
-                $tingkat = $kelas?->tingkat ?? '-';
-                $rombelNama = $rombel?->nama ?? 'Rombel Tidak Diketahui';
-                
-                // Inisialisasi group jika belum ada
-                if (!isset($groupedAlumni[$compositeKey])) {
-                    $groupedAlumni[$compositeKey] = [
-                        'composite_key' => $compositeKey,
-                        'kelas_tingkat' => $tingkat,
-                        'rombel_nama' => $rombelNama,
-                        'display_name' => 'Kelas ' . $tingkat . ' - ' . $rombelNama,
-                        'students' => []
-                    ];
-                }
-                
-                // Tambahkan siswa ke group
-                $groupedAlumni[$compositeKey]['students'][] = [
-                    'siswa' => $siswa,
+
+        foreach ($alumni as $item) {
+            if (!$item->siswa) {
+                continue;
+            }
+
+            $siswa = $item->siswa;
+            $rombelNama = $siswa->rombel ? $siswa->rombel->nama : 'Tidak Ada Kelas';
+            $kelasTingkat = $item->kelas_tingkat ?? 'XII';
+
+            $key = $kelasTingkat . '_' . $rombelNama;
+
+            if (!isset($groupedAlumni[$key])) {
+                $groupedAlumni[$key] = [
+                    'kelas_tingkat' => $kelasTingkat,
+                    'rombel_nama' => $rombelNama,
+                    'display_name' => 'Kelas ' . $kelasTingkat . ' - ' . $rombelNama,
+                    'students' => []
                 ];
             }
+
+            $groupedAlumni[$key]['students'][] = $siswa;
         }
 
-        return view('tu.alumni.by-jurusan', compact('groupedAlumni', 'tahun', 'jurusanId', 'namaJurusan', 'tahunAjaranList'));
+        // Tahun ajaran list untuk filter
+        $tahunAjaranList = KenaikanKelas::where('status', 'Lulus')
+            ->when($jurusanId == 0, function($q) {
+                return $q->whereNull('jurusan_id');
+            }, function($q) use ($jurusanId) {
+                return $q->where('jurusan_id', $jurusanId)
+                    ->orWhereHas('siswa.rombel.kelas.jurusan', function($jq) use ($jurusanId) {
+                        $jq->where('id', $jurusanId);
+                    });
+            })
+            ->distinct()
+            ->orderBy('tahun_ajaran', 'desc')
+            ->pluck('tahun_ajaran');
+
+        return view('tu.alumni.by-jurusan', compact(
+            'groupedAlumni', 
+            'tahun', 
+            'jurusanId', 
+            'namaJurusan', 
+            'tahunAjaranList'
+        ));
     }
 
     public function show($id)
     {
-        $siswa = DataSiswa::with(['rombel', 'ayah', 'ibu', 'wali'])->findOrFail($id);
+        $siswa = DataSiswa::with(['rombel', 'ayah', 'ibu', 'wali', 'agama', 'jenisKelamin'])->findOrFail($id);
         return view('tu.alumni.show', compact('siswa'));
     }
 
-    public function bukuInduk($siswa_id)
+    // 🔥 FIX 7: Tambahkan method untuk memperbaiki data alumni
+    public function fixJurusan(Request $request)
+    {
+        $fixed = 0;
+        $alumniNull = KenaikanKelas::where('status', 'Lulus')
+            ->whereNull('jurusan_id')
+            ->get();
+
+        foreach ($alumniNull as $alumni) {
+            $jurusanId = null;
+
+            // Coba dari rombel_tujuan_id
+            if ($alumni->rombel_tujuan_id) {
+                $rombel = \App\Models\Rombel::with('kelas.jurusan')->find($alumni->rombel_tujuan_id);
+                if ($rombel && $rombel->kelas && $rombel->kelas->jurusan) {
+                    $jurusanId = $rombel->kelas->jurusan_id;
+                }
+            }
+
+            // Coba dari siswa
+            if (!$jurusanId && $alumni->siswa && $alumni->siswa->rombel && $alumni->siswa->rombel->kelas) {
+                $jurusanId = $alumni->siswa->rombel->kelas->jurusan_id;
+            }
+
+            if ($jurusanId) {
+                $alumni->jurusan_id = $jurusanId;
+                $alumni->save();
+                $fixed++;
+            }
+        }
+
+        return redirect()->back()->with('success', "Berhasil memperbaiki {$fixed} data alumni");
+    }
+
+    // ================================================================
+    // 🔥 TAMBAHAN METHOD UNTUK RAPORT ALUMNI
+    // ================================================================
+
+    /**
+     * Tampilkan daftar raport yang tersedia untuk alumni
+     */
+    public function raporList($siswa_id)
     {
         $siswa = DataSiswa::with(['rombel.kelas.jurusan'])->findOrFail($siswa_id);
         
-        // Ambil data nilai untuk buku induk
-        $nilaiRaports = \App\Models\NilaiRaport::where('siswa_id', $siswa_id)
-            ->with('mapel')
-            ->orderBy('tahun_ajaran')
-            ->orderBy('semester')
-            ->get();
-        
-        // Group nilai berdasarkan tahun ajaran dan kelompok
-        $byKelompok = [];
-        $tahunAjaranList = [];
-        
-        foreach ($nilaiRaports as $nilai) {
-            if (!$nilai->mapel) continue;
-            
-            $tahun = $nilai->tahun_ajaran;
-            $semester = $nilai->semester;
-            $kelompok = $nilai->mapel->kelompok ?? 'A';
-            $mapelNama = $nilai->mapel->nama;
-            $nilaiAkhir = $nilai->nilai_akhir ?? '-';
-            
-            // Konversi semester ke angka jika string
-            $semesterNum = $semester;
-            if (is_string($semester)) {
-                $semesterNum = strtolower($semester) === 'ganjil' ? 1 : (strtolower($semester) === 'genap' ? 2 : $semester);
-            }
-            
-            // Tambah ke tahun ajaran list jika belum ada
-            if (!in_array($tahun, $tahunAjaranList)) {
-                $tahunAjaranList[] = $tahun;
-            }
-            
-            // Buat struktur kelompok jika belum ada
-            if (!isset($byKelompok[$kelompok])) {
-                $byKelompok[$kelompok] = [];
-            }
-            
-            // Buat struktur mapel jika belum ada
-            if (!isset($byKelompok[$kelompok][$mapelNama])) {
-                $byKelompok[$kelompok][$mapelNama] = [
-                    'nama' => $mapelNama,
-                    'nilai' => []
-                ];
-            }
-            
-            // Buat struktur tahun ajaran jika belum ada
-            if (!isset($byKelompok[$kelompok][$mapelNama]['nilai'][$tahun])) {
-                $byKelompok[$kelompok][$mapelNama]['nilai'][$tahun] = [];
-            }
-            
-            // Simpan nilai dengan key semester (1 atau 2)
-            $byKelompok[$kelompok][$mapelNama]['nilai'][$tahun][$semesterNum] = $nilaiAkhir;
-        }
-        
-        // Sort tahun ajaran
-        sort($tahunAjaranList);
-        
-        // Ambil status mutasi terakhir (jika ada)
-        $kenaikanKelas = KenaikanKelas::where('siswa_id', $siswa_id)
-            ->orderBy('tahun_ajaran', 'desc')
-            ->orderBy('semester', 'desc')
-            ->first();
-        
-        // Attach mutasi terakhir ke siswa untuk view
-        $siswa->mutasiTerakhir = $kenaikanKelas;
-        
-        // Struktur data sesuai view
-        $nilaiByKelompok = [
-            'byKelompok' => $byKelompok,
-            'tahunAjaranList' => $tahunAjaranList
-        ];
-        
-        return view('tu.alumni.buku-induk.show', compact('siswa', 'nilaiByKelompok'));
-    }
-
-    public function raporList($siswa_id)
-    {
-        $siswa = DataSiswa::findOrFail($siswa_id);
-        
-        // Ambil semua raport yang tersedia untuk alumni ini
-        $raports = \App\Models\NilaiRaport::where('siswa_id', $siswa_id)
+        $raports = NilaiRaport::where('siswa_id', $siswa_id)
             ->select('semester', 'tahun_ajaran')
-            ->distinct('tahun_ajaran', 'semester')
+            ->distinct()
             ->orderBy('tahun_ajaran', 'desc')
             ->orderBy('semester', 'desc')
             ->get();
@@ -273,39 +297,34 @@ class AlumniController extends Controller
         return view('tu.alumni.raport.list', compact('siswa', 'raports'));
     }
 
+    /**
+     * Tampilkan detail raport alumni
+     */
     public function raporShow($siswa_id, $semester, $tahun)
     {
         $siswa = DataSiswa::with(['rombel.kelas'])->findOrFail($siswa_id);
         
-        // Ubah format tahun jika perlu
-        $tahun = str_replace('-', '/', $tahun);
-        
-        // Ambil nilai raport dengan kelas dan jurusan history
-        $nilaiRaports = \App\Models\NilaiRaport::where('siswa_id', $siswa_id)
+        $nilaiRaports = NilaiRaport::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->with(['mapel', 'kelas.jurusan', 'rombel'])
             ->get();
         
-        // Ambil ekstrakurikuler
-        $ekstra = \App\Models\EkstrakurikulerSiswa::where('siswa_id', $siswa_id)
+        $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->get();
         
-        // Ambil kehadiran
-        $kehadiran = \App\Models\Kehadiran::where('siswa_id', $siswa_id)
+        $kehadiran = Kehadiran::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->first();
         
-        // Ambil kenaikan kelas (hanya untuk semester genap)
         $kenaikan = KenaikanKelas::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->first();
         
-        // Ambil kelas history (dari nilai raport yang pertama)
         $kelasHistory = $nilaiRaports->first()?->kelas;
         
         return view('tu.alumni.raport.show', compact(
@@ -321,122 +340,34 @@ class AlumniController extends Controller
     }
 
     /**
-     * Print/Cetak Buku Induk for Alumni
-     */
-    public function bukuIndukCetak($siswa_id)
-    {
-        $siswa = DataSiswa::with(['rombel.kelas.jurusan', 'ayah', 'ibu', 'wali'])->findOrFail($siswa_id);
-        
-        // Ambil data nilai untuk buku induk
-        $nilaiRaports = \App\Models\NilaiRaport::where('siswa_id', $siswa_id)
-            ->with('mapel')
-            ->orderBy('tahun_ajaran')
-            ->orderBy('semester')
-            ->get();
-        
-        // Group nilai berdasarkan tahun ajaran dan kelompok
-        $byKelompok = [];
-        $tahunAjaranList = [];
-        
-        foreach ($nilaiRaports as $nilai) {
-            if (!$nilai->mapel) continue;
-            
-            $tahun = $nilai->tahun_ajaran;
-            $semester = $nilai->semester;
-            $kelompok = $nilai->mapel->kelompok ?? 'A';
-            $mapelNama = $nilai->mapel->nama;
-            $nilaiAkhir = $nilai->nilai_akhir ?? '-';
-            
-            // Konversi semester ke angka jika string
-            $semesterNum = $semester;
-            if (is_string($semester)) {
-                $semesterNum = strtolower($semester) === 'ganjil' ? 1 : (strtolower($semester) === 'genap' ? 2 : $semester);
-            }
-            
-            // Tambah ke tahun ajaran list jika belum ada
-            if (!in_array($tahun, $tahunAjaranList)) {
-                $tahunAjaranList[] = $tahun;
-            }
-            
-            // Buat struktur kelompok jika belum ada
-            if (!isset($byKelompok[$kelompok])) {
-                $byKelompok[$kelompok] = [];
-            }
-            
-            // Buat struktur mapel jika belum ada
-            if (!isset($byKelompok[$kelompok][$mapelNama])) {
-                $byKelompok[$kelompok][$mapelNama] = [
-                    'nama' => $mapelNama,
-                    'nilai' => []
-                ];
-            }
-            
-            // Buat struktur tahun ajaran jika belum ada
-            if (!isset($byKelompok[$kelompok][$mapelNama]['nilai'][$tahun])) {
-                $byKelompok[$kelompok][$mapelNama]['nilai'][$tahun] = [];
-            }
-            
-            // Simpan nilai dengan key semester (1 atau 2)
-            $byKelompok[$kelompok][$mapelNama]['nilai'][$tahun][$semesterNum] = $nilaiAkhir;
-        }
-        
-        // Sort tahun ajaran
-        sort($tahunAjaranList);
-        
-        // Ambil status mutasi terakhir (jika ada)
-        $kenaikanKelas = KenaikanKelas::where('siswa_id', $siswa_id)
-            ->orderBy('tahun_ajaran', 'desc')
-            ->orderBy('semester', 'desc')
-            ->first();
-        
-        // Attach mutasi terakhir ke siswa untuk view
-        $siswa->mutasiTerakhir = $kenaikanKelas;
-        
-        // Struktur data sesuai view
-        $nilaiByKelompok = [
-            'byKelompok' => $byKelompok,
-            'tahunAjaranList' => $tahunAjaranList
-        ];
-        
-        return view('tu.alumni.buku-induk.cetak', compact('siswa', 'nilaiByKelompok'));
-    }
-
-    /**
-     * Print/Cetak Raport for Alumni
+     * Cetak raport alumni
      */
     public function raporCetak($siswa_id, $semester, $tahun)
     {
         $siswa = DataSiswa::with(['rombel.kelas'])->findOrFail($siswa_id);
-        
-        // Ubah format tahun jika perlu
         $tahun = str_replace('-', '/', $tahun);
         
-        // Ambil nilai raport dengan kelas dan jurusan history
-        $nilaiRaports = \App\Models\NilaiRaport::where('siswa_id', $siswa_id)
+        $nilaiRaports = NilaiRaport::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->with(['mapel', 'kelas.jurusan', 'rombel'])
             ->get();
         
-        // Ambil ekstrakurikuler
-        $ekstra = \App\Models\EkstrakurikulerSiswa::where('siswa_id', $siswa_id)
+        $ekstra = EkstrakurikulerSiswa::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->get();
         
-        // Ambil kehadiran
-        $kehadiran = \App\Models\Kehadiran::where('siswa_id', $siswa_id)
+        $kehadiran = Kehadiran::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->first();
         
-        // Ambil kenaikan kelas (hanya untuk semester genap)
         $kenaikan = KenaikanKelas::where('siswa_id', $siswa_id)
             ->where('semester', $semester)
             ->where('tahun_ajaran', $tahun)
             ->first();
         
-        // Ambil kelas history (dari nilai raport yang pertama)
         $kelasHistory = $nilaiRaports->first()?->kelas;
         
         return view('tu.alumni.raport.cetak', compact(
@@ -449,5 +380,143 @@ class AlumniController extends Controller
             'semester',
             'tahun'
         ));
+    }
+
+    /**
+     * Buku Induk Alumni
+     */
+    public function bukuInduk($siswa_id)
+    {
+        $siswa = DataSiswa::with(['rombel.kelas.jurusan', 'ayah', 'ibu', 'wali'])->findOrFail($siswa_id);
+        
+        $nilaiRaports = NilaiRaport::where('siswa_id', $siswa_id)
+            ->with('mapel')
+            ->orderBy('tahun_ajaran')
+            ->orderBy('semester')
+            ->get();
+        
+        $byKelompok = [];
+        $tahunAjaranList = [];
+        
+        foreach ($nilaiRaports as $nilai) {
+            if (!$nilai->mapel) continue;
+            
+            $tahun = $nilai->tahun_ajaran;
+            $semester = $nilai->semester;
+            $kelompok = $nilai->mapel->kelompok ?? 'A';
+            $mapelNama = $nilai->mapel->nama;
+            $nilaiAkhir = $nilai->nilai_akhir ?? '-';
+            
+            $semesterNum = $semester;
+            if (is_string($semester)) {
+                $semesterNum = strtolower($semester) === 'ganjil' ? 1 : (strtolower($semester) === 'genap' ? 2 : $semester);
+            }
+            
+            if (!in_array($tahun, $tahunAjaranList)) {
+                $tahunAjaranList[] = $tahun;
+            }
+            
+            if (!isset($byKelompok[$kelompok])) {
+                $byKelompok[$kelompok] = [];
+            }
+            
+            if (!isset($byKelompok[$kelompok][$mapelNama])) {
+                $byKelompok[$kelompok][$mapelNama] = [
+                    'nama' => $mapelNama,
+                    'nilai' => []
+                ];
+            }
+            
+            if (!isset($byKelompok[$kelompok][$mapelNama]['nilai'][$tahun])) {
+                $byKelompok[$kelompok][$mapelNama]['nilai'][$tahun] = [];
+            }
+            
+            $byKelompok[$kelompok][$mapelNama]['nilai'][$tahun][$semesterNum] = $nilaiAkhir;
+        }
+        
+        sort($tahunAjaranList);
+        
+        $kenaikanKelas = KenaikanKelas::where('siswa_id', $siswa_id)
+            ->orderBy('tahun_ajaran', 'desc')
+            ->orderBy('semester', 'desc')
+            ->first();
+        
+        $siswa->mutasiTerakhir = $kenaikanKelas;
+        
+        $nilaiByKelompok = [
+            'byKelompok' => $byKelompok,
+            'tahunAjaranList' => $tahunAjaranList
+        ];
+        
+        return view('tu.alumni.buku-induk.show', compact('siswa', 'nilaiByKelompok'));
+    }
+
+    /**
+     * Cetak Buku Induk Alumni
+     */
+    public function bukuIndukCetak($siswa_id)
+    {
+        $siswa = DataSiswa::with(['rombel.kelas.jurusan', 'ayah', 'ibu', 'wali'])->findOrFail($siswa_id);
+        
+        $nilaiRaports = NilaiRaport::where('siswa_id', $siswa_id)
+            ->with('mapel')
+            ->orderBy('tahun_ajaran')
+            ->orderBy('semester')
+            ->get();
+        
+        $byKelompok = [];
+        $tahunAjaranList = [];
+        
+        foreach ($nilaiRaports as $nilai) {
+            if (!$nilai->mapel) continue;
+            
+            $tahun = $nilai->tahun_ajaran;
+            $semester = $nilai->semester;
+            $kelompok = $nilai->mapel->kelompok ?? 'A';
+            $mapelNama = $nilai->mapel->nama;
+            $nilaiAkhir = $nilai->nilai_akhir ?? '-';
+            
+            $semesterNum = $semester;
+            if (is_string($semester)) {
+                $semesterNum = strtolower($semester) === 'ganjil' ? 1 : (strtolower($semester) === 'genap' ? 2 : $semester);
+            }
+            
+            if (!in_array($tahun, $tahunAjaranList)) {
+                $tahunAjaranList[] = $tahun;
+            }
+            
+            if (!isset($byKelompok[$kelompok])) {
+                $byKelompok[$kelompok] = [];
+            }
+            
+            if (!isset($byKelompok[$kelompok][$mapelNama])) {
+                $byKelompok[$kelompok][$mapelNama] = [
+                    'nama' => $mapelNama,
+                    'nilai' => []
+                ];
+            }
+            
+            if (!isset($byKelompok[$kelompok][$mapelNama]['nilai'][$tahun])) {
+                $byKelompok[$kelompok][$mapelNama]['nilai'][$tahun] = [];
+            }
+            
+            $byKelompok[$kelompok][$mapelNama]['nilai'][$tahun][$semesterNum] = $nilaiAkhir;
+        }
+        
+        sort($tahunAjaranList);
+        
+        $kenaikanKelas = KenaikanKelas::where('siswa_id', $siswa_id)
+            ->orderBy('tahun_ajaran', 'desc')
+            ->orderBy('semester', 'desc')
+            ->first();
+        
+        $siswa->mutasiTerakhir = $kenaikanKelas;
+        
+        $nilaiByKelompok = [
+            'byKelompok' => $byKelompok,
+            'tahunAjaranList' => $tahunAjaranList
+        ];
+        
+        return view('tu.alumni.buku-induk.cetak', compact('siswa', 'nilaiByKelompok'));
     }
 }

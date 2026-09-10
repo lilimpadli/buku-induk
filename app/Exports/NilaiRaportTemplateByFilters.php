@@ -2,125 +2,150 @@
 
 namespace App\Exports;
 
-use App\Models\DataSiswa;
+use App\Models\DataSiswa as Siswa;
 use App\Models\MataPelajaran;
+use App\Models\Kurikulum;
+use App\Models\Jurusan;
+use App\Models\KonsentrasiKeahlian;
+use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
-class NilaiRaportTemplateByFilters implements FromArray, WithStyles, WithColumnWidths
+class NilaiRaportTemplateByFilters implements FromCollection, WithHeadings, WithStyles, WithTitle, ShouldAutoSize
 {
     protected $kurikulumIds;
     protected $jurusanIds;
     protected $tingkatLevels;
+    protected $konsentrasiIds;
+    protected $mataPelajarans;
+    protected $headersCount = 0;
 
-    public function __construct($kurikulumIds = [], $jurusanIds = [], $tingkatLevels = [])
+    public function __construct($kurikulumIds = [], $jurusanIds = [], $tingkatLevels = [], $konsentrasiIds = [])
     {
-        $this->kurikulumIds = (array)$kurikulumIds;
-        $this->jurusanIds = (array)$jurusanIds;
-        $this->tingkatLevels = (array)$tingkatLevels;
+        $this->kurikulumIds = is_array($kurikulumIds) ? array_filter($kurikulumIds) : (array_filter([$kurikulumIds]));
+        $this->jurusanIds = is_array($jurusanIds) ? array_filter($jurusanIds) : (array_filter([$jurusanIds]));
+        $this->tingkatLevels = is_array($tingkatLevels) ? array_filter($tingkatLevels) : (array_filter([$tingkatLevels]));
+        $this->konsentrasiIds = is_array($konsentrasiIds) ? array_filter($konsentrasiIds) : (array_filter([$konsentrasiIds]));
+
+        $this->loadMataPelajaran();
     }
 
-    public function array(): array
+    protected function getFormattedTingkatVariants(): array
     {
-        // Get mata pelajaran based on kurikulum and jurusan filters
+        $variants = [];
+        foreach ($this->tingkatLevels as $t) {
+            $val = trim((string)$t);
+            $variants[] = $val;
+
+            $cleaned = preg_replace('/[^0-9]/', '', $val);
+            if (!empty($cleaned)) {
+                $num = (int)$cleaned;
+                $variants[] = $num;
+                $variants[] = (string)$num;
+                if ($num === 10) $variants[] = 'X';
+                if ($num === 11) $variants[] = 'XI';
+                if ($num === 12) $variants[] = 'XII';
+            } else {
+                $upper = strtoupper($val);
+                if ($upper === 'X') { $variants[] = 10; $variants[] = '10'; }
+                if ($upper === 'XI') { $variants[] = 11; $variants[] = '11'; }
+                if ($upper === 'XII') { $variants[] = 12; $variants[] = '12'; }
+            }
+        }
+        return array_unique($variants);
+    }
+
+    protected function loadMataPelajaran()
+    {
+        $tingkatVariants = $this->getFormattedTingkatVariants();
         $mataPelajaranQuery = MataPelajaran::query();
-        
+
         if (!empty($this->kurikulumIds)) {
             $mataPelajaranQuery->whereHas('kurikulums', function ($q) {
                 $q->whereIn('kurikulum_id', $this->kurikulumIds);
             });
         }
-        
+
         if (!empty($this->jurusanIds)) {
             $mataPelajaranQuery->whereHas('jurusans', function ($q) {
                 $q->whereIn('jurusan_id', $this->jurusanIds);
             });
         }
-        
-        $mataPelajarans = $mataPelajaranQuery->orderBy('nama')->get();
 
-        // Get kurikulum names
-        $kurikulums = \App\Models\Kurikulum::whereIn('id', $this->kurikulumIds)->pluck('nama_kurikulum')->toArray();
-        
-        // Get jurusan names
-        $jurusans = \App\Models\Jurusan::whereIn('id', $this->jurusanIds)->pluck('nama')->toArray();
+        if (!empty($tingkatVariants)) {
+            $mataPelajaranQuery->whereHas('tingkats', function ($q) use ($tingkatVariants) {
+                $q->where(function ($sub) use ($tingkatVariants) {
+                    $sub->whereIn('tingkat', $tingkatVariants);
+                    if (\Schema::hasColumn('mata_pelajaran_tingkat', 'tingkat_id')) {
+                        $sub->orWhereIn('tingkat_id', $tingkatVariants);
+                    }
+                });
+            });
+        }
 
-        // Get students filtered by jurusan and tingkat
-        $siswasQuery = DataSiswa::with('rombel.kelas.jurusan');
-        
+        $this->mataPelajarans = $mataPelajaranQuery->orderBy('kelompok')->orderBy('urutan')->get();
+    }
+
+    public function title(): string
+    {
+        return 'TEMPLATE NILAI RAPOR';
+    }
+
+    public function headings(): array
+    {
+        $headerRow = ['No', 'NIS', 'NISN', 'Nama Siswa', 'Rombel', 'Semester', 'Tahun Ajaran'];
+        foreach ($this->mataPelajarans as $mapel) {
+            $headerRow[] = $mapel->nama;
+        }
+
+        $this->headersCount = count($headerRow);
+        return $headerRow;
+    }
+
+    public function collection()
+    {
+        $siswaQuery = Siswa::with(['rombel.kelas.jurusan']);
+
         if (!empty($this->jurusanIds)) {
-            $siswasQuery->whereHas('rombel.kelas', function ($q) {
-                $q->whereIn('jurusan_id', $this->jurusanIds);
-            });
-        }
-        
-        if (!empty($this->tingkatLevels)) {
-            $siswasQuery->whereHas('rombel.kelas', function ($q) {
-                $q->whereIn('tingkat', $this->tingkatLevels);
+            $siswaQuery->whereHas('rombel.kelas.jurusan', function ($q) {
+                $q->whereIn('id', $this->jurusanIds);
             });
         }
 
-        // Get all students matching the filter criteria
-        $siswas = $siswasQuery->orderBy('nama_lengkap')->get();
-
-        // Build info rows at top
-        $data = [];
-        $data[] = ['TEMPLATE IMPORT NILAI RAPOR'];
-        $data[] = [];
-        
-        if (!empty($kurikulums)) {
-            $data[] = ['KURIKULUM:', implode(', ', $kurikulums)];
+        $tingkatVariants = $this->getFormattedTingkatVariants();
+        if (!empty($tingkatVariants)) {
+            $siswaQuery->whereHas('rombel.kelas', function ($q) use ($tingkatVariants) {
+                $q->whereIn('tingkat', $tingkatVariants);
+            });
         }
-        if (!empty($jurusans)) {
-            $data[] = ['JURUSAN:', implode(', ', $jurusans)];
-        }
-        if (!empty($this->tingkatLevels)) {
-            $data[] = ['TINGKAT:', implode(', ', $this->tingkatLevels)];
-        }
-        
-        $data[] = [];
 
-        // Build header row
-        $headers = ['No', 'NIS', 'NISN', 'Nama Siswa', 'Rombel'];
-        foreach ($mataPelajarans as $mp) {
-            $headers[] = substr($mp->nama, 0, 15); // Abbreviated
-        }
-        $headers[] = 'Kehadiran - Sakit';
-        $headers[] = 'Kehadiran - Izin';
-        $headers[] = 'Kehadiran - Alpa';
-        $headers[] = 'Catatan';
+        $siswas = $siswaQuery->get();
 
-        $data[] = $headers;
-
-        // Build data rows
+        $data = collect();
         $no = 1;
+
         foreach ($siswas as $siswa) {
             $row = [
                 $no++,
-                $siswa->nis ?? '',
-                $siswa->nisn ?? '',
-                $siswa->nama_lengkap,
-                $siswa->rombel ? $siswa->rombel->nama : '',
+                $siswa->nis ?? '-',
+                $siswa->nisn ?? '-',
+                $siswa->nama_lengkap ?? '-',
+                $siswa->rombel ? $siswa->rombel->nama : '-',
+                '',
+                '',
             ];
 
-            // Add empty cells for mata pelajaran values
-            foreach ($mataPelajarans as $mp) {
+            foreach ($this->mataPelajarans as $mapel) {
                 $row[] = '';
             }
 
-            // Add empty kehadiran fields
-            $row[] = 0; // Sakit
-            $row[] = 0; // Izin
-            $row[] = 0; // Alpa
-            $row[] = ''; // Catatan
-
-            $data[] = $row;
+            $data->push($row);
         }
 
         return $data;
@@ -128,92 +153,36 @@ class NilaiRaportTemplateByFilters implements FromArray, WithStyles, WithColumnW
 
     public function styles(Worksheet $sheet)
     {
-        // Style info rows (1-5) with light gray background
-        $sheet->getStyle('1:5')->applyFromArray([
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => 'E8E8E8'],
-            ],
-            'font' => [
-                'bold' => true,
-                'size' => 10,
-            ],
-        ]);
+        $lastColumn = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($this->headersCount);
+        $highestRow = $sheet->getHighestRow();
 
-        // Style title row
-        $sheet->getStyle('1:1')->applyFromArray([
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => '366092'],
-            ],
-            'font' => [
-                'bold' => true,
-                'color' => ['rgb' => 'FFFFFF'],
-                'size' => 12,
-            ],
-        ]);
-
-        // Style header row (row 6 - after info rows)
-        $sheet->getStyle('6:6')->applyFromArray([
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => '4472C4'],
-            ],
-            'font' => [
-                'bold' => true,
-                'color' => ['rgb' => 'FFFFFF'],
-            ],
+        $sheet->getStyle("A1:{$lastColumn}1")->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['argb' => '000000']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'D9D9D9']],
             'alignment' => [
                 'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+                'wrapText' => true,
+            ],
+            'borders' => [
+                'allBorders' => ['borderStyle' => Border::BORDER_THIN],
             ],
         ]);
 
+        if ($highestRow >= 2) {
+            $sheet->getStyle("A2:{$lastColumn}{$highestRow}")->applyFromArray([
+                'borders' => [
+                    'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'D9D9D9']],
+                ],
+                'alignment' => [
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+            ]);
+
+            $sheet->getStyle("A2:C{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle("E2:E{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        }
+
         return [];
-    }
-
-    public function columnWidths(): array
-    {
-        $widths = [
-            'A' => 5,   // No
-            'B' => 12,  // NIS
-            'C' => 12,  // NISN
-            'D' => 25,  // Nama Siswa
-            'E' => 12,  // Rombel
-        ];
-
-        $currentColumn = 'F';
-        for ($i = 0; $i < 20; $i++) {
-            $widths[$currentColumn] = 10;
-            $currentColumn = $this->nextColumn($currentColumn);
-        }
-
-        $widths[$currentColumn] = 12; // Sakit
-        $currentColumn = $this->nextColumn($currentColumn);
-        $widths[$currentColumn] = 12; // Izin
-        $currentColumn = $this->nextColumn($currentColumn);
-        $widths[$currentColumn] = 12; // Alpa
-        $currentColumn = $this->nextColumn($currentColumn);
-        $widths[$currentColumn] = 15; // Catatan
-
-        return $widths;
-    }
-
-    protected function nextColumn(string $column): string
-    {
-        $letters = str_split($column);
-        $index = count($letters) - 1;
-
-        while ($index >= 0) {
-            if ($letters[$index] !== 'Z') {
-                $letters[$index] = chr(ord($letters[$index]) + 1);
-                return implode('', $letters);
-            }
-
-            $letters[$index] = 'A';
-            $index--;
-        }
-
-        array_unshift($letters, 'A');
-        return implode('', $letters);
     }
 }

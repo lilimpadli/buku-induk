@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Detail Siswa - ' . $siswa->nama_lengkap)
 
@@ -509,7 +509,7 @@
                         <div class="col-md-6">
                             <table class="table-modern">
                                 <tbody>
-                                    <tr><th>Agama</th><td>{{ $siswa->agama ?? '-' }}</td></tr>
+                                    <tr><th>Agama</th><td>{{ $siswa->nama_agama }}</td></tr>
                                     <tr><th>Kewarganegaraan</th><td>{{ $siswa->kewarganegaraan ?? '-' }}</td></tr>
                                     <tr><th>Sekolah Asal</th><td>{{ $siswa->sekolah_asal ?? '-' }}</td></tr>
                                     <tr><th>Tanggal Diterima</th><td>{{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->format('d-m-Y') : '-' }}</td></tr>
@@ -601,10 +601,10 @@
                         <div class="bg-light rounded-3 p-3">
                             <table class="table-modern mb-0">
                                 <tbody>
-                                    <tr><th style="width: 120px">Nama</th><td>{{ $siswa->ayah->nama ?? '-' }}</td></tr>
-                                    <tr><th>Pekerjaan</th><td>{{ $siswa->ayah->pekerjaan ?? '-' }}</td></tr>
-                                    <tr><th>Telepon</th><td>{{ $siswa->ayah->telepon ?? '-' }}</td></tr>
-                                    <tr><th>Alamat</th><td>{{ $siswa->ayah->alamat ?? '-' }}</td></tr>
+                                    <tr><th style="width: 120px">Nama</th><td>{{ $siswa->nama_ayah ?? '-' }}</td></tr>
+                                    <tr><th>Pekerjaan</th><td>{{ $siswa->pekerjaan_ayah ?? '-' }}</td></tr>
+                                    <tr><th>Telepon</th><td>{{ $siswa->telepon_ayah ?? '-' }}</td></tr>
+                                    <tr><th>Alamat</th><td>{{ $siswa->alamat_ayah ?? '-' }}</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -615,25 +615,25 @@
                         <div class="bg-light rounded-3 p-3">
                             <table class="table-modern mb-0">
                                 <tbody>
-                                    <tr><th style="width: 120px">Nama</th><td>{{ $siswa->ibu->nama ?? '-' }}</td></tr>
-                                    <tr><th>Pekerjaan</th><td>{{ $siswa->ibu->pekerjaan ?? '-' }}</td></tr>
-                                    <tr><th>Telepon</th><td>{{ $siswa->ibu->telepon ?? '-' }}</td></tr>
-                                    <tr><th>Alamat</th><td>{{ $siswa->ibu->alamat ?? '-' }}</td></tr>
+                                    <tr><th style="width: 120px">Nama</th><td>{{ $siswa->nama_ibu ?? '-' }}</td></tr>
+                                    <tr><th>Pekerjaan</th><td>{{ $siswa->pekerjaan_ibu ?? '-' }}</td></tr>
+                                    <tr><th>Telepon</th><td>{{ $siswa->telepon_ibu ?? '-' }}</td></tr>
+                                    <tr><th>Alamat</th><td>{{ $siswa->alamat_ibu ?? '-' }}</td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     <!-- Wali -->
-                    @if($siswa->wali)
+                    @if($siswa->nama_wali)
                     <div>
                         <h6 class="fw-bold mb-3"><i class="fas fa-user-shield text-secondary me-2"></i>Data Wali</h6>
                         <div class="bg-light rounded-3 p-3">
                             <table class="table-modern mb-0">
                                 <tbody>
-                                    <tr><th style="width: 120px">Nama</th><td>{{ $siswa->wali->nama ?? '-' }}</td></tr>
-                                    <tr><th>Pekerjaan</th><td>{{ $siswa->wali->pekerjaan ?? '-' }}</td></tr>
-                                    <tr><th>Telepon</th><td>{{ $siswa->wali->telepon ?? '-' }}</td></tr>
-                                    <tr><th>Alamat</th><td>{{ $siswa->wali->alamat ?? '-' }}</td></tr>
+                                    <tr><th style="width: 120px">Nama</th><td>{{ $siswa->nama_wali ?? '-' }}</td></tr>
+                                    <tr><th>Pekerjaan</th><td>{{ $siswa->pekerjaan_wali ?? '-' }}</td></tr>
+                                    <tr><th>Telepon</th><td>{{ $siswa->telepon_wali ?? '-' }}</td></tr>
+                                    <tr><th>Alamat</th><td>{{ $siswa->alamat_wali ?? '-' }}</td></tr>
                                 </tbody>
                             </table>
                         </div>

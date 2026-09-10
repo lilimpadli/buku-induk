@@ -457,16 +457,31 @@
                             <input type="date" name="tanggal_lahir" id="tanggal_lahir" class="form-control @error('tanggal_lahir') is-invalid @enderror" value="{{ old('tanggal_lahir', $siswa->tanggal_lahir) }}">
                             @error('tanggal_lahir') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
+
+                        {{-- ========== AGAMA - FIX (Hardcode) ========== --}}
                         <div class="form-group">
-                            <label for="agama" class="form-label">Agama</label>
-                            <select name="agama" id="agama" class="form-select @error('agama') is-invalid @enderror">
-                                <option value="">Pilih</option>
-                                @foreach(['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu'] as $agama)
-                                    <option value="{{ $agama }}" {{ old('agama', $siswa->agama) == $agama ? 'selected' : '' }}>{{ $agama }}</option>
-                                @endforeach
+                            <label for="agama_id" class="form-label">Agama</label>
+                            <select name="agama_id" id="agama_id" class="form-select @error('agama_id') is-invalid @enderror">
+                                <option value="">Pilih Agama</option>
+                                <option value="1" {{ old('agama_id', $siswa->agama_id) == 1 ? 'selected' : '' }}>Islam</option>
+                                <option value="2" {{ old('agama_id', $siswa->agama_id) == 2 ? 'selected' : '' }}>Kristen</option>
+                                <option value="3" {{ old('agama_id', $siswa->agama_id) == 3 ? 'selected' : '' }}>Katolik</option>
+                                <option value="4" {{ old('agama_id', $siswa->agama_id) == 4 ? 'selected' : '' }}>Hindu</option>
+                                <option value="5" {{ old('agama_id', $siswa->agama_id) == 5 ? 'selected' : '' }}>Buddha</option>
+                                <option value="6" {{ old('agama_id', $siswa->agama_id) == 6 ? 'selected' : '' }}>Konghucu</option>
+                                <option value="other" {{ old('agama_id') == 'other' ? 'selected' : '' }}>Lainnya...</option>
                             </select>
-                            @error('agama') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            @error('agama_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
+
+                        <div class="form-group" id="agamaLainnyaWrapper" style="display: none;">
+                            <label for="agama_lainnya" class="form-label">Agama Lainnya</label>
+                            <input type="text" name="agama_lainnya" id="agama_lainnya" class="form-control @error('agama_lainnya') is-invalid @enderror" 
+                                   placeholder="Masukkan agama lain" value="{{ old('agama_lainnya', $siswa->agama_lainnya) }}">
+                            @error('agama_lainnya') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        {{-- ========== END AGAMA ========== --}}
+
                         <div class="form-group">
                             <label for="kewarganegaraan" class="form-label">Kewarganegaraan</label>
                             <input type="text" name="kewarganegaraan" id="kewarganegaraan" class="form-control @error('kewarganegaraan') is-invalid @enderror" value="{{ old('kewarganegaraan', $siswa->kewarganegaraan) }}" placeholder="WNI / WNA">
@@ -698,7 +713,7 @@
                     <button type="submit" class="btn-save">
                         <i class="fas fa-save"></i> Simpan Perubahan
                     </button>
-                    <a href="{{ route('tu.buku-induk.show', $siswa->id) }}" class="btn-batal">
+                    <a href="{{ route('tu.buku-induk.index') }}" class="btn-batal">
                         <i class="fas fa-times"></i> Batal
                     </a>
                 </div>
@@ -770,6 +785,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 showPlaceholder();
             }
         });
+    }
+
+    // ========== TOGGLE AGAMA LAINNYA ==========
+    const agamaSelect = document.getElementById('agama_id');
+    const agamaLainnyaWrapper = document.getElementById('agamaLainnyaWrapper');
+    const agamaLainnyaInput = document.getElementById('agama_lainnya');
+
+    function toggleAgamaLainnya() {
+        if (agamaSelect && agamaSelect.value === 'other') {
+            agamaLainnyaWrapper.style.display = 'block';
+            if (agamaLainnyaInput) agamaLainnyaInput.required = true;
+        } else {
+            agamaLainnyaWrapper.style.display = 'none';
+            if (agamaLainnyaInput) {
+                agamaLainnyaInput.required = false;
+                if (agamaSelect && agamaSelect.value !== 'other') {
+                    agamaLainnyaInput.value = '';
+                }
+            }
+        }
+    }
+
+    if (agamaSelect) {
+        agamaSelect.addEventListener('change', toggleAgamaLainnya);
+        toggleAgamaLainnya(); // Initial check
     }
 
     // ========== VALIDASI STATUS MUTASI ==========

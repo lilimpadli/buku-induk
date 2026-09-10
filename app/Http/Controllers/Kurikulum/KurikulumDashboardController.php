@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 
 class KurikulumDashboardController extends Controller
 {
-    public function index()
+  public function index()
     {
         // Statistik Utama
         $totalSiswa = DataSiswa::count();
@@ -61,6 +61,15 @@ class KurikulumDashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // ⭐ TAMBAHKAN: STATISTIK WALI KELAS
+        $totalRombels = Rombel::count();
+        $rombelsWithWali = Rombel::whereNotNull('guru_id')->count();
+        $rombelsWithoutWali = Rombel::whereNull('guru_id')->count();
+        $rombelsWithoutWaliList = Rombel::with(['kelas.jurusan'])
+            ->whereNull('guru_id')
+            ->limit(5)
+            ->get();
+
         return view('kurikulum.dashboard', compact(
             'totalSiswa',
             'totalGuru',
@@ -74,8 +83,12 @@ class KurikulumDashboardController extends Controller
             'siswaXI',
             'siswaXII',
             'jurusanData',
-            'rombels'
+            'rombels',
+            // ⭐ TAMBAHKAN VARIABLE INI
+            'totalRombels',
+            'rombelsWithWali',
+            'rombelsWithoutWali',
+            'rombelsWithoutWaliList'
         ));
     }
 }
-

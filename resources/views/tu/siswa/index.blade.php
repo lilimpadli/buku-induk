@@ -95,7 +95,8 @@ body{
     display:flex;
     align-items:center;
     gap:16px;
-    flex-wrap:wrap;
+    flex-wrap:nowrap;
+    overflow-x:auto;
 }
 
 .stat-card{
@@ -430,6 +431,10 @@ body{
     background:linear-gradient(135deg,#F59E0B,#FBBF24);
 }
 
+.btn-print{
+    background:linear-gradient(135deg,#6366F1,#8B5CF6);
+}
+
 .btn-delete{
     background:linear-gradient(135deg,#EF4444,#F87171);
 }
@@ -588,7 +593,6 @@ body{
 
     <!-- HEADER -->
     <div class="page-header">
-
         <div class="header-content">
 
             <div>
@@ -606,38 +610,64 @@ body{
                     <div class="stat-label">Total Siswa</div>
                 </div>
 
-                <a href="{{ route('tu.siswa.export', collect(request()->query())->except('page')->toArray()) }}"
-                   class="btn-modern btn-success-modern">
-                    <i class="fas fa-file-excel"></i>
-                    Export Excel
-                </a>
+                <div class="action-group" style="flex-wrap:nowrap; gap:10px;">
+                    <a href="{{ route('tu.siswa.export', collect(request()->query())->except('page')->toArray()) }}"
+                       class="btn-modern btn-success-modern">
+                        <i class="fas fa-file-excel"></i>
+                        Export Excel
+                    </a>
 
-                <a href="{{ route('tu.siswa.template.download') }}"
-                   class="btn-modern btn-warning-modern">
-                    <i class="fas fa-download"></i>
-                    Download Template
-                </a>
+                    <a href="{{ route('tu.siswa.cetak-claver.index') }}" class="btn-modern btn-warning-modern">
+                        <i class="fas fa-book"></i>
+                        Cetak Claver
+                    </a>
 
-                <button type="button"
-                        class="btn-modern btn-info-modern"
-                        data-bs-toggle="modal"
-                        data-bs-target="#importModal">
-                    <i class="fas fa-file-import"></i>
-                    Import Excel
-                </button>
+                    <button type="button"
+                            class="btn-modern btn-primary-modern"
+                            data-bs-toggle="modal"
+                            data-bs-target="#cetakBiodataModal">
+                        <i class="fas fa-print"></i>
+                        Cetak Biodata
+                    </button>
 
-                <a href="{{ route('tu.siswa.create') }}"
-                   class="btn-modern btn-primary-modern">
-                    <i class="fas fa-plus"></i>
-                    Tambah Siswa
-                </a>
+                    <button type="button"
+                            class="btn-modern btn-secondary-modern"
+                            data-bs-toggle="modal"
+                            data-bs-target="#cetakDaftarHadirRapotModal">
+                        <i class="fas fa-file-pdf"></i>
+                        Cetak Daftar Hadir Rapot
+                    </button>
+
+                    <a href="{{ route('tu.siswa.template.download') }}"
+                       class="btn-modern btn-warning-modern">
+                        <i class="fas fa-download"></i>
+                        Download Template
+                    </a>
+
+                    <button type="button"
+                            class="btn-modern btn-info-modern"
+                            data-bs-toggle="modal"
+                            data-bs-target="#importModal">
+                        <i class="fas fa-file-import"></i>
+                        Import Excel
+                    </button>
+
+                    <a href="{{ route('tu.siswa.create') }}"
+                       class="btn-modern btn-primary-modern">
+                        <i class="fas fa-plus"></i>
+                        Tambah Siswa
+                    </a>
+                </div>
 
             </div>
 
         </div>
 
     </div>
+
+<!-- ============================================================ -->
 <!-- FILTER TINGKAT -->
+<!-- ============================================================ -->
 <div class="class-filter">
     <a href="{{ request()->url() }}?tingkat=X{{ request()->getQueryString() ? '&' . http_build_query(array_diff_key(request()->query(), ['tingkat' => ''])) : '' }}"
        class="filter-pill {{ $currentTingkat == 'X' ? 'active' : '' }}">
@@ -654,6 +684,24 @@ body{
     <a href="{{ route('tu.siswa.index') }}"
        class="filter-pill {{ !$currentTingkat ? 'active' : '' }}">
         <i class="fas fa-globe"></i> Semua
+    </a>
+</div>
+
+<!-- ============================================================ -->
+<!-- FILTER STATUS (BARU) -->
+<!-- ============================================================ -->
+<div class="class-filter">
+    <a href="{{ request()->url() }}?status=aktif{{ request()->getQueryString() ? '&' . http_build_query(array_diff_key(request()->query(), ['status' => ''])) : '' }}"
+       class="filter-pill {{ request('status', 'aktif') == 'aktif' ? 'active' : '' }}">
+        <i class="fas fa-user-check"></i> Aktif
+    </a>
+    <a href="{{ request()->url() }}?status=semua{{ request()->getQueryString() ? '&' . http_build_query(array_diff_key(request()->query(), ['status' => ''])) : '' }}"
+       class="filter-pill {{ request('status') == 'semua' ? 'active' : '' }}">
+        <i class="fas fa-users"></i> Semua
+    </a>
+    <a href="{{ request()->url() }}?status=alumni{{ request()->getQueryString() ? '&' . http_build_query(array_diff_key(request()->query(), ['status' => ''])) : '' }}"
+       class="filter-pill {{ request('status') == 'alumni' ? 'active' : '' }}">
+        <i class="fas fa-graduation-cap"></i> Alumni
     </a>
 </div>
 
@@ -782,6 +830,23 @@ body{
     </div>
 @endif
 
+@if(session('import_warnings'))
+    <div class="alert alert-warning alert-dismissible fade show mt-3" role="alert" style="border-radius:16px;border-left:5px solid #F59E0B;">
+        <div class="d-flex align-items-start gap-3">
+            <i class="fas fa-triangle-exclamation fa-2x" style="color:#F59E0B;margin-top:4px;"></i>
+            <div>
+                <div class="fw-bold">⚠️ Perhatian!</div>
+                <div style="font-size:14px;max-height:200px;overflow-y:auto;">
+                    @foreach(session('import_warnings') as $warning)
+                        <div style="border-bottom:1px solid #fef3c7;padding:4px 0;">{{ $warning }}</div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
     @if($siswas->count() > 0)
         @if($siswas->total())
             <div class="mb-3 text-muted">
@@ -885,9 +950,20 @@ body{
                                 </span>
                             </td>
 
+                            <!-- ============================================================ -->
+                            <!-- KELAS - DENGAN BADGE ALUMNI -->
+                            <!-- ============================================================ -->
                             <td>
+                                @php
+                                    $isLulus = $siswa->mutasiTerakhir && $siswa->mutasiTerakhir->status == 'lulus';
+                                @endphp
 
-                                @if($rombel)
+                                @if($isLulus)
+                                    <span class="badge-modern" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9); color:white; border-radius:999px; padding:6px 16px; font-weight:700;">
+                                        <i class="fas fa-graduation-cap"></i>
+                                        Alumni
+                                    </span>
+                                @elseif($rombel)
                                     <span class="badge-modern badge-class">
                                         <i class="fas fa-graduation-cap"></i>
 
@@ -898,8 +974,8 @@ body{
                                         @endif
                                     </span>
                                 @else
-                                    <span class="badge-modern badge-class">
-                                        <i class="fas fa-question"></i>
+                                    <span class="badge-modern" style="background:#FEF3C7; color:#92400E; border-radius:999px; padding:6px 16px; font-weight:700;">
+                                        <i class="fas fa-clock"></i>
                                         Belum Ada Kelas
                                     </span>
                                 @endif
@@ -920,6 +996,13 @@ body{
                                        class="action-btn btn-edit"
                                        tooltip="Edit Siswa">
                                         <i class="fas fa-pen"></i>
+                                    </a>
+
+                                    <a href="{{ route('tu.laporan.surat-aktif', $siswa->id) }}"
+                                       class="action-btn btn-print"
+                                       tooltip="Cetak Surat Aktif"
+                                       target="_blank">
+                                        <i class="fas fa-file-alt"></i>
                                     </a>
 
                                     <form action="{{ route('tu.siswa.destroy',$siswa->id) }}"
@@ -992,6 +1075,101 @@ body{
     @endif
 
 </div>
+
+<!-- Modal: Cetak Biodata -->
+<div class="modal fade" id="cetakBiodataModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="GET" action="{{ route('tu.laporan.biodata-all') }}" target="_blank">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-print text-primary"></i> Cetak Biodata
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Pilih Rombel -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-users"></i> Pilih Rombel
+                        </label>
+                        <select name="rombel_id" class="form-select" required>
+                            <option value="">-- Pilih Rombel --</option>
+                            @foreach(($allRombels ?? collect()) as $r)
+                                <option value="{{ $r->id }}">{{ $r->display_name ?? $r->nama }}</option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Pilih rombel untuk mencetak biodata siswa.</small>
+                    </div>
+
+                    <!-- Pilih Tahun Ajaran -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-calendar-alt"></i> Pilih Tahun Ajaran
+                        </label>
+                        <select name="tahun_ajaran" class="form-select" required>
+                            <option value="">-- Pilih Tahun Ajaran --</option>
+                            @php
+                                $currentYear = date('Y');
+                                $tahunOptions = [
+                                    ($currentYear - 1) . '/' . $currentYear,
+                                    $currentYear . '/' . ($currentYear + 1),
+                                    ($currentYear + 1) . '/' . ($currentYear + 2),
+                                ];
+                                $tahunList = !empty($tahunAjarans) ? $tahunAjarans : $tahunOptions;
+                            @endphp
+                            @foreach($tahunList as $tahun)
+                                <option value="{{ $tahun }}" {{ $loop->first ? 'selected' : '' }}>
+                                    {{ $tahun }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Pilih tahun ajaran yang akan dicetak.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-print"></i> Cetak PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Cetak Daftar Hadir Rapot -->
+<div class="modal fade" id="cetakDaftarHadirRapotModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="GET" action="{{ route('tu.laporan.daftar-hadir-rapot') }}" target="_blank">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cetak Daftar Hadir Rapot</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Pilih Rombel</label>
+                        <select name="rombel_id" class="form-select" required>
+                            <option value="">-- Pilih Rombel --</option>
+                            @foreach(($allRombels ?? collect()) as $r)
+                                <option value="{{ $r->id }}">{{ $r->display_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Cetak PDF</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="importModal">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -1035,4 +1213,3 @@ body{
     </div>
 </div>
 @endsection
-

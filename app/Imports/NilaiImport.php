@@ -2,88 +2,162 @@
 
 namespace App\Imports;
 
-use App\Models\Siswa;
-use App\Models\MataPelajaran;
 use App\Models\NilaiRaport;
+use App\Models\DataSiswa;
+use App\Models\MataPelajaran;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
-use Maatwebsite\Excel\Concerns\WithStartRow;
+use Maatwebsite\Excel\Concerns\SkipsOnError;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
-class NilaiImport implements ToModel, WithHeadingRow, SkipsEmptyRows, WithStartRow
+class NilaiImport implements ToModel, WithHeadingRow, SkipsEmptyRows, SkipsOnError, WithChunkReading
 {
-    protected array $errors = [];
-    protected array $mapelLookup = [];
+    protected $defaultSemester;
+    protected $defaultTahunAjaran;
+    protected $mapelMap = [];
+    protected $errors = [];
+    protected $successCount = 0;
+    protected $processedRows = 0;
+    protected $rowCount = 0;
+    protected $skippedEmptyRows = 0;
 
-    public function __construct()
+    public function __construct($semester, $tahunAjaran)
     {
-        MataPelajaran::all()->each(function ($mapel) {
-            $this->mapelLookup[strtolower(trim($mapel->nama))] = $mapel->id;
-            $this->mapelLookup[strtolower(trim($mapel->id))] = $mapel->id;
-        });
-    }
+        $this->defaultSemester = $semester;
+        $this->defaultTahunAjaran = $tahunAjaran;
 
-    // Skip first 6 rows (info rows) and use row 7 as header
-    public function startRow(): int
-    {
-        return 7;
+        $mapels = MataPelajaran::all();
+        foreach ($mapels as $mapel) {
+            $this->mapelMap[strtolower(trim($mapel->nama))] = $mapel->id;
+        }
     }
 
     public function model(array $row)
     {
-        if (empty($row['nis']) || empty($row['nisn']) || empty($row['mata_pelajaran'])) {
+        $this->rowCount++;
+        $this->processedRows++;
+
+        $normalizedRow = [];
+        foreach ($row as $key => $value) {
+            $normalizedRow[strtolower(trim($key))] = $value;
+        }
+        $row = $normalizedRow;
+
+        $nis = isset($row['nis']) ? trim((string) $row['nis']) : null;
+        $nisn = isset($row['nisn']) ? trim((string) $row['nisn']) : null;
+
+        if (empty($nis) || empty($nisn)) {
+            $this->skippedEmptyRows++;
             return null;
         }
 
-        $nis = trim((string) $row['nis']);
-        $nisn = trim((string) $row['nisn']);
-        $mapelKey = strtolower(trim((string) $row['mata_pelajaran']));
-        $nilai = $row['nilai'] ?? null;
-        $semester = trim((string) ($row['semester'] ?? ''));
-        $tahunAjaran = trim((string) ($row['tahun_ajaran'] ?? ''));
-
-        $siswa = Siswa::where('nis', $nis)
-            ->where('nisn', $nisn)
-            ->first();
-
-        if (!$siswa) {
-            $this->errors[] = "Baris dengan NIS {$nis} dan NISN {$nisn} tidak ditemukan.";
-            return null;
+        $semester = isset($row['semester']) ? trim((string) $row['semester']) : $this->defaultSemester;
+        $semesterLower = strtolower($semester);
+        if ($semesterLower === 'ganjil' || $semesterLower === '1') {
+            $semester = 'Ganjil';
+        } elseif ($semesterLower === 'genap' || $semesterLower === '2') {
+            $semester = 'Genap';
         }
 
-        $mapelId = $this->mapelLookup[$mapelKey] ?? null;
-        if (!$mapelId) {
-            $this->errors[] = "Mata pelajaran '{$row['mata_pelajaran']}' tidak dikenali untuk siswa {$siswa->nama_lengkap}.";
+        $tahunAjaran = isset($row['tahun_ajaran']) ? trim((string) $row['tahun_ajaran']) : $this->defaultTahunAjaran;
+
+        try {
+            $siswa = DataSiswa::where('nis', $nis)->where('nisn', $nisn)->first();
+
+            if (!$siswa) {
+                $this->errors[] = "Siswa dengan NIS {$nis} dan NISN {$nisn} tidak ditemukan (baris {$this->rowCount})";
+                return null;
+            }
+
+            $headers = array_keys($row);
+            $excludeColumns = ['no', 'nis', 'nisn', 'nama_siswa', 'rombel', 'semester', 'tahun_ajaran'];
+
+            foreach ($headers as $col) {
+                $colLower = strtolower(trim($col));
+                if (in_array($colLower, $excludeColumns)) {
+                    continue;
+                }
+
+                $nilaiValue = $row[$col] ?? null;
+                if ($nilaiValue === '' || $nilaiValue === null) {
+                    continue;
+                }
+
+                $mapelId = $this->mapelMap[$colLower] ?? null;
+                if (!$mapelId) {
+                    continue;
+                }
+
+                $existing = NilaiRaport::where([
+                    'siswa_id' => $siswa->id,
+                    'mata_pelajaran_id' => $mapelId,
+                    'semester' => $semester,
+                    'tahun_ajaran' => $tahunAjaran,
+                ])->first();
+
+                if ($existing) {
+                    $existing->nilai_akhir = (float) $nilaiValue;
+                    $existing->kelas_id = $siswa->rombel->kelas_id ?? null;
+                    $existing->rombel_id = $siswa->rombel_id;
+                    $existing->save();
+                } else {
+                    NilaiRaport::create([
+                        'siswa_id' => $siswa->id,
+                        'mata_pelajaran_id' => $mapelId,
+                        'semester' => $semester,
+                        'tahun_ajaran' => $tahunAjaran,
+                        'nilai_akhir' => (float) $nilaiValue,
+                        'kelas_id' => $siswa->rombel->kelas_id ?? null,
+                        'rombel_id' => $siswa->rombel_id,
+                    ]);
+                }
+                $this->successCount++;
+            }
+
+            return null;
+
+        } catch (Throwable $e) {
+            $this->errors[] = "Error pada baris {$this->rowCount} (NIS {$nis}): " . $e->getMessage();
+            Log::error("NilaiImport Error: " . $e->getMessage());
             return null;
         }
-
-        $nilaiValue = is_numeric($nilai) ? (float) $nilai : null;
-        if ($nilaiValue === null) {
-            $this->errors[] = "Nilai tidak valid untuk siswa {$siswa->nama_lengkap} pada mata pelajaran {$row['mata_pelajaran']}.";
-            return null;
-        }
-
-        $siswa->loadMissing('rombel');
-
-        NilaiRaport::updateOrCreate(
-            [
-                'siswa_id' => $siswa->id,
-                'mata_pelajaran_id' => $mapelId,
-                'semester' => $semester,
-                'tahun_ajaran' => $tahunAjaran,
-            ],
-            [
-                'nilai_akhir' => $nilaiValue,
-                'kelas_id' => $siswa->rombel->kelas_id ?? null,
-                'rombel_id' => $siswa->rombel_id,
-            ]
-        );
-
-        return null;
     }
 
-    public function getErrors(): array
+    public function chunkSize(): int
+    {
+        return 100;
+    }
+
+    public function onError(\Throwable $e)
+    {
+        Log::error('NilaiImport Error: ' . $e->getMessage());
+    }
+
+    public function getErrors()
     {
         return $this->errors;
     }
-}
+
+    public function getSuccessCount()
+    {
+        return $this->successCount;
+    }
+
+    public function getProcessedRows()
+    {
+        return $this->processedRows;
+    }
+
+    public function getRowCount()
+    {
+        return $this->rowCount;
+    }
+
+    public function getSkippedEmptyRows()
+    {
+        return $this->skippedEmptyRows;
+    }
+}   

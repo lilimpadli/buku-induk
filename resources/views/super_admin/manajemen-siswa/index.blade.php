@@ -5,75 +5,105 @@
 @section('content')
 <style>
 :root {
-    --primary-blue: #f093fb;
-    --secondary-blue: #f5576c;
-    --accent-cyan: #00D4FF;
-    --accent-pink: #FF4D6D;
-    --accent-green: #43E97B;
-    --light-bg: #F4F7FE;
-    --soft-gray: #E9EEF7;
-    --text-dark: #1E293B;
-    --text-muted: #64748B;
-    --shadow-light: 0 4px 18px rgba(15,23,42,0.06);
-    --shadow-medium: 0 12px 30px rgba(245,87,108,0.08);
-    --shadow-hover: 0 16px 40px rgba(240,147,251,0.16);
-    --radius: 24px;
+    --primary-color: #4f46e5;
+    --secondary-color: #2563eb;
+    --light-bg: #f8fafc;
+    --soft-gray: #e2e8f0;
+    --text-dark: #0f172a;
+    --text-muted: #64748b;
+    --shadow-light: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+    --shadow-medium: 0 10px 15px -3px rgba(0,0,0,0.07), 0 4px 6px -2px rgba(0,0,0,0.04);
+    --shadow-hover: 0 20px 25px -5px rgba(79, 70, 229, 0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+    --radius: 16px;
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Inter', sans-serif;
     background: var(--light-bg);
+    color: var(--text-dark);
 }
 
 .page-header {
-    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
-    border-radius: 30px;
-    padding: 32px 32px 28px;
-    margin-bottom: 28px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: 24px;
     color: white;
-    box-shadow: var(--shadow-medium);
+    box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.25);
+    position: relative;
+    overflow: hidden;
     animation: fadeInUp .45s ease both;
 }
 
+.page-header::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -20px;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
 .page-title {
-    font-size: 2.25rem;
-    font-weight: 800;
+    font-size: 1.75rem;
+    font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 16px;
-    margin-bottom: 10px;
+    gap: 14px;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+}
+
+.page-title i {
+    background: rgba(255,255,255,0.2);
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
 }
 
 .page-subtitle {
-    opacity: .88;
+    opacity: .9;
     margin: 0;
-    font-size: 1rem;
+    font-size: 0.95rem;
     max-width: 680px;
-    line-height: 1.7;
+    line-height: 1.6;
+    position: relative;
+    z-index: 1;
 }
 
 .btn-modern {
     border: none;
-    border-radius: 18px;
-    padding: 12px 20px;
-    font-size: 14px;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
+    gap: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
     color: white;
+    letter-spacing: 0.2px;
 }
 
-.btn-primary-modern{
-    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+.btn-primary-modern {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
 }
 
 .btn-modern:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 8px 16px rgba(79, 70, 229, 0.35);
     color: white;
 }
 
@@ -81,33 +111,20 @@ body {
     width: 42px;
     height: 42px;
     padding: 0;
-    font-size: 14px;
-    border-radius: 50%;
-}
-
-.btn-modern.btn-sm i {
-    width: 18px;
-    height: 18px;
+    font-size: 0.95rem;
+    border-radius: 12px;
 }
 
 .btn-secondary-modern {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
-
-.btn-secondary-outline {
-    background: white;
-    color: var(--text-dark);
-    border: 1px solid rgba(15,23,42,0.12);
-}
-
-.btn-secondary-outline:hover {
-    background: #F8FAFF;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
 }
 
 .toolbar-card {
     background: white;
-    border-radius: 24px;
+    border-radius: var(--radius);
     box-shadow: var(--shadow-light);
+    border: 1px solid #f1f5f9;
     padding: 16px 20px;
     margin-bottom: 24px;
 }
@@ -132,46 +149,44 @@ body {
     max-width: 320px;
     width: 100%;
     min-height: 44px;
-    border-radius: 16px;
-    padding: 12px 14px;
-}
-
-.toolbar-icon-btn {
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border-radius: 16px;
+    border-radius: 10px;
+    padding: 10px 14px;
 }
 
 .btn-pill {
-    border-radius: 999px;
+    border-radius: 8px;
     padding: 10px 18px;
-    min-height: 44px;
-    border: 1px solid rgba(47,83,255,.16);
-    background: #F8FAFF;
-    color: var(--text-dark);
+    min-height: 42px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: var(--text-muted);
     font-weight: 600;
-    transition: all .3s ease;
+    font-size: 0.88rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
 }
 
 .btn-pill:hover {
-    background: #EFF6FF;
+    background: #f1f5f9;
     color: var(--text-dark);
-    box-shadow: var(--shadow-light);
+    border-color: #cbd5e1;
+    text-decoration: none;
 }
 
 .btn-pill.active,
 .btn-pill.active:hover {
-    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
     border-color: transparent;
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
 }
 
 .toolbar-pill-group {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
 }
 
@@ -180,13 +195,11 @@ body {
         flex-direction: column;
         align-items: stretch;
     }
-
     .toolbar-actions,
     .toolbar-pill-group {
         justify-content: flex-start;
         width: 100%;
     }
-
     .toolbar-select {
         min-width: 100%;
     }
@@ -195,19 +208,20 @@ body {
 .filter-card,
 .data-table-card {
     background: white;
-    border-radius: 24px;
+    border-radius: var(--radius);
     box-shadow: var(--shadow-light);
-    margin-bottom: 28px;
+    border: 1px solid #f1f5f9;
+    margin-bottom: 24px;
     overflow: hidden;
 }
 
 .filter-card .card-body,
 .data-table-card .card-body {
-    padding: 28px;
+    padding: 24px;
 }
 
 .form-label {
-    font-size: 14px;
+    font-size: 0.85rem;
     font-weight: 600;
     color: var(--text-dark);
     margin-bottom: 8px;
@@ -215,26 +229,32 @@ body {
 
 .form-control,
 .form-select {
-    border-radius: 14px;
-    border: 2px solid var(--soft-gray);
-    padding: 12px 16px;
-    transition: .3s ease;
+    border-radius: 10px;
+    border: 1.5px solid #e2e8f0;
+    padding: 10px 14px;
+    transition: all 0.2s ease;
     box-shadow: none;
+    font-size: 0.9rem;
 }
 
 .form-control:focus,
 .form-select:focus {
-    border-color: var(--primary-blue);
-    box-shadow: 0 0 0 4px rgba(47,83,255,.1);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
 
 .input-group {
-    border-radius: 16px;
-    overflow: hidden;
-    border: 2px solid var(--soft-gray);
+    border-radius: 10px;
+    border: 1.5px solid #e2e8f0;
     display: flex;
     align-items: center;
     background: white;
+    overflow: hidden;
+}
+
+.input-group:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
 
 .input-group .form-control {
@@ -246,126 +266,140 @@ body {
     border: none;
     background: white;
     color: var(--text-muted);
-    padding: 0 16px;
+    padding: 0 14px;
 }
 
 .table-modern {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 0.85rem;
+    border-spacing: 0 12px;
 }
 
 .table-modern thead th {
-    background: #EFF6FF;
+    background: transparent;
     border: none;
-    padding: 22px 20px;
-    font-size: 13px;
+    padding: 0 20px 12px;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: .08em;
+    letter-spacing: 0.5px;
     color: var(--text-muted);
     font-weight: 700;
 }
 
 .table-modern tbody td {
-    padding: 20px;
+    padding: 18px 20px;
     vertical-align: middle;
     border: none;
     background: white;
 }
 
 .table-modern tbody tr {
-    transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
-    box-shadow: 0 8px 20px rgba(15,23,42,0.04);
-    border-radius: 24px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 8px rgba(15,23,42,0.04);
 }
 
 .table-modern tbody tr:hover {
     transform: translateY(-1px);
-    background: #F8FBFF;
-    box-shadow: 0 18px 35px rgba(47,83,255,0.08);
+    box-shadow: 0 12px 24px rgba(79, 70, 229, 0.08);
 }
 
-.table-modern th,
-.table-modern td {
-    border: none;
-    padding: 18px 20px;
+.table-modern tbody td:first-child {
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+.table-modern tbody td:last-child {
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.student-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+    flex-shrink: 0;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(79, 70, 229, 0.2);
+}
+
+.student-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .status-badge {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
-    border-radius: 999px;
-    padding: 8px 14px;
+    background: #eef2ff;
+    color: #4338ca;
+    border-radius: 8px;
+    padding: 6px 12px;
     display: inline-block;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 0.8rem;
+    font-weight: 600;
     margin: 3px 0;
-    box-shadow: 0 10px 25px rgba(47,83,255,0.12);
-    transition: transform .3s ease, box-shadow .3s ease;
-}
-
-.pill-badge {
-    background: rgba(47,83,255,.08);
-    color: var(--text-dark);
-    border-radius: 999px;
-    padding: 8px 14px;
-    display: inline-block;
-    font-size: 12px;
-    font-weight: 700;
+    border: 1px solid #e0e7ff;
 }
 
 .action-buttons {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
     justify-content: center;
 }
 
 .action-btn {
-    width: 42px;
-    height: 42px;
+    width: 36px;
+    height: 36px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 16px;
+    border-radius: 8px;
     border: none;
     color: white;
-    transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
-    box-shadow: var(--shadow-light);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .action-btn:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 
 .action-btn.view {
-    background: linear-gradient(135deg,#06B6D4,#3B82F6);
+    background: linear-gradient(135deg, #0ea5e9, #2563eb);
 }
 
 .action-btn.edit {
-    background: linear-gradient(135deg,#F59E0B,#F97316);
+    background: linear-gradient(135deg, #f59e0b, #d97706);
 }
 
 .action-btn.delete {
-    background: linear-gradient(135deg,#EF4444,#DC2626);
+    background: linear-gradient(135deg, #ef4444, #dc2626);
 }
 
 .empty-state {
-    padding: 70px 20px;
+    padding: 60px 20px;
     text-align: center;
 }
 
 .empty-state i {
-    font-size: 50px;
+    font-size: 48px;
     margin-bottom: 16px;
-    color: var(--primary-blue);
-    opacity: .3;
+    color: var(--primary-color);
+    opacity: .2;
 }
 
 .empty-state h5 {
     font-weight: 700;
     margin-bottom: 8px;
+    color: var(--text-dark);
 }
 
 .empty-state p {
@@ -373,7 +407,7 @@ body {
 }
 
 .pagination-container {
-    padding: 24px;
+    padding: 20px 24px 24px;
 }
 
 .pagination {
@@ -382,25 +416,29 @@ body {
 
 .page-link {
     border: none;
-    border-radius: 12px !important;
-    margin: 0 4px;
+    border-radius: 8px !important;
+    margin: 0 3px;
     color: var(--text-dark);
-    transition: all .3s ease;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    padding: 0.5rem 0.85rem;
 }
 
 .page-link:hover {
-    background: rgba(47,83,255,0.08);
+    background: #eef2ff;
+    color: var(--primary-color);
 }
 
 .page-item.active .page-link {
-    background: linear-gradient(135deg,var(--primary-blue),var(--secondary-blue));
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
 }
 
 @keyframes fadeInUp {
     0% {
         opacity: 0;
-        transform: translateY(18px);
+        transform: translateY(15px);
     }
     100% {
         opacity: 1;
@@ -412,37 +450,34 @@ body {
     .page-header {
         padding: 24px;
     }
-
     .page-title {
-        font-size: 24px;
+        font-size: 1.5rem;
     }
-
     .filter-card .card-body,
     .data-table-card .card-body {
-        padding: 20px;
+        padding: 16px;
     }
-
     .table-modern thead {
         display: none;
     }
-
-    .table,
-    .table tbody,
-    .table tr,
-    .table td {
+    .table, .table tbody, .table tr, .table td {
         display: block;
         width: 100%;
     }
-
     .table tr {
         margin-bottom: 16px;
-        border-bottom: 1px solid #E5E7EB;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
-
     .table td {
-        padding: 14px 18px;
+        padding: 10px 0;
+        border-bottom: 1px solid #f1f5f9;
     }
-
+    .table td:last-child {
+        border-bottom: none;
+    }
     .action-buttons {
         justify-content: flex-start;
     }
@@ -478,18 +513,19 @@ body {
                     @endforeach
                 </select>
 
-                <button id="btnExportJurusan" type="button" class="btn-modern btn-secondary-modern btn-sm toolbar-icon-btn" title="Export Jurusan">
+                <button id="btnExportJurusan" type="button" class="btn-modern btn-secondary-modern btn-sm" title="Export Jurusan">
                     <i class="fas fa-file-download"></i>
                 </button>
-                <button id="btnExportAngkatan" type="button" class="btn-modern btn-secondary-modern btn-sm toolbar-icon-btn" title="Export Per Angkatan">
+                <button id="btnExportAngkatan" type="button" class="btn-modern btn-secondary-modern btn-sm" title="Export Per Angkatan">
                     <i class="fas fa-file-export"></i>
                 </button>
-                <button type="button" id="btnImportSiswa" class="btn-modern btn-primary-modern btn-sm toolbar-icon-btn" title="Import Siswa">
+                <button type="button" id="btnImportSiswa" class="btn-modern btn-primary-modern btn-sm" title="Import Siswa">
                     <i class="fas fa-upload"></i>
                 </button>
-                <a href="{{ route('tu.siswa.template.download') }}" class="btn-modern btn-secondary-modern btn-sm toolbar-icon-btn" title="Download Template">
+                <a href="{{ route('tu.siswa.template.download') }}" class="btn-modern btn-primary-modern btn-sm" title="Download Template">
                     <i class="fas fa-download"></i>
                 </a>
+                <input type="file" id="importFile" accept=".xlsx,.xls,.csv" style="display:none">
             </div>
 
             @php $currentTingkat = request()->query('tingkat', ''); @endphp
@@ -560,6 +596,14 @@ body {
         </div>
     @endif
 
+    @if(session('info'))
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="fas fa-info-circle me-2"></i>
+            {{ session('info') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="data-table-card">
         <div class="card-body">
             @if($siswas->count() > 0)
@@ -580,6 +624,7 @@ body {
                                     $rombel = $siswa->rombel ?? null;
                                     $rombelNama = $rombel ? ($rombel->nama ?? null) : null;
                                     $tingkatVal = $rombel && $rombel->kelas ? ($rombel->kelas->tingkat ?? null) : null;
+                                    // PERBAIKAN: ganti $rombelNombre menjadi $rombelNama
                                     $rombelWithoutTingkat = $rombelNama ? preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama) : null;
                                     $rombelWithoutTingkat = $rombelWithoutTingkat ? trim($rombelWithoutTingkat) : null;
                                     $formatted = $rombelWithoutTingkat ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat) : null;
@@ -657,6 +702,7 @@ body {
         </div>
     </div>
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function(){
     const select = document.getElementById('exportJurusan');
@@ -688,7 +734,6 @@ document.addEventListener('DOMContentLoaded', function(){
         });
     }
 
-    // Import functionality
     if(btnImport){
         btnImport.addEventListener('click', function(e){
             e.preventDefault();
@@ -699,17 +744,11 @@ document.addEventListener('DOMContentLoaded', function(){
     if(importFile){
         importFile.addEventListener('change', function(e){
             if(!this.files || this.files.length === 0) return;
-            
-            const fileName = this.files[0].name;
-            const fileSize = (this.files[0].size / 1024 / 1024).toFixed(2); // Size in MB
-            
-            console.log(`Uploading file: ${fileName} (${fileSize} MB)`);
 
             const formData = new FormData();
             formData.append('file', this.files[0]);
             formData.append('_token', '{{ csrf_token() }}');
 
-            // Show loading indicator
             const originalBtnText = btnImport.innerHTML;
             btnImport.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Proses...';
             btnImport.disabled = true;
@@ -718,73 +757,29 @@ document.addEventListener('DOMContentLoaded', function(){
                 method: 'POST',
                 body: formData
             })
-            .then(response => {
-                // Log response info
-                console.log('Response status:', response.status);
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 btnImport.innerHTML = originalBtnText;
                 btnImport.disabled = false;
 
-                console.log('Import result:', data);
-
                 if(data.success){
-                    // Success message
-                    let message = data.message || 'Import berhasil';
-                    
-                    if(data.warnings && data.warnings.length > 0) {
-                        // Show success with warnings
-                        let warningHtml = '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
-                        warningHtml += '<i class="fas fa-exclamation-triangle me-2"></i>';
-                        warningHtml += '<strong>Peringatan:</strong> ' + message + '<br>';
-                        warningHtml += '<small>';
-                        data.warnings.slice(0, 5).forEach(warning => {
-                            warningHtml += '• ' + warning + '<br>';
-                        });
-                        if(data.warning_count > 5) {
-                            warningHtml += '• ... dan ' + (data.warning_count - 5) + ' peringatan lainnya';
-                        }
-                        warningHtml += '</small>';
-                        warningHtml += '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
-                        warningHtml += '</div>';
-                        
-                        // Insert warning before the data table
-                        const alertContainer = document.createElement('div');
-                        alertContainer.innerHTML = warningHtml;
-                        document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.data-table-card'));
-                    } else {
-                        // Show pure success
-                        let successHtml = '<div class="alert alert-success alert-dismissible fade show" role="alert">';
-                        successHtml += '<i class="fas fa-check-circle me-2"></i>' + message;
-                        successHtml += '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
-                        successHtml += '</div>';
-                        
-                        const alertContainer = document.createElement('div');
-                        alertContainer.innerHTML = successHtml;
-                        document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.data-table-card'));
-                    }
+                    let successHtml = '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+                    successHtml += '<i class="fas fa-check-circle me-2"></i>' + (data.message || 'Import berhasil');
+                    successHtml += '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+                    successHtml += '</div>';
 
-                    // Reload page after 2 seconds
+                    const alertContainer = document.createElement('div');
+                    alertContainer.innerHTML = successHtml;
+                    document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.data-table-card'));
+
                     setTimeout(() => location.reload(), 2000);
                 } else {
-                    // Error message
                     let errorHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
                     errorHtml += '<i class="fas fa-times-circle me-2"></i>';
-                    errorHtml += '<strong>Error:</strong> ' + (data.message || 'Import gagal') + '<br>';
-                    if(data.errors && data.errors.length > 0) {
-                        errorHtml += '<small>';
-                        data.errors.slice(0, 5).forEach(error => {
-                            errorHtml += '• ' + error + '<br>';
-                        });
-                        if(data.errors.length > 5) {
-                            errorHtml += '• ... dan ' + (data.errors.length - 5) + ' error lainnya';
-                        }
-                        errorHtml += '</small>';
-                    }
+                    errorHtml += '<strong>Error:</strong> ' + (data.message || 'Import gagal');
                     errorHtml += '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
                     errorHtml += '</div>';
-                    
+
                     const alertContainer = document.createElement('div');
                     alertContainer.innerHTML = errorHtml;
                     document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.data-table-card'));
@@ -793,20 +788,18 @@ document.addEventListener('DOMContentLoaded', function(){
             .catch(error => {
                 btnImport.innerHTML = originalBtnText;
                 btnImport.disabled = false;
-                
-                console.error('Error:', error);
+
                 let errorHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
                 errorHtml += '<i class="fas fa-exclamation-circle me-2"></i>';
-                errorHtml += 'Terjadi kesalahan saat mengupload file: ' + error.message;
+                errorHtml += 'Terjadi kesalahan: ' + error.message;
                 errorHtml += '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
                 errorHtml += '</div>';
-                
+
                 const alertContainer = document.createElement('div');
                 alertContainer.innerHTML = errorHtml;
                 document.querySelector('.container-fluid').insertBefore(alertContainer.firstElementChild, document.querySelector('.data-table-card'));
             });
 
-            // Reset file input
             this.value = '';
         });
     }

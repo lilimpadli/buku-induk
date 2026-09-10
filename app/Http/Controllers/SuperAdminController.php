@@ -123,41 +123,56 @@ class SuperAdminController extends Controller
      * Index semua users
      */
     public function usersIndex(Request $request)
-{
-    $query = User::with(['guru', 'siswa'])->latest();
+    {
+        $query = User::with(['guru', 'siswa'])->latest();
 
-    // SEARCH
-    if ($request->search) {
+        // SEARCH
+        if ($request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('nomor_induk', 'like', "%{$search}%");
+            });
+        }
 
-        $search = $request->search;
+        // FILTER ROLE
+        if ($request->role) {
+            $query->where('role', $request->role);
+        }
 
-        $query->where(function ($q) use ($search) {
+        $users = $query->paginate(20)->withQueryString();
 
-            $q->where('name', 'like', "%{$search}%")
-              ->orWhere('email', 'like', "%{$search}%")
-              ->orWhere('nomor_induk', 'like', "%{$search}%");
+        // 🔥 TAMBAHKAN INI - Definisi roles untuk filter dropdown
+        $roles = [
+            'siswa' => 'Siswa',
+            'guru' => 'Guru',
+            'walikelas' => 'Wali Kelas',
+            'kaprog' => 'Kaprog',
+            'tu' => 'TU',
+            'kurikulum' => 'Kurikulum',
+            'super_admin' => 'Super Admin',
+        ];
 
-        });
+        return view('super_admin.users.index', compact('users', 'roles'));
     }
-
-    // FILTER ROLE
-    if ($request->role) {
-
-        $query->where('role', $request->role);
-
-    }
-
-    $users = $query->paginate(20)->withQueryString();
-
-    return view('super_admin.users.index', compact('users'));
-}
 
     /**
      * Form create user baru
      */
     public function create()
     {
-        return view('super_admin.users.create');
+        $roles = [
+            'siswa' => 'Siswa',
+            'guru' => 'Guru',
+            'walikelas' => 'Wali Kelas',
+            'kaprog' => 'Kaprog',
+            'tu' => 'TU',
+            'kurikulum' => 'Kurikulum',
+            'super_admin' => 'Super Admin',
+        ];
+
+        return view('super_admin.users.create', compact('roles'));
     }
 
     /**
@@ -168,15 +183,19 @@ class SuperAdminController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'nomor_induk' => 'nullable|string|unique:users,nomor_induk',
-            'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|string',
+            'nomor_induk' => 'required|string|unique:users,nomor_induk',
+            'password' => 'required|string|min:6|confirmed',
+            'role' => 'required|string|in:siswa,guru,walikelas,kaprog,tu,kurikulum,super_admin',
+        ], [
+            'nomor_induk.required' => 'Nomor induk wajib diisi!',
+            'nomor_induk.unique' => 'Nomor induk sudah digunakan!',
         ]);
 
         $validated['password'] = bcrypt($validated['password']);
         User::create($validated);
 
-        return redirect()->route('super_admin.users.index')->with('success', 'User berhasil ditambahkan');
+        return redirect()->route('super_admin.users.index')
+            ->with('success', 'User berhasil ditambahkan! Gunakan NOMOR INDUK untuk login.');
     }
 
     /**
@@ -194,7 +213,18 @@ class SuperAdminController extends Controller
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        return view('super_admin.users.edit', compact('user'));
+
+        $roles = [
+            'siswa' => 'Siswa',
+            'guru' => 'Guru',
+            'walikelas' => 'Wali Kelas',
+            'kaprog' => 'Kaprog',
+            'tu' => 'TU',
+            'kurikulum' => 'Kurikulum',
+            'super_admin' => 'Super Admin',
+        ];
+
+        return view('super_admin.users.edit', compact('user', 'roles'));
     }
 
     /**
@@ -207,9 +237,12 @@ class SuperAdminController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
-            'nomor_induk' => 'nullable|string|unique:users,nomor_induk,' . $id,
-            'password' => 'nullable|string|min:8|confirmed',
-            'role' => 'required|string',
+            'nomor_induk' => 'required|string|unique:users,nomor_induk,' . $id,
+            'password' => 'nullable|string|min:6|confirmed',
+            'role' => 'required|string|in:siswa,guru,walikelas,kaprog,tu,kurikulum,super_admin',
+        ], [
+            'nomor_induk.required' => 'Nomor induk wajib diisi!',
+            'nomor_induk.unique' => 'Nomor induk sudah digunakan!',
         ]);
 
         if (!empty($validated['password'])) {
@@ -220,7 +253,8 @@ class SuperAdminController extends Controller
 
         $user->update($validated);
 
-        return redirect()->route('super_admin.users.index')->with('success', 'User berhasil diperbarui');
+        return redirect()->route('super_admin.users.index')
+            ->with('success', 'User berhasil diperbarui');
     }
 
     /**
@@ -229,9 +263,31 @@ class SuperAdminController extends Controller
     public function destroy($id)
     {
         $user = User::findOrFail($id);
+
+        // Cegah hapus user sendiri
+        if ($user->id == auth()->id()) {
+            return back()->with('error', 'Tidak dapat menghapus akun sendiri');
+        }
+
         $user->delete();
 
-        return redirect()->route('super_admin.users.index')->with('success', 'User berhasil dihapus');
+        return redirect()->route('super_admin.users.index')
+            ->with('success', 'User berhasil dihapus');
+    }
+
+    /**
+     * Reset password user
+     */
+    public function resetPassword($id)
+    {
+        $user = User::findOrFail($id);
+
+        $user->update([
+            'password' => bcrypt('12345678')
+        ]);
+
+        return redirect()->route('super_admin.users.index')
+            ->with('success', 'Password user berhasil direset menjadi 12345678');
     }
 
     /**
@@ -246,6 +302,8 @@ class SuperAdminController extends Controller
     {
         try {
             Artisan::call('cache:clear');
+            Artisan::call('view:clear');
+            Artisan::call('config:clear');
             return redirect()->back()->with('success', 'Cache berhasil dibersihkan');
         } catch (\Throwable $e) {
             return redirect()->back()->with('error', 'Gagal membersihkan cache: ' . $e->getMessage());
@@ -275,7 +333,7 @@ class SuperAdminController extends Controller
                 Artisan::call('up');
                 return redirect()->back()->with('success', 'Maintenance mode dimatikan');
             } else {
-                Artisan::call('down');
+                Artisan::call('down', ['--retry' => 60]);
                 return redirect()->back()->with('success', 'Maintenance mode diaktifkan');
             }
         } catch (\Throwable $e) {

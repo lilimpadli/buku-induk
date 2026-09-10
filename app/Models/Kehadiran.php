@@ -9,14 +9,14 @@ class Kehadiran extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'siswa_id',
-        'sakit',
-        'izin',
-        'tanpa_keterangan',
-        'semester',
-        'tahun_ajaran',
-    ];
+protected $fillable = [
+    'siswa_id',
+    'sakit',
+    'izin',
+    'tanpa_keterangan',
+    'semester',
+    'tahun_ajaran',
+];
 
     public function siswa()
     {

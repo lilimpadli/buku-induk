@@ -3,7 +3,6 @@
 @section('title', 'Manajemen Users')
 
 @push('styles')
-
 <style>
 .page-header{
     background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
@@ -186,268 +185,116 @@
     opacity:.3;
 }
 </style>
-
 @endpush
 
 @section('content')
-
 <div class="container-fluid py-4">
-
-    <!-- HEADER -->
     <div class="page-header">
-
         <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
-
             <div>
-
-                <h1 class="page-title">
-                    Daftar Users
-                </h1>
-
-                <p class="page-subtitle">
-                    Kelola hak akses, profil, dan role pengguna sistem.
-                </p>
-
+                <h1 class="page-title">Daftar Users</h1>
+                <p class="page-subtitle">Kelola hak akses, profil, dan role pengguna sistem.</p>
             </div>
-
-            <a href="{{ route('super_admin.users.create') }}"
-               class="btn-modern btn-primary-modern">
-
+            <a href="{{ route('super_admin.users.create') }}" class="btn-modern btn-primary-modern">
                 <i class="fas fa-plus"></i>
                 Tambah User
-
             </a>
-
         </div>
-
     </div>
 
-    <!-- CARD -->
     <div class="card-modern">
-
         <div class="card-body">
-
-            <!-- SEARCH -->
             <div class="filter-box">
-
-                <form method="GET"
-                      action="{{ route('super_admin.users.index') }}">
-
+                <form method="GET" action="{{ route('super_admin.users.index') }}">
                     <div class="row g-3">
-
-                        <!-- SEARCH INPUT -->
-                        <div class="col-md-6">
-
-                            <input type="text"
-                                   name="search"
-                                   class="form-control-modern w-100"
+                        <div class="col-md-5">
+                            <input type="text" name="search" class="form-control-modern w-100"
                                    placeholder="Cari nama, email, nomor induk..."
                                    value="{{ request()->get('search') }}">
-
                         </div>
-
-                        <!-- ROLE FILTER -->
                         <div class="col-md-4">
-
-                            <select name="role"
-                                    class="form-select-modern w-100">
-
+                            <select name="role" class="form-select-modern w-100">
                                 <option value="">Semua Role</option>
-
-                                <option value="super_admin"
-                                    {{ request()->get('role') == 'super_admin' ? 'selected' : '' }}>
-                                    Super Admin
-                                </option>
-
-                                <option value="guru"
-                                    {{ request()->get('role') == 'guru' ? 'selected' : '' }}>
-                                    Guru
-                                </option>
-
-                                <option value="siswa"
-                                    {{ request()->get('role') == 'siswa' ? 'selected' : '' }}>
-                                    Siswa
-                                </option>
-
+                                @foreach($roles as $key => $label)
+                                    <option value="{{ $key }}" {{ request()->get('role') == $key ? 'selected' : '' }}>
+                                        {{ $label }}
+                                    </option>
+                                @endforeach
                             </select>
-
                         </div>
-
-                        <!-- BUTTON -->
-                        <div class="col-md-2 d-grid">
-
-                            <button type="submit"
-                                    class="btn-modern btn-primary-modern w-100">
-
-                                <i class="fas fa-search"></i>
-                                Cari
-
+                        <div class="col-md-3 d-grid">
+                            <button type="submit" class="btn-modern btn-primary-modern w-100">
+                                <i class="fas fa-search"></i> Cari
                             </button>
-
                         </div>
-
                     </div>
-
                 </form>
-
             </div>
 
-            <!-- TABLE -->
             <div class="table-responsive">
-
                 <table class="table table-modern">
-
                     <thead>
-
                         <tr>
                             <th>#</th>
                             <th>Nama</th>
                             <th>Nomor Induk</th>
                             <th>Email</th>
                             <th>Role</th>
-                            <th>Guru/Siswa</th>
                             <th>Aksi</th>
                         </tr>
-
                     </thead>
-
                     <tbody>
-
                     @forelse($users as $user)
-
                         <tr>
-
+                            <td>{{ $users->firstItem() + $loop->index }}</td>
+                            <td><strong>{{ $user->name }}</strong></td>
+                            <td><strong>{{ $user->nomor_induk ?? '-' }}</strong></td>
+                            <td>{{ $user->email }}</td>
                             <td>
-                                {{ $users->firstItem() + $loop->index }}
-                            </td>
-
-                            <td>
-                                <strong>{{ $user->name }}</strong>
-                            </td>
-
-                            <td>
-                                {{ $user->nomor_induk }}
-                            </td>
-
-                            <td>
-                                {{ $user->email }}
-                            </td>
-
-                            <td>
-
                                 <span class="badge-role">
-                                    {{ ucfirst($user->role) }}
+                                    {{ ucfirst(str_replace('_', ' ', $user->role)) }}
                                 </span>
-
                             </td>
-
                             <td>
-
-                                @if($user->guru)
-
-                                    <small class="text-muted">
-                                        {{ $user->guru->nama }}
-                                    </small>
-
-                                @elseif($user->siswa)
-
-                                    <small class="text-muted">
-                                        {{ $user->siswa->nama_lengkap }}
-                                    </small>
-
-                                @else
-
-                                    -
-
-                                @endif
-
-                            </td>
-
-                            <td>
-
                                 <div class="action-buttons">
-
-                                    <a href="{{ route('super_admin.users.show', $user->id) }}"
-                                       class="action-btn view">
-
+                                    <a href="{{ route('super_admin.users.show', $user->id) }}" class="action-btn view">
                                         <i class="fas fa-eye"></i>
-
                                     </a>
-
-                                    <a href="{{ route('super_admin.users.edit', $user->id) }}"
-                                       class="action-btn edit">
-
+                                    <a href="{{ route('super_admin.users.edit', $user->id) }}" class="action-btn edit">
                                         <i class="fas fa-edit"></i>
-
                                     </a>
-
                                     <form action="{{ route('super_admin.users.destroy', $user->id) }}"
-                                          method="POST"
-                                          onsubmit="return confirm('Yakin ingin menghapus user ini?')">
-
+                                          method="POST" onsubmit="return confirm('Yakin ingin menghapus user ini?')">
                                         @csrf
                                         @method('DELETE')
-
-                                        <button type="submit"
-                                                class="action-btn delete">
-
+                                        <button type="submit" class="action-btn delete">
                                             <i class="fas fa-trash"></i>
-
                                         </button>
-
                                     </form>
-
                                 </div>
-
                             </td>
-
                         </tr>
-
                     @empty
-
                         <tr>
-
-                            <td colspan="7">
-
+                            <td colspan="6">
                                 <div class="empty-state">
-
                                     <i class="fas fa-users"></i>
-
                                     <h5>Tidak ada data users</h5>
-
-                                    <p>
-                                        Data user yang kamu cari tidak ditemukan.
-                                    </p>
-
+                                    <p>Data user yang kamu cari tidak ditemukan.</p>
                                 </div>
-
                             </td>
-
                         </tr>
-
                     @endforelse
-
                     </tbody>
-
                 </table>
-
             </div>
 
-            <!-- PAGINATION -->
             @if($users->hasPages())
-
                 <div class="mt-4">
-
                     {{ $users->withQueryString()->links('pagination::bootstrap-4') }}
-
                 </div>
-
             @endif
-
         </div>
-
     </div>
-
 </div>
-
-@endsection 
+@endsection

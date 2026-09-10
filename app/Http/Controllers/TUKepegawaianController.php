@@ -10,9 +10,12 @@ use App\Models\Kurikulum;
 use App\Models\MataPelajaran;
 use App\Models\Mutasi;
 use App\Models\RiwayatTugas;
+use App\Models\MutasiPegawai;
+use App\Models\RiwayatKerja;
+use App\Models\Dokumen;
+use App\Models\TugasTambahan;
 use App\Imports\GuruImport;
 use App\Exports\GuruTemplateExport;
-use App\Models\Dokumen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -29,9 +32,28 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 class TUKepegawaianController extends Controller
 {
+    // ==========================================================
+    // PROPERTIES & HELPERS
+    // ==========================================================
+
     private function riwayatTableAvailable(): bool
     {
         return Schema::hasTable('riwayat_kerjas');
+    }
+
+    private function riwayatTugasTableAvailable(): bool
+    {
+        return Schema::hasTable('riwayat_tugas');
+    }
+
+    private function mutasiTableAvailable(): bool
+    {
+        return Schema::hasTable('mutasis');
+    }
+
+    private function mutasiPegawaiTableAvailable(): bool
+    {
+        return Schema::hasTable('mutasi_pegawais');
     }
 
     protected static $guruTemplateFields = [
@@ -43,19 +65,18 @@ class TUKepegawaianController extends Controller
         'jenis_kelamin' => 'Jenis Kelamin',
         'pendidikan' => 'Pendidikan',
         'serdik' => 'Serdik',
-        'tugas_tambahan' => 'Tugas Tambahan',
         'tempat_lahir' => 'Tempat Lahir',
         'tanggal_lahir' => 'Tanggal Lahir',
         'email_pribadi' => 'Email Pribadi',
         'email_resmi' => 'Email Resmi',
-        'alamat' => 'Alamat',
+        'alamat_jalan' => 'Alamat',
         'rt' => 'RT',
         'rw' => 'RW',
         'dusun' => 'Dusun',
-        'kelurahan' => 'Kelurahan',
+        'desa' => 'Desa/Kelurahan',
         'kecamatan' => 'Kecamatan',
         'kode_pos' => 'Kode Pos',
-        'no_hp' => 'No HP',
+        'telepon' => 'No HP',
     ];
 
     private static $guruColumnsCache = null;
@@ -66,10 +87,10 @@ class TUKepegawaianController extends Controller
             'nama', 'nik', 'nuptk', 'nip',
             'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir',
             'status_kepegawaian', 'status_aktif', 'pendidikan', 'serdik',
-            'tugas_tambahan',
             'telepon', 'no_hp', 'email', 'email_pribadi', 'email_resmi',
             'alamat', 'alamat_jalan', 'rt', 'rw', 'dusun', 'desa', 'kelurahan',
             'kecamatan', 'kode_pos', 'jurusan_id', 'gelar_belakang',
+            'gelar_depan',
         ];
 
         $data = $request->only($fields);
@@ -79,6 +100,7 @@ class TUKepegawaianController extends Controller
         }
         $guruColumns = self::$guruColumnsCache;
 
+        // Alias field untuk kompatibilitas antar versi
         $aliases = [
             'alamat_jalan' => 'alamat',
             'alamat'       => 'alamat_jalan',
@@ -102,15 +124,29 @@ class TUKepegawaianController extends Controller
         }, ARRAY_FILTER_USE_BOTH);
     }
 
-    // --- DASHBOARD ---
+    // ==========================================================
+    // DASHBOARD
+    // ==========================================================
     public function dashboard()
     {
         $totalGuru          = Guru::count();
-        $totalTU            = Pegawai::where('jabatan', 'tu')->count();
-        $totalTUKepegawaian = Pegawai::where('jabatan', 'tu_kepegawaian')->count();
-        $totalPegawai       = Pegawai::count();
-        $totalPegawaiLainnya = max(0, $totalPegawai - $totalTU - $totalTUKepegawaian);
-        $totalStaffAktif    = $totalGuru + $totalPegawai;
+        
+        // Cek apakah tabel pegawais ada
+        $pegawaiTableExists = Schema::hasTable('pegawais');
+        
+        if ($pegawaiTableExists) {
+            $totalTU            = Pegawai::where('jabatan', 'tu')->count();
+            $totalTUKepegawaian = Pegawai::where('jabatan', 'tu_kepegawaian')->count();
+            $totalPegawai       = Pegawai::count();
+            $totalPegawaiLainnya = max(0, $totalPegawai - $totalTU - $totalTUKepegawaian);
+            $totalStaffAktif    = $totalGuru + $totalPegawai;
+        } else {
+            $totalTU            = User::where('role', 'tu')->count();
+            $totalTUKepegawaian = User::where('role', 'tu_kepegawaian')->count();
+            $totalPegawai       = User::whereIn('role', ['tu', 'tu_kepegawaian'])->count();
+            $totalPegawaiLainnya = 0;
+            $totalStaffAktif    = $totalGuru + $totalPegawai;
+        }
 
         $guruBaru = Guru::with('user')->latest()->take(5)->get();
 
@@ -125,10 +161,16 @@ class TUKepegawaianController extends Controller
         $totalGuruPPPK      = $hitungStatus($guruQuery, 'PPPK');
         $totalGuruPPPKParuh = $hitungStatus($guruQuery, 'PPPK Paruh Waktu');
 
-        $tuQuery = Pegawai::query();
-        $totalTUPNS      = $hitungStatus($tuQuery, 'PNS');
-        $totalTUPPPK     = $hitungStatus($tuQuery, 'PPPK');
-        $totalTUPPKParuh = $hitungStatus($tuQuery, 'PPPK Paruh Waktu');
+        if ($pegawaiTableExists) {
+            $tuQuery = Pegawai::query();
+            $totalTUPNS      = $hitungStatus($tuQuery, 'PNS');
+            $totalTUPPPK     = $hitungStatus($tuQuery, 'PPPK');
+            $totalTUPPKParuh = $hitungStatus($tuQuery, 'PPPK Paruh Waktu');
+        } else {
+            $totalTUPNS      = 0;
+            $totalTUPPPK     = 0;
+            $totalTUPPKParuh = 0;
+        }
 
         return view('tu_kepegawaian.dashboard', compact(
             'totalGuru', 'totalTU', 'totalTUKepegawaian', 'totalStaffAktif', 'guruBaru',
@@ -138,7 +180,9 @@ class TUKepegawaianController extends Controller
         ));
     }
 
-    // --- DATA GURU ---
+    // ==========================================================
+    // DATA GURU
+    // ==========================================================
     public function guruIndex(Request $request)
     {
         $query = Guru::with('user', 'jurusan')->orderBy('nama');
@@ -240,7 +284,6 @@ class TUKepegawaianController extends Controller
             'status_kepegawaian' => 'nullable|in:PNS,PPPK,PPPK Paruh Waktu,Honorer,Guru Tetap Yayasan,Guru Tidak Tetap',
             'pendidikan' => 'nullable|in:S1,S2,S3,D4,D3',
             'gelar_belakang' => 'nullable|string|max:255',
-            'tugas_tambahan' => 'nullable|string|max:255',
         ]);
 
         DB::beginTransaction();
@@ -295,7 +338,6 @@ class TUKepegawaianController extends Controller
             'status_kepegawaian' => 'nullable|in:PNS,PPPK,PPPK Paruh Waktu,Honorer,Guru Tetap Yayasan,Guru Tidak Tetap',
             'pendidikan' => 'nullable|in:S1,S2,S3,D4,D3',
             'gelar_belakang' => 'nullable|string|max:255',
-            'tugas_tambahan' => 'nullable|string|max:255',
         ]);
 
         if ($guru->user) {
@@ -382,6 +424,11 @@ class TUKepegawaianController extends Controller
 
     public function tuIndex(Request $request)
     {
+        if (!Schema::hasTable('pegawais')) {
+            return redirect()->route('tu_kepegawaian.dashboard')
+                ->with('error', 'Tabel pegawai belum tersedia. Jalankan migrasi terlebih dahulu.');
+        }
+
         $query = Pegawai::with('user')->orderBy('nama');
 
         $currentUserId = auth()->id();
@@ -450,120 +497,153 @@ class TUKepegawaianController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'nomor_induk' => 'required|string|unique:pegawais,nip',
-            'email' => 'nullable|email|unique:pegawais,email',
+            'nomor_induk' => 'required|string|unique:users,nomor_induk',
+            'email' => 'nullable|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'role' => 'required|in:tu,tu_kepegawaian',
-            'tugas_tambahan' => 'nullable|string|max:255',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'nomor_induk' => $request->nomor_induk,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'role' => $request->role,
-        ]);
+        DB::beginTransaction();
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'nomor_induk' => $request->nomor_induk,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'role' => $request->role,
+            ]);
 
-        Pegawai::create([
-            'nama' => $request->name,
-            'nip' => $request->nomor_induk,
-            'nik' => $request->nik,
-            'nuptk' => $request->nuptk,
-            'jenis_kelamin' => $request->jenis_kelamin,
-            'tempat_lahir' => $request->tempat_lahir,
-            'tanggal_lahir' => $request->tanggal_lahir,
-            'status_kepegawaian' => $request->status_kepegawaian,
-            'pendidikan' => $request->pendidikan,
-            'tugas_tambahan' => $request->tugas_tambahan,
-            'email' => $request->email,
-            'no_hp' => $request->no_hp,
-            'jabatan' => $request->role,
-            'alamat' => $request->alamat,
-            'user_id' => $user->id,
-        ]);
+            if (Schema::hasTable('pegawais')) {
+                Pegawai::create([
+                    'nama' => $request->name,
+                    'nip' => $request->nomor_induk,
+                    'nik' => $request->nik,
+                    'nuptk' => $request->nuptk,
+                    'jenis_kelamin' => $request->jenis_kelamin,
+                    'tempat_lahir' => $request->tempat_lahir,
+                    'tanggal_lahir' => $request->tanggal_lahir,
+                    'status_kepegawaian' => $request->status_kepegawaian,
+                    'pendidikan' => $request->pendidikan,
+                    'email' => $request->email,
+                    'no_hp' => $request->no_hp,
+                    'jabatan' => $request->role,
+                    'alamat' => $request->alamat,
+                    'user_id' => $user->id,
+                ]);
+            }
 
-        return redirect()->route('tu_kepegawaian.tu.index')->with('success', 'Akun dan Data Pegawai berhasil ditambahkan');
+            DB::commit();
+            return redirect()->route('tu_kepegawaian.tu.index')->with('success', 'Akun dan Data Pegawai berhasil ditambahkan');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+        }
     }
 
     public function tuShow($id)
     {
-        $pegawai = Pegawai::with('user')->findOrFail($id);
-        return view('tu_kepegawaian.tu.show', compact('pegawai'));
+        if (Schema::hasTable('pegawais')) {
+            $pegawai = Pegawai::with('user')->findOrFail($id);
+            return view('tu_kepegawaian.tu.show', compact('pegawai'));
+        }
+        
+        $user = User::findOrFail($id);
+        return view('tu_kepegawaian.tu.show', compact('user'));
     }
 
     public function tuEdit($id)
     {
-        $pegawai = Pegawai::with('user')->findOrFail($id);
-        return view('tu_kepegawaian.tu.edit', compact('pegawai'));
+        if (Schema::hasTable('pegawais')) {
+            $pegawai = Pegawai::with('user')->findOrFail($id);
+            return view('tu_kepegawaian.tu.edit', compact('pegawai'));
+        }
+        
+        $user = User::findOrFail($id);
+        return view('tu_kepegawaian.tu.edit', compact('user'));
     }
 
     public function tuUpdate(Request $request, $id)
     {
-        $pegawai = Pegawai::findOrFail($id);
-
         $request->validate([
             'name' => 'required|string',
-            'nip' => 'required|unique:pegawais,nip,' . $id,
-            'email' => 'nullable|email|unique:pegawais,email,' . $id,
-            'jabatan' => 'required|in:tu,tu_kepegawaian',
+            'nomor_induk' => 'required|string|unique:users,nomor_induk,' . $id,
+            'email' => 'nullable|email|unique:users,email,' . $id,
+            'role' => 'required|in:tu,tu_kepegawaian',
             'password' => 'nullable|string|min:6|confirmed',
-            'tugas_tambahan' => 'nullable|string|max:255',
         ]);
 
-        if ($pegawai->user) {
-            $dataUser = [
+        DB::beginTransaction();
+        try {
+            $user = User::findOrFail($id);
+            
+            $userData = [
                 'name' => $request->name,
-                'nomor_induk' => $request->nip,
+                'nomor_induk' => $request->nomor_induk,
                 'email' => $request->email,
-                'role' => $request->jabatan,
+                'role' => $request->role,
             ];
-
+            
             if ($request->filled('password')) {
-                $dataUser['password'] = bcrypt($request->password);
+                $userData['password'] = bcrypt($request->password);
+            }
+            
+            $user->update($userData);
+
+            if (Schema::hasTable('pegawais')) {
+                $pegawai = Pegawai::where('user_id', $user->id)->first();
+                if ($pegawai) {
+                    $pegawai->update([
+                        'nama' => $request->name,
+                        'nip' => $request->nomor_induk,
+                        'nik' => $request->nik,
+                        'nuptk' => $request->nuptk,
+                        'jenis_kelamin' => $request->jenis_kelamin,
+                        'tempat_lahir' => $request->tempat_lahir,
+                        'tanggal_lahir' => $request->tanggal_lahir,
+                        'status_kepegawaian' => $request->status_kepegawaian,
+                        'pendidikan' => $request->pendidikan,
+                        'email' => $request->email,
+                        'no_hp' => $request->no_hp,
+                        'jabatan' => $request->role,
+                        'alamat' => $request->alamat,
+                    ]);
+                }
             }
 
-            $pegawai->user->update($dataUser);
+            DB::commit();
+            return redirect()->route('tu_kepegawaian.tu.index')->with('success', 'Data Pegawai berhasil diupdate');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->with('error', 'Gagal mengupdate: ' . $e->getMessage());
         }
-
-        $pegawai->update([
-            'nama' => $request->name,
-            'nip' => $request->nip,
-            'nik' => $request->nik,
-            'nuptk' => $request->nuptk,
-            'jenis_kelamin' => $request->jenis_kelamin,
-            'tempat_lahir' => $request->tempat_lahir,
-            'tanggal_lahir' => $request->tanggal_lahir,
-            'status_kepegawaian' => $request->status_kepegawaian,
-            'pendidikan' => $request->pendidikan,
-            'tugas_tambahan' => $request->tugas_tambahan,
-            'email' => $request->email,
-            'no_hp' => $request->no_hp,
-            'jabatan' => $request->jabatan,
-            'alamat' => $request->alamat,
-        ]);
-
-        return redirect()->route('tu_kepegawaian.tu.index')->with('success', 'Data Pegawai berhasil diupdate');
     }
 
     public function tuDestroy($id)
     {
-        $pegawai = Pegawai::findOrFail($id);
-
-        if ($pegawai->user) {
-            $user = $pegawai->user;
+        DB::beginTransaction();
+        try {
+            $user = User::findOrFail($id);
 
             $totalAdmin = User::where('role', 'tu_kepegawaian')->count();
             if ($user->role === 'tu_kepegawaian' && $totalAdmin <= 1) {
                 return back()->with('error', 'GAGAL DIHAPUS! Anda adalah satu-satunya Admin. Tidak bisa menghapus akun login sendiri.');
             }
 
+            if (Schema::hasTable('pegawais')) {
+                $pegawai = Pegawai::where('user_id', $user->id)->first();
+                if ($pegawai) {
+                    $pegawai->forceDelete();
+                }
+            }
+
             $user->forceDelete();
+
+            DB::commit();
+            return back()->with('success', 'Data Pegawai berhasil dihapus permanen dari database.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menghapus: ' . $e->getMessage());
         }
-
-        $pegawai->forceDelete();
-
-        return back()->with('success', 'Data Pegawai berhasil dihapus permanen dari database.');
     }
 
     // ==========================================================
@@ -678,9 +758,6 @@ class TUKepegawaianController extends Controller
                     $nip = 'IMP-' . time() . '-' . $index;
                 }
 
-                // Kolom ke-5 adalah tugas_tambahan (jenis_ptk di template diabaikan)
-                $tugas_tambahan = trim($row[5] ?? null);
-
                 $tempat_lahir = trim($row[6] ?? null);
                 $jenis_kelamin = trim($row[8] ?? null);
 
@@ -728,24 +805,25 @@ class TUKepegawaianController extends Controller
                     ]
                 );
 
-                Pegawai::updateOrCreate(
-                    ['nip' => $nip],
-                    [
-                        'nama'                  => $nama,
-                        'nik'                   => $nik,
-                        'nuptk'                 => $nuptk,
-                        'jenis_kelamin'         => $jenis_kelamin,
-                        'tempat_lahir'          => $tempat_lahir,
-                        'tanggal_lahir'         => $tanggal_lahir,
-                        'status_kepegawaian'    => $status_kepegawaian,
-                        'tugas_tambahan'        => $tugas_tambahan,
-                        'email'                 => $email,
-                        'no_hp'                 => $no_hp,
-                        'jabatan'               => $jabatan,
-                        'alamat'                => $alamat,
-                        'user_id'               => $user->id,
-                    ]
-                );
+                if (Schema::hasTable('pegawais')) {
+                    Pegawai::updateOrCreate(
+                        ['nip' => $nip],
+                        [
+                            'nama'                  => $nama,
+                            'nik'                   => $nik,
+                            'nuptk'                 => $nuptk,
+                            'jenis_kelamin'         => $jenis_kelamin,
+                            'tempat_lahir'          => $tempat_lahir,
+                            'tanggal_lahir'         => $tanggal_lahir,
+                            'status_kepegawaian'    => $status_kepegawaian,
+                            'email'                 => $email,
+                            'no_hp'                 => $no_hp,
+                            'jabatan'               => $jabatan,
+                            'alamat'                => $alamat,
+                            'user_id'               => $user->id,
+                        ]
+                    );
+                }
 
                 $successCount++;
             }
@@ -770,44 +848,99 @@ class TUKepegawaianController extends Controller
         }
     }
 
-    // --- PENUGASAN ---
+    // ==========================================================
+    // DOKUMEN
+    // ==========================================================
     public function dokumen()
     {
+        if (!Schema::hasTable('dokumens')) {
+            return redirect()->route('tu_kepegawaian.dashboard')
+                ->with('error', 'Tabel dokumen belum tersedia.');
+        }
+
         $dokumens = Dokumen::all();
         return view('tu_kepegawaian.dokumen.index', compact('dokumens'));
     }
 
-    // --- RIWAYAT TUGAS (BERSIH, TANPA DOBEL) ---
+    public function dokumenIndex()
+    {
+        return $this->dokumen();
+    }
+
+    public function dokumenStore(Request $request)
+    {
+        $request->validate([
+            'guru_id'      => 'required',
+            'nama_dokumen' => 'required',
+            'file'         => 'required|file|mimes:pdf,jpg,png|max:2048',
+        ]);
+
+        $path = $request->file('file')->store('dokumen_pegawai', 'public');
+
+        Dokumen::create([
+            'guru_id'      => $request->guru_id,
+            'nama_dokumen' => $request->nama_dokumen,
+            'file_path'    => $path,
+        ]);
+
+        return redirect()->back()->with('success', 'Dokumen berhasil diupload!');
+    }
+
+    // ==========================================================
+    // RIWAYAT TUGAS (Model: RiwayatTugas)
+    // ==========================================================
     public function riwayat()
     {
-        $riwayat = RiwayatTugas::all();
-        $pegawais = Pegawai::all();
+        if ($this->riwayatTugasTableAvailable()) {
+            $riwayat = RiwayatTugas::all();
+        } elseif ($this->riwayatTableAvailable()) {
+            $riwayat = RiwayatKerja::all();
+        } else {
+            $riwayat = collect();
+        }
+
+        $pegawais = Schema::hasTable('pegawais') ? Pegawai::all() : collect();
+
         return view('tu_kepegawaian.riwayat_tugas.index', compact('riwayat', 'pegawais'));
+    }
+
+    public function riwayatIndex()
+    {
+        return $this->riwayat();
     }
 
     public function riwayatStore(Request $request)
     {
         $request->validate([
-            'pegawai_id' => 'required|exists:pegawais,id',
             'instansi' => 'required',
             'jabatan' => 'required',
             'mulai' => 'required|date',
         ]);
 
-        RiwayatTugas::create($request->all());
+        if ($this->riwayatTugasTableAvailable()) {
+            RiwayatTugas::create($request->all());
+        } elseif ($this->riwayatTableAvailable()) {
+            RiwayatKerja::create($request->all());
+        }
 
         return redirect()->route('tu_kepegawaian.riwayat.index')->with('success', 'Data berhasil ditambahkan!');
     }
 
     public function riwayatUpdate(Request $request, $id)
     {
-        $riwayat = RiwayatTugas::findOrFail($id);
-
         $request->validate([
             'instansi' => 'required',
             'jabatan' => 'required',
             'mulai' => 'required|date',
         ]);
+
+        if ($this->riwayatTugasTableAvailable()) {
+            $riwayat = RiwayatTugas::findOrFail($id);
+        } elseif ($this->riwayatTableAvailable()) {
+            $riwayat = RiwayatKerja::findOrFail($id);
+        } else {
+            return back()->with('error', 'Tabel riwayat tidak tersedia.');
+        }
 
         $riwayat->update($request->all());
 
@@ -816,26 +949,35 @@ class TUKepegawaianController extends Controller
 
     public function riwayatDestroy($id)
     {
-        RiwayatTugas::findOrFail($id)->delete();
+        if ($this->riwayatTugasTableAvailable()) {
+            RiwayatTugas::findOrFail($id)->delete();
+        } elseif ($this->riwayatTableAvailable()) {
+            RiwayatKerja::findOrFail($id)->delete();
+        }
+
         return redirect()->route('tu_kepegawaian.riwayat.index')->with('success', 'Data berhasil dihapus!');
     }
 
-    public function riwayatIndex()
-    {
-        return $this->riwayat();
-    }
-
-    // --- MUTASI ---
+    // ==========================================================
+    // MUTASI (Model: Mutasi)
+    // ==========================================================
     public function mutasiIndex()
     {
-        $mutasis = Mutasi::with([])->get();
+        if ($this->mutasiTableAvailable()) {
+            $mutasis = Mutasi::all();
+        } elseif ($this->mutasiPegawaiTableAvailable()) {
+            $mutasis = MutasiPegawai::with('pegawai')->get();
+        } else {
+            $mutasis = collect();
+        }
+
         return view('tu_kepegawaian.mutasi.index', compact('mutasis'));
     }
 
     public function mutasiCreate()
     {
         $gurus = Guru::all();
-        $pegawais = Pegawai::all();
+        $pegawais = Schema::hasTable('pegawais') ? Pegawai::all() : collect();
         return view('tu_kepegawaian.mutasi.create', compact('gurus', 'pegawais'));
     }
 
@@ -849,7 +991,7 @@ class TUKepegawaianController extends Controller
 
         $split = explode('-', $request->entitas_id);
         $tipe  = $split[0];
-        $id    = $split[1];
+        $id    = $split[1] ?? null;
 
         if (empty($id)) {
             return back()->with('error', 'Data yang dipilih tidak valid. Silakan pilih Guru atau Pegawai.');
@@ -863,7 +1005,7 @@ class TUKepegawaianController extends Controller
             } else {
                 return back()->with('error', 'Guru tidak ditemukan.');
             }
-        } elseif ($tipe === 'pegawai') {
+        } elseif ($tipe === 'pegawai' && Schema::hasTable('pegawais')) {
             $pegawai = Pegawai::find($id);
             if ($pegawai) {
                 $namaEntitas = $pegawai->nama;
@@ -872,12 +1014,20 @@ class TUKepegawaianController extends Controller
             }
         }
 
-        Mutasi::create([
-            'guru_id'      => $id,
-            'nama_entitas' => $namaEntitas,
-            'jenis'        => $request->jenis_mutasi,
-            'tanggal'      => $request->tanggal,
-        ]);
+        if ($this->mutasiTableAvailable()) {
+            Mutasi::create([
+                'guru_id'      => $id,
+                'nama_entitas' => $namaEntitas,
+                'jenis'        => $request->jenis_mutasi,
+                'tanggal'      => $request->tanggal,
+            ]);
+        } elseif ($this->mutasiPegawaiTableAvailable()) {
+            MutasiPegawai::create([
+                'pegawai_id' => $id,
+                'jenis'      => $request->jenis_mutasi,
+                'tanggal'    => $request->tanggal,
+            ]);
+        }
 
         return redirect()->route('tu_kepegawaian.mutasi.index')
                          ->with('success', 'Data mutasi berhasil ditambahkan!');
@@ -885,21 +1035,30 @@ class TUKepegawaianController extends Controller
 
     public function mutasiEdit($id)
     {
-        $mutasi = Mutasi::findOrFail($id);
+        if ($this->mutasiTableAvailable()) {
+            $mutasi = Mutasi::findOrFail($id);
+        } else {
+            $mutasi = MutasiPegawai::findOrFail($id);
+        }
+
         $gurus = Guru::all();
-        $pegawais = Pegawai::all();
+        $pegawais = Schema::hasTable('pegawais') ? Pegawai::all() : collect();
 
         return view('tu_kepegawaian.mutasi.edit', compact('mutasi', 'gurus', 'pegawais'));
     }
 
     public function mutasiUpdate(Request $request, $id)
     {
-        $mutasi = Mutasi::findOrFail($id);
-
         $request->validate([
             'jenis_mutasi' => 'required',
             'tanggal'      => 'required|date',
         ]);
+
+        if ($this->mutasiTableAvailable()) {
+            $mutasi = Mutasi::findOrFail($id);
+        } else {
+            $mutasi = MutasiPegawai::findOrFail($id);
+        }
 
         $mutasi->update([
             'jenis' => $request->jenis_mutasi,
@@ -911,7 +1070,25 @@ class TUKepegawaianController extends Controller
 
     public function mutasiDestroy($id)
     {
-        Mutasi::findOrFail($id)->delete();
+        if ($this->mutasiTableAvailable()) {
+            Mutasi::findOrFail($id)->delete();
+        } elseif ($this->mutasiPegawaiTableAvailable()) {
+            MutasiPegawai::findOrFail($id)->delete();
+        }
+
         return redirect()->back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function mutasiLaporan()
+    {
+        if ($this->mutasiTableAvailable()) {
+            $mutasis = Mutasi::all();
+        } elseif ($this->mutasiPegawaiTableAvailable()) {
+            $mutasis = MutasiPegawai::with('pegawai')->get();
+        } else {
+            $mutasis = collect();
+        }
+
+        return view('tu_kepegawaian.mutasi.laporan', compact('mutasis'));
     }
 }

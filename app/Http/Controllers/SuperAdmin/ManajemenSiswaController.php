@@ -16,9 +16,6 @@ class ManajemenSiswaController extends Controller
     {
         $query = DataSiswa::with([
             'user',
-            'ayah',
-            'ibu',
-            'wali',
             'rombel.kelas'
         ]);
 
@@ -77,6 +74,93 @@ class ManajemenSiswaController extends Controller
 
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            'nama_lengkap' => 'required|string|max:255',
+            'nis' => 'required|string|unique:data_siswa,nis',
+            'nisn' => 'nullable|string|unique:data_siswa,nisn',
+            'jenis_kelamin' => 'required|in:L,P',
+            'tempat_lahir' => 'nullable|string|max:100',
+            'tanggal_lahir' => 'nullable|date',
+            'agama' => 'nullable|string|max:50',
+            'kewarganegaraan' => 'nullable|string|max:50',
+            'no_hp' => 'nullable|string|max:20',
+            'sekolah_asal' => 'nullable|string|max:255',
+            'tanggal_diterima' => 'nullable|date',
+            'jurusan_id' => 'nullable|exists:jurusans,id',
+            'kelas_id' => 'nullable|exists:kelas,id',
+            'rombel_id' => 'nullable|exists:rombels,id',
+
+            // ORANG TUA (FIELD LANGSUNG)
+            'nama_ayah' => 'nullable|string|max:255',
+            'pekerjaan_ayah' => 'nullable|string|max:255',
+            'telepon_ayah' => 'nullable|string|max:20',
+
+            'nama_ibu' => 'nullable|string|max:255',
+            'pekerjaan_ibu' => 'nullable|string|max:255',
+            'telepon_ibu' => 'nullable|string|max:20',
+
+            'nama_wali' => 'nullable|string|max:255',
+            'pekerjaan_wali' => 'nullable|string|max:255',
+            'telepon_wali' => 'nullable|string|max:20',
+
+            'alamat' => 'nullable|string',
+            'dusun' => 'nullable|string|max:100',
+            'rt' => 'nullable|string|max:10',
+            'rw' => 'nullable|string|max:10',
+            'kelurahan' => 'nullable|string|max:100',
+            'kecamatan' => 'nullable|string|max:100',
+            'kode_pos' => 'nullable|string|max:10',
+
+            'password' => 'nullable|confirmed|min:6',
+        ]);
+
+        $siswa = DataSiswa::create([
+            'nama_lengkap' => $request->nama_lengkap,
+            'nis' => $request->nis,
+            'nisn' => $request->nisn,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'tempat_lahir' => $request->tempat_lahir,
+            'tanggal_lahir' => $request->tanggal_lahir,
+            'agama' => $request->agama,
+            'kewarganegaraan' => $request->kewarganegaraan,
+            'no_hp' => $request->no_hp,
+            'sekolah_asal' => $request->sekolah_asal,
+            'tanggal_diterima' => $request->tanggal_diterima,
+            'rombel_id' => $request->rombel_id,
+
+            // ORANG TUA (FIELD LANGSUNG)
+            'nama_ayah' => $request->nama_ayah,
+            'pekerjaan_ayah' => $request->pekerjaan_ayah,
+            'telepon_ayah' => $request->telepon_ayah,
+
+            'nama_ibu' => $request->nama_ibu,
+            'pekerjaan_ibu' => $request->pekerjaan_ibu,
+            'telepon_ibu' => $request->telepon_ibu,
+
+            'nama_wali' => $request->nama_wali,
+            'pekerjaan_wali' => $request->pekerjaan_wali,
+            'telepon_wali' => $request->telepon_wali,
+
+            'alamat' => $request->alamat,
+            'dusun' => $request->dusun,
+            'rt' => $request->rt,
+            'rw' => $request->rw,
+            'kelurahan' => $request->kelurahan,
+            'kecamatan' => $request->kecamatan,
+            'kode_pos' => $request->kode_pos,
+        ]);
+
+        // CREATE USER ACCOUNT
+        if ($request->filled('password')) {
+            $siswa->user()->create([
+                'name' => $request->nama_lengkap,
+                'email' => $request->nis . '@siswa.sch.id',
+                'password' => bcrypt($request->password),
+                'role' => 'siswa',
+                'nomor_induk' => $request->nis,
+            ]);
+        }
+
         return redirect()->route('super_admin.manajemen-siswa.index')
             ->with('success', 'Data siswa berhasil ditambahkan.');
     }
@@ -85,9 +169,6 @@ class ManajemenSiswaController extends Controller
     {
         $siswa = DataSiswa::with([
             'user',
-            'ayah',
-            'ibu',
-            'wali',
             'rombel.kelas.jurusan'
         ])->findOrFail($id);
 
@@ -108,35 +189,44 @@ class ManajemenSiswaController extends Controller
     public function update(Request $request, $id)
     {
         $siswa = DataSiswa::with([
-            'ayah',
-            'ibu',
-            'wali',
             'user'
         ])->findOrFail($id);
 
         $validated = $request->validate([
-            'nama_lengkap' => 'required',
-            'nis' => 'required',
-            'nisn' => 'nullable',
-            'jenis_kelamin' => 'required',
-            'tempat_lahir' => 'nullable',
-            'tanggal_lahir' => 'nullable',
-            'agama' => 'nullable',
-            'kewarganegaraan' => 'nullable',
-            'no_hp' => 'nullable',
-            'sekolah_asal' => 'nullable',
-            'tanggal_diterima' => 'nullable',
-            'jurusan_id' => 'nullable',
-            'kelas_id' => 'nullable',
-            'rombel_id' => 'nullable',
+            'nama_lengkap' => 'required|string|max:255',
+            'nis' => 'required|string|unique:data_siswa,nis,' . $id,
+            'nisn' => 'nullable|string|unique:data_siswa,nisn,' . $id,
+            'jenis_kelamin' => 'required|in:L,P',
+            'tempat_lahir' => 'nullable|string|max:100',
+            'tanggal_lahir' => 'nullable|date',
+            'agama' => 'nullable|string|max:50',
+            'kewarganegaraan' => 'nullable|string|max:50',
+            'no_hp' => 'nullable|string|max:20',
+            'sekolah_asal' => 'nullable|string|max:255',
+            'tanggal_diterima' => 'nullable|date',
+            'jurusan_id' => 'nullable|exists:jurusans,id',
+            'kelas_id' => 'nullable|exists:kelas,id',
+            'rombel_id' => 'nullable|exists:rombels,id',
 
-            'nama_ayah' => 'nullable',
-            'pekerjaan_ayah' => 'nullable',
-            'telepon_ayah' => 'nullable',
+            'nama_ayah' => 'nullable|string|max:255',
+            'pekerjaan_ayah' => 'nullable|string|max:255',
+            'telepon_ayah' => 'nullable|string|max:20',
 
-            'nama_ibu' => 'nullable',
-            'pekerjaan_ibu' => 'nullable',
-            'telepon_ibu' => 'nullable',
+            'nama_ibu' => 'nullable|string|max:255',
+            'pekerjaan_ibu' => 'nullable|string|max:255',
+            'telepon_ibu' => 'nullable|string|max:20',
+
+            'nama_wali' => 'nullable|string|max:255',
+            'pekerjaan_wali' => 'nullable|string|max:255',
+            'telepon_wali' => 'nullable|string|max:20',
+
+            'alamat' => 'nullable|string',
+            'dusun' => 'nullable|string|max:100',
+            'rt' => 'nullable|string|max:10',
+            'rw' => 'nullable|string|max:10',
+            'kelurahan' => 'nullable|string|max:100',
+            'kecamatan' => 'nullable|string|max:100',
+            'kode_pos' => 'nullable|string|max:10',
 
             'password' => 'nullable|confirmed|min:6',
         ]);
@@ -155,6 +245,19 @@ class ManajemenSiswaController extends Controller
             'tanggal_diterima' => $request->tanggal_diterima,
             'rombel_id' => $request->rombel_id,
 
+            'nama_ayah' => $request->nama_ayah,
+            'pekerjaan_ayah' => $request->pekerjaan_ayah,
+            'telepon_ayah' => $request->telepon_ayah,
+
+            'nama_ibu' => $request->nama_ibu,
+            'pekerjaan_ibu' => $request->pekerjaan_ibu,
+            'telepon_ibu' => $request->telepon_ibu,
+
+            'nama_wali' => $request->nama_wali,
+            'pekerjaan_wali' => $request->pekerjaan_wali,
+            'telepon_wali' => $request->telepon_wali,
+
+            'alamat' => $request->alamat,
             'dusun' => $request->dusun,
             'rt' => $request->rt,
             'rw' => $request->rw,
@@ -163,28 +266,18 @@ class ManajemenSiswaController extends Controller
             'kode_pos' => $request->kode_pos,
         ]);
 
-        // UPDATE AYAH
-        if ($siswa->ayah) {
-            $siswa->ayah->update([
-                'nama' => $request->nama_ayah,
-                'pekerjaan' => $request->pekerjaan_ayah,
-                'telepon' => $request->telepon_ayah,
-            ]);
-        }
-
-        // UPDATE IBU
-        if ($siswa->ibu) {
-            $siswa->ibu->update([
-                'nama' => $request->nama_ibu,
-                'pekerjaan' => $request->pekerjaan_ibu,
-                'telepon' => $request->telepon_ibu,
-            ]);
-        }
-
         // UPDATE PASSWORD USER
         if ($request->filled('password') && $siswa->user) {
             $siswa->user->update([
                 'password' => bcrypt($request->password)
+            ]);
+        }
+
+        // UPDATE USER NAME
+        if ($siswa->user) {
+            $siswa->user->update([
+                'name' => $request->nama_lengkap,
+                'nomor_induk' => $request->nis,
             ]);
         }
 
@@ -196,6 +289,11 @@ class ManajemenSiswaController extends Controller
     public function destroy($id)
     {
         $siswa = DataSiswa::findOrFail($id);
+
+        // Hapus user terkait
+        if ($siswa->user) {
+            $siswa->user->delete();
+        }
 
         $siswa->delete();
 
@@ -218,6 +316,12 @@ class ManajemenSiswaController extends Controller
 
     public function import(Request $request)
     {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:5120',
+        ]);
+
+        // TODO: Implement import logic
+
         return redirect()
             ->route('super_admin.manajemen-siswa.index')
             ->with('success', 'Data siswa berhasil diimport.');

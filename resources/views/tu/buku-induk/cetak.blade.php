@@ -366,7 +366,6 @@
                             <span style="font-size: 8px; color: #999;">Photo</span>
                         @endif
                     </div>
-                    <!-- side-table removed: keeping underlined form fields only -->
                 </div>
 
                 <!-- Form Data (VERTICAL) - Tanpa Judul A dan B -->
@@ -391,19 +390,24 @@
                         <div class="data-label">Warganegara</div>
                         <div class="data-value">{{ $siswa->kewarganegaraan ?? 'WNI' }}</div>
                     </div>
+                    {{-- ========== AGAMA - FIX ========== --}}
                     <div class="data-row">
                         <div class="data-label">Agama</div>
-                        <div class="data-value">{{ $siswa->agama ?? '-' }}</div>
+                        <div class="data-value">
+                            @if($siswa->agama_id)
+                                {{ $siswa->agama->nama ?? '-' }}
+                            @elseif($siswa->agama_lainnya)
+                                {{ $siswa->agama_lainnya }}
+                            @else
+                                -
+                            @endif
+                        </div>
                     </div>
-                    <div class="data-row">
-                        <div class="data-label">Kewarganegaraan</div>
-                        <div class="data-value">{{ $siswa->kewarganegaraan ?? '-' }}</div>
-                    </div>
+                    {{-- ========== END AGAMA ========== --}}
                     <div class="data-row">
                         <div class="data-label">Alamat Siswa</div>
                         <div class="data-value">Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}</div>
                     </div>
-                   
                 </div>
 
                 <div class="data-section">
@@ -532,7 +536,6 @@
                         <p>Mengetahui</p>
                         <p>Kepala Sekolah</p>
                     </div>
-                    <div class="stamp-box" aria-hidden="true"></div>
                 </div>
             </div>
         </div>

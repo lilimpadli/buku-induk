@@ -5,11 +5,16 @@ namespace App\Http\Controllers\TU;
 use App\Http\Controllers\Controller;
 use App\Models\MutasiSiswa;
 use App\Models\Siswa;
+use App\Models\DataSiswa;
 use App\Models\Kelas;
 use App\Models\Rombel;
 use App\Models\Jurusan;
 use App\Models\KenaikanKelas;
+use App\Models\Guru;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class MutasiController extends Controller
 {
@@ -18,13 +23,11 @@ class MutasiController extends Controller
      */
     public function index(Request $request)
     {
-        // Load classes with rombels and students
         $classes = Kelas::with(['jurusan', 'rombels.siswas'])
             ->orderBy('tingkat')
             ->orderBy('id')
             ->get();
 
-        // Build array of all students by class for JSON in view
         $allStudents = [];
         foreach ($classes as $kelas) {
             foreach ($kelas->rombels as $rombel) {
@@ -40,7 +43,6 @@ class MutasiController extends Controller
             }
         }
 
-        // Get existing mutasi records for reference
         $mutasis = MutasiSiswa::with('siswa')
             ->where('status', '!=', 'lulus')
             ->latest('tanggal_mutasi')
@@ -65,7 +67,7 @@ class MutasiController extends Controller
         $q = $request->get('q', '');
         $kelasId = $request->get('kelas_id');
 
-        $query = Siswa::query()->with('rombel.kelas')
+        $query = DataSiswa::query()->with('rombel.kelas')
             ->whereNotNull('rombel_id')
             ->whereDoesntHave('mutasis', function ($sub) {
                 $sub->whereRaw('LOWER(status) = ?', ['lulus']);
@@ -98,13 +100,12 @@ class MutasiController extends Controller
         return response()->json($results);
     }
 
-
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        $siswas = Siswa::with('rombel.kelas.jurusan')
+        $siswas = DataSiswa::with('rombel.kelas.jurusan')
             ->whereDoesntHave('mutasiTerakhir', function ($q) {
                 $q->whereIn('status', ['lulus', 'pindah', 'do', 'meninggal']);
             })
@@ -137,9 +138,12 @@ class MutasiController extends Controller
     /**
      * Show rombel for mutation with student grid
      */
-    public function showRombel($rombelId)
+    public function showRombel($id)
     {
-        $rombel = Rombel::with(['siswas.mutasiTerakhir', 'kelas.jurusan', 'guru'])->findOrFail($rombelId);
+        $rombel = Rombel::with([
+            'kelas.jurusan',
+            'siswas.mutasiTerakhir',
+        ])->findOrFail($id);
 
         return view('tu.mutasi.kelas.show', compact('rombel'));
     }
@@ -161,6 +165,10 @@ class MutasiController extends Controller
             'tujuan_pindah' => 'nullable|string',
         ]);
 
+        $siswa = DataSiswa::with('rombel')->find($validated['siswa_id']);
+        $validated['rombel_asal_id'] = $siswa->rombel_id ?? null;
+        $validated['diproses_oleh'] = $this->getValidUserId();
+
         MutasiSiswa::create($validated);
 
         return redirect()->route('tu.mutasi.index')
@@ -181,7 +189,7 @@ class MutasiController extends Controller
      */
     public function edit(MutasiSiswa $mutasi)
     {
-        $siswas = Siswa::orderBy('nama_lengkap')->get();
+        $siswas = DataSiswa::orderBy('nama_lengkap')->get();
         $statuses = [
             'pindah' => 'Pindah Sekolah',
             'do' => 'Putus Sekolah (DO)',
@@ -196,24 +204,95 @@ class MutasiController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, MutasiSiswa $mutasi)
+    public function update(Request $request)
     {
-        $validated = $request->validate([
-            'siswa_id' => 'required|exists:data_siswa,id',
-            'status' => 'required|in:pindah,do,meninggal,naik_kelas,lulus',
+        $request->validate([
+            'siswa_ids' => 'required|array|min:1',
+            'siswa_ids.*' => 'exists:data_siswa,id',
+            'action' => 'required|in:lulus,naik_kelas,pindah,do,meninggal',
             'tanggal_mutasi' => 'required|date',
-            'tahun_ajaran' => 'nullable|string',
-            'keterangan' => 'nullable|string',
-            'alasan_pindah' => 'nullable|string',
-            'no_sk_keluar' => 'nullable|string',
+            'rombel_id' => 'nullable|exists:rombels,id',
+            'keterangan' => 'nullable|string|max:255',
+            'alasan_pindah' => 'nullable|string|max:255',
+            'tujuan_pindah' => 'nullable|string|max:255',
+            'no_sk_keluar' => 'nullable|string|max:255',
             'tanggal_sk_keluar' => 'nullable|date',
-            'tujuan_pindah' => 'nullable|string',
         ]);
 
-        $mutasi->update($validated);
+        $action = $request->action;
+        $siswaIds = $request->siswa_ids;
 
-        return redirect()->route('tu.mutasi.index')
-            ->with('success', 'Data mutasi siswa berhasil diperbarui!');
+        DB::beginTransaction();
+        try {
+            foreach ($siswaIds as $siswaId) {
+                $siswa = DataSiswa::find($siswaId);
+                if (!$siswa) {
+                    continue;
+                }
+
+                MutasiSiswa::create([
+                    'siswa_id' => $siswa->id,
+                    'status' => $action,
+                    'tanggal_mutasi' => $request->tanggal_mutasi,
+                    'rombel_asal_id' => $siswa->rombel_id,
+                    'keterangan' => $request->keterangan,
+                    'alasan_pindah' => $request->alasan_pindah,
+                    'tujuan_pindah' => $request->tujuan_pindah,
+                    'no_sk_keluar' => $request->no_sk_keluar,
+                    'tanggal_sk_keluar' => $request->tanggal_sk_keluar,
+                    'diproses_oleh' => $this->getValidUserId(),
+                ]);
+
+                switch ($action) {
+                    case 'lulus':
+                        $siswa->update([
+                            'rombel_id' => null,
+                            'status_siswa' => 'lulus',
+                            'is_active' => false,
+                        ]);
+                        break;
+
+                    case 'naik_kelas':
+                        $siswa->update([
+                            'status_siswa' => 'aktif',
+                        ]);
+                        break;
+
+                    case 'pindah':
+                        $siswa->update([
+                            'rombel_id' => null,
+                            'status_siswa' => 'pindah',
+                            'is_active' => false,
+                        ]);
+                        break;
+
+                    case 'do':
+                        $siswa->update([
+                            'rombel_id' => null,
+                            'status_siswa' => 'drop_out',
+                            'is_active' => false,
+                        ]);
+                        break;
+
+                    case 'meninggal':
+                        $siswa->update([
+                            'rombel_id' => null,
+                            'status_siswa' => 'meninggal',
+                            'is_active' => false,
+                        ]);
+                        break;
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Proses mutasi ' . count($siswaIds) . ' siswa berhasil diproses.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error saat proses mutasi siswa: ' . $e->getMessage());
+
+            return redirect()->back()->with('error', 'Gagal memproses mutasi: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -228,7 +307,96 @@ class MutasiController extends Controller
     }
 
     /**
-     * Update/mutasi siswa from form
+     * 🔥 FIX: Get valid user ID for diproses_oleh
+     */
+    private function getValidUserId()
+    {
+        $userId = auth()->id();
+        
+        if ($userId) {
+            $userExists = User::where('id', $userId)->exists();
+            if ($userExists) {
+                Log::info("Using auth user ID: {$userId}");
+                return $userId;
+            }
+        }
+        
+        $firstUser = User::first();
+        if ($firstUser) {
+            Log::info("Using first user ID: {$firstUser->id}");
+            return $firstUser->id;
+        }
+        
+        $defaultUser = User::firstOrCreate(
+            ['email' => 'admin@sekolah.com'],
+            [
+                'name' => 'Admin Sekolah',
+                'password' => bcrypt('password123'),
+            ]
+        );
+        
+        Log::info("Created default user ID: {$defaultUser->id}");
+        return $defaultUser->id;
+    }
+
+    /**
+     * 🔥 FIND TARGET ROMBEL WITH SMART LOGIC
+     */
+    private function findTargetRombel($rombelAsal, $nextKelas)
+    {
+        $rombelNumber = preg_replace('/[^0-9]/', '', $rombelAsal->nama);
+        $rombelName = $rombelAsal->nama;
+        
+        // STRATEGI 1: Cari berdasarkan angka (untuk rombel bernomor)
+        if (!empty($rombelNumber)) {
+            $found = Rombel::where('kelas_id', $nextKelas->id)
+                ->where('nama', 'like', '%' . $rombelNumber . '%')
+                ->first();
+            if ($found) {
+                Log::info("✅ Found by number: {$found->nama}");
+                return $found;
+            }
+        }
+        
+        // STRATEGI 2: Ganti 'XI' dengan 'XII' di nama (EXACT MATCH)
+        $targetName = str_replace('XI', 'XII', $rombelName);
+        $targetName = str_replace('X ', 'XII ', $targetName);
+        $targetName = str_replace('XII ', 'XII ', $targetName);
+        
+        $found = Rombel::where('kelas_id', $nextKelas->id)
+            ->where('nama', $targetName)
+            ->first();
+        if ($found) {
+            Log::info("✅ Found by name replacement: {$found->nama}");
+            return $found;
+        }
+        
+        // STRATEGI 3: Cari berdasarkan kata kunci (tanpa tingkat)
+        $keywords = preg_replace('/^(X|XI|XII|10|11|12)\s*/i', '', $rombelName);
+        $keywords = trim($keywords);
+        
+        if (!empty($keywords)) {
+            $found = Rombel::where('kelas_id', $nextKelas->id)
+                ->where('nama', 'like', '%' . $keywords . '%')
+                ->first();
+            if ($found) {
+                Log::info("✅ Found by keyword: {$found->nama}");
+                return $found;
+            }
+        }
+        
+        // STRATEGI 4: Cari berdasarkan jurusan (ambil rombel pertama di kelas tersebut)
+        $found = Rombel::where('kelas_id', $nextKelas->id)->first();
+        if ($found) {
+            Log::warning("⚠️ Fallback to first rombel: {$found->nama}");
+            return $found;
+        }
+        
+        return null;
+    }
+
+    /**
+     * Update/mutasi siswa from form - MAIN METHOD (FIXED)
      */
     public function updateSiswa(Request $request)
     {
@@ -238,6 +406,7 @@ class MutasiController extends Controller
             'rombel_id' => 'required|exists:rombels,id',
             'action' => 'required|in:lulus,naik_kelas,pindah,do,meninggal',
             'tanggal_mutasi' => 'required|date',
+            'rombel_asal_id' => 'nullable|exists:rombels,id',
             'keterangan' => 'nullable|string',
             'alasan_pindah' => 'nullable|string|required_if:action,pindah',
             'tujuan_pindah' => 'nullable|string|required_if:action,pindah',
@@ -245,134 +414,183 @@ class MutasiController extends Controller
             'tanggal_sk_keluar' => 'nullable|date|required_if:action,do,meninggal',
         ]);
 
+        $userId = $this->getValidUserId();
+        Log::info("Processing mutasi with user ID: {$userId}");
+
+        DB::beginTransaction();
         try {
-            $rombel = Rombel::with('kelas.jurusan')->findOrFail($validated['rombel_id']);
+            $rombelAsal = Rombel::with('kelas.jurusan')->findOrFail($validated['rombel_id']);
             $action = $validated['action'];
-            $currentKelas = $rombel->kelas;
-            $currentTingkat = $currentKelas->tingkat;
-            
-            // Validasi untuk aksi naik kelas
+            $nextRombel = null;
+            $nextKelas = null;
+
             if ($action === 'naik_kelas') {
-                // Map tingkat ke level (X=10, XI=11, XII=12)
-                $tingkatMap = ['X' => 10, 'XI' => 11, 'XII' => 12, '10' => 10, '11' => 11, '12' => 12];
-                $reverseMap = [10 => 'XI', 11 => 'XII', 12 => 'XII'];
-                
-                if (!isset($tingkatMap[$currentTingkat])) {
-                    return redirect()
-                        ->back()
-                        ->with('error', 'Tingkat kelas tidak dikenali');
+                $currentTingkat = strtoupper($rombelAsal->kelas->tingkat);
+                if (in_array($currentTingkat, ['XII', '12'])) {
+                    return redirect()->back()->with('error', 'Siswa kelas XII harus diproses LULUS.');
                 }
-                
-                $currentLevel = $tingkatMap[$currentTingkat];
-                
-                // Kelas XII harus LULUS, tidak boleh naik
-                if ($currentLevel === 12 || strtoupper($currentTingkat) === 'XII' || $currentTingkat === '12') {
-                    return redirect()
-                        ->back()
-                        ->with('error', '❌ Siswa kelas XII harus LULUS, bukan naik kelas. Silakan pilih aksi "Lulus Siswa".');
-                }
-                
-                // Tentukan kelas tujuan
-                $nextLevel = $currentLevel + 1;
-                $nextTingkat = $reverseMap[$nextLevel] ?? null;
-                if (!$nextTingkat) {
-                    return redirect()
-                        ->back()
-                        ->with('error', '❌ Tingkat tujuan tidak ditemukan untuk naik kelas.');
-                }
-                
-                // Cek apakah kelas tujuan ada
-                $nextKelas = Kelas::where('jurusan_id', $currentKelas->jurusan_id)
+
+                $tingkatMap = ['X' => 'XI', 'XI' => 'XII', '10' => '11', '11' => '12'];
+                $nextTingkat = $tingkatMap[$currentTingkat] ?? null;
+
+                $nextKelas = Kelas::where('jurusan_id', $rombelAsal->kelas->jurusan_id)
                     ->where('tingkat', $nextTingkat)
                     ->first();
-                
+
                 if (!$nextKelas) {
-                    $kelasName = $nextTingkat . ' ' . $currentKelas->jurusan->nama;
-                    return redirect()
-                        ->back()
-                        ->with('error', "❌ Kelas $kelasName belum ada di sistem. Silakan buat kelas terlebih dahulu sebelum melakukan naik kelas.");
+                    return redirect()->back()->with('error', "Kelas tingkat $nextTingkat belum tersedia.");
                 }
-                
-                // Cari rombel tujuan dengan nomor/nama yang sama di kelas berikutnya
-                // Ambil nomor rombel dari nama (contoh: "RPL 1" -> 1, "IPA 2" -> 2)
-                $rombelNumber = preg_replace('/[^0-9]/', '', $rombel->nama);
-                
-                $nextRombel = Rombel::where('kelas_id', $nextKelas->id)
-                    ->where('nama', 'like', '%' . $rombelNumber . '%')
-                    ->first();
-                
+
+                // 🔥 FIX: Gunakan logika cari rombel yang lebih pintar
+                $nextRombel = $this->findTargetRombel($rombelAsal, $nextKelas);
+
+                // 🔥 FIX: Buat rombel baru jika tidak ditemukan
                 if (!$nextRombel) {
-                    // Jika tidak ada dengan nomor sama, coba cari dengan nama yang sama persis
-                    $nextRombel = Rombel::where('kelas_id', $nextKelas->id)
-                        ->where('nama', $rombel->nama)
-                        ->first();
-                }
-                
-                if (!$nextRombel) {
-                    $rombelName = $nextTingkat . ' ' . $rombel->nama;
-                    return redirect()
-                        ->back()
-                        ->with('error', "❌ Rombel $rombelName belum ada di sistem. Silakan buat rombel terlebih dahulu sebelum melakukan naik kelas.");
+                    $newName = str_replace('XI', 'XII', $rombelAsal->nama);
+                    $newName = str_replace('X ', 'XII ', $newName);
+                    $newName = str_replace('XII ', 'XII ', $newName);
+                    
+                    $nextRombel = Rombel::create([
+                        'kelas_id' => $nextKelas->id,
+                        'nama' => $newName,
+                        'tahun_ajaran' => $rombelAsal->tahun_ajaran ?? now()->format('Y') . '/' . (now()->format('Y') + 1),
+                    ]);
+                    
+                    Log::info("🔥 Buat rombel baru: {$newName} (ID: {$nextRombel->id})");
                 }
             }
 
-            $count = 0;
-            $today = now()->format('Y-m-d');
-            $status = $action;
-            $terminalStatuses = ['pindah', 'do', 'meninggal'];
-
             foreach ($validated['siswa_ids'] as $siswaId) {
-                $siswa = Siswa::with('mutasiTerakhir')->find($siswaId);
-                $lastStatus = optional($siswa->mutasiTerakhir)->status;
-
-                if ($action === 'naik_kelas' && in_array($lastStatus, $terminalStatuses, true)) {
-                    if (isset($nextRombel) && isset($nextKelas)) {
-                        $siswa->update([
-                            'rombel_id' => $nextRombel->id,
-                            'kelas_id' => $nextKelas->id,
-                        ]);
-                    }
-                    $count++;
-                    continue;
-                }
+                $siswa = DataSiswa::find($siswaId);
+                if (!$siswa) continue;
 
                 $mutasiData = [
                     'siswa_id' => $siswaId,
-                    'status' => $status,
+                    'status' => $action,
                     'tanggal_mutasi' => $validated['tanggal_mutasi'],
+                    'rombel_asal_id' => $siswa->rombel_id,
                     'keterangan' => $validated['keterangan'] ?? null,
+                    'diproses_oleh' => $userId,
                 ];
 
-                if ($status === 'pindah') {
-                    $mutasiData['alasan_pindah'] = $validated['alasan_pindah'];
-                    $mutasiData['tujuan_pindah'] = $validated['tujuan_pindah'];
-                }
-
-                if (in_array($status, ['do', 'meninggal'], true)) {
-                    $mutasiData['no_sk_keluar'] = $validated['no_sk_keluar'];
-                    $mutasiData['tanggal_sk_keluar'] = $validated['tanggal_sk_keluar'];
+                if ($action === 'naik_kelas' && $nextRombel) {
+                    $mutasiData['rombel_tujuan_id'] = $nextRombel->id;
+                    $siswa->update([
+                        'kelas_id' => $nextKelas->id,
+                        'rombel_id' => $nextRombel->id,
+                        'status_siswa' => 'aktif',
+                    ]);
+                } elseif ($action === 'lulus') {
+                    $siswa->update([
+                        'rombel_id' => null,
+                        'status_siswa' => 'lulus',
+                        'is_active' => false,
+                    ]);
+                    $this->lepasWaliKelasXII($siswa);
+                } else {
+                    $siswa->update([
+                        'rombel_id' => null,
+                        'status_siswa' => $action,
+                        'is_active' => false,
+                    ]);
                 }
 
                 MutasiSiswa::create($mutasiData);
-                $count++;
             }
 
+            if ($action === 'naik_kelas' && $nextRombel) {
+                $this->pindahWaliKelas($rombelAsal, $nextRombel);
+            }
+
+            DB::commit();
+            
             $statusLabel = [
-                'naik_kelas' => 'dinaikkan kelasnya',
                 'lulus' => 'lulus',
+                'naik_kelas' => 'naik kelas',
                 'pindah' => 'pindah sekolah',
                 'do' => 'keluar sekolah',
-                'meninggal' => 'tercatat meninggal dunia',
-            ][$status] ?? 'dimutasi';
-
-            return redirect()
-                ->route('tu.mutasi.kelas', ['jurusan' => $rombel->kelas->jurusan->id])
-                ->with('success', "✅ $count siswa berhasil $statusLabel!");
+                'meninggal' => 'meninggal dunia'
+            ][$action] ?? 'dimutasi';
+            
+            return redirect()->back()->with('success', "✅ " . count($validated['siswa_ids']) . " siswa berhasil $statusLabel!");
+            
         } catch (\Exception $e) {
-            return redirect()
-                ->back()
-                ->with('error', 'Error: ' . $e->getMessage());
+            DB::rollBack();
+            Log::error('Error updateSiswa: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memproses mutasi: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Pindahkan wali kelas dari rombel asal ke rombel tujuan
+     */
+    private function pindahWaliKelas($rombelAsal, $rombelTujuan)
+    {
+        if (!$rombelAsal || !$rombelTujuan) {
+            return;
+        }
+
+        $guruId = $rombelAsal->guru_id;
+        
+        if (!$guruId) {
+            return;
+        }
+
+        $existingWali = Rombel::where('id', $rombelTujuan->id)
+            ->whereNotNull('guru_id')
+            ->first();
+
+        if ($existingWali) {
+            Log::warning("Rombel tujuan {$rombelTujuan->nama} sudah memiliki wali kelas.");
+            return;
+        }
+
+        $rombelAsal->guru_id = null;
+        $rombelAsal->save();
+
+        $rombelTujuan->guru_id = $guruId;
+        $rombelTujuan->save();
+
+        $guru = Guru::find($guruId);
+        if ($guru) {
+            $guru->rombel_id = $rombelTujuan->id;
+            $guru->save();
+        }
+
+        Log::info("Wali kelas pindah dari {$rombelAsal->nama} ke {$rombelTujuan->nama}");
+    }
+
+    /**
+     * Lepas wali kelas jika siswa kelas XII lulus
+     */
+    private function lepasWaliKelasXII($siswa)
+    {
+        if (!$siswa->rombel) {
+            return;
+        }
+
+        $kelas = $siswa->rombel->kelas;
+        if (!$kelas || $kelas->tingkat !== 'XII') {
+            return;
+        }
+
+        $rombel = $siswa->rombel;
+        $guruId = $rombel->guru_id;
+        
+        if (!$guruId) {
+            return;
+        }
+
+        $rombel->guru_id = null;
+        $rombel->save();
+        
+        $guru = Guru::find($guruId);
+        if ($guru) {
+            $guru->rombel_id = null;
+            $guru->save();
+        }
+
+        Log::info("Wali kelas dilepas dari rombel {$rombel->nama} (kelas XII lulus)");
     }
 
     /**
@@ -394,6 +612,7 @@ class MutasiController extends Controller
             $count = 0;
             $today = now()->format('Y-m-d');
             $status = $validated['status'];
+            $userId = $this->getValidUserId();
 
             foreach ($validated['siswa_ids'] as $siswaId) {
                 $mutasiData = [
@@ -401,9 +620,9 @@ class MutasiController extends Controller
                     'status' => $status,
                     'tanggal_mutasi' => $today,
                     'keterangan' => $validated['keterangan'] ?? null,
+                    'diproses_oleh' => $userId,
                 ];
 
-                // Add fields based on status
                 if ($status === 'pindah') {
                     $mutasiData['alasan_pindah'] = $validated['alasan_pindah'] ?? null;
                     $mutasiData['tujuan_pindah'] = $validated['tujuan_pindah'] ?? null;
@@ -428,6 +647,7 @@ class MutasiController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Bulk mutasi error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error: ' . $e->getMessage()
@@ -437,20 +657,17 @@ class MutasiController extends Controller
 
     /**
      * Up all students automatically (X->XI, XI->XII, XII->Lulus)
-     * Each student moves to the same rombel number in next class
-     * e.g., X RPL 1 -> XI RPL 1, X RPL 2 -> XI RPL 2
      */
     public function upAll(Request $request)
     {
         try {
             $today = now()->format('Y-m-d');
-            // Gunakan tahun ajaran dari request, atau hitung otomatis
             $tahunAjaran = $request->input('tahun_ajaran') ?? (now()->format('Y') . '-' . (now()->format('Y') + 1));
             $count = 0;
             $graduatedCount = 0;
+            $userId = $this->getValidUserId();
 
-            // Get all active students (not graduated and not with terminal status)
-            $siswa = Siswa::with('rombel.kelas.jurusan')
+            $siswa = DataSiswa::with(['rombel.kelas.jurusan', 'rombel.guru'])
                 ->whereHas('rombel.kelas', function ($q) {
                     $q->whereIn('tingkat', ['X', 'XI', 'XII']);
                 })
@@ -466,11 +683,10 @@ class MutasiController extends Controller
                 ], 422);
             }
 
-            // Group siswa by current rombel
             $byRombel = $siswa->groupBy('rombel_id');
 
             foreach ($byRombel as $rombelId => $students) {
-                $currentRombel = Rombel::with('kelas.jurusan')->find($rombelId);
+                $currentRombel = Rombel::with(['kelas.jurusan', 'guru'])->find($rombelId);
                 if (!$currentRombel) continue;
 
                 $currentKelas = $currentRombel->kelas;
@@ -478,19 +694,17 @@ class MutasiController extends Controller
                 $rombelNama = $currentRombel->nama;
 
                 if ($currentTingkat === 'XII') {
-                    // XII -> Lulus (Graduated)
                     foreach ($students as $s) {
-                        // Check apakah siswa sudah pernah lulus (status='lulus' di mutasi_siswas)
+                        $this->lepasWaliKelasXII($s);
+
                         $sudahLulus = MutasiSiswa::where('siswa_id', $s->id)
                             ->where('status', 'lulus')
                             ->exists();
                         
-                        // Skip jika sudah lulus
                         if ($sudahLulus) {
                             continue;
                         }
                         
-                        // Ambil tahun ajaran dari kenaikan_kelas terbaru
                         $lastKenaikanKelas = KenaikanKelas::where('siswa_id', $s->id)
                             ->orderBy('tahun_ajaran', 'desc')
                             ->orderBy('semester', 'desc')
@@ -498,66 +712,61 @@ class MutasiController extends Controller
                         
                         $tahunAjaranLulus = $lastKenaikanKelas ? $lastKenaikanKelas->tahun_ajaran : $tahunAjaran;
                         
-                        // Create mutasi record
                         MutasiSiswa::create([
                             'siswa_id' => $s->id,
                             'status' => 'lulus',
                             'tanggal_mutasi' => $today,
                             'tahun_ajaran' => $tahunAjaranLulus,
                             'keterangan' => 'Lulus otomatis - UP ALL',
+                            'diproses_oleh' => $userId,
                         ]);
 
                         $graduatedCount++;
                     }
                 } else {
-                    // X -> XI atau XI -> XII
                     $nextTingkat = $currentTingkat === 'X' ? 'XI' : 'XII';
                     
-                    // Find target kelas dengan jurusan sama
                     $targetKelas = Kelas::where('tingkat', $nextTingkat)
                         ->where('jurusan_id', $currentKelas->jurusan_id)
                         ->first();
 
                     if (!$targetKelas) {
-                        continue; // Skip jika kelas tujuan tidak ada
+                        continue;
                     }
 
-                    // Cari rombel dengan nama sama di kelas tujuan
                     $targetRombel = Rombel::where('kelas_id', $targetKelas->id)
                         ->where('nama', 'like', '%' . preg_replace('/\b(X|XI|XII)\b/iu', '', $rombelNama) . '%')
                         ->first();
 
-                    // Jika tidak ada rombel dengan nama serupa, gunakan rombel pertama
                     if (!$targetRombel) {
                         $targetRombel = Rombel::where('kelas_id', $targetKelas->id)->first();
                     }
 
                     if (!$targetRombel) {
-                        continue; // Skip jika tidak ada rombel di kelas tujuan
+                        continue;
                     }
 
+                    $this->pindahWaliKelas($currentRombel, $targetRombel);
+
                     foreach ($students as $s) {
-                        // Check apakah siswa sudah punya status terminal (lulus, pindah, do, meninggal)
                         $hasTerminalStatus = MutasiSiswa::where('siswa_id', $s->id)
                             ->whereIn('status', ['lulus', 'pindah', 'do', 'meninggal'])
                             ->exists();
                         
-                        // Skip jika sudah punya status terminal
                         if ($hasTerminalStatus) {
                             continue;
                         }
                         
-                        // Create mutasi record
                         MutasiSiswa::create([
                             'siswa_id' => $s->id,
                             'status' => 'naik_kelas',
                             'tanggal_mutasi' => $today,
                             'tahun_ajaran' => $tahunAjaran,
                             'keterangan' => "Naik dari {$currentTingkat} ke {$nextTingkat} - UP ALL",
+                            'diproses_oleh' => $userId,
                         ]);
 
-                        // Update siswa's kelas and rombel
-                        Siswa::where('id', $s->id)->update([
+                        DataSiswa::where('id', $s->id)->update([
                             'kelas_id' => $targetKelas->id,
                             'rombel_id' => $targetRombel->id,
                         ]);
@@ -575,6 +784,7 @@ class MutasiController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error('UpAll error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error: ' . $e->getMessage()

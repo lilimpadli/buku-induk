@@ -18,7 +18,6 @@ class RoleMiddleware
         $user = Auth::user();
         $userRole = $this->normalizeRole($user->role);
 
-        // Normalize allowed roles passed to middleware
         $normalizedRoles = array_map(function($r) {
             return $this->normalizeRole($r);
         }, $roles);
@@ -27,27 +26,9 @@ class RoleMiddleware
             abort(403, 'Anda tidak punya akses.');
         }
 
-        // Validasi role-specific records di database
-        // Role guru harus punya record di tabel gurus
-        if (in_array('guru', $normalizedRoles) && $userRole === 'guru') {
-            if (!$user->guru) {
-                abort(403, 'Anda bukan guru.');
-            }
-        }
-
-        // Role walikelas harus punya record di tabel gurus dengan status wali kelas
-        if (in_array('walikelas', $normalizedRoles) && $userRole === 'walikelas') {
-            if (!$user->guru) {
-                abort(403, 'Anda bukan wali kelas.');
-            }
-        }
-
         return $next($request);
     }
 
-    /**
-     * Normalize role string to a canonical form (lowercase, underscores)
-     */
     private function normalizeRole($role)
     {
         return Str::of($role)

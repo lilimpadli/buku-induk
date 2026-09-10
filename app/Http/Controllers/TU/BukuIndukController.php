@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\TU;
 
 use App\Http\Controllers\Controller;
+use App\Models\Agama;
+use App\Models\TahunAjaran;
 use App\Models\DataSiswa as Siswa;
 use App\Models\Rombel;
 use App\Models\Jurusan;
@@ -23,6 +25,10 @@ use App\Exports\NilaiRaportTemplateByJurusan;
 use App\Exports\NilaiRaportTemplateByFilters;
 use App\Imports\SiswaImport;
 use App\Imports\NilaiImport;
+use Illuminate\Support\Facades\Log;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
@@ -30,14 +36,10 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class BukuIndukController extends Controller
 {
-    /**
-     * Display a listing of students for Buku Induk
-     */
     public function index(Request $request)
     {
         $query = Siswa::with(['user', 'nilaiRaports.mapel', 'mutasis', 'rombel.kelas.jurusan']);
 
-        // Filter berdasarkan nama siswa
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where('nama_lengkap', 'like', "%{$search}%")
@@ -45,28 +47,22 @@ class BukuIndukController extends Controller
                   ->orWhere('nisn', 'like', "%{$search}%");
         }
 
-        // Filter berdasarkan jurusan
         if ($request->filled('jurusan_id')) {
             $query->whereHas('rombel.kelas.jurusan', function($q) {
                 $q->where('id', request('jurusan_id'));
             });
         }
 
-        // Filter berdasarkan jenis kelamin
         if ($request->filled('jenis_kelamin')) {
             $query->filterByJenisKelamin($request->jenis_kelamin);
         }
 
-        // Only include students currently assigned to a rombel
         $query->whereNotNull('rombel_id');
 
-        // Exclude students who have a 'lulus' mutation (moved to alumni)
-        // Use case-insensitive comparison to handle variations like 'Lulus'
         $query->whereDoesntHave('mutasis', function($q) {
             $q->whereRaw('LOWER(status) = ?', ['lulus']);
         });
 
-        // Also exclude students recorded in kenaikan_kelas with status 'lulus' (case-insensitive)
         $excludedIds = KenaikanKelas::whereRaw('LOWER(status) = ?', ['lulus'])
             ->pluck('siswa_id')
             ->unique()
@@ -82,21 +78,18 @@ class BukuIndukController extends Controller
 
         $siswas = $query->paginate($perPage)->withQueryString();
         
-        // Get all jurusans for filter dropdown
         $jurusans = Jurusan::orderBy('nama')->get();
 
         return view('tu.buku-induk.index', compact('siswas', 'jurusans', 'perPage'));
     }
 
-    /**
-     * Show the Buku Induk for a specific student
-     */
     public function show(Siswa $siswa)
     {
         $siswa->load([
             'user', 
             'rombel.kelas.jurusan',
             'kurikulum',
+            'agama',
             'mutasis',
             'nilaiRaports' => function($query) {
                 $query->with('mapel')
@@ -105,16 +98,127 @@ class BukuIndukController extends Controller
             }
         ]);
         
-        // Group nilai by kelompok and nama mata pelajaran
         $nilaiByKelompok = $this->groupNilaiByKelompok($siswa);
         
         return view('tu.buku-induk.show', compact('siswa', 'nilaiByKelompok'));
     }
 
-    public function exportSiswa()
+    public function exportSiswa(Request $request)
     {
-        $filename = 'data_siswa_' . date('Ymd_His') . '.xlsx';
-        return Excel::download(new SiswaExport(), $filename);
+        try {
+            // Ambil parameter filter
+            $kelasId = $request->input('kelas');
+            $rombelId = $request->input('rombel');
+            $tahunAjaran = $request->input('tahun_ajaran');
+            $semester = $request->input('semester');
+            $status = $request->input('status');
+
+            // BUILD NAMA FILE BERDASARKAN FILTER
+            $fileName = 'Buku_Induk';
+            
+            // Tambahkan tahun ajaran
+            if ($tahunAjaran) {
+                $fileName .= '_' . str_replace('/', '-', $tahunAjaran);
+            }
+            
+            // Tambahkan semester
+            if ($semester) {
+                $fileName .= '_' . $semester;
+            }
+            
+            // Tambahkan kelas & rombel
+            if ($kelasId || $rombelId) {
+                $kelas = \App\Models\Kelas::find($kelasId);
+                $rombel = \App\Models\Rombel::find($rombelId);
+                
+                if ($kelas) {
+                    $fileName .= '_' . $kelas->nama;
+                }
+                if ($rombel) {
+                    $fileName .= '_' . $rombel->nama;
+                }
+            }
+            
+            // Tambahkan status
+            if ($status) {
+                $fileName .= '_' . $status;
+            }
+            
+            // Tambahkan tanggal
+            $fileName .= '_' . date('Y-m-d');
+            
+            $fileName .= '.xlsx';
+
+            // Query data siswa dengan filter
+            $query = Siswa::with(['rombel.kelas.jurusan', 'user']);
+            
+            if ($kelasId) {
+                $query->whereHas('rombel.kelas', function($q) use ($kelasId) {
+                    $q->where('id', $kelasId);
+                });
+            }
+            
+            if ($rombelId) {
+                $query->where('rombel_id', $rombelId);
+            }
+            
+            if ($tahunAjaran) {
+                $query->where('tahun_ajaran', $tahunAjaran);
+            }
+            
+            // Filter status (aktif/tidak)
+            if ($status === 'aktif') {
+                $query->where('status', 'Aktif');
+            } elseif ($status === 'tidak_aktif') {
+                $query->where('status', '!=', 'Aktif');
+            }
+            
+            $siswa = $query->get();
+
+            // Generate Excel
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Set headers
+            $headers = ['No', 'NIS', 'NISN', 'Nama', 'Kelas', 'Jurusan', 'Rombel', 'Tahun Ajaran', 'Status'];
+            $col = 'A';
+            foreach ($headers as $header) {
+                $sheet->setCellValue($col . '1', $header);
+                $col++;
+            }
+
+            // Isi data
+            $row = 2;
+            $no = 1;
+            foreach ($siswa as $s) {
+                $sheet->setCellValue('A' . $row, $no++);
+                $sheet->setCellValue('B' . $row, $s->nis);
+                $sheet->setCellValue('C' . $row, $s->nisn);
+                $sheet->setCellValue('D' . $row, $s->nama_lengkap);
+                $sheet->setCellValue('E' . $row, $s->rombel?->kelas?->nama ?? '-');
+                $sheet->setCellValue('F' . $row, $s->rombel?->kelas?->jurusan?->nama ?? '-');
+                $sheet->setCellValue('G' . $row, $s->rombel?->nama ?? '-');
+                $sheet->setCellValue('H' . $row, $s->tahun_ajaran ?? '-');
+                $sheet->setCellValue('I' . $row, $s->status ?? 'Aktif');
+                $row++;
+            }
+
+            // Auto size columns
+            foreach (range('A', 'I') as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+
+            // Export
+            $writer = new Xlsx($spreadsheet);
+            $tempFile = tempnam(sys_get_temp_dir(), 'export_');
+            $writer->save($tempFile);
+
+            return response()->download($tempFile, $fileName)->deleteFileAfterSend(true);
+
+        } catch (\Exception $e) {
+            Log::error('Export error: ' . $e->getMessage());
+            return redirect()->back()->with('error', '❌ Gagal export: ' . $e->getMessage());
+        }
     }
 
     public function exportNilai(Request $request)
@@ -156,28 +260,128 @@ class BukuIndukController extends Controller
         return redirect()->route('tu.buku-induk.index')->with('success', $message);
     }
 
-    public function importNilai(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|file|mimes:xlsx,xls,csv',
-        ]);
+  public function importNilai(Request $request)
+{
+    $request->validate([
+        'file' => 'required|file|mimes:xlsx,xls,csv',
+    ]);
 
-        $import = new NilaiImport();
-        Excel::import($import, $request->file('file'));
+    $semester = $request->input('semester', 'Ganjil');
+    $tahunAjaran = $request->input('tahun_ajaran', date('Y') . '/' . (date('Y') + 1));
 
-        $message = 'Import nilai berhasil disimpan.';
-        if (method_exists($import, 'getErrors')) {
-            $errors = $import->getErrors();
-            if (!empty($errors)) {
-                return redirect()->route('tu.buku-induk.index')
-                    ->with('warning', 'Import selesai namun ada beberapa baris tidak diproses.')
-                    ->with('import_errors', $errors);
+    try {
+        $file = $request->file('file');
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getPathname());
+        $worksheet = $spreadsheet->getActiveSheet();
+        $highestRow = $worksheet->getHighestRow();
+        $highestColumn = $worksheet->getHighestColumn();
+
+        // 🔥 PERBAIKAN: Gunakan Coordinate untuk mendapatkan semua kolom
+        $headers = [];
+        $highestColumnIndex = Coordinate::columnIndexFromString($highestColumn);
+        
+        for ($colIndex = 1; $colIndex <= $highestColumnIndex; $colIndex++) {
+            $columnLetter = Coordinate::stringFromColumnIndex($colIndex);
+            $headers[$colIndex - 1] = $worksheet->getCell($columnLetter . '1')->getValue();
+        }
+
+        // Buat mapel map
+        $mapelMap = [];
+        $mapels = \App\Models\MataPelajaran::all();
+        foreach ($mapels as $mapel) {
+            $mapelMap[strtolower(trim($mapel->nama))] = $mapel->id;
+        }
+
+        $successCount = 0;
+        $errors = [];
+
+        for ($row = 2; $row <= $highestRow; $row++) {
+            $nis = $worksheet->getCell('B' . $row)->getValue();
+            $nisn = $worksheet->getCell('C' . $row)->getValue();
+
+            if (empty($nis) || empty($nisn)) {
+                continue;
+            }
+
+            $siswa = \App\Models\DataSiswa::where('nis', $nis)->where('nisn', $nisn)->first();
+            if (!$siswa) {
+                $errors[] = "Siswa NIS {$nis} tidak ditemukan (baris {$row})";
+                continue;
+            }
+
+            // Ambil semester dari Excel atau pakai default
+            $semesterVal = $worksheet->getCell('F' . $row)->getValue() ?: $semester;
+            $semesterVal = strtolower($semesterVal);
+            if ($semesterVal === 'ganjil' || $semesterVal === '1') {
+                $semesterVal = 'Ganjil';
+            } elseif ($semesterVal === 'genap' || $semesterVal === '2') {
+                $semesterVal = 'Genap';
+            }
+
+            $tahunVal = $worksheet->getCell('G' . $row)->getValue() ?: $tahunAjaran;
+
+            // 🔥 PERBAIKAN: Loop berdasarkan header dengan index yang benar
+            // Kolom mulai dari index 7 (kolom H) untuk mata pelajaran
+            for ($colIndex = 7; $colIndex < count($headers); $colIndex++) {
+                $mapelNama = trim($headers[$colIndex] ?? '');
+                
+                // Lewati jika header kosong
+                if (empty($mapelNama)) {
+                    continue;
+                }
+
+                // Dapatkan nilai dengan cara yang benar
+                $columnLetter = Coordinate::stringFromColumnIndex($colIndex + 1);
+                $nilaiValue = $worksheet->getCell($columnLetter . $row)->getValue();
+
+                if ($nilaiValue === null || $nilaiValue === '') {
+                    continue;
+                }
+
+                $mapelId = $mapelMap[strtolower(trim($mapelNama))] ?? null;
+                if (!$mapelId) {
+                    $errors[] = "Mata pelajaran '{$mapelNama}' tidak ditemukan (baris {$row})";
+                    continue;
+                }
+
+                \App\Models\NilaiRaport::updateOrCreate(
+                    [
+                        'siswa_id' => $siswa->id,
+                        'mata_pelajaran_id' => $mapelId,
+                        'semester' => $semesterVal,
+                        'tahun_ajaran' => $tahunVal,
+                    ],
+                    [
+                        'nilai_akhir' => (float) $nilaiValue,
+                        'kelas_id' => $siswa->rombel->kelas_id ?? null,
+                        'rombel_id' => $siswa->rombel_id,
+                    ]
+                );
+                $successCount++;
             }
         }
 
-        return redirect()->route('tu.buku-induk.index')->with('success', $message);
-    }
+        $message = "✅ Import selesai! {$successCount} nilai berhasil disimpan.";
+        if (!empty($errors)) {
+            // Batasi error yang ditampilkan
+            $errorLimit = array_slice($errors, 0, 20);
+            $errorCount = count($errors);
+            if ($errorCount > 20) {
+                $errorLimit[] = "... dan " . ($errorCount - 20) . " error lainnya.";
+            }
+            return redirect()->route('tu.buku-induk.index')
+                ->with('warning', $message)
+                ->with('import_errors', $errorLimit);
+        }
 
+        return redirect()->route('tu.buku-induk.index')->with('success', $message);
+
+    } catch (\Exception $e) {
+        Log::error('Import nilai error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+        return redirect()->route('tu.buku-induk.index')
+            ->with('error', '❌ Terjadi kesalahan: ' . $e->getMessage());
+    }
+}
     public function importPkl(Request $request)
     {
         $request->validate([
@@ -222,34 +426,33 @@ class BukuIndukController extends Controller
 
     public function downloadTemplateNilaiFiltered(Request $request)
     {
-        // Increase memory limit for large exports
         ini_set('memory_limit', '1024M');
         set_time_limit(300);
         
         $kurikulumIds = $request->input('kurikulum_ids', []);
         $jurusanIds = $request->input('jurusan_ids', []);
         $tingkatLevels = $request->input('tingkat_levels', []);
+        $konsentrasiIds = $request->input('konsentrasi_ids', []);
+
+        if (empty($kurikulumIds) && empty($jurusanIds) && empty($tingkatLevels) && empty($konsentrasiIds)) {
+            return redirect()->back()->with('error', 'Pilih minimal satu filter!');
+        }
 
         $fileName = 'template_nilai_rapor_' . date('Ymd_His') . '.xlsx';
         
         return Excel::download(
-            new NilaiRaportTemplateByFilters($kurikulumIds, $jurusanIds, $tingkatLevels),
+            new \App\Exports\NilaiRaportTemplateByFilters($kurikulumIds, $jurusanIds, $tingkatLevels, $konsentrasiIds),
             $fileName
         );
     }
 
-    /**
-     * Show printable version of Buku Induk
-     */
     public function cetak(Siswa $siswa)
     {
         $siswa->load([
             'user', 
             'rombel.kelas.jurusan',
             'kurikulum',
-            'ayah',
-            'ibu',
-            'wali',
+            'agama',
             'mutasis', 
             'mutasiTerakhir',
             'nilaiRaports' => function($query) {
@@ -259,24 +462,18 @@ class BukuIndukController extends Controller
             }
         ]);
         
-        // Group nilai by kelompok and nama mata pelajaran
         $nilaiByKelompok = $this->groupNilaiByKelompok($siswa);
         
         return view('tu.buku-induk.cetak', compact('siswa', 'nilaiByKelompok'));
     }
 
-    /**
-     * Export Buku Induk to PDF
-     */
     public function export(Siswa $siswa)
     {
         $siswa->load([
             'user', 
             'rombel.kelas.jurusan',
             'kurikulum',
-            'ayah',
-            'ibu',
-            'wali',
+            'agama',
             'mutasis', 
             'mutasiTerakhir',
             'nilaiRaports' => function($query) {
@@ -286,58 +483,86 @@ class BukuIndukController extends Controller
             }
         ]);
         
-        // This would require a PDF library like DomPDF
-        // For now, we'll return the print view
         return $this->cetak($siswa);
     }
 
-    /**
-     * Show edit form for Buku Induk (edit siswa data)
-     */
     public function edit(Siswa $siswa)
     {
-        $siswa->load(['user','ayah','ibu','wali','rombel.kelas.jurusan','mutasiTerakhir']);
-        return view('tu.buku-induk.edit', compact('siswa'));
+        $siswa->load(['user','rombel.kelas.jurusan','mutasiTerakhir','agama']);
+        $agamas = Agama::all();
+        return view('tu.buku-induk.edit', compact('siswa', 'agamas'));
     }
 
-    /**
-     * Update siswa data from Buku Induk edit form
-     */
     public function update(Request $request, Siswa $siswa)
     {
         $validated = $request->validate([
-            'nis' => 'required|string',
-            'nama_lengkap' => 'required|string',
-            'nisn' => 'nullable|string',
-            'jenis_kelamin' => 'nullable|string',
-            'tempat_lahir' => 'nullable|string',
+            'nis' => 'required|string|max:20',
+            'nama_lengkap' => 'required|string|max:255',
+            'nisn' => 'nullable|string|max:20',
+            'jenis_kelamin' => 'nullable|string|max:20',
+            'tempat_lahir' => 'nullable|string|max:255',
             'tanggal_lahir' => 'nullable|date',
-            'agama' => 'nullable|string',
-            'kewarganegaraan' => 'nullable|string',
-            'dusun' => 'nullable|string',
-            'kelurahan' => 'nullable|string',
-            'kecamatan' => 'nullable|string',
-            'rt' => 'nullable|string',
-            'rw' => 'nullable|string',
-            'kode_pos' => 'nullable|string',
-            'pkl_nilai' => 'nullable|string',
-            'pkl_sertifikat' => 'nullable|string',
-            'pkl_nama_industri' => 'nullable|string',
+            'agama_id' => 'nullable|exists:agamas,id',
+            'agama_lainnya' => 'nullable|string|max:50',
+            'kewarganegaraan' => 'nullable|string|max:50',
+            'dusun' => 'nullable|string|max:255',
+            'kelurahan' => 'nullable|string|max:255',
+            'kecamatan' => 'nullable|string|max:255',
+            'rt' => 'nullable|string|max:10',
+            'rw' => 'nullable|string|max:10',
+            'kode_pos' => 'nullable|string|max:10',
+            'pkl_nilai' => 'nullable|string|max:50',
+            'pkl_sertifikat' => 'nullable|string|max:100',
+            'pkl_nama_industri' => 'nullable|string|max:255',
             'pkl_alamat' => 'nullable|string',
-            'ijazah_nomor' => 'nullable|string',
+            'ijazah_nomor' => 'nullable|string|max:100',
             'ijazah_tanggal' => 'nullable|date',
-            'transkip_nomor' => 'nullable|string',
+            'transkip_nomor' => 'nullable|string|max:100',
             'transkip_tanggal' => 'nullable|date',
             'tanggal_lulus' => 'nullable|date',
-            'status_kelulusan' => 'nullable|string',
+            'status_kelulusan' => 'nullable|string|max:50',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            // other fields may be added as needed
         ]);
 
-        // Update main siswa fields
-        $siswa->update($validated);
+        if ($request->agama_id === 'other') {
+            $agamaId = null;
+            $agamaLainnya = $request->agama_lainnya;
+        } elseif ($request->agama_id) {
+            $agamaId = $request->agama_id;
+            $agamaLainnya = null;
+        } else {
+            $agamaId = null;
+            $agamaLainnya = null;
+        }
 
-        // Handle ayah/ibu/wali relations if provided
+        $siswa->update([
+            'nis' => $request->nis,
+            'nama_lengkap' => $request->nama_lengkap,
+            'nisn' => $request->nisn,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'tempat_lahir' => $request->tempat_lahir,
+            'tanggal_lahir' => $request->tanggal_lahir,
+            'agama_id' => $agamaId,
+            'agama_lainnya' => $agamaLainnya,
+            'kewarganegaraan' => $request->kewarganegaraan,
+            'dusun' => $request->dusun,
+            'kelurahan' => $request->kelurahan,
+            'kecamatan' => $request->kecamatan,
+            'rt' => $request->rt,
+            'rw' => $request->rw,
+            'kode_pos' => $request->kode_pos,
+            'pkl_nilai' => $request->pkl_nilai,
+            'pkl_sertifikat' => $request->pkl_sertifikat,
+            'pkl_nama_industri' => $request->pkl_nama_industri,
+            'pkl_alamat' => $request->pkl_alamat,
+            'ijazah_nomor' => $request->ijazah_nomor,
+            'ijazah_tanggal' => $request->ijazah_tanggal,
+            'transkip_nomor' => $request->transkip_nomor,
+            'transkip_tanggal' => $request->transkip_tanggal,
+            'tanggal_lulus' => $request->tanggal_lulus,
+            'status_kelulusan' => $request->status_kelulusan,
+        ]);
+
         $ayahData = $request->input('ayah', []);
         if (!empty(array_filter($ayahData))) {
             if ($siswa->ayah) {
@@ -368,7 +593,6 @@ class BukuIndukController extends Controller
             }
         }
 
-        // Handle photo upload / removal for related user
         $removeFoto = $request->input('remove_foto', '0');
         if ($removeFoto === '1' && $siswa->user && $siswa->user->photo) {
             Storage::disk('public')->delete($siswa->user->photo);
@@ -393,68 +617,56 @@ class BukuIndukController extends Controller
         return redirect()->route('tu.buku-induk.show', $siswa->id)->with('success', 'Data siswa berhasil diperbarui.');
     }
 
-    /**
-     * Get tahun ajaran list based on student's class level
-     */
     private function getTahunAjaranList(Siswa $siswa)
     {
-        // Get current year and month
-        $currentMonth = date('n');
         $currentYear = date('Y');
+        $currentMonth = date('n');
         
-        // Determine tahun ajaran saat ini
-        // Jika bulan < 7 (sebelum Juli), tahun ajaran adalah tahun lalu
-        $tahunAjaranSekarang = $currentMonth < 7 ? $currentYear - 1 : $currentYear;
-        
-        // Get student's class level (tingkat)
-        $tingkat = $siswa->rombel && $siswa->rombel->kelas ? 
-                   intval($siswa->rombel->kelas->tingkat) : 10;
-        
-        // Get tahun masuk from nilaiRaports or estimate
-        $tahunMasuk = null;
-        if ($siswa->nilaiRaports->count() > 0) {
-            $tahunMasukStr = $siswa->nilaiRaports->first()->tahun_ajaran;
-            $tahunMasuk = intval(explode('/', $tahunMasukStr)[0]);
+        if ($currentMonth >= 7) {
+            $tahunAjaranAktif = $currentYear . '/' . ($currentYear + 1);
+        } else {
+            $tahunAjaranAktif = ($currentYear - 1) . '/' . $currentYear;
         }
         
-        // If no nilai found, estimate from current tahun ajaran and tingkat
-        // Kelas 10 masuk tahun ini, Kelas 11 masuk tahun lalu, Kelas 12 2 tahun lalu
-        if (!$tahunMasuk) {
-            $tahunMasuk = $tahunAjaranSekarang - ($tingkat - 10);
+        $tahunAktifMulai = (int) substr($tahunAjaranAktif, 0, 4);
+        
+        $tingkat = 10;
+        if ($siswa->rombel && $siswa->rombel->kelas) {
+            $tingkatRaw = $siswa->rombel->kelas->tingkat;
+            if (is_numeric($tingkatRaw)) {
+                $tingkat = (int) $tingkatRaw;
+            } else {
+                $map = ['X' => 10, 'XI' => 11, 'XII' => 12];
+                $tingkat = $map[strtoupper($tingkatRaw)] ?? 10;
+            }
         }
         
-        // Generate tahun ajaran list for 3 years (Kelas 10, 11, 12)
+        $offset = $tingkat - 10;
+        $tahunKelasX = $tahunAktifMulai - $offset;
+        
         $tahunAjaranList = [];
         for ($i = 0; $i < 3; $i++) {
-            $startYear = $tahunMasuk + $i;
-            $endYear = $startYear + 1;
-            $tahunAjaranList[] = "{$startYear}/{$endYear}";
+            $year = $tahunKelasX + $i;
+            $tahunAjaranList[] = $year . '/' . ($year + 1);
         }
         
         return $tahunAjaranList;
     }
 
-    /**
-     * Get mata pelajaran by jurusan, kurikulum, and kelas tingkat
-     */
     private function getMataPelajaranByJurusan(Siswa $siswa)
     {
         $mapelByKelompok = [];
         
-        // Get tingkat kelas siswa
         $tingkat = $siswa->rombel && $siswa->rombel->kelas ? 
                    intval($siswa->rombel->kelas->tingkat) : 10;
         
-        // Get kurikulum siswa
         $kurikulumId = $siswa->kurikulum_id;
         
-        // First priority: Get from jurusan if siswa has one
         if ($siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan) {
             $jurusanId = $siswa->rombel->kelas->jurusan->id;
             
-            // Strategy 1: Try to get with jurusan + kurikulum + tingkat
             $mapels = MataPelajaran::whereHas('jurusans', function($q) use ($jurusanId) {
-                $q->where('jurusan_id', $jurusanId);
+                $q->where('jurusans.id', $jurusanId);
             })
             ->whereHas('kurikulums', function($q) use ($kurikulumId) {
                 $q->where('kurikulum_id', $kurikulumId);
@@ -466,10 +678,9 @@ class BukuIndukController extends Controller
             ->orderBy('urutan')
             ->get();
             
-            // Strategy 2: If no result, try jurusan + tingkat (without kurikulum)
             if ($mapels->count() === 0) {
                 $mapels = MataPelajaran::whereHas('jurusans', function($q) use ($jurusanId) {
-                    $q->where('jurusan_id', $jurusanId);
+                    $q->where('jurusans.id', $jurusanId);
                 })
                 ->whereHas('tingkats', function($q) use ($tingkat) {
                     $q->where('tingkat', $tingkat);
@@ -479,10 +690,9 @@ class BukuIndukController extends Controller
                 ->get();
             }
             
-            // Strategy 3: If still no result, try jurusan + kurikulum (without tingkat)
             if ($mapels->count() === 0 && $kurikulumId) {
                 $mapels = MataPelajaran::whereHas('jurusans', function($q) use ($jurusanId) {
-                    $q->where('jurusan_id', $jurusanId);
+                    $q->where('jurusans.id', $jurusanId);
                 })
                 ->whereHas('kurikulums', function($q) use ($kurikulumId) {
                     $q->where('kurikulum_id', $kurikulumId);
@@ -492,17 +702,15 @@ class BukuIndukController extends Controller
                 ->get();
             }
             
-            // Strategy 4: If still no result, try jurusan only
             if ($mapels->count() === 0) {
                 $mapels = MataPelajaran::whereHas('jurusans', function($q) use ($jurusanId) {
-                    $q->where('jurusan_id', $jurusanId);
+                    $q->where('jurusans.id', $jurusanId);
                 })
                 ->orderBy('kelompok')
                 ->orderBy('urutan')
                 ->get();
             }
             
-            // Process mapels
             if ($mapels->count() > 0) {
                 foreach ($mapels as $mapel) {
                     $kelompok = $mapel->kelompok;
@@ -512,7 +720,6 @@ class BukuIndukController extends Controller
                         $mapelByKelompok[$kelompok] = [];
                     }
                     
-                    // Check if this mapel name already exists in this kelompok
                     $exists = false;
                     foreach ($mapelByKelompok[$kelompok] as $existing) {
                         if (trim($existing['nama']) === $mapelNama) {
@@ -531,7 +738,6 @@ class BukuIndukController extends Controller
             }
         }
         
-        // Second priority: If no mapel from jurusan, get from nilai raport
         if (empty($mapelByKelompok) && $siswa->nilaiRaports->count() > 0) {
             foreach ($siswa->nilaiRaports as $nilai) {
                 $kelompok = trim($nilai->mapel->kelompok ?? 'Lainnya');
@@ -542,7 +748,6 @@ class BukuIndukController extends Controller
                     $mapelByKelompok[$kelompok] = [];
                 }
                 
-                // Check if already added
                 $exists = false;
                 foreach ($mapelByKelompok[$kelompok] as $existing) {
                     if (trim($existing['nama']) === $mapelNama) {
@@ -560,12 +765,11 @@ class BukuIndukController extends Controller
             }
         }
         
-        // Third priority: If still empty and no jurusan, use first jurusan as fallback placeholder
         if (empty($mapelByKelompok) && !($siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan)) {
             $firstJurusan = Jurusan::first();
             if ($firstJurusan) {
                 $mapels = MataPelajaran::whereHas('jurusans', function($q) use ($firstJurusan) {
-                    $q->where('jurusan_id', $firstJurusan->id);
+                    $q->where('jurusans.id', $firstJurusan->id);
                 })
                                        ->orderBy('kelompok')
                                        ->orderBy('urutan')
@@ -580,7 +784,6 @@ class BukuIndukController extends Controller
                             $mapelByKelompok[$kelompok] = [];
                         }
                         
-                        // Check if this mapel name already exists
                         $exists = false;
                         foreach ($mapelByKelompok[$kelompok] as $existing) {
                             if (trim($existing['nama']) === $mapelNama) {
@@ -600,7 +803,6 @@ class BukuIndukController extends Controller
             }
         }
         
-        // Sort each kelompok by urutan and nama
         foreach ($mapelByKelompok as &$mapels) {
             usort($mapels, function ($a, $b) {
                 if ($a['urutan'] == $b['urutan']) {
@@ -610,7 +812,6 @@ class BukuIndukController extends Controller
             });
         }
         
-        // Sort kelompok
         $sortedKelompok = [];
         foreach (['A', 'B'] as $k) {
             if (isset($mapelByKelompok[$k])) {
@@ -626,22 +827,16 @@ class BukuIndukController extends Controller
         return $sortedKelompok;
     }
 
-    /**
-     * Group nilai raport by kelompok mata pelajaran
-     */
     private function groupNilaiByKelompok(Siswa $siswa)
     {
         $nilaiByKelompok = [];
         $tahunAjaranList = [];
         $semesterMap = ['Ganjil' => 1, 'Genap' => 2, 1 => 1, 2 => 2];
         
-        // Get tahun ajaran list
         $tahunAjaranList = $this->getTahunAjaranList($siswa);
         
-        // Get mata pelajaran from database
         $mapelByKelompok = $this->getMataPelajaranByJurusan($siswa);
         
-        // Initialize structure with mata pelajaran from database
         foreach ($mapelByKelompok as $kelompok => $mapels) {
             if (!isset($nilaiByKelompok[$kelompok])) {
                 $nilaiByKelompok[$kelompok] = [];
@@ -656,7 +851,6 @@ class BukuIndukController extends Controller
                         'nilai' => []
                     ];
                     
-                    // Initialize all tahun ajaran with empty values
                     foreach ($tahunAjaranList as $tahunAjaran) {
                         $nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran] = [
                             1 => null,
@@ -667,14 +861,12 @@ class BukuIndukController extends Controller
             }
         }
         
-        // Fill in actual nilai from database
         foreach ($siswa->nilaiRaports as $nilai) {
             $kelompok = trim($nilai->mapel->kelompok ?? 'Lainnya');
             $mapelNama = trim($nilai->mapel->nama ?? 'Tidak Diketahui');
             $tahunAjaran = $nilai->tahun_ajaran;
             $semester = $semesterMap[$nilai->semester] ?? $nilai->semester;
             
-            // Initialize if not exists
             if (!isset($nilaiByKelompok[$kelompok])) {
                 $nilaiByKelompok[$kelompok] = [];
             }
@@ -692,11 +884,9 @@ class BukuIndukController extends Controller
                 ];
             }
             
-            // Store nilai
             $nilaiByKelompok[$kelompok][$mapelNama]['nilai'][$tahunAjaran][$semester] = $nilai->nilai_akhir;
         }
         
-        // Sort kelompok: A dulu, B kedua
         $sortedKelompok = [];
         foreach (['A', 'B'] as $k) {
             if (isset($nilaiByKelompok[$k])) {
@@ -709,7 +899,6 @@ class BukuIndukController extends Controller
             }
         }
         
-        // Sort mata pelajaran dalam setiap kelompok berdasarkan urutan
         foreach ($sortedKelompok as &$mapelGroup) {
             uasort($mapelGroup, function ($a, $b) {
                 if ($a['urutan'] == $b['urutan']) {

@@ -109,15 +109,15 @@
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Nama Ayah</label>
-                        <input type="text" name="ayah_nama" class="form-control" value="{{ old('ayah_nama', $siswa->nama_ayah) }}">
+                        <input type="text" name="nama_ayah" class="form-control" value="{{ old('nama_ayah', $siswa->nama_ayah) }}">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Pekerjaan</label>
-                        <input type="text" name="ayah_pekerjaan" class="form-control" value="{{ old('ayah_pekerjaan', $siswa->pekerjaan_ayah) }}">
+                        <input type="text" name="pekerjaan_ayah" class="form-control" value="{{ old('pekerjaan_ayah', $siswa->pekerjaan_ayah) }}">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Telepon</label>
-                        <input type="text" name="ayah_telepon" class="form-control" value="{{ old('ayah_telepon', $siswa->telepon_ayah) }}">
+                        <input type="text" name="telepon_ayah" class="form-control" value="{{ old('telepon_ayah', $siswa->telepon_ayah) }}">
                     </div>
                 </div>
 
@@ -126,15 +126,15 @@
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Nama Ibu</label>
-                        <input type="text" name="ibu_nama" class="form-control" value="{{ old('ibu_nama', $siswa->nama_ibu) }}">
+                        <input type="text" name="nama_ibu" class="form-control" value="{{ old('nama_ibu', $siswa->nama_ibu) }}">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Pekerjaan</label>
-                        <input type="text" name="ibu_pekerjaan" class="form-control" value="{{ old('ibu_pekerjaan', $siswa->pekerjaan_ibu) }}">
+                        <input type="text" name="pekerjaan_ibu" class="form-control" value="{{ old('pekerjaan_ibu', $siswa->pekerjaan_ibu) }}">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Telepon</label>
-                        <input type="text" name="ibu_telepon" class="form-control" value="{{ old('ibu_telepon', $siswa->telepon_ibu) }}">
+                        <input type="text" name="telepon_ibu" class="form-control" value="{{ old('telepon_ibu', $siswa->telepon_ibu) }}">
                     </div>
                 </div>
 
@@ -143,21 +143,21 @@
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Nama Wali</label>
-                        <input type="text" name="wali_nama" class="form-control" value="{{ old('wali_nama', $siswa->nama_wali) }}">
+                        <input type="text" name="nama_wali" class="form-control" value="{{ old('nama_wali', $siswa->nama_wali) }}">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Pekerjaan</label>
-                        <input type="text" name="wali_pekerjaan" class="form-control" value="{{ old('wali_pekerjaan', $siswa->pekerjaan_wali) }}">
+                        <input type="text" name="pekerjaan_wali" class="form-control" value="{{ old('pekerjaan_wali', $siswa->pekerjaan_wali) }}">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Telepon</label>
-                        <input type="text" name="wali_telepon" class="form-control" value="{{ old('wali_telepon', $siswa->telepon_wali) }}">
+                        <input type="text" name="telepon_wali" class="form-control" value="{{ old('telepon_wali', $siswa->telepon_wali) }}">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12 mb-3">
                         <label class="form-label">Alamat Wali</label>
-                        <input type="text" name="wali_alamat" class="form-control" value="{{ old('wali_alamat', $siswa->alamat_wali) }}">
+                        <input type="text" name="alamat_wali" class="form-control" value="{{ old('alamat_wali', $siswa->alamat_wali) }}">
                     </div>
                 </div>
 
@@ -172,4 +172,4 @@
         </div>
     </div>
 </div>
-@endsection
+@endsection 

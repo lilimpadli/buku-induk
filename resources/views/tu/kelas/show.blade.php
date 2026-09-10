@@ -119,7 +119,6 @@
     }
 
     .btn-modern {
-        border: 1px solid rgba(148, 163, 184, .18);
         border-radius: 16px;
         padding: 12px 20px;
         font-weight: 700;
@@ -144,6 +143,17 @@
         background: #f8fafc;
     }
 
+    .btn-modern-primary {
+        border: 1px solid #2563eb;
+        color: #2563eb;
+        background: white;
+    }
+
+    .btn-modern-primary:hover {
+        background: rgba(37, 99, 235, .1);
+        color: #1d4ed8;
+    }
+
     .btn-modern:active,
     .btn-modern:focus-visible {
         transform: scale(.98);
@@ -153,6 +163,7 @@
     .btn-modern-white {
         background: white;
         color: var(--primary);
+        border: 1px solid rgba(148, 163, 184, .18);
     }
 
     .btn-modern-outline {
@@ -479,15 +490,20 @@
                 </div>
             </div>
             <div class="action-buttons">
-                <a href="{{ route('tu.kelas.export', $rombel->id) }}" class="btn-modern btn-modern-white">
-                    <i class="fas fa-file-excel"></i>
-                    Export
+                {{-- CETAK DAFTAR HADIR --}}
+                <a href="{{ route('tu.kelas.print-absensi', $rombel->id) }}" class="btn-modern btn-modern-primary">
+                    <i class="bi bi-printer"></i>
+                    Cetak Daftar Hadir
                 </a>
+
+                {{-- EDIT --}}
                 <a href="{{ route('tu.kelas.edit', $rombel->id) }}" class="btn-modern btn-modern-outline">
                     <i class="fas fa-edit"></i>
                     Edit
                 </a>
-                <a href="{{ request()->header('referer') ?: route('tu.kelas.index') }}" class="btn-modern btn-modern-outline">
+
+                {{-- KEMBALI --}}
+                <a href="{{ route('tu.kelas.index') }}" class="btn-modern btn-modern-outline">
                     <i class="fas fa-arrow-left"></i>
                     Kembali
                 </a>
@@ -551,9 +567,36 @@
                             </td>
                             <td>{{ $siswa->nis }}</td>
                             <td>
-                                <span class="badge badge-{{ $siswa->jenis_kelamin == 'L' ? 'laki' : 'perempuan' }}">
-                                    <i class="fas fa-{{ $siswa->jenis_kelamin == 'L' ? 'mars' : 'venus' }}"></i>
-                                    {{ $siswa->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}
+                                @php
+                                    $jk = '-';
+                                    
+                                    // Cek dari relasi jenisKelamin (object)
+                                    if (isset($siswa->jenisKelamin) && is_object($siswa->jenisKelamin)) {
+                                        $jk = $siswa->jenisKelamin->nama ?? '-';
+                                    } 
+                                    // Cek dari field jenis_kelamin_id (integer)
+                                    elseif (isset($siswa->jenis_kelamin_id)) {
+                                        if ($siswa->jenis_kelamin_id == 1) {
+                                            $jk = 'Laki-laki';
+                                        } elseif ($siswa->jenis_kelamin_id == 2) {
+                                            $jk = 'Perempuan';
+                                        }
+                                    }
+                                    // Cek dari field jenis_kelamin (string)
+                                    elseif (isset($siswa->jenis_kelamin) && is_string($siswa->jenis_kelamin)) {
+                                        $val = strtolower($siswa->jenis_kelamin);
+                                        if (in_array($val, ['l', 'laki-laki', 'laki'])) {
+                                            $jk = 'Laki-laki';
+                                        } elseif (in_array($val, ['p', 'perempuan'])) {
+                                            $jk = 'Perempuan';
+                                        }
+                                    }
+                                    
+                                    $isLaki = ($jk == 'Laki-laki');
+                                @endphp
+                                <span class="badge {{ $isLaki ? 'badge-laki' : 'badge-perempuan' }}">
+                                    <i class="fas fa-{{ $isLaki ? 'mars' : 'venus' }}"></i>
+                                    {{ $jk }}
                                 </span>
                             </td>
                         </tr>

@@ -136,15 +136,28 @@
                 @csrf
                 @method('PUT')
 
-                <div class="row mb-3">
+                <div class="row">
                     <!-- Tingkat -->
                     <div class="col-md-6 mb-3">
                         <label for="tingkat" class="form-label">Tingkat</label>
                         <select name="tingkat" id="tingkat" class="form-select" required>
                             <option value="">Pilih Tingkat</option>
                             @foreach($tingkats as $t)
-                                <option value="{{ $t }}" {{ $t == $rombel->kelas->tingkat ? 'selected' : '' }}>
+                                <option value="{{ $t }}" {{ $t == ($rombel->kelas->tingkat ?? '') ? 'selected' : '' }}>
                                     Kelas {{ $t }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Jurusan -->
+                    <div class="col-md-6 mb-3">
+                        <label for="jurusan_id" class="form-label">Jurusan</label>
+                        <select name="jurusan_id" id="jurusan_id" class="form-select" required>
+                            <option value="">Pilih Jurusan</option>
+                            @foreach($jurusans as $j)
+                                <option value="{{ $j->id }}" {{ $j->id == ($rombel->kelas->jurusan_id ?? '') ? 'selected' : '' }}>
+                                    {{ $j->nama }}
                                 </option>
                             @endforeach
                         </select>
@@ -152,24 +165,25 @@
 
                     <!-- Konsentrasi Keahlian -->
                     <div class="col-md-6 mb-3">
-                        <label for="jurusan_id" class="form-label">Konsentrasi Keahlian</label>
-                        <select name="jurusan_id" id="jurusan_id" class="form-select" required>
+                        <label for="id_konke" class="form-label">Konsentrasi Keahlian</label>
+                        <select name="id_konke" id="id_konke" class="form-select">
                             <option value="">Pilih Konsentrasi Keahlian</option>
-                            @foreach($jurusans as $j)
-                                <option value="{{ $j->id }}" {{ $j->id == $rombel->kelas->jurusan_id ? 'selected' : '' }}>
-                                    {{ $j->nama }}
+                            @foreach($konsentrasiKeahlians as $konke)
+                                <option value="{{ $konke->id }}" 
+                                    {{ $konke->id == ($rombel->id_konke ?? '') ? 'selected' : '' }}>
+                                    {{ $konke->nama_konsentrasi }} ({{ $konke->id_jurusan }})
                                 </option>
                             @endforeach
                         </select>
+                        <small class="text-muted">Kosongkan jika tidak ada konsentrasi keahlian</small>
                     </div>
-                </div>
 
-                <div class="row mb-4">
                     <!-- Nama Rombel -->
                     <div class="col-md-6 mb-3">
                         <label for="nama" class="form-label">Nama Rombel</label>
-                        <input type="text" name="nama" id="nama" class="form-control" placeholder="Contoh: RPL 1, TKJ 2"
-                            value="{{ old('nama', $rombel->nama) }}" required>
+                        <input type="text" name="nama" id="nama" class="form-control" 
+                               placeholder="Contoh: RPL 1, TKJ 2"
+                               value="{{ old('nama', $rombel->nama) }}" required>
                     </div>
 
                     <!-- Wali Kelas -->
@@ -178,7 +192,7 @@
                         <select name="guru_id" id="guru_id" class="form-select" required>
                             <option value="">Pilih Wali Kelas</option>
                             @foreach($gurus as $guru)
-                                <option value="{{ $guru->id }}" {{ $guru->id == $rombel->guru_id ? 'selected' : '' }}>
+                                <option value="{{ $guru->id }}" {{ $guru->id == ($rombel->guru_id ?? '') ? 'selected' : '' }}>
                                     {{ $guru->nama }}
                                 </option>
                             @endforeach

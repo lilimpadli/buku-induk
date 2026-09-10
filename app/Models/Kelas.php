@@ -28,13 +28,15 @@ class Kelas extends Model
         return $this->hasMany(DataSiswa::class, 'kelas_id', 'id');
     }
 
-     public function rombels()
+    // Relasi dengan rombel
+    public function rombels()
     {
         return $this->hasMany(Rombel::class, 'kelas_id');
     }
-    public function waliKelas()
-{
-    return $this->hasMany(WaliKelas::class, 'kelas_id');
-}
 
+    // Relasi dengan wali kelas
+    public function waliKelas()
+    {
+        return $this->hasMany(WaliKelas::class, 'kelas_id');
+    }
 }

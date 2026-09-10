@@ -131,21 +131,29 @@ $selected_jurusan = old('jurusan_id', $siswa?->rombel?->kelas?->jurusan?->id);
                        value="{{ old('nisn', $siswa->nisn ?? '') }}">
             </div>
 
-            <div class="col-md-4">
-                <label class="form-label">Jenis Kelamin</label>
+<!-- JENIS KELAMIN -->
+<div class="col-md-4">
+    <label class="form-label">
+        Jenis Kelamin
+        <span class="badge-required">WAJIB</span>
+    </label>
 
-                <select name="jenis_kelamin_id" class="form-select" required>
-                    <option value="">-- Pilih --</option>
+    <select name="jenis_kelamin" class="form-select" required>
+        <option value="">-- Pilih Jenis Kelamin --</option>
+        <option value="Laki-laki" {{ old('jenis_kelamin', $siswa->jenis_kelamin ?? '') == 'Laki-laki' ? 'selected' : '' }}>
+            Laki-laki
+        </option>
+        <option value="Perempuan" {{ old('jenis_kelamin', $siswa->jenis_kelamin ?? '') == 'Perempuan' ? 'selected' : '' }}>
+            Perempuan
+        </option>
+    </select>
 
-                    @foreach($jenisKelamins as $item)
-                        <option value="{{ $item->id }}"
-                            {{ (string) old('jenis_kelamin_id', $siswa->jenis_kelamin_id ?? '') === (string) $item->id ? 'selected' : '' }}>
-                            {{ $item->nama }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
+    @error('jenis_kelamin')
+        <div class="text-danger" style="font-size:12px;margin-top:4px;">
+            <i class="fas fa-exclamation-circle"></i> {{ $message }}
+        </div>
+    @enderror
+</div>
             <div class="col-md-4">
                 <label class="form-label">Sekolah Asal</label>
 
@@ -257,6 +265,7 @@ $selected_jurusan = old('jurusan_id', $siswa?->rombel?->kelas?->jurusan?->id);
             </div>
 
             @php
+                $agamas = $agamas ?? collect();
                 $currentAgamaId = old('agama_id', $siswa->agama_id ?? '');
                 $currentAgamaLainnya = old('agama_lainnya', $siswa->agama_lainnya ?? '');
                 $selectedAgamaId = $currentAgamaLainnya !== '' && $currentAgamaId === '' ? 'other' : $currentAgamaId;

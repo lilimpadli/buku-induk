@@ -111,7 +111,8 @@
     }
 
     .hero-actions .btn {
-        min-width: 230px;
+        height: 48px;
+        width: 250px;
         border-radius: 18px;
         box-shadow: 0 18px 40px rgba(59, 130, 246, 0.18);
     }

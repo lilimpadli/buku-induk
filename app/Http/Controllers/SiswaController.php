@@ -8,9 +8,10 @@ use App\Models\EkstrakurikulerSiswa;
 use App\Models\Kehadiran;
 use App\Models\RaporInfo;
 use App\Models\KenaikanKelas;
-use App\Models\Ayah;
-use App\Models\Ibu;
-use App\Models\Wali;
+// ✅ HAPUS 3 USE INI KARENA SUDAH TIDAK DIPAKAI:
+// use App\Models\Ayah;
+// use App\Models\Ibu;
+// use App\Models\Wali;
 use App\Models\Jurusan;
 use App\Models\MataPelajaran;
 use Illuminate\Http\Request;
@@ -36,7 +37,7 @@ class SiswaController extends Controller
      */
     public function dataDiri()
     {
-       $siswa = $this->getSiswaLogin();
+        $siswa = $this->getSiswaLogin();
 
         // Jika tidak ada data siswa, arahkan ke form pembuatan data diri
         if (! $siswa) {
@@ -44,8 +45,8 @@ class SiswaController extends Controller
                 ->with('info', 'Silakan lengkapi data diri siswa terlebih dahulu.');
         }
 
-        // Load relasi orang tua
-        $siswa->load(['ayah', 'ibu', 'wali']);
+        // ✅ HAPUS load relasi ayah, ibu, wali (karena sudah langsung di tabel)
+        // $siswa->load(['ayah', 'ibu', 'wali']);
 
         return view('siswa.data-diri', compact('siswa'));
     }
@@ -91,10 +92,12 @@ class SiswaController extends Controller
 
         return view('siswa.dashboard', compact('siswa','raportYears','missing'));
     }
+
     public function index()
-{
-    return redirect()->route('siswa.dashboard');
-}
+    {
+        return redirect()->route('siswa.dashboard');
+    }
+
     public function create()
     {
         return view('siswa.data-diri-create');
@@ -121,53 +124,26 @@ class SiswaController extends Controller
             'kode_pos'         => 'required|string|max:10',
             'no_hp'            => 'required|string|max:20',
 
-            // Data Ayah
+            // Data Ayah - LANGSUNG KE TABEL data_siswa
             'nama_ayah'        => 'required|string|max:255',
             'pekerjaan_ayah'   => 'required|string|max:255',
             'telepon_ayah'     => 'nullable|string|max:20',
             'alamat_ayah'      => 'required|string',
 
-            // Data Ibu
+            // Data Ibu - LANGSUNG KE TABEL data_siswa
             'nama_ibu'         => 'required|string|max:255',
             'pekerjaan_ibu'    => 'required|string|max:255',
             'telepon_ibu'      => 'nullable|string|max:20',
             'alamat_ibu'       => 'required|string',
 
-            // Data Wali (opsional)
+            // Data Wali (opsional) - LANGSUNG KE TABEL data_siswa
             'nama_wali'        => 'nullable|string|max:255',
             'pekerjaan_wali'   => 'nullable|string|max:255',
             'telepon_wali'     => 'nullable|string|max:20',
             'alamat_wali'      => 'nullable|string',
         ]);
 
-        // Simpan data ayah
-        $ayah = Ayah::create([
-            'nama' => $request->nama_ayah,
-            'pekerjaan' => $request->pekerjaan_ayah,
-            'telepon' => $request->telepon_ayah,
-            'alamat' => $request->alamat_ayah,
-        ]);
-
-        // Simpan data ibu
-        $ibu = Ibu::create([
-            'nama' => $request->nama_ibu,
-            'pekerjaan' => $request->pekerjaan_ibu,
-            'telepon' => $request->telepon_ibu,
-            'alamat' => $request->alamat_ibu,
-        ]);
-
-        // Simpan data wali jika ada
-        $wali = null;
-        if ($request->filled('nama_wali')) {
-            $wali = Wali::create([
-                'nama' => $request->nama_wali,
-                'pekerjaan' => $request->pekerjaan_wali,
-                'telepon' => $request->telepon_wali,
-                'alamat' => $request->alamat_wali,
-            ]);
-        }
-
-        // Simpan data siswa
+        // ✅ SIMPAN LANGSUNG KE data_siswa (TANPA buat ayah, ibu, wali terpisah)
         $siswa = DataSiswa::create([
             'user_id' => $user->id,
             'nis' => $user->nomor_induk,
@@ -185,9 +161,21 @@ class SiswaController extends Controller
             'kecamatan' => $request->kecamatan,
             'kode_pos' => $request->kode_pos,
             'no_hp' => $request->no_hp,
-            'ayah_id' => $ayah->id,
-            'ibu_id' => $ibu->id,
-            'wali_id' => $wali ? $wali->id : null,
+            // ✅ DATA AYAH LANGSUNG
+            'nama_ayah' => $request->nama_ayah,
+            'pekerjaan_ayah' => $request->pekerjaan_ayah,
+            'telepon_ayah' => $request->telepon_ayah,
+            'alamat_ayah' => $request->alamat_ayah,
+            // ✅ DATA IBU LANGSUNG
+            'nama_ibu' => $request->nama_ibu,
+            'pekerjaan_ibu' => $request->pekerjaan_ibu,
+            'telepon_ibu' => $request->telepon_ibu,
+            'alamat_ibu' => $request->alamat_ibu,
+            // ✅ DATA WALI LANGSUNG
+            'nama_wali' => $request->nama_wali,
+            'pekerjaan_wali' => $request->pekerjaan_wali,
+            'telepon_wali' => $request->telepon_wali,
+            'alamat_wali' => $request->alamat_wali,
         ]);
 
         return redirect()->route('siswa.dataDiri')
@@ -197,8 +185,8 @@ class SiswaController extends Controller
     public function edit()
     {
         $siswa = $this->getSiswaLogin();
-        // Load relasi orang tua
-        $siswa->load(['ayah', 'ibu', 'wali']);
+        // ✅ HAPUS load relasi ayah, ibu, wali
+        // $siswa->load(['ayah', 'ibu', 'wali']);
 
         if (!$siswa) {
             return redirect()->route('siswa.dataDiri.create')
@@ -252,7 +240,7 @@ class SiswaController extends Controller
             'alamat_wali'      => 'nullable|string',
         ]);
 
-        // Update data siswa
+        // ✅ UPDATE LANGSUNG KE data_siswa
         $siswa->update([
             'nama_lengkap' => $request->nama_lengkap,
             'nisn' => $request->nisn,
@@ -272,74 +260,22 @@ class SiswaController extends Controller
             'kecamatan' => $request->kecamatan,
             'kode_pos' => $request->kode_pos,
             'no_hp' => $request->no_hp,
+            // ✅ DATA AYAH
+            'nama_ayah' => $request->nama_ayah,
+            'pekerjaan_ayah' => $request->pekerjaan_ayah,
+            'telepon_ayah' => $request->telepon_ayah,
+            'alamat_ayah' => $request->alamat_ayah,
+            // ✅ DATA IBU
+            'nama_ibu' => $request->nama_ibu,
+            'pekerjaan_ibu' => $request->pekerjaan_ibu,
+            'telepon_ibu' => $request->telepon_ibu,
+            'alamat_ibu' => $request->alamat_ibu,
+            // ✅ DATA WALI
+            'nama_wali' => $request->nama_wali,
+            'pekerjaan_wali' => $request->pekerjaan_wali,
+            'telepon_wali' => $request->telepon_wali,
+            'alamat_wali' => $request->alamat_wali,
         ]);
-
-        // Update data ayah
-        if ($siswa->ayah_id) {
-            $ayah = Ayah::find($siswa->ayah_id);
-            $ayah->update([
-                'nama' => $request->nama_ayah,
-                'pekerjaan' => $request->pekerjaan_ayah,
-                'telepon' => $request->telepon_ayah,
-                'alamat' => $request->alamat_ayah,
-            ]);
-        } else {
-            $ayah = Ayah::create([
-                'nama' => $request->nama_ayah,
-                'pekerjaan' => $request->pekerjaan_ayah,
-                'telepon' => $request->telepon_ayah,
-                'alamat' => $request->alamat_ayah,
-            ]);
-            $siswa->ayah_id = $ayah->id;
-            $siswa->save();
-        }
-
-        // Update data ibu
-        if ($siswa->ibu_id) {
-            $ibu = Ibu::find($siswa->ibu_id);
-            $ibu->update([
-                'nama' => $request->nama_ibu,
-                'pekerjaan' => $request->pekerjaan_ibu,
-                'telepon' => $request->telepon_ibu,
-                'alamat' => $request->alamat_ibu,
-            ]);
-        } else {
-            $ibu = Ibu::create([
-                'nama' => $request->nama_ibu,
-                'pekerjaan' => $request->pekerjaan_ibu,
-                'telepon' => $request->telepon_ibu,
-                'alamat' => $request->alamat_ibu,
-            ]);
-            $siswa->ibu_id = $ibu->id;
-            $siswa->save();
-        }
-
-        // Update data wali jika ada
-        if ($request->filled('nama_wali')) {
-            if ($siswa->wali_id) {
-                $wali = Wali::find($siswa->wali_id);
-                $wali->update([
-                    'nama' => $request->nama_wali,
-                    'pekerjaan' => $request->pekerjaan_wali,
-                    'telepon' => $request->telepon_wali,
-                    'alamat' => $request->alamat_wali,
-                ]);
-            } else {
-                $wali = Wali::create([
-                    'nama' => $request->nama_wali,
-                    'pekerjaan' => $request->pekerjaan_wali,
-                    'telepon' => $request->telepon_wali,
-                    'alamat' => $request->alamat_wali,
-                ]);
-                $siswa->wali_id = $wali->id;
-                $siswa->save();
-            }
-        } elseif ($siswa->wali_id) {
-            // Hapus data wali jika ada sebelumnya tapi sekarang dikosongkan
-            Wali::destroy($siswa->wali_id);
-            $siswa->wali_id = null;
-            $siswa->save();
-        }
 
         return redirect()->route('siswa.dataDiri')
             ->with('success', 'Data diri berhasil diperbarui.');
@@ -361,7 +297,6 @@ class SiswaController extends Controller
         ]);
 
         // Simpan pada disk `public` di folder `siswa_photos`
-
         $path = $request->file('foto')->store('siswa_photos', 'public');
 
         // Hapus foto lama jika ada (pada table siswa)
@@ -602,14 +537,11 @@ class SiswaController extends Controller
     {
         $siswa = $this->getSiswaLogin();
 
-        // Load relasi yang diperlukan untuk buku induk
+        // ✅ HAPUS 'ayah', 'ibu', 'wali' dari load
         $siswa->load([
             'user', 
             'rombel.kelas.jurusan',
             'mutasis',
-            'ayah',
-            'ibu',
-            'wali',
             'nilaiRaports' => function($query) {
                 $query->with('mapel')
                       ->orderBy('tahun_ajaran')
@@ -908,8 +840,8 @@ class SiswaController extends Controller
     public function exportPDF()
     {
         $siswa = $this->getSiswaLogin();
-        // Load relasi yang diperlukan untuk export PDF
-        $siswa->load(['user', 'ayah', 'ibu', 'wali', 'rombel.kelas.jurusan']);
+        // ✅ HAPUS 'ayah', 'ibu', 'wali' dari load
+        $siswa->load(['user', 'rombel.kelas.jurusan']);
 
         $pdf = Pdf::loadView('siswa.pdf', compact('siswa'))
             ->setPaper('A4', 'portrait');
@@ -918,97 +850,94 @@ class SiswaController extends Controller
     }
 
     /**
- * Update profil siswa (nama)
- */
-public function updateProfile(Request $request)
-{
-    $siswa = $this->getSiswaLogin();
-    
-    $request->validate([
-        'nama_lengkap' => 'required|string|max:255',
-    ]);
-    
-    $siswa->update([
-        'nama_lengkap' => $request->nama_lengkap,
-    ]);
-    
-    return redirect()->route('siswa.dashboard')->with('success', 'Nama berhasil diperbarui.');
-}
-
-/**
- * Update email user
- */
-public function updateEmail(Request $request)
-{
-    $user = Auth::user();
-    
-    $request->validate([
-        'email' => 'required|email|unique:users,email,' . $user->id,
-        'current_password' => 'required|string',
-    ]);
-    
-    // Verifikasi password saat ini
-    if (!Hash::check($request->current_password, $user->password)) {
-        return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.']);
+     * Update profil siswa (nama)
+     */
+    public function updateProfile(Request $request)
+    {
+        $siswa = $this->getSiswaLogin();
+        
+        $request->validate([
+            'nama_lengkap' => 'required|string|max:255',
+        ]);
+        
+        $siswa->update([
+            'nama_lengkap' => $request->nama_lengkap,
+        ]);
+        
+        return redirect()->route('siswa.dashboard')->with('success', 'Nama berhasil diperbarui.');
     }
-    
-    $user->update([
-        'email' => $request->email,
-    ]);
-    
-    return redirect()->route('siswa.dashboard')->with('success', 'Email berhasil diperbarui.');
-}
 
-/**
- * Update password user
- */
-public function updatePassword(Request $request)
-{
-    $user = Auth::user();
-    
-    $request->validate([
-        'current_password' => 'required|string',
-        'password' => 'required|string|min:8|confirmed',
-    ]);
-    
-    // Verifikasi password saat ini
-    if (!Hash::check($request->current_password, $user->password)) {
-        return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.']);
-    }
-    
-    $user->update([
-        'password' => Hash::make($request->password),
-    ]);
-    
-    return redirect()->route('siswa.dashboard')->with('success', 'Password berhasil diperbarui.');
-}
-
-/**
- * Menampilkan versi cetak Buku Induk Siswa
- */
-public function bukuIndukCetak()
-{
-    $siswa = $this->getSiswaLogin();
-
-    // Load relasi yang diperlukan untuk buku induk cetak
-    $siswa->load([
-        'user', 
-        'rombel.kelas.jurusan',
-        'ayah',
-        'ibu',
-        'wali',
-        'mutasis', 
-        'mutasiTerakhir',
-        'nilaiRaports' => function($query) {
-            $query->with('mapel')
-                  ->orderBy('tahun_ajaran')
-                  ->orderBy('semester');
+    /**
+     * Update email user
+     */
+    public function updateEmail(Request $request)
+    {
+        $user = Auth::user();
+        
+        $request->validate([
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'current_password' => 'required|string',
+        ]);
+        
+        // Verifikasi password saat ini
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.']);
         }
-    ]);
-    
-    // Group nilai by kelompok and nama mata pelajaran
-    $nilaiByKelompok = $this->groupNilaiByKelompok($siswa);
-    
-    return view('siswa.buku-induk-cetak', compact('siswa', 'nilaiByKelompok'));
-}
+        
+        $user->update([
+            'email' => $request->email,
+        ]);
+        
+        return redirect()->route('siswa.dashboard')->with('success', 'Email berhasil diperbarui.');
+    }
+
+    /**
+     * Update password user
+     */
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::user();
+        
+        $request->validate([
+            'current_password' => 'required|string',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+        
+        // Verifikasi password saat ini
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.']);
+        }
+        
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+        
+        return redirect()->route('siswa.dashboard')->with('success', 'Password berhasil diperbarui.');
+    }
+
+    /**
+     * Menampilkan versi cetak Buku Induk Siswa
+     */
+    public function bukuIndukCetak()
+    {
+        $siswa = $this->getSiswaLogin();
+
+        // ✅ HAPUS 'ayah', 'ibu', 'wali' dari load
+        $siswa->load([
+            'user', 
+            'rombel.kelas.jurusan',
+            'mutasis', 
+            'mutasiTerakhir',
+            'nilaiRaports' => function($query) {
+                $query->with('mapel')
+                      ->orderBy('tahun_ajaran')
+                      ->orderBy('semester');
+            }
+        ]);
+        
+        // Group nilai by kelompok and nama mata pelajaran
+        $nilaiByKelompok = $this->groupNilaiByKelompok($siswa);
+        
+        return view('siswa.buku-induk-cetak', compact('siswa', 'nilaiByKelompok'));
+    }
 }

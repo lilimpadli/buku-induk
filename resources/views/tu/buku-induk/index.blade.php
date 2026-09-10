@@ -353,7 +353,6 @@
         background: white;
     }
 
-    /* DROPDOWN FIX - PASTI MUNCUL */
     .dropdown {
         position: static !important;
         overflow: visible !important;
@@ -421,7 +420,6 @@
         text-align: center !important;
     }
 
-    /* FIX TOMBOL EXPORT/IMPORT/TEMPLATE */
     .hero-actions .btn-modern {
         background: white !important;
         color: var(--primary) !important;
@@ -458,7 +456,6 @@
         margin-left: 8px !important;
     }
 
-    /* OVERFLOW FIX SEMUA CONTAINER */
     .container-fluid,
     .hero-banner,
     .hero-top,
@@ -522,7 +519,7 @@
                     </button>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#importSiswaModal"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
-                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#importNilaiModal" data-jurusan-id="{{ request('jurusan_id') }}"><i class="fas fa-chart-bar"></i> Nilai Rapor</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#importNilaiModal"><i class="fas fa-chart-bar"></i> Nilai Rapor</a></li>
                         <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#importPklModal"><i class="fas fa-briefcase"></i> PKL & Ijazah</a></li>
                     </ul>
                 </div>
@@ -615,6 +612,20 @@
                     @csrf
                     <div class="modal-body modal-body-modern">
                         <p class="text-muted">Pilih file Excel (.xlsx / .xls / .csv) berisi nilai rapor. Pastikan kolom sesuai dengan template.</p>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Semester</label>
+                            <select name="semester" class="form-select" required>
+                                <option value="Ganjil">Ganjil</option>
+                                <option value="Genap">Genap</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Tahun Ajaran</label>
+                            <input type="text" name="tahun_ajaran" class="form-control" value="{{ date('Y') . '/' . (date('Y') + 1) }}" required>
+                        </div>
+
                         <div class="mb-3">
                             <label for="importNilaiFile" class="form-label fw-semibold">File Excel</label>
                             <input class="form-control" type="file" id="importNilaiFile" name="file" accept=".xlsx,.xls,.csv" required>
@@ -872,121 +883,120 @@
         });
     });
 </script>
-    <!-- MODAL DOWNLOAD TEMPLATE NILAI WITH FILTERS -->
-    <div class="modal fade" id="downloadTemplateNilaiModal" tabindex="-1" aria-labelledby="downloadTemplateNilaiModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content modal-content-modern">
-                <div class="modal-header modal-header-modern">
-                    <h5 class="modal-title" id="downloadTemplateNilaiModalLabel"><i class="fas fa-file-download me-2"></i> Download Template Nilai Rapor</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="downloadTemplateForm" method="POST" action="{{ route('tu.buku-induk.template.nilai.filtered') }}">
-                    @csrf
-                    <div class="modal-body modal-body-modern">
-                        <p class="text-muted mb-3">Pilih filter untuk template yang akan diunduh:</p>
 
-                        <!-- KURIKULUM FILTER -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold mb-2"><i class="fas fa-graduation-cap me-2"></i> Kurikulum</label>
-                            <div class="checkbox-group">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="kurikulum_ids[]" value="1" id="kurikulum1">
-                                    <label class="form-check-label" for="kurikulum1">
-                                        MERDEKA
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="kurikulum_ids[]" value="2" id="kurikulum2">
-                                    <label class="form-check-label" for="kurikulum2">
-                                        BRIGHTERLY
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- JURUSAN FILTER -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold mb-2"><i class="fas fa-briefcase me-2"></i> Jurusan</label>
-                            <div class="checkbox-group" style="max-height: 200px; overflow-y: auto;">
-                                @foreach($jurusans as $jurusan)
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="jurusan_ids[]" value="{{ $jurusan->id }}" id="jurusan{{ $jurusan->id }}">
-                                    <label class="form-check-label" for="jurusan{{ $jurusan->id }}">
-                                        {{ $jurusan->nama }}
-                                    </label>
-                                </div>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <!-- TINGKAT FILTER -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold mb-2"><i class="fas fa-layer-group me-2"></i> Tingkat</label>
-                            <div class="checkbox-group">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="tingkat_levels[]" value="X" id="tingkat_x">
-                                    <label class="form-check-label" for="tingkat_x">
-                                        Kelas X
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="tingkat_levels[]" value="XI" id="tingkat_xi">
-                                    <label class="form-check-label" for="tingkat_xi">
-                                        Kelas XI
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="tingkat_levels[]" value="XII" id="tingkat_xii">
-                                    <label class="form-check-label" for="tingkat_xii">
-                                        Kelas XII
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="tingkat_levels[]" value="10" id="tingkat_10">
-                                    <label class="form-check-label" for="tingkat_10">
-                                        Kelas 10
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer modal-footer-modern">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-modern btn-modern-primary"><i class="fas fa-download me-2"></i> Download Template</button>
-                    </div>
-                </form>
+<!-- MODAL DOWNLOAD TEMPLATE NILAI WITH FILTERS -->
+<div class="modal fade" id="downloadTemplateNilaiModal" tabindex="-1" aria-labelledby="downloadTemplateNilaiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-modern">
+            <div class="modal-header modal-header-modern">
+                <h5 class="modal-title" id="downloadTemplateNilaiModalLabel"><i class="fas fa-file-download me-2"></i> Download Template Nilai Rapor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <form id="downloadTemplateForm" method="POST" action="{{ route('tu.buku-induk.template.nilai.filtered') }}">
+                @csrf
+                <div class="modal-body modal-body-modern">
+                    <p class="text-muted mb-3">Pilih filter untuk template yang akan diunduh:</p>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold mb-2"><i class="fas fa-graduation-cap me-2"></i> Kurikulum</label>
+                        <div class="checkbox-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="kurikulum_ids[]" value="1" id="kurikulum1">
+                                <label class="form-check-label" for="kurikulum1">MERDEKA</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="kurikulum_ids[]" value="2" id="kurikulum2">
+                                <label class="form-check-label" for="kurikulum2">BRIGHTERLY</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold mb-2"><i class="fas fa-briefcase me-2"></i> Jurusan</label>
+                        <div class="checkbox-group" style="max-height: 200px; overflow-y: auto;">
+                            @foreach($jurusans as $jurusan)
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="jurusan_ids[]" value="{{ $jurusan->id }}" id="jurusan{{ $jurusan->id }}">
+                                <label class="form-check-label" for="jurusan{{ $jurusan->id }}">{{ $jurusan->nama }}</label>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold mb-2"><i class="fas fa-layer-group me-2"></i> Tingkat</label>
+                        <div class="checkbox-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="tingkat_levels[]" value="X" id="tingkat_x">
+                                <label class="form-check-label" for="tingkat_x">Kelas X</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="tingkat_levels[]" value="XI" id="tingkat_xi">
+                                <label class="form-check-label" for="tingkat_xi">Kelas XI</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="tingkat_levels[]" value="XII" id="tingkat_xii">
+                                <label class="form-check-label" for="tingkat_xii">Kelas XII</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="tingkat_levels[]" value="10" id="tingkat_10">
+                                <label class="form-check-label" for="tingkat_10">Kelas 10</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold mb-2"><i class="fas fa-layer-group me-2"></i> Konsentrasi Keahlian</label>
+                        <div class="checkbox-group" style="max-height: 200px; overflow-y: auto;">
+                            @php
+                                $konsentrasis = App\Models\KonsentrasiKeahlian::orderBy('nama_konsentrasi')->get();
+                            @endphp
+                            @foreach($konsentrasis as $konsentrasi)
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="konsentrasi_ids[]" value="{{ $konsentrasi->id }}" id="konsentrasi{{ $konsentrasi->id }}">
+                                <label class="form-check-label" for="konsentrasi{{ $konsentrasi->id }}">{{ $konsentrasi->nama_konsentrasi }}</label>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer modal-footer-modern">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-modern btn-modern-primary"><i class="fas fa-download me-2"></i> Download Template</button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
-    <style>
-        .checkbox-group {
-            background-color: #f8f9fa;
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #e0e0e0;
-        }
+<style>
+    .checkbox-group {
+        background-color: #f8f9fa;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+    }
 
-        .checkbox-group .form-check {
-            margin-bottom: 8px;
-        }
+    .checkbox-group .form-check {
+        margin-bottom: 8px;
+    }
 
-        .checkbox-group .form-check:last-child {
-            margin-bottom: 0;
-        }
+    .checkbox-group .form-check:last-child {
+        margin-bottom: 0;
+    }
 
-        .checkbox-group .form-check-input {
-            cursor: pointer;
-            width: 18px;
-            height: 18px;
-        }
+    .checkbox-group .form-check-input {
+        cursor: pointer;
+        width: 18px;
+        height: 18px;
+    }
 
-        .checkbox-group .form-check-label {
-            cursor: pointer;
-            margin-left: 6px;
-            margin-bottom: 0;
-        }
-    </style>
+    .checkbox-group .form-check-label {
+        cursor: pointer;
+        margin-left: 6px;
+        margin-bottom: 0;
+    }
+</style>
 
 @endpush
 

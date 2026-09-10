@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Siswa - ' . $rombel->nama)
+@section('title', 'Detail Siswa - ' . ($rombel->nama ?? 'Rombel'))
 
 @section('content')
 <style>
@@ -210,18 +210,6 @@
         color: #B91C1C;
     }
 
-    .status-row.pindah {
-        background: #EFF6FF;
-    }
-
-    .status-row.do {
-        background: #FEF3C7;
-    }
-
-    .status-row.meninggal {
-        background: #FEE2E2;
-    }
-
     .status-badge {
         display: inline-block;
         margin-top: 6px;
@@ -302,19 +290,28 @@
     <div class="page-header">
         <div class="page-title-section">
             <h1 class="page-title">Detail Siswa</h1>
-            <p class="page-subtitle">{{ $rombel->nama }} - {{ $rombel->kelas->tingkat ?? '-' }} {{ $rombel->kelas->jurusan->nama ?? 'Umum' }}</p>
+            <p class="page-subtitle">{{ $rombel->nama ?? '' }} - {{ $rombel->kelas->tingkat ?? '-' }} {{ $rombel->kelas->jurusan->nama ?? 'Umum' }}</p>
         </div>
         <div class="action-buttons">
-            <a href="{{ route('tu.mutasi.kelas', $rombel->kelas->jurusan->id) }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Kembali
-            </a>
+            @if(isset($rombel->kelas->jurusan_id))
+                <a href="{{ route('tu.mutasi.kelas', $rombel->kelas->jurusan_id) }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+            @else
+                <a href="{{ route('tu.mutasi.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+            @endif
         </div>
     </div>
 
     <!-- Alert Info -->
     @php
         $tingkat = $rombel->kelas->tingkat ?? '';
-        $isKelasAkhir = in_array($tingkat, ['XII', '12']);
+        $isKelasAkhir = in_array(strtoupper($tingkat), ['XII', '12']);
+        
+        // Ambil koleksi siswa secara aman (fallback dari siswas atau siswa)
+        $daftarSiswa = $rombel->siswas ?? $rombel->siswa ?? collect();
     @endphp
     
     @if($isKelasAkhir)
@@ -338,7 +335,7 @@
     @endif
 
     <!-- Siswa Table -->
-    @if($rombel->siswas->count() > 0)
+    @if($daftarSiswa->count() > 0)
         <div class="siswa-table-container">
             <table class="siswa-table">
                 <thead>
@@ -354,7 +351,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($rombel->siswas as $siswa)
+                    @foreach($daftarSiswa as $siswa)
                         @php
                             $mutasiStatus = optional($siswa->mutasiTerakhir)->status;
                             $mutasiLabel = optional($siswa->mutasiTerakhir)->status_label;
@@ -369,9 +366,9 @@
                                     <div class="status-badge">{{ $mutasiLabel }}</div>
                                 @endif
                             </td>
-                            <td>{{ $siswa->nis }}</td>
-                            <td>{{ $siswa->nisn }}</td>
-                            <td>{{ $siswa->jenis_kelamin }}</td>
+                            <td>{{ $siswa->nis ?? '-' }}</td>
+                            <td>{{ $siswa->nisn ?? '-' }}</td>
+                            <td>{{ $siswa->jenis_kelamin_id ? \App\Models\JenisKelamin::find($siswa->jenis_kelamin_id)->nama : '-' }}</td>
                             <td>{{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d/m/Y') : '-' }}</td>
                         </tr>
                     @endforeach
@@ -427,7 +424,7 @@
     </div>
 </div>
 
-<!-- Visible Mutasi Form -->
+<!-- Form Input Mutasi Terbuka -->
 <div class="mutasi-form-container" style="margin: 24px auto 0; max-width: 960px; background: white; border-radius: 16px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08); padding: 24px;">
     <h3 style="margin-bottom: 16px; color: #1F2937;">Form Mutasi Siswa Terpilih</h3>
     <form id="mutasiForm" method="POST" action="{{ route('tu.mutasi.siswa.update') }}">
@@ -494,7 +491,7 @@
     </form>
 </div>
 
-<!-- Hidden form for quick top button actions -->
+<!-- Form tersembunyi untuk tombol cepat di bagian atas -->
 <form id="mutasiHiddenForm" method="POST" action="{{ route('tu.mutasi.siswa.update') }}" style="display: none;">
     @csrf
     <input type="hidden" name="rombel_id" value="{{ $rombel->id }}">
@@ -508,21 +505,17 @@
 </form>
 
 <script>
-    // Data kelas dari server
     const kelasInfo = {
         tingkat: '{{ $rombel->kelas->tingkat ?? "" }}'
     };
 
-    // Checkbox selection handling
     document.addEventListener('DOMContentLoaded', function() {
         const selectAllCheckbox = document.getElementById('selectAll');
         const siswaCheckboxes = document.querySelectorAll('.siswa-checkbox');
         const selectedCount = document.getElementById('selectedCount');
         const countText = document.getElementById('countText');
-        const selectedCountLabel = document.getElementById('selectedCountLabel');
         const mutasiForm = document.getElementById('mutasiForm');
 
-        // Handle "Select All" checkbox
         if (selectAllCheckbox) {
             selectAllCheckbox.addEventListener('change', function() {
                 siswaCheckboxes.forEach(checkbox => {
@@ -532,7 +525,6 @@
             });
         }
 
-        // Handle individual checkboxes
         siswaCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', function() {
                 const allChecked = Array.from(siswaCheckboxes).every(cb => cb.checked);
@@ -556,10 +548,6 @@
                 countText.textContent = `${count} siswa terpilih`;
             } else {
                 selectedCount.style.display = 'none';
-            }
-
-            if (selectedCountLabel) {
-                selectedCountLabel.textContent = `${count} siswa terpilih`;
             }
         }
 
@@ -587,14 +575,12 @@
             });
         }
 
-        // Initialize
         updateSelectedCount();
         if (typeof updateStatusFields === 'function') {
             updateStatusFields();
         }
     });
 
-    // Form submission for action buttons still uses hidden form
     function submitForm(action) {
         const checkboxes = document.querySelectorAll('.siswa-checkbox:checked');
         if (checkboxes.length === 0) {
@@ -611,8 +597,7 @@
                 return;
             }
 
-            const actionText = 'naikkan kelas';
-            if (confirm(`✅ Apakah Anda yakin ingin ${actionText} ${checkboxes.length} siswa yang dipilih?\n\nKelas: ${tingkat} → Kelas berikutnya`)) {
+            if (confirm(`✅ Apakah Anda yakin ingin menaikkan kelas ${checkboxes.length} siswa yang dipilih?`)) {
                 prepareFormData(action, checkboxes, {});
                 document.getElementById('mutasiHiddenForm').submit();
             }
@@ -622,8 +607,7 @@
                 return;
             }
 
-            const actionText = 'luluskan';
-            if (confirm(`✅ Apakah Anda yakin ingin ${actionText} ${checkboxes.length} siswa yang dipilih?\n\nSiswa ini akan keluar dari sistem.`)) {
+            if (confirm(`✅ Apakah Anda yakin ingin meluluskan ${checkboxes.length} siswa yang dipilih?\n\nSiswa ini akan dipindahkan ke Data Alumni.`)) {
                 prepareFormData(action, checkboxes, {});
                 document.getElementById('mutasiHiddenForm').submit();
             }
@@ -631,16 +615,7 @@
             document.getElementById('actionSelect').value = action;
             updateStatusFields();
             document.getElementById('mutasiForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-            let suggestion = 'Lengkapi form di bawah ini untuk melanjutkan mutasi.';
-            if (action === 'pindah') {
-                suggestion = 'Isi alasan pindah dan sekolah tujuan di form yang muncul.';
-            } else if (action === 'do' || action === 'meninggal') {
-                suggestion = 'Isi nomor SK dan tanggal SK keluar di form yang muncul.';
-            }
-
-            showNotification(`ℹ️ ${suggestion} Setelah lengkap, tekan tombol Proses Mutasi di form.`, 'info');
-            return;
+            showNotification('ℹ️ Lengkapi form di bawah ini untuk melanjutkan mutasi.', 'info');
         }
     }
 
@@ -649,15 +624,8 @@
         const visibleTanggal = document.getElementById('tanggal_mutasiForm')?.value;
         const visibleKeterangan = document.getElementById('keteranganForm')?.value;
 
-        if (visibleTanggal && !('tanggal_mutasi' in extraFields)) {
-            extraFields.tanggal_mutasi = visibleTanggal;
-        }
-
-        if (visibleKeterangan && !('keterangan' in extraFields)) {
-            extraFields.keterangan = visibleKeterangan;
-        }
-
-        const hiddenFieldNames = ['keterangan', 'tanggal_mutasi', 'alasan_pindah', 'tujuan_pindah', 'no_sk_keluar', 'tanggal_sk_keluar'];
+        if (visibleTanggal) extraFields.tanggal_mutasi = visibleTanggal;
+        if (visibleKeterangan) extraFields.keterangan = visibleKeterangan;
 
         form.querySelectorAll('input[name="siswa_ids[]"]').forEach(input => input.remove());
 
@@ -670,8 +638,8 @@
         });
 
         document.getElementById('actionInput').value = action;
-
-        hiddenFieldNames.forEach(name => {
+        
+        ['keterangan', 'tanggal_mutasi', 'alasan_pindah', 'tujuan_pindah', 'no_sk_keluar', 'tanggal_sk_keluar'].forEach(name => {
             const input = document.getElementById(name + 'Input');
             if (input) {
                 input.value = extraFields[name] ?? '';
@@ -684,9 +652,7 @@
         const pindahFields = document.getElementById('pindahFieldsForm');
         const skFields = document.getElementById('skFieldsForm');
 
-        if (!pindahFields || !skFields) {
-            return;
-        }
+        if (!pindahFields || !skFields) return;
 
         pindahFields.style.display = 'none';
         skFields.style.display = 'none';
@@ -699,7 +665,6 @@
         }
     }
     
-    // Toast notification function
     function showNotification(message, type = 'info') {
         const bgColor = {
             'error': '#EF4444',
@@ -726,10 +691,7 @@
         `;
         document.body.appendChild(toast);
         
-        setTimeout(() => {
-            toast.style.opacity = '1';
-        }, 100);
-        
+        setTimeout(() => toast.style.opacity = '1', 100);
         setTimeout(() => {
             toast.style.opacity = '0';
             setTimeout(() => toast.remove(), 300);

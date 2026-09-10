@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\MataPelajaran;
 use App\Models\Kurikulum;
 use App\Models\Jurusan;
-use Illuminate\Support\Facades\Schema;
 
 class MataPelajaranController extends Controller
 {
@@ -16,13 +15,10 @@ class MataPelajaranController extends Controller
         $tingkat = $request->query('tingkat');
         $jurusan = $request->query('jurusan');
 
-        // available jurusans for the filter dropdown
-        $jurusans = \App\Models\Jurusan::orderBy('nama')->get();
-
+        $jurusans = Jurusan::orderBy('nama')->get();
         $query = MataPelajaran::query();
 
         if ($jurusan) {
-            // Use many-to-many relationship instead of direct jurusan_id column
             $query->whereHas('jurusans', function($q) use ($jurusan) {
                 $q->where('jurusans.id', $jurusan);
             });
@@ -34,7 +30,7 @@ class MataPelajaranController extends Controller
             });
         }
 
-        $mapels = $query->orderBy('urutan')->get();
+        $mapels = $query->orderBy('kelompok')->orderBy('urutan')->get();
 
         return view('kurikulum.mata-pelajaran.index', compact('mapels', 'tingkat', 'jurusans', 'jurusan'));
     }
@@ -66,37 +62,21 @@ class MataPelajaranController extends Controller
             'jurusan_ids.*' => 'exists:jurusans,id'
         ]);
 
-        // Validasi urutan tidak boleh sama di 1 tingkat
-        if ($request->filled('urutan') && $request->filled('tingkat')) {
-            $urutan = $request->input('urutan');
-            $tingkats = array_map('intval', (array) $request->input('tingkat'));
-            
-            foreach ($tingkats as $t) {
-                $exists = \App\Models\MataPelajaranTingkat::whereHas('mataPelajaran', function($q) use ($urutan) {
-                    $q->where('urutan', $urutan);
-                })->where('tingkat', $t)->exists();
-                
-                if ($exists) {
-                    return redirect()->back()
-                        ->withInput()
-                        ->with('error', "Urutan $urutan sudah digunakan di kelas $t. Gunakan urutan yang berbeda.");
-                }
-            }
+        // Auto-generate urutan jika diisi kosong/null
+        if (!$request->filled('urutan')) {
+            $request->merge(['urutan' => MataPelajaran::max('urutan') + 1]);
         }
 
         $mapel = MataPelajaran::create($request->only(['nama', 'kelompok', 'urutan']));
 
-        // Sync kurikulum relationships
         if ($request->filled('kurikulum_ids')) {
             $mapel->kurikulums()->sync($request->kurikulum_ids);
         }
 
-        // Sync jurusan relationships
         if ($request->filled('jurusan_ids')) {
             $mapel->jurusans()->sync($request->jurusan_ids);
         }
 
-        // sync tingkat
         if ($request->filled('tingkat')) {
             $tingkats = array_map('intval', (array) $request->input('tingkat'));
             foreach ($tingkats as $t) {
@@ -136,34 +116,12 @@ class MataPelajaranController extends Controller
             'jurusan_ids.*' => 'exists:jurusans,id'
         ]);
 
-        // Validasi urutan tidak boleh sama di 1 tingkat (exclude mapel saat ini)
-        if ($request->filled('urutan') && $request->filled('tingkat')) {
-            $urutan = $request->input('urutan');
-            $tingkats = array_map('intval', (array) $request->input('tingkat'));
-            
-            foreach ($tingkats as $t) {
-                $exists = \App\Models\MataPelajaranTingkat::whereHas('mataPelajaran', function($q) use ($urutan, $id) {
-                    $q->where('urutan', $urutan)
-                      ->where('id', '!=', $id);
-                })->where('tingkat', $t)->exists();
-                
-                if ($exists) {
-                    return redirect()->back()
-                        ->withInput()
-                        ->with('error', "Urutan $urutan sudah digunakan di kelas $t. Gunakan urutan yang berbeda.");
-                }
-            }
-        }
-
         $mapel->update($request->only(['nama', 'kelompok', 'urutan']));
 
-        // Sync kurikulum relationships
+        // Sync kurikulum & jurusan tanpa memicu error urutan
         $mapel->kurikulums()->sync($data['kurikulum_ids'] ?? []);
-
-        // Sync jurusan relationships
         $mapel->jurusans()->sync($data['jurusan_ids'] ?? []);
 
-        // sync tingkat: delete existing then insert
         \App\Models\MataPelajaranTingkat::where('mata_pelajaran_id', $mapel->id)->delete();
         if ($request->filled('tingkat')) {
             $tingkats = array_map('intval', (array) $request->input('tingkat'));

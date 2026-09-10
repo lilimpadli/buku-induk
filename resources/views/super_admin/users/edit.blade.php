@@ -50,6 +50,11 @@
     margin-bottom: 10px;
 }
 
+.form-label .required{
+    color: #ef4444;
+    margin-left: 4px;
+}
+
 .form-control{
     width: 100%;
     padding: 14px 18px;
@@ -182,7 +187,7 @@
                 @method('PUT')
 
                 <div class="form-group">
-                    <label for="name" class="form-label">Nama Lengkap</label>
+                    <label for="name" class="form-label">Nama Lengkap <span class="required">*</span></label>
                     <input type="text" id="name" name="name" class="form-control @error('name') is-invalid @enderror" 
                            value="{{ old('name', $user->name) }}" required>
                     @error('name')
@@ -192,7 +197,7 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="email" class="form-label">Email</label>
+                        <label for="email" class="form-label">Email <span class="required">*</span></label>
                         <input type="email" id="email" name="email" class="form-control @error('email') is-invalid @enderror" 
                                value="{{ old('email', $user->email) }}" required>
                         @error('email')
@@ -201,9 +206,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="nomor_induk" class="form-label">Nomor Induk (Opsional)</label>
+                        <label for="nomor_induk" class="form-label">Nomor Induk <span class="required">*</span></label>
                         <input type="text" id="nomor_induk" name="nomor_induk" class="form-control @error('nomor_induk') is-invalid @enderror" 
-                               value="{{ old('nomor_induk', $user->nomor_induk) }}">
+                               value="{{ old('nomor_induk', $user->nomor_induk) }}" required>
                         @error('nomor_induk')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -212,8 +217,9 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="password" class="form-label">Password Baru (Kosongkan jika tidak diubah)</label>
-                        <input type="password" id="password" name="password" class="form-control @error('password') is-invalid @enderror">
+                        <label for="password" class="form-label">Password Baru</label>
+                        <input type="password" id="password" name="password" class="form-control @error('password') is-invalid @enderror" 
+                               placeholder="Kosongkan jika tidak diubah">
                         @error('password')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -222,7 +228,8 @@
                     <div class="form-group">
                         <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
                         <input type="password" id="password_confirmation" name="password_confirmation" 
-                               class="form-control @error('password_confirmation') is-invalid @enderror">
+                               class="form-control @error('password_confirmation') is-invalid @enderror"
+                               placeholder="Ulangi password baru">
                         @error('password_confirmation')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -230,7 +237,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="role" class="form-label">Role/Peran</label>
+                    <label for="role" class="form-label">Role/Peran <span class="required">*</span></label>
                     <select id="role" name="role" class="form-control @error('role') is-invalid @enderror" required>
                         <option value="">-- Pilih Role --</option>
                         <option value="super_admin" {{ old('role', $user->role) === 'super_admin' ? 'selected' : '' }}>Super Admin</option>

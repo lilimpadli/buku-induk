@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buku Induk Alumni - {{ $siswa->nama_lengkap }}</title>
+    <title>Buku Induk - {{ $siswa->nama_lengkap ?? 'Siswa' }}</title>
     <style>
         * {
             margin: 0;
@@ -115,25 +115,6 @@
             width: 68px;
             height: 93px;
             object-fit: cover;
-        }
-        .side-table {
-            width: 100%;
-            font-size: 6px;
-            text-align: left;
-        }
-        .side-table td {
-            padding: 1px 2px;
-            vertical-align: top;
-        }
-        .side-table td.label {
-            font-weight: 700;
-            width: 45%;
-        }
-        .side-table td.sep {
-            width: 4%;
-        }
-        .side-table td.value {
-            width: 51%;
         }
 
         /* --- Left Column: Grades Table (PANJANG) --- */
@@ -268,13 +249,13 @@
     <div class="container">
         <!-- Header -->
         <div class="buku-induk-header">
-            <h1>BUKU INDUK SISWA ALUMNI</h1>
+            <h1>BUKU INDUK SISWA</h1>
             <h2>SMKN 1 KAWALI</h2>
             <h2>KONSENTRASI: {{ $siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan ? $siswa->rombel->kelas->jurusan->nama : 'REKAYASA PERANGKAT LUNAK' }}</h2>
         </div>
 
         <div class="main-content-wrapper">
-            <!-- KOLOM KIRI: TABEL NILAI (DIPANJANGKAN) -->
+            <!-- KOLOM KIRI: TABEL NILAI -->
             <div class="nilai-column">
                 <div class="hasil-prestasi-title">HASIL PRESTASI PEMBELAJARAN</div>
                 <div class="table-responsive">
@@ -331,16 +312,9 @@
                                         <td>-</td>
                                     @endforeach
                                 </tr>
-                                <tr>
-                                    <td>-</td>
-                                    @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
-                                        <td>-</td>
-                                        <td>-</td>
-                                    @endforeach
-                                </tr>
                             @endif
                             
-                            {{-- TAMBAHKAN BANYAK BARIS KOSONG DI SINI --}}
+                            {{-- TAMBAHKAN BARIS KOSONG --}}
                             @for ($i = 0; $i < 15; $i++)
                                 <tr>
                                     <td>&nbsp;</td>
@@ -355,29 +329,32 @@
                 </div>
             </div>
 
-            <!-- KOLOM KANAN: DATA SISWA (VERTICAL) -->
+            <!-- KOLOM KANAN: DATA SISWA -->
             <div class="data-column">
-                <!-- Photo & Info Table -->
+                <!-- Photo -->
                 <div class="photo-info-container">
                     <div class="photo-box">
-                        <span style="font-size: 8px; color: #999;">Photo</span>
+                        @if($siswa->foto)
+                            <img src="{{ public_path('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}" onerror="this.style.display='none'">
+                        @else
+                            <span style="font-size: 8px; color: #999;">Photo</span>
+                        @endif
                     </div>
-                    <!-- side-table removed: keeping underlined form fields only -->
                 </div>
 
-                <!-- Form Data (VERTICAL) - Tanpa Judul A dan B -->
+                <!-- Data Siswa -->
                 <div class="data-section">
                     <div class="data-row">
                         <div class="data-label">NIS / NISN</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->nis ?? '-' }} / {{ $siswa->nisn ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">Nama Lengkap</div>
-                        <div class="data-value">{{ $siswa->nama_lengkap }}</div>
+                        <div class="data-value">{{ $siswa->nama_lengkap ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">Jenis Kelamin</div>
-                        <div class="data-value">{{ substr($siswa->jenis_kelamin ?? '-', 0, 1) }}</div>
+                        <div class="data-value">{{ $siswa->jenisKelamin->nama ?? $siswa->jenis_kelamin ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">Tempat/Tgl.Lahir</div>
@@ -387,16 +364,21 @@
                         <div class="data-label">Warganegara</div>
                         <div class="data-value">{{ $siswa->kewarganegaraan ?? 'WNI' }}</div>
                     </div>
+                    <!-- ========================================== -->
+                    <!-- AGAMA - FIXED -->
+                    <!-- ========================================== -->
                     <div class="data-row">
                         <div class="data-label">Agama</div>
-                        <div class="data-value">{{ $siswa->agama ?? '-' }}</div>
+                        <div class="data-value">{{ $siswa->agama->nama ?? $siswa->agama_lainnya ?? '-' }}</div>
                     </div>
+                    <!-- ========================================== -->
                     <div class="data-row">
                         <div class="data-label">Alamat Siswa</div>
                         <div class="data-value">{{ $siswa->alamat ?? '-' }}</div>
                     </div>
                 </div>
 
+                <!-- Orang Tua -->
                 <div class="data-section">
                     <div class="data-row">
                         <div class="data-label">Nama Orang Tua</div>
@@ -404,15 +386,15 @@
                     </div>
                     <div class="data-row">
                         <div class="data-label">a. Ayah</div>
-                        <div class="data-value">{{ $siswa->ayah->nama ?? '-' }}</div>
+                        <div class="data-value">{{ $siswa->ayah->nama ?? $siswa->nama_ayah ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">b. Ibu</div>
-                        <div class="data-value">{{ $siswa->ibu->nama ?? '-' }}</div>
+                        <div class="data-value">{{ $siswa->ibu->nama ?? $siswa->nama_ibu ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">c. Pekerjaan Ayah</div>
-                        <div class="data-value">{{ $siswa->ayah->pekerjaan ?? '-' }}</div>
+                        <div class="data-value">{{ $siswa->ayah->pekerjaan ?? $siswa->pekerjaan_ayah ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">d. Alamat Rumah</div>
@@ -420,30 +402,32 @@
                     </div>
                     <div class="data-row">
                         <div class="data-label">Nama Wali</div>
-                        <div class="data-value">{{ $siswa->wali->nama ?? '-' }}</div>
+                        <div class="data-value">{{ $siswa->wali->nama ?? $siswa->nama_wali ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">a. Pekerjaan</div>
-                        <div class="data-value">{{ $siswa->wali->pekerjaan ?? '-' }}</div>
+                        <div class="data-value">{{ $siswa->wali->pekerjaan ?? $siswa->pekerjaan_wali ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">b. Alamat Rumah</div>
-                        <div class="data-value">{{ $siswa->wali->alamat ?? '-' }}</div>
+                        <div class="data-value">{{ $siswa->wali->alamat ?? $siswa->alamat_wali ?? '-' }}</div>
                     </div>
                 </div>
 
+                <!-- Diterima -->
                 <div class="data-section">
                     <div class="data-section-title">Diterima menjadi Siswa</div>
                     <div class="data-row">
                         <div class="data-label">a. Mulai Tanggal</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->format('d F Y') : '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">b. Asal sekolah</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->sekolah_asal ?? '-' }}</div>
                     </div>
                 </div>
 
+                <!-- Meninggalkan Sekolah -->
                 <div class="data-section">
                     <div class="data-section-title">Meninggalkan Sekolah</div>
                     <div class="data-row">
@@ -468,43 +452,53 @@
                     </div>
                 </div>
 
+                <!-- Lulus/Tamat -->
                 <div class="data-section">
                     <div class="data-section-title">Lulus/Tamat</div>
                     <div class="data-row">
                         <div class="data-label">a. Nomor Ijazah</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->ijazah_nomor ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">b. Tanggal Ijazah</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->ijazah_tanggal ? \Carbon\Carbon::parse($siswa->ijazah_tanggal)->format('d F Y') : '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">c. Nomor Transkip</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->transkip_nomor ?? '-' }}</div>
                     </div>
                     <div class="data-row">
-                        <div class="data-label">d. Tanggal Transip</div>
-                        <div class="data-value">-</div>
+                        <div class="data-label">d. Tanggal Transkip</div>
+                        <div class="data-value">{{ $siswa->transkip_tanggal ? \Carbon\Carbon::parse($siswa->transkip_tanggal)->format('d F Y') : '-' }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">e. Tanggal Lulus</div>
+                        <div class="data-value">{{ $siswa->tanggal_lulus ? \Carbon\Carbon::parse($siswa->tanggal_lulus)->format('d F Y') : '-' }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">f. Status Kelulusan</div>
+                        <div class="data-value">{{ $siswa->status_kelulusan ?? 'Lulus' }}</div>
                     </div>
                 </div>
 
+                <!-- PKL -->
                 <div class="data-section">
                     <div class="data-section-title">Praktek Kerja Industri</div>
                     <div class="data-row">
                         <div class="data-label">a. Nilai</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->pkl_nilai ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">b. Nomor Sertifikat</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->pkl_sertifikat ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">c. Nama Industri</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->pkl_nama_industri ?? '-' }}</div>
                     </div>
                     <div class="data-row">
                         <div class="data-label">d. Alamat</div>
-                        <div class="data-value">-</div>
+                        <div class="data-value">{{ $siswa->pkl_alamat ?? '-' }}</div>
                     </div>
                 </div>
                 

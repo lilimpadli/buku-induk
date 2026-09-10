@@ -292,6 +292,49 @@
         font-size: 0.85rem;
     }
 
+    /* WIDGET WALI KELAS */
+    .wali-kelas-widget .stat-box {
+        text-align: center;
+        padding: 1rem;
+        border-radius: 12px;
+        background: #F8FAFC;
+        transition: var(--transition);
+        height: 100%;
+    }
+
+    .wali-kelas-widget .stat-box:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--card-shadow);
+    }
+
+    .wali-kelas-widget .stat-box .number {
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .wali-kelas-widget .stat-box .label {
+        font-size: 0.75rem;
+        color: #64748B;
+        margin-top: 4px;
+    }
+
+    .wali-kelas-widget .stat-box.bg-success-light {
+        background: #ECFDF5;
+    }
+
+    .wali-kelas-widget .stat-box.bg-danger-light {
+        background: #FEF2F2;
+    }
+
+    .wali-kelas-widget .stat-box.bg-warning-light {
+        background: #FFFBEB;
+    }
+
+    .wali-kelas-widget .stat-box.bg-primary-light {
+        background: #EFF6FF;
+    }
+
     /* RESPONSIVE */
     @media (max-width: 768px) {
         .dashboard-header {
@@ -349,6 +392,10 @@
             font-size: 0.6rem;
             padding: 2px 10px;
         }
+
+        .wali-kelas-widget .stat-box .number {
+            font-size: 1.5rem;
+        }
     }
 
     @media (max-width: 576px) {
@@ -372,6 +419,10 @@
             font-size: 8px;
             min-width: 18px;
         }
+
+        .wali-kelas-widget .stat-box .number {
+            font-size: 1.2rem;
+        }
     }
 
     @media (max-width: 450px) {
@@ -388,11 +439,13 @@
 </style>
 
 <div class="container-fluid px-4">
+    <!-- HEADER -->
     <div class="dashboard-header">
         <h1>Selamat Datang, Kurikulum! 👋</h1>
         <p class="text-muted">Dashboard monitoring akademik SMKN 1 Kawali</p>
     </div>
 
+    <!-- STATISTIK UTAMA -->
     <div class="stats-row">
         <div class="stat-card">
             <div class="stat-card-header">
@@ -438,6 +491,104 @@
         </div>
     </div>
 
+    <!-- ⭐ WIDGET WALI KELAS -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-12">
+            <div class="chart-card wali-kelas-widget">
+                <div class="card-header">
+                    <span><i class="fas fa-chalkboard-teacher me-2"></i> Status Wali Kelas</span>
+                    <a href="{{ route('kurikulum.wali-kelas-mapping.index') }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-edit me-1"></i> Atur Wali Kelas
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3 col-6">
+                            <div class="stat-box bg-primary-light">
+                                <div class="number" style="color:#2563EB;">{{ $totalRombels ?? 0 }}</div>
+                                <div class="label">Total Rombel</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="stat-box bg-success-light">
+                                <div class="number" style="color:#059669;">{{ $rombelsWithWali ?? 0 }}</div>
+                                <div class="label">✅ Sudah Ada Wali</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="stat-box bg-danger-light">
+                                <div class="number" style="color:#DC2626;">{{ $rombelsWithoutWali ?? 0 }}</div>
+                                <div class="label">❌ Belum Ada Wali</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="stat-box bg-warning-light">
+                                <div class="number" style="color:#D97706;">
+                                    @if(($rombelsWithoutWali ?? 0) == 0)
+                                        ✅
+                                    @else
+                                        ⚠️
+                                    @endif
+                                </div>
+                                <div class="label">
+                                    @if(($rombelsWithoutWali ?? 0) == 0)
+                                        Semua lengkap!
+                                    @else
+                                        {{ $rombelsWithoutWali }} rombel perlu wali
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if(($rombelsWithoutWali ?? 0) > 0)
+                    <div class="mt-3">
+                        <div class="alert alert-warning d-flex align-items-center" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2" style="font-size:1.2rem;"></i>
+                            <div>
+                                <strong>Perhatian!</strong> Ada <strong>{{ $rombelsWithoutWali }}</strong> rombel yang belum memiliki wali kelas.
+                                <a href="{{ route('kurikulum.wali-kelas-mapping.index', ['status' => 'belum']) }}" class="alert-link ms-1">
+                                    Atur sekarang
+                                </a>
+                            </div>
+                        </div>
+                        
+                        @if(isset($rombelsWithoutWaliList) && $rombelsWithoutWaliList->count() > 0)
+                        <div class="mt-2">
+                            <h6 class="text-muted" style="font-size:0.85rem;">Rombel yang perlu wali kelas:</h6>
+                            <div class="list-rombels">
+                                @foreach($rombelsWithoutWaliList as $rombel)
+                                    <div class="item">
+                                        <span class="nama">{{ $rombel->display_name }}</span>
+                                        <span class="detail">
+                                            {{ optional(optional($rombel->kelas)->jurusan)->nama ?? '-' }}
+                                        </span>
+                                    </div>
+                                @endforeach
+                                @if(($rombelsWithoutWali ?? 0) > 5)
+                                    <div class="item text-muted">
+                                        <span>dan {{ ($rombelsWithoutWali ?? 0) - 5 }} lainnya</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                    @else
+                    <div class="mt-3">
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Semua rombel sudah memiliki wali kelas. ✅
+                        </div>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END WIDGET WALI KELAS -->
+
+    <!-- GRAFIK SISWA PER TINGKAT & JENIS KELAMIN -->
     <div class="row g-3">
         <div class="col-md-6">
             <div class="chart-card">
@@ -498,13 +649,14 @@
             </div>
         </div>
 
+        <!-- SISWA PER JURUSAN -->
         <div class="col-md-7">
             <div class="chart-card">
                 <div class="card-header">
                     <span><i class="fas fa-chart-bar"></i> Siswa per Jurusan</span>
                 </div>
                 <div class="card-body">
-                    @foreach($jurusanData as $j)
+                    @forelse($jurusanData ?? [] as $j)
                         <div class="chart-bar">
                             <span class="bar-label">{{ $j['nama'] }}</span>
                             <div class="bar-track">
@@ -513,11 +665,17 @@
                                 </div>
                             </div>
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="empty-state">
+                            <i class="fas fa-inbox mb-2 d-block"></i>
+                            Belum ada data jurusan
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>
 
+        <!-- ROMBEL TERBARU -->
         <div class="col-md-5">
             <div class="chart-card">
                 <div class="card-header">
@@ -525,7 +683,7 @@
                 </div>
                 <div class="card-body">
                     <div class="list-rombels">
-                        @forelse($rombels as $r)
+                        @forelse($rombels ?? [] as $r)
                             <div class="item">
                                 <span class="nama">{{ $r->nama }}</span>
                                 <span class="detail">

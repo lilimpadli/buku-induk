@@ -50,6 +50,11 @@
     margin-bottom: 10px;
 }
 
+.form-label .required{
+    color: #ef4444;
+    margin-left: 4px;
+}
+
 .form-control{
     width: 100%;
     padding: 14px 18px;
@@ -140,6 +145,24 @@
 .btn-group a{
     text-decoration: none;
 }
+
+.info-box{
+    background: #eef2ff;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    border-left: 4px solid #667eea;
+}
+
+.info-box p{
+    margin: 0;
+    color: #475569;
+    font-size: 0.9rem;
+}
+
+.info-box strong{
+    color: #1e293b;
+}
 </style>
 @endpush
 
@@ -154,13 +177,17 @@
 
     <div class="card-modern" style="max-width: 600px; margin: 0 auto;">
         <div class="card-body">
+            <div class="info-box">
+                <p>⚠️ <strong>Perhatian!</strong> Nomor induk akan digunakan untuk <strong>LOGIN</strong>. Pastikan nomor induk benar dan unik.</p>
+            </div>
+
             <form action="{{ route('super_admin.users.store') }}" method="POST">
                 @csrf
 
                 <div class="form-group">
-                    <label for="name" class="form-label">Nama Lengkap</label>
+                    <label for="name" class="form-label">Nama Lengkap <span class="required">*</span></label>
                     <input type="text" id="name" name="name" class="form-control @error('name') is-invalid @enderror" 
-                           value="{{ old('name') }}" required>
+                           value="{{ old('name') }}" required placeholder="Masukkan nama lengkap">
                     @error('name')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -168,18 +195,18 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="email" class="form-label">Email</label>
+                        <label for="email" class="form-label">Email <span class="required">*</span></label>
                         <input type="email" id="email" name="email" class="form-control @error('email') is-invalid @enderror" 
-                               value="{{ old('email') }}" required>
+                               value="{{ old('email') }}" required placeholder="email@domain.com">
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="form-group">
-                        <label for="nomor_induk" class="form-label">Nomor Induk (Opsional)</label>
+                        <label for="nomor_induk" class="form-label">Nomor Induk <span class="required">*</span></label>
                         <input type="text" id="nomor_induk" name="nomor_induk" class="form-control @error('nomor_induk') is-invalid @enderror" 
-                               value="{{ old('nomor_induk') }}">
+                               value="{{ old('nomor_induk') }}" required placeholder="NIS/NIP untuk login">
                         @error('nomor_induk')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -188,18 +215,18 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="password" class="form-label">Password</label>
+                        <label for="password" class="form-label">Password <span class="required">*</span></label>
                         <input type="password" id="password" name="password" class="form-control @error('password') is-invalid @enderror" 
-                               required>
+                               required placeholder="Minimal 6 karakter">
                         @error('password')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="form-group">
-                        <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
+                        <label for="password_confirmation" class="form-label">Konfirmasi Password <span class="required">*</span></label>
                         <input type="password" id="password_confirmation" name="password_confirmation" 
-                               class="form-control @error('password_confirmation') is-invalid @enderror" required>
+                               class="form-control @error('password_confirmation') is-invalid @enderror" required placeholder="Ulangi password">
                         @error('password_confirmation')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -207,7 +234,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="role" class="form-label">Role/Peran</label>
+                    <label for="role" class="form-label">Role/Peran <span class="required">*</span></label>
                     <select id="role" name="role" class="form-control @error('role') is-invalid @enderror" required>
                         <option value="">-- Pilih Role --</option>
                         <option value="super_admin" {{ old('role') === 'super_admin' ? 'selected' : '' }}>Super Admin</option>

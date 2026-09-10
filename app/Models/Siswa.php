@@ -52,33 +52,21 @@ class Siswa extends Model
         return $this->hasMany(MutasiSiswa::class, 'siswa_id');
     }
 
-    /**
-     * Get mutasi terakhir dari siswa
-     */
     public function mutasiTerakhir()
     {
         return $this->hasOne(MutasiSiswa::class, 'siswa_id')->latestOfMany();
     }
 
-    /**
-     * Get rombel dari siswa
-     */
     public function rombel()
     {
         return $this->belongsTo(Rombel::class, 'rombel_id');
     }
 
-    /**
-     * Relasi Kurikulum
-     */
     public function kurikulum()
     {
         return $this->belongsTo(Kurikulum::class, 'kurikulum_id');
     }
 
-    /**
-     * Relasi Orang Tua
-     */
     public function ayah()
     {
         return $this->belongsTo(Ayah::class, 'ayah_id');
@@ -92,5 +80,28 @@ class Siswa extends Model
     public function wali()
     {
         return $this->belongsTo(Wali::class, 'wali_id');
+    }
+
+    public function agama()
+    {
+        return $this->belongsTo(Agama::class, 'agama_id');
+    }
+
+    // 🔥 FIX: Tambahkan relasi ke kenaikan kelas
+    public function kenaikanKelas()
+    {
+        return $this->hasMany(KenaikanKelas::class, 'siswa_id');
+    }
+
+    // 🔥 FIX: Relasi ke kelas
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class, 'kelas_id');
+    }
+
+    // 🔥 FIX: Accessor untuk nama lengkap (sudah ada)
+    public function getNamaAttribute()
+    {
+        return $this->nama_lengkap;
     }
 }
