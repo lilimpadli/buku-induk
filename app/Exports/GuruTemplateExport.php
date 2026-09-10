@@ -14,20 +14,50 @@ class GuruTemplateExport implements FromArray, WithHeadings, WithColumnWidths, W
 {
     protected static $fieldLabels = [
         'nama' => 'Nama',
+        'nik' => 'NIK',
+        'nuptk' => 'NUPTK',
         'nip' => 'NIP',
         'status_kepegawaian' => 'Status Kepegawaian',
+        'jenis_kelamin' => 'Jenis Kelamin',
         'pendidikan' => 'Pendidikan',
-        'gelar_depan' => 'Gelar Depan',
-        'gelar_belakang' => 'Gelar Belakang',
+        'serdik' => 'Serdik',
+        'tugas_tambahan' => 'Tugas Tambahan',   // ← TAMBAHAN
+        'tempat_lahir' => 'Tempat Lahir',
+        'tanggal_lahir' => 'Tanggal Lahir',
+        'email_pribadi' => 'Email Pribadi',
+        'email_resmi' => 'Email Resmi',
+        'alamat' => 'Alamat',
+        'rt' => 'RT',
+        'rw' => 'RW',
+        'dusun' => 'Dusun',
+        'kelurahan' => 'Kelurahan',
+        'kecamatan' => 'Kecamatan',
+        'kode_pos' => 'Kode Pos',
+        'no_hp' => 'No HP',
     ];
 
     protected static $fieldWidths = [
         'nama' => 30,
+        'nik' => 25,
+        'nuptk' => 25,
         'nip' => 25,
         'status_kepegawaian' => 30,
+        'jenis_kelamin' => 18,
         'pendidikan' => 18,
-        'gelar_depan' => 20,
-        'gelar_belakang' => 20,
+        'serdik' => 20,
+        'tugas_tambahan' => 30,                 // ← TAMBAHAN
+        'tempat_lahir' => 22,
+        'tanggal_lahir' => 20,
+        'email_pribadi' => 30,
+        'email_resmi' => 30,
+        'alamat' => 35,
+        'rt' => 12,
+        'rw' => 12,
+        'dusun' => 20,
+        'kelurahan' => 25,
+        'kecamatan' => 25,
+        'kode_pos' => 15,
+        'no_hp' => 20,
     ];
 
     protected array $fields;

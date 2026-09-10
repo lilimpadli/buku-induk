@@ -37,6 +37,7 @@
         body {
             background: #f6f7fb;
             transition: var(--transition, 0.2s) ease;
+            font-family: 'Poppins', sans-serif;
         }
 
         /* Mobile Header */
@@ -151,10 +152,6 @@
 
         .sidebar-content {
             padding: 16px 12px;
-        }
-
-        .user-mini {
-            display: none;
         }
 
         .nav-section-title {
@@ -302,7 +299,6 @@
                 padding-right: 16px;
             }
 
-            /* Keep collapsed styling behavior for small screens when sidebar-collapsed is set */
             body.sidebar-collapsed .sidebar{
                 left: -100%;
             }
@@ -376,7 +372,7 @@
 
     <!-- Mobile Header -->
     <div class="mobile-header">
-        <button class="hamburger" id="sidebarToggle">
+        <button class="hamburger" id="sidebarToggle" aria-label="Toggle Menu">
             <i class="fas fa-bars"></i>
         </button>
         <div class="user-info">
@@ -410,14 +406,13 @@
                             <small>Sekolah</small>
                         </div>
                     </div>
-                    <button class="sidebar-close" id="sidebarClose">
+                    <button class="sidebar-close" id="sidebarClose" aria-label="Close Menu">
                         <i class="fas fa-chevron-left"></i>
                     </button>
                 </div>
 
                 <div class="sidebar-content">
                     @auth
-                        <!-- MENU -->
                         <nav class="nav flex-column">
 
                             {{-- ROLE: SISWA --}}
@@ -453,7 +448,7 @@
                                 <div class="nav-section-title">DATA</div>
 
                                 <a href="{{ route('guru.profile.index') }}" class="nav-link {{ request()->routeIs('guru.profile.*') ? 'active' : '' }}">
-                                    <i class="fas fa-user"></i> <span>Data Pribadi </span>
+                                    <i class="fas fa-user"></i> <span>Data Pribadi</span>
                                 </a>
                             @endif
 
@@ -466,7 +461,7 @@
                                 <div class="nav-section-title">DATA</div>
 
                                 <a href="{{ route('walikelas.data_diri.profile') }}" class="nav-link {{ request()->routeIs('walikelas.data_diri.profile') ? 'active' : '' }}">
-                                    <i class="fas fa-user"></i> <span>Data Pribadi </span>
+                                    <i class="fas fa-user"></i> <span>Data Pribadi</span>
                                 </a>
 
                                 <a href="{{ route('walikelas.siswa.index') }}" class="nav-link {{ request()->routeIs('walikelas.siswa.*') ? 'active' : '' }}">
@@ -523,16 +518,13 @@
                                     <i class="fas fa-users"></i> <span>Data Siswa</span>
                                 </a>
 
-                               
                                 <a href="{{ route('tu.kelas.index') }}" class="nav-link {{ request()->routeIs('tu.kelas*') ? 'active' : '' }}">
                                     <i class="fas fa-school"></i> <span>Manajemen Kelas</span>
                                 </a>
 
-                               
-
                                 <div class="nav-section-title">BUKU INDUK</div>
 
-                                <a href="{{ route('tu.buku-induk.index') }}" class="nav-link {{ request()->routeIs('tu.buku-induk*') ? 'active' : '' }}">
+                                <a href="{{ route('tu.buku-induk.index') }}" class="nav-link {{ request()->routeIs('buku-induk*') ? 'active' : '' }}">
                                     <i class="fas fa-book"></i> <span>Buku Induk</span>
                                 </a>
 
@@ -547,34 +539,38 @@
                                 </a>
                             @endif
 
-                          {{-- ROLE: TU KEPEGAWAIAN --}}
-                           @if(Auth::user()->role == 'tu_kepegawaian')
-                            <div class="nav-section-title">KEPEGAWAIAN</div>
+                            {{-- ROLE: TU KEPEGAWAIAN --}}
+                            @if(in_array(Auth::user()->role, ['tu_kepegawaian', 'tu-kepegawaian', 'pegawai']))
+                                <div class="nav-section-title">KEPEGAWAIAN</div>
 
-                            <a href="{{ route('tu_kepegawaian.dashboard') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.dashboard') ? 'active' : '' }}">
-                                <i class="fas fa-home"></i> <span>Dashboard</span>
-                            </a>
+                                <a href="{{ route('tu_kepegawaian.dashboard') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.dashboard') ? 'active' : '' }}">
+                                    <i class="fas fa-home"></i> <span>Dashboard</span>
+                                </a>
 
-                            <a href="{{ route('tu_kepegawaian.guru.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.guru.*') ? 'active bg-primary text-white' : 'text-dark' }}">
-                                <i class="fas fa-user-graduate me-2"></i> <span>Data Guru</span>
-                            </a>
+                                <a href="{{ route('tu_kepegawaian.guru.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.guru.*') ? 'active' : '' }}">
+                                    <i class="fas fa-user-graduate me-2"></i> <span>Data Guru</span>
+                                </a>
 
-                            <a href="{{ route('tu_kepegawaian.tu.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.tu.index') ? 'active' : '' }}">
-                                <i class="fas fa-user-tie"></i> <span>Data Pegawai</span>
-                            </a>
+                                <a href="{{ route('tu_kepegawaian.tu.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.tu.*') ? 'active' : '' }}">
+                                    <i class="fas fa-user-tie"></i> <span>Data Pegawai</span>
+                                </a>
 
-                            <a href="{{ route('tu_kepegawaian.riwayat.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.riwayat.index') ? 'active' : '' }}">
-                                <i class="fas fa-history"></i> <span>Riwayat Tugas</span>
-                            </a>
+                                <a href="{{ route('tu_kepegawaian.riwayat.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.riwayat.*') ? 'active' : '' }}">
+                                    <i class="fas fa-history"></i> <span>Riwayat Tugas</span>
+                                </a>
 
-                            <a href="{{ route('tu_kepegawaian.penugasan.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.penugasan.index') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-tasks"></i> <span>Penugasan Guru</span>
-                            </a>
+                                <a href="{{ route('tu_kepegawaian.mutasi.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.mutasi*') ? 'active' : '' }}">
+                                    <i class="fas fa-exchange-alt"></i> <span>Mutasi Guru & Pegawai</span>
+                                </a>
 
-                          <a href="{{ route('tu_kepegawaian.mutasi.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.mutasi*') ? 'active' : '' }}">
-                              <i class="fas fa-exchange-alt"></i> <span>Mutasi Pegawai</span>
-                          </a>
+                                {{-- ✅ MENU BARU: CETAK ABSENSI KEGIATAN (GURU + PEGAWAI) --}}
+                                <div class="nav-section-title">CETAK</div>
+
+                                <a href="{{ route('tu_kepegawaian.absensi_kegiatan_semua') }}" target="_blank" class="nav-link">
+                                    <i class="fas fa-print"></i> <span>Cetak Absensi Kegiatan</span>
+                                </a>
                             @endif
+
                             {{-- ROLE: SUPER ADMIN --}}
                             @if(Auth::user()->role == 'super_admin')
                                 <a href="{{ route('super_admin.dashboard') }}" class="nav-link {{ request()->routeIs('super_admin.dashboard') ? 'active' : '' }}">
@@ -628,37 +624,65 @@
                                     <i class="fas fa-id-card"></i> <span>Data Pribadi</span>
                                 </a>
 
-                                <a href="{{ route('kurikulum.kelas.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kelas*') ? 'active' : '' }}">
-                                    <i class="fas fa-school"></i> <span>Manajemen Kelas</span>
+                                <a href="{{ route('kurikulum.guru.index') }}" class="nav-link {{ request()->routeIs('kurikulum.guru*') ? 'active' : '' }}">
+                                    <i class="fas fa-chalkboard-teacher"></i> <span>Manajemen Guru</span>
                                 </a>
 
-                                <a href="{{ route('kurikulum.kurikulum.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kurikulum*') ? 'active' : '' }}">
-                                    <i class="fas fa-graduation-cap"></i> <span>Manajemen Kurikulum</span>
+                                <a href="{{ route('kurikulum.wali-kelas-mapping.index') }}" class="nav-link {{ request()->routeIs('kurikulum.wali-kelas-mapping*') ? 'active' : '' }}">
+                                    <i class="fas fa-user-tie"></i> <span>Wali Kelas Mapping</span>
+                                </a>
+                                
+                                <a href="{{ route('kurikulum.kelas.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kelas*') ? 'active' : '' }}">
+                                    <i class="fas fa-school"></i> <span>Manajemen Kelas</span>
                                 </a>
 
                                 <a href="{{ route('kurikulum.jurusan.index') }}" class="nav-link {{ request()->routeIs('kurikulum.jurusan*') ? 'active' : '' }}">
                                     <i class="fas fa-graduation-cap"></i> <span>Manajemen Jurusan</span>
                                 </a>
 
-                                <a href="{{ route('kurikulum.guru.index') }}" class="nav-link {{ request()->routeIs('kurikulum.guru*') ? 'active' : '' }}">
-                                    <i class="fas fa-chalkboard-teacher"></i> <span>Manajemen Guru</span>
+                                <a href="{{ route('kurikulum.kurikulum.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kurikulum*') ? 'active' : '' }}">
+                                    <i class="fas fa-book"></i> <span>Manajemen Kurikulum</span>
                                 </a>
 
                                 <a href="{{ route('kurikulum.mata-pelajaran.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mata-pelajaran*') ? 'active' : '' }}">
                                     <i class="fas fa-book-open"></i> <span>Manajemen Mata Pelajaran</span>
                                 </a>
 
-                                {{-- KURIKULUM: CRUD BIDANG/PROGRAM/KONSENTRASI KEAHLIAN --}}
+                                <div class="nav-section-title">AKADEMIK</div>
+
+                                <a href="{{ route('kurikulum.siswa.index') }}" class="nav-link {{ request()->routeIs('kurikulum.siswa*') ? 'active' : '' }}">
+                                    <i class="fas fa-users"></i> <span>Data Siswa</span>
+                                </a>
+
+                                <a href="{{ route('kurikulum.buku-induk.index') }}" class="nav-link {{ request()->routeIs('kurikulum.buku-induk*') ? 'active' : '' }}">
+                                    <i class="fas fa-book"></i> <span>Buku Induk Siswa</span>
+                                </a>
+
+                                <a href="{{ route('kurikulum.alumni.index') }}" class="nav-link {{ request()->routeIs('kurikulum.alumni*') ? 'active' : '' }}">
+                                    <i class="fas fa-user-graduate"></i> <span>Data Alumni</span>
+                                </a>
+
+                                <div class="nav-section-title">MUTASI & KENAIKAN</div>
+
+                                <a href="{{ route('kurikulum.mutasi.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mutasi*') ? 'active' : '' }}">
+                                    <i class="fas fa-exchange-alt"></i> <span>Riwayat Mutasi</span>
+                                </a>
+
+                                <a href="{{ route('kurikulum.kenaikan-kelas.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kenaikan-kelas*') ? 'active' : '' }}">
+                                    <i class="fas fa-arrow-up"></i> <span>Kenaikan Kelas</span>
+                                </a>
+
                                 <div class="nav-section-title">KEAHLIAN</div>
+
                                 <a href="{{ route('kurikulum.bidang-keahlian.index') }}" class="nav-link {{ request()->routeIs('kurikulum.bidang-keahlian*') ? 'active' : '' }}">
                                     <i class="fas fa-layer-group"></i> <span>Bidang Keahlian</span>
                                 </a>
-                               
+
                                 <a href="{{ route('kurikulum.program-keahlian.index') }}" class="nav-link {{ request()->routeIs('kurikulum.program-keahlian*') ? 'active' : '' }}">
                                     <i class="fas fa-cube"></i> <span>Program Keahlian</span>
                                 </a>
 
-                                 <a href="{{ route('kurikulum.konsentrasi-keahlian.index') }}" class="nav-link {{ request()->routeIs('kurikulum.konsentrasi-keahlian*') ? 'active' : '' }}">
+                                <a href="{{ route('kurikulum.konsentrasi-keahlian.index') }}" class="nav-link {{ request()->routeIs('kurikulum.konsentrasi-keahlian*') ? 'active' : '' }}">
                                     <i class="fas fa-cubes"></i> <span>Konsentrasi Keahlian</span>
                                 </a>
                             @endif
@@ -689,7 +713,9 @@
         </div>
     </div>
 
+    <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const sidebar = document.getElementById('sidebar');
@@ -697,19 +723,19 @@
             const sidebarClose = document.getElementById('sidebarClose');
             const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-            // Toggle sidebar
+            // Toggle sidebar (Mobile)
             if (sidebarToggle) {
                 sidebarToggle.addEventListener('click', function() {
-                    sidebar.classList.add('show');
-                    sidebarOverlay.classList.add('show');
+                    if (sidebar) sidebar.classList.add('show');
+                    if (sidebarOverlay) sidebarOverlay.classList.add('show');
                     document.body.style.overflow = 'hidden';
                 });
             }
 
-            // Close sidebar
+            // Close sidebar (Mobile)
             function closeSidebar() {
-                sidebar.classList.remove('show');
-                sidebarOverlay.classList.remove('show');
+                if (sidebar) sidebar.classList.remove('show');
+                if (sidebarOverlay) sidebarOverlay.classList.remove('show');
                 document.body.style.overflow = '';
             }
 
@@ -721,29 +747,14 @@
                 sidebarOverlay.addEventListener('click', closeSidebar);
             }
 
-            // Initialize Bootstrap dropdowns
-            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
-            var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
-                return new bootstrap.Dropdown(dropdownToggleEl);
-            });
-
-            // On resize, ensure overlay is closed when moving to desktop and re-apply collapsed state
+            // Window resize handler
             window.addEventListener('resize', function(){
                 if (window.innerWidth > 991) {
-                    // close overlay if open
-                    if (document.body.classList.contains('show-sidebar')) {
-                        document.body.classList.remove('show-sidebar');
-                        if (sidebarBackdrop) sidebarBackdrop.classList.remove('visible');
-                    }
-                    // re-apply saved collapsed state
-                    applySavedSidebarState();
+                    closeSidebar();
                 }
             });
         });
     </script>
-
-    <!-- Backdrop for mobile sidebar -->
-    <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
 
     @stack('scripts')
 

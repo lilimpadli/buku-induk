@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Mutasi; // Pastikan Model Mutasi sudah di-import
+use App\Models\Mutasi;
+use App\Models\Guru;
+use App\Models\Pegawai;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,48 +22,67 @@ class MutasiController extends Controller
         });
     }
 
-    public function index()
-    {
-        // Tambahkan die() ini untuk memastikan controller ini yang sedang diakses
-        die('Controller MutasiController sedang diakses!'); 
-        
-        $mutasis = Mutasi::with('pegawai')->latest()->get(); 
-        return view('tu.mutasi.index', compact('mutasis'));
-    }
-
     public function create()
     {
-        // Logika untuk menampilkan form tambah mutasi
-        return view('tu.mutasi.create'); 
+        $gurus = Guru::all();
+        $pegawais = Pegawai::all(); 
+        return view('tu.mutasi.create', compact('gurus', 'pegawais')); 
     }
 
-    public function laporan()
+    public function store(Request $request)
     {
-        // Logika untuk menampilkan atau generate laporan
-        return view('tu.mutasi.laporan');
-    }
-
-    public function bulk(Request $request)
-    {
-        // Ini contoh logika sederhana untuk menerima data
-        $siswaIds = $request->input('siswa_ids');
-        $kelasId = $request->input('kelas_id');
-        
-        // Lakukan logika simpan data mutasi ke database di sini
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Data berhasil diproses'
+        $request->validate([
+            'entitas_id'   => 'required', 
+            'jenis_mutasi' => 'required',
+            'tanggal'      => 'required|date',
         ]);
+
+        // Mengambil data dari string (misal: "guru-1" atau "pegawai-5")
+        $data = explode('-', $request->entitas_id);
+        
+        // Pastikan data valid
+        if (count($data) !== 2) {
+            return redirect()->back()->with('error', 'Format data entitas tidak valid!');
+        }
+
+        $id   = $data[1];
+
+        // PERBAIKAN: Simpan ke kolom 'guru_id' dan 'jenis' (sesuai database)
+        Mutasi::create([
+            'guru_id'    => $id,
+            'jenis'      => $request->jenis_mutasi,
+            'tanggal'    => $request->tanggal,
+            'keterangan' => $request->keterangan ?? null,
+        ]);
+
+        return redirect()->route('tu_kepegawaian.mutasi.index')->with('success', 'Data berhasil disimpan!');
     }
 
-    public function upAll(Request $request)
+    public function edit($id)
     {
-        // Contoh logika dasar
-        return response()->json([
-            'success' => true,
-            'naik_kelas' => 10,
-            'lulus' => 5
+        $mutasi = Mutasi::findOrFail($id);
+        $gurus = Guru::all();
+        $pegawais = Pegawai::all(); 
+        
+        return view('tu.mutasi.edit', compact('mutasi', 'gurus', 'pegawais')); 
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'jenis_mutasi' => 'required',
+            'tanggal'      => 'required|date',
         ]);
+
+        $mutasi = Mutasi::findOrFail($id);
+
+        // PERBAIKAN: Hanya update kolom 'jenis' dan 'tanggal' (bisa tambahkan keterangan jika diinput)
+        $mutasi->update([
+            'jenis'      => $request->jenis_mutasi,
+            'tanggal'    => $request->tanggal,
+            'keterangan' => $request->keterangan ?? null,
+        ]);
+
+        return redirect()->route('tu_kepegawaian.mutasi.index')->with('success', 'Data berhasil diupdate!');
     }
 }

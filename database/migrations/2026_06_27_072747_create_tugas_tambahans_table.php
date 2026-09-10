@@ -9,20 +9,19 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
+    public function up()
+{
+    if (!Schema::hasTable('tugas_tambahans')) {
         Schema::create('tugas_tambahans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('guru_id')->constrained('gurus')->onDelete('cascade');
-            $table->enum('tipe_tugas', ['wali_kelas', 'waka_kesiswaan', 'kaprog']);
-            $table->string('tahun_ajaran')->nullable();
+            $table->string('entitas_type');
+            $table->unsignedBigInteger('entitas_id');
+            $table->string('nama_tugas');
+            $table->string('sk_tugas')->nullable();
             $table->timestamps();
-            
-            // Unique constraint untuk mencegah duplikasi tugas yang sama untuk guru yang sama
-            $table->unique(['guru_id', 'tipe_tugas']);
         });
     }
-
+}
     /**
      * Reverse the migrations.
      */

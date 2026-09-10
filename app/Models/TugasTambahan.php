@@ -2,21 +2,27 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TugasTambahan extends Model
 {
-    protected $table = 'tugas_tambahans';
-    
+    use HasFactory;
+
+    protected $table = 'tugas_tambahan';
+
     protected $fillable = [
         'guru_id',
-        'tipe_tugas',
-        'tahun_ajaran',
+        'pegawai_id',
+        'nama_tugas',
+        'instansi',
+        'mulai',
+        'is_tugas_tambahan',
     ];
 
     protected $casts = [
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'mulai' => 'date',
+        'is_tugas_tambahan' => 'boolean',
     ];
 
     /**
@@ -24,56 +30,15 @@ class TugasTambahan extends Model
      */
     public function guru()
     {
-        return $this->belongsTo(Guru::class);
+        return $this->belongsTo(Guru::class, 'guru_id');
     }
 
     /**
-     * Relasi ke User melalui Guru
+     * 
+     * \Relasi ke Pegawai
      */
-    public function user()
+    public function pegawai()
     {
-        return $this->belongsTo(User::class, 'guru_id', 'id')->through('guru');
-    }
-
-    /**
-     * Scope untuk filter berdasarkan tipe tugas
-     */
-    public function scopeByTipe($query, $tipe)
-    {
-        return $query->where('tipe_tugas', $tipe);
-    }
-
-    /**
-     * Scope untuk filter berdasarkan tahun ajaran
-     */
-    public function scopeByTahunAjaran($query, $tahunAjaran)
-    {
-        return $query->where('tahun_ajaran', $tahunAjaran);
-    }
-
-    /**
-     * Get label untuk tipe tugas
-     */
-    public static function getTipeLabel($tipe)
-    {
-        $labels = [
-            'wali_kelas' => 'Wali Kelas',
-            'waka_kesiswaan' => 'Waka Kesiswaan',
-            'kaprog' => 'Kaprog',
-        ];
-
-        return $labels[$tipe] ?? $tipe;
-    }
-
-    /**
-     * Get all available tipe tugas
-     */
-    public static function getAvailableTipes()
-    {
-        return [
-            'wali_kelas' => 'Wali Kelas',
-            'waka_kesiswaan' => 'Waka Kesiswaan',
-            'kaprog' => 'Kaprog',
-        ];
+        return $this->belongsTo(Pegawai::class, 'pegawai_id');
     }
 }

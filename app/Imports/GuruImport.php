@@ -4,324 +4,179 @@ namespace App\Imports;
 
 use App\Models\Guru;
 use App\Models\User;
-use App\Models\Rombel;
-use App\Models\Jurusan;
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
-use Maatwebsite\Excel\Concerns\WithStartRow;
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\ToCollection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
-class GuruImport implements ToModel, WithStartRow, SkipsEmptyRows, WithHeadingRow
+class GuruImport implements ToCollection
 {
     protected $errors = [];
     protected $successCount = 0;
     protected $defaultPassword = '12345678';
+    
     protected $selectedColumns = [];
     protected $columnMap = [];
+    protected $headerRow = [];
 
     public function setSelectedColumns(array $columns)
     {
-        $this->selectedColumns = array_values(array_filter($columns, fn($value) => trim($value) !== ''));
-        return $this;
+        $this->selectedColumns = $columns;
     }
 
     public function setColumnMap(array $map)
     {
-        $normalized = [];
-        foreach ($map as $field => $header) {
-            if (trim($header) === '') {
+        $this->columnMap = $map;
+    }
+
+    public function collection(Collection $rows)
+    {
+        foreach ($rows as $index => $row) {
+            // Ambil baris pertama sebagai header nama kolom
+            if ($index === 0) {
+                foreach ($row as $colIdx => $colVal) {
+                    if (!empty($colVal)) {
+                        $cleanHeader = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $colVal)));
+                        $this->headerRow[$cleanHeader] = $colIdx;
+                    }
+                }
                 continue;
             }
-            $normalized[$field] = trim($header);
-        }
-        $this->columnMap = $normalized;
-        return $this;
-    }
 
-    protected function normalizeHeaderKey(string $header): string
-    {
-        $clean = trim($header);
-        $clean = preg_replace('/[^A-Za-z0-9]+/', '_', $clean);
-        $clean = strtolower(trim($clean, '_'));
-
-        return $clean;
-    }
-
-    public function startRow(): int
-    {
-        return 2; // Data mulai dari baris 2 (setelah header di baris 1)
-    }
-
-    public function headingRow(): int
-    {
-        return 1; // Header ada di baris 1
-    }
-
-    /**
-     * Normalize row keys to standard lowercase format
-     * Handles various column name formats (camelCase, spaces, etc.)
-     */
-    protected function normalizeRowKeys(array $row): array
-    {
-        $normalized = [];
-        $keyMap = [
-            'nama' => ['nama', 'Nama', 'NAMA', 'name'],
-            'nomor_induk' => ['nomor_induk', 'nomor induk', 'nip', 'NIP', 'nip_guru', 'niP', 'Nomor Induk', 'nomor_induk'],
-            'jenis_kelamin' => ['jenis_kelamin', 'jenis kelamin', 'Jenis Kelamin', 'gender'],
-            'email' => ['email', 'Email', 'EMAIL', 'e_mail'],
-            'role' => ['role', 'Role', 'ROLE', 'jabatan'],
-            'rombel_id' => ['rombel_id', 'rombel_Id', 'rombel', 'rombel id', 'rombelid'],
-            'jurusan_id' => ['jurusan_id', 'jurusan_Id', 'jurusan', 'jurusan id', 'jurusanid'],
-            'status_kepegawaian' => ['status_kepegawaian', 'status kepegawaian', 'status', 'status_kepegawaian', 'statuskepegawaian'],
-            'pendidikan' => ['pendidikan', 'Pendidikan', 'jenjang', 'jenjang pendidikan'],
-            'gelar_depan' => ['gelar_depan', 'gelar depan', 'gelardepan'],
-            'gelar_belakang' => ['gelar_belakang', 'gelar belakang', 'gelarbelakang'],
-        ];
-
-        $rowByHeader = [];
-        foreach ($row as $key => $value) {
-            $rowByHeader[$this->normalizeHeaderKey((string)$key)] = $value;
-        }
-
-        if (!empty($this->columnMap)) {
-            foreach ($this->columnMap as $standardField => $header) {
-                $headerKey = $this->normalizeHeaderKey($header);
-                if (array_key_exists($headerKey, $rowByHeader)) {
-                    $normalized[$standardField] = $rowByHeader[$headerKey];
-                }
-            }
-        } else {
-            foreach ($rowByHeader as $key => $value) {
-                $standardKey = $key;
-                foreach ($keyMap as $standard => $variants) {
-                    if (in_array($key, array_map(fn($variant) => $this->normalizeHeaderKey($variant), $variants), true)) {
-                        $standardKey = $standard;
-                        break;
+            // Fungsi helper untuk mengambil data berdasarkan nama kolom di header secara fleksibel
+            $getValue = function($possibleKeys, $fallbackIndex) use ($row) {
+                foreach ((array)$possibleKeys as $key) {
+                    $cleanKey = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $key)));
+                    if (isset($this->headerRow[$cleanKey])) {
+                        $idx = $this->headerRow[$cleanKey];
+                        if (isset($row[$idx]) && trim($row[$idx]) !== '') {
+                            return trim($row[$idx]);
+                        }
                     }
                 }
-                $normalized[$standardKey] = $value;
+                // Fallback ke urutan angka jika header tidak ketemu
+                return isset($row[$fallbackIndex]) ? trim($row[$fallbackIndex]) : null;
+            };
+
+            $nama = $getValue(['nama', 'namalengkap'], 0);
+            if (empty($nama)) {
+                continue;
             }
-        }
 
-        if (!empty($this->selectedColumns)) {
-            $normalized = array_intersect_key($normalized, array_flip($this->selectedColumns));
-        }
-
-        return $normalized;
-    }
-
-    /**
-     * Normalize role values to match enum values
-     * Handles typos and variations like 'kurrikulum' -> 'kurikulum'
-     */
-    protected function normalizeRole(string $role): string
-    {
-        $role = strtolower(trim($role));
-        
-        // Map common typos and variations
-        $roleMap = [
-            'guru' => 'guru',
-            'walikelas' => 'walikelas',
-            'wali_kelas' => 'walikelas',
-            'wali kelas' => 'walikelas',
-            'kaprog' => 'kaprog',
-            'kepala program' => 'kaprog',
-            'kaprogdam' => 'kaprog',
-            'tu' => 'tu',
-            'tatausa' => 'tu',
-            'tata_usaha' => 'tu',
-            'tata usaha' => 'tu',
-            'kurikulum' => 'kurikulum',
-            'kurrikulum' => 'kurikulum',  // Common typo
-            'kurukulum' => 'kurikulum',   // Another typo
-            'calon_siswa' => 'calon_siswa',
-            'calon siswa' => 'calon_siswa',
-            'kepala_sekolah' => 'guru',  // Map to guru as fallback
-            'kepala sekolah' => 'guru',
-            'siswa' => 'siswa',
-        ];
-        
-        // Try direct match first
-        if (isset($roleMap[$role])) {
-            return $roleMap[$role];
-        }
-        
-        // Try fuzzy matching with common patterns
-        foreach ($roleMap as $key => $value) {
-            if (strpos($role, str_replace('_', '', $key)) !== false || 
-                strpos(str_replace(' ', '', $key), str_replace(' ', '', $role)) !== false) {
-                return $value;
-            }
-        }
-        
-        // Default to guru if no match
-        return 'guru';
-    }
-
-    public function model(array $row)
-    {
-        // Debug: log raw row and keys
-        Log::info('GuruImport Row Keys', ['keys' => array_keys($row)]);
-        Log::info('GuruImport Row Data', ['row' => $row]);
-
-        // Normalize row keys to lowercase and handle various formats
-        $normalizedRow = $this->normalizeRowKeys($row);
-        
-        // Get nama - required field
-        $nama = trim($normalizedRow['nama'] ?? '');
-        if (empty($nama)) {
-            $this->errors[] = "Baris skip: Kolom 'nama' kosong. Kunci tersedia: " . implode(', ', array_keys($normalizedRow));
-            return null;
-        }
-
-        try {
-            // Extract data from normalized row
-            $nomor_induk = trim($normalizedRow['nomor_induk'] ?? $normalizedRow['nip'] ?? '');
-            $jenis_kelamin = trim($normalizedRow['jenis_kelamin'] ?? 'L');
-            $role = trim($normalizedRow['role'] ?? 'guru');
-            $rombel_id = !empty($normalizedRow['rombel_id']) ? (int)$normalizedRow['rombel_id'] : null;
-            $jurusan_id = !empty($normalizedRow['jurusan_id']) ? (int)$normalizedRow['jurusan_id'] : null;
-
-                $nomor_induk = trim($normalizedRow['nomor_induk'] ?? '');
-    
-    // CEK APAKAH NOMOR INDUK MILIK SUPER ADMIN
-    $superAdmin = User::where('nomor_induk', $nomor_induk)->where('role', 'super_admin')->first();
-    if ($superAdmin) {
-        $this->errors[] = "SKIP: Nomor induk {$nomor_induk} milik SUPER ADMIN, tidak bisa diimport!";
-        return null;
-    }
-
-            // Validate and normalize role - map to valid enum values
-            $validRoles = ['siswa', 'guru', 'walikelas', 'kaprog', 'tu', 'kurikulum', 'calon_siswa'];
-            $normalizedRole = $this->normalizeRole($role);
+            $nik               = $getValue(['nik'], 1);
+            $nuptk              = $getValue(['nuptk'], 2);
+            $nip                = $getValue(['nip', 'nomorindukpegawai'], 3);
+            $status_kepegawaian = $getValue(['statuskepegawaian', 'statuspegawai'], 4);
+            $jenis_kelamin      = $getValue(['jeniskelamin', 'jk'], 5) ?: 'L';
+            $pendidikan         = $getValue(['pendidikan'], 6);
+            $serdik             = $getValue(['serdik'], 7);
+            $tempat_lahir       = $getValue(['tempatlahir'], 8);
             
-            if (!in_array($normalizedRole, $validRoles)) {
-                // Default to 'guru' if role is invalid
-                $this->errors[] = "Warning: Role '$role' tidak valid untuk guru {$nama}, menggunakan default 'guru'";
-                $normalizedRole = 'guru';
-            }
-            
-            $role = $normalizedRole;
-
-            // Handle case where nomor_induk is empty - use nama as fallback
-            if (empty($nomor_induk)) {
-                $nomor_induk = $nama;
-            }
-
-            // Generate email dari nama jika tidak ada
-            if (!empty($normalizedRow['email'] ?? '')) {
-                $email = trim($normalizedRow['email']);
-            } else {
-                $email = strtolower(str_replace(' ', '', $nama)) . time() . "@smkn1x.sch.id";
-            }
-
-            // Handle duplicate email - tambahkan timestamp jika sudah ada
-            $emailExists = User::where('email', $email)->first();
-            if ($emailExists && (!empty($normalizedRow['email'] ?? '') === false)) {
-                // Email sudah digunakan dan bukan dari user input, generate unique email
-                $email = strtolower(str_replace(' ', '', $nama)) . "." . time() . "@smkn1x.sch.id";
-            }
-
-// Check if user already exists
-$existingUser = User::where('nomor_induk', $nomor_induk)->first();
-if ($existingUser) {
-    // ✅ TAMBAHKAN PENGECUALIAN UNTUK SUPER ADMIN
-    if ($existingUser->role === 'super_admin') {
-        $this->errors[] = "SKIP: User {$nama} dengan nomor induk {$nomor_induk} adalah SUPER ADMIN, tidak bisa diupdate via import guru!";
-        return null; // LEWATI, JANGAN UPDATE
-    }
-    
-    // Update existing user (kecuali super admin)
-    $user = $existingUser;
-    $user->update([
-        'name' => $nama,
-        'email' => $email,
-        'role' => $role,
-    ]);
-} else {
-    // Create new user (kode tetap sama)
-    $user = User::create([
-        'name' => $nama,
-        'nomor_induk' => $nomor_induk,
-        'email' => $email,
-        'password' => Hash::make($this->defaultPassword),
-        'role' => $role,
-    ]);
-}
-
-            // Check if guru already exists
-            $guru = Guru::where('nip', $nomor_induk)->first();
-            
-            if (!$guru) {
-                $guru = new Guru();
-                $guru->nip = $nomor_induk;
-            }
-
-            $guru->nama = $nama;
-            $guru->email = $email;  // HARUS DIISI karena unique dan NOT NULL
-            $guru->jenis_kelamin = $jenis_kelamin;
-            $guru->status_kepegawaian = !empty($normalizedRow['status_kepegawaian']) ? trim($normalizedRow['status_kepegawaian']) : null;
-            $guru->pendidikan = !empty($normalizedRow['pendidikan']) ? trim($normalizedRow['pendidikan']) : null;
-            $guru->gelar_depan = !empty($normalizedRow['gelar_depan']) ? trim($normalizedRow['gelar_depan']) : null;
-            $guru->gelar_belakang = !empty($normalizedRow['gelar_belakang']) ? trim($normalizedRow['gelar_belakang']) : null;
-            $guru->user_id = $user->id;
-
-            // Normalize role values for assignment logic
-            $roleNorm = strtolower(str_replace([' ', '_'], '', $role));
-            
-            // Set jurusan_id dan rombel_id berdasarkan role
-            if (in_array($roleNorm, ['walikelas', 'wali'])) {
-                // Wali kelas: isi rombel_id, kosongkan jurusan_id
-                $guru->rombel_id = $rombel_id;
-                $guru->jurusan_id = null;
-            } elseif (in_array($roleNorm, ['kaprog', 'program'])) {
-                // Kaprog: isi jurusan_id, kosongkan rombel_id
-                $guru->jurusan_id = $jurusan_id;
-                $guru->rombel_id = null;
-            } else {
-                // Guru biasa: kosongkan keduanya
-                $guru->rombel_id = null;
-                $guru->jurusan_id = null;
-            }
-            
-            // Save guru first (harus di-save sebelum digunakan untuk foreign key)
-            $guru->save();
-            
-            // Setelah guru di-save, update rombel jika walikelas
-            if (in_array($roleNorm, ['walikelas', 'wali'])) {
-                if ($rombel_id) {
-                    $rombel = Rombel::find($rombel_id);
-                    if ($rombel) {
-                        // Update rombel dengan guru_id (HARUS guru->id, bukan user->id)
-                        $rombel->guru_id = $guru->id;
-                        $rombel->save();
+            // Tanggal Lahir
+            $raw_tgl_lahir      = $getValue(['tanggallahir', 'tgllahir'], 9);
+            $tanggal_lahir      = null;
+            if (!empty($raw_tgl_lahir)) {
+                try {
+                    if (is_numeric($raw_tgl_lahir)) {
+                        $tanggal_lahir = ExcelDate::excelToDateTimeObject($raw_tgl_lahir)->format('Y-m-d');
                     } else {
-                        $this->errors[] = "Warning: Rombel dengan ID {$rombel_id} tidak ditemukan untuk guru {$nama}";
+                        $clean_date = trim(str_replace('/', '-', $raw_tgl_lahir));
+                        $tanggal_lahir = Carbon::parse($clean_date)->format('Y-m-d');
                     }
-                } else {
-                    $this->errors[] = "Warning: Walikelas {$nama} tidak memiliki rombel_id";
-                }
-            } elseif (in_array($roleNorm, ['kaprog', 'program'])) {
-                if (!$jurusan_id) {
-                    $this->errors[] = "Warning: Kaprog {$nama} tidak memiliki jurusan_id";
+                } catch (\Exception $e) {
+                    $tanggal_lahir = null;
                 }
             }
 
-            $this->successCount++;
-            Log::info('GuruImport Success', ['guru' => $guru->nama, 'nip' => $guru->nip]);
-            return $guru;
+            $email_pribadi      = $getValue(['emailpribadi', 'email'], 10);
+            $email_resmi        = $getValue(['emailresmi'], 11);
+            
+            $alamat_jalan       = $getValue(['alamat', 'alamatjalan'], 12);
+            $rt                 = $getValue(['rt'], 13);
+            $rw                 = $getValue(['rw'], 14);
+            $dusun              = $getValue(['dusun'], 15);
+            $kelurahan          = $getValue(['kelurahan', 'desa', 'desakel'], 16);
+            $kecamatan          = $getValue(['kecamatan', 'kec'], 17);
+            $kode_pos           = $getValue(['kodepos', 'pos'], 18);
+            $telepon            = $getValue(['nohp', 'telepon', 'hp'], 19);
 
-        } catch (\Exception $e) {
-            $guruName = $row['nama'] ?? 'Unknown';
-            Log::error('GuruImport Error', [
-                'row' => $row,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            $this->errors[] = "Error guru {$guruName}: " . $e->getMessage();
-            return null;
+            // Gabungkan alamat lengkap
+            $array_alamat = [];
+            if ($alamat_jalan) $array_alamat[] = $alamat_jalan;
+            if ($rt && $rw) $array_alamat[] = "RT {$rt}/RW {$rw}";
+            if ($dusun) $array_alamat[] = "Dusun {$dusun}";
+            if ($kelurahan) $array_alamat[] = "Desa/Kel. {$kelurahan}";
+            if ($kecamatan) $array_alamat[] = "Kec. {$kecamatan}";
+            if ($kode_pos) $array_alamat[] = $kode_pos;
+            
+            $alamat_gabung = count($array_alamat) > 0 ? implode(', ', $array_alamat) : null;
+
+            try {
+                $nomor_induk = $nip ?: ($nik ?: $nama);
+
+                $superAdmin = User::where('nomor_induk', $nomor_induk)->where('role', 'super_admin')->first();
+                if ($superAdmin) {
+                    $this->errors[] = "SKIP: Identitas {$nomor_induk} milik SUPER ADMIN.";
+                    continue;
+                }
+
+                $email = $email_pribadi ?: (strtolower(str_replace(' ', '', $nama)) . time() . "@smkn1x.sch.id");
+
+                $existingUser = User::where('nomor_induk', $nomor_induk)->first();
+                if ($existingUser) {
+                    if ($existingUser->role === 'super_admin') {
+                        continue;
+                    }
+                    $user = $existingUser;
+                    $user->update(['name' => $nama, 'email' => $email]);
+                } else {
+                    $user = User::create([
+                        'name' => $nama,
+                        'nomor_induk' => $nomor_induk,
+                        'email' => $email,
+                        'password' => Hash::make($this->defaultPassword),
+                        'role' => 'guru',
+                    ]);
+                }
+
+                Guru::updateOrCreate(
+                    [
+                        'nip' => $nip ?: $nomor_induk
+                    ],
+                    [
+                        'nama'               => $nama,
+                        'nik'                => $nik,
+                        'nuptk'              => $nuptk,
+                        'status_kepegawaian' => $status_kepegawaian,
+                        'status_keaktifan'   => 'Aktif',
+                        'jenis_kelamin'      => $jenis_kelamin,
+                        'pendidikan'         => $pendidikan,
+                        'serdik'             => $serdik,
+                        'tempat_lahir'       => $tempat_lahir,
+                        'tanggal_lahir'      => $tanggal_lahir,
+                        'email'              => $email_pribadi ?: $email, // <-- INI YANG DITAMBAHKAN
+                        'email_pribadi'      => $email_pribadi ?: $email,
+                        'email_resmi'        => $email_resmi,
+                        'alamat_jalan'       => $alamat_gabung,
+                        'rt'                 => $rt,
+                        'rw'                 => $rw,
+                        'dusun'              => $dusun,
+                        'desa'               => $kelurahan,
+                        'kecamatan'          => $kecamatan,
+                        'kode_pos'           => $kode_pos,
+                        'telepon'            => $telepon,
+                        'user_id'            => $user->id,
+                    ]
+                );
+
+                $this->successCount++;
+
+            } catch (\Exception $e) {
+                $this->errors[] = "Gagal pada guru {$nama}: " . $e->getMessage();
+                Log::error('GuruImport Error: ' . $e->getMessage());
+            }
         }
     }
 
