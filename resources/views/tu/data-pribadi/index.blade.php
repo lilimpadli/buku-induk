@@ -355,16 +355,16 @@ body{
                     <img src="{{ asset('storage/' . $user->photo) }}" alt="Foto Profil">
                 @else
                     <div class="profile-avatar-placeholder">
-                        {{ $guru && $guru->nama ? strtoupper(substr($guru->nama, 0, 1)) : 'TU' }}
+                        {{ $guru && $guru->nama ? strtoupper(substr($guru->nama, 0, 1)) : strtoupper(substr($user->name ?? 'TU', 0, 1)) }}
                     </div>
                 @endif
             </div>
 
             <!-- Nama -->
-            <div class="profile-name">{{ $guru->nama ?? '-' }}</div>
+            <div class="profile-name">{{ optional($guru)->nama ?? $user->name ?? '-' }}</div>
             <div class="profile-role">
                 <i class="fas fa-id-card"></i>
-                NIP: {{ $guru->nip ?: ($user->nomor_induk ?? '-') }}
+                NIP: {{ optional($guru)->nip ?: ($user->nomor_induk ?? '-') }}
             </div>
 
             <!-- Statistik -->
@@ -400,19 +400,19 @@ body{
                 <div class="info-grid">
                     <div class="info-item">
                         <div class="info-label">Nama Lengkap</div>
-                        <div class="info-value">{{ $guru->nama ?? '-' }}</div>
+                        <div class="info-value">{{ optional($guru)->nama ?? $user->name ?? '-' }}</div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">NIP</div>
-                        <div class="info-value">{{ $guru->nip ?: ($user->nomor_induk ?? '-') }}</div>
+                        <div class="info-value">{{ optional($guru)->nip ?: ($user->nomor_induk ?? '-') }}</div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">Email</div>
-                        <div class="info-value">{{ $guru->email ?? '-' }}</div>
+                        <div class="info-value">{{ optional($guru)->email ?? $user->email ?? '-' }}</div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">Telepon</div>
-                        <div class="info-value">{{ $guru->telepon ?? '-' }}</div>
+                        <div class="info-value">{{ optional($guru)->telepon ?? '-' }}</div>
                     </div>
                 </div>
             </div>

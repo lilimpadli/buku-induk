@@ -16,7 +16,7 @@ class GuruImport implements ToCollection
     protected $errors = [];
     protected $successCount = 0;
     protected $defaultPassword = '12345678';
-    
+
     protected $selectedColumns = [];
     protected $columnMap = [];
     protected $headerRow = [];
@@ -34,7 +34,7 @@ class GuruImport implements ToCollection
     public function collection(Collection $rows)
     {
         foreach ($rows as $index => $row) {
-            // Ambil baris pertama sebagai header nama kolom
+            // Baris pertama = header
             if ($index === 0) {
                 foreach ($row as $colIdx => $colVal) {
                     if (!empty($colVal)) {
@@ -45,19 +45,18 @@ class GuruImport implements ToCollection
                 continue;
             }
 
-            // Fungsi helper untuk mengambil data berdasarkan nama kolom di header secara fleksibel
-            $getValue = function($possibleKeys, $fallbackIndex) use ($row) {
-                foreach ((array)$possibleKeys as $key) {
+            // Helper ambil nilai berdasarkan nama kolom header
+            $getValue = function ($possibleKeys, $fallbackIndex) use ($row) {
+                foreach ((array) $possibleKeys as $key) {
                     $cleanKey = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $key)));
                     if (isset($this->headerRow[$cleanKey])) {
                         $idx = $this->headerRow[$cleanKey];
-                        if (isset($row[$idx]) && trim($row[$idx]) !== '') {
-                            return trim($row[$idx]);
+                        if (isset($row[$idx]) && trim((string) $row[$idx]) !== '') {
+                            return trim((string) $row[$idx]);
                         }
                     }
                 }
-                // Fallback ke urutan angka jika header tidak ketemu
-                return isset($row[$fallbackIndex]) ? trim($row[$fallbackIndex]) : null;
+                return isset($row[$fallbackIndex]) ? trim((string) $row[$fallbackIndex]) : null;
             };
 
             $nama = $getValue(['nama', 'namalengkap'], 0);
@@ -65,18 +64,19 @@ class GuruImport implements ToCollection
                 continue;
             }
 
-            $nik               = $getValue(['nik'], 1);
+            $nik                = $getValue(['nik'], 1);
             $nuptk              = $getValue(['nuptk'], 2);
             $nip                = $getValue(['nip', 'nomorindukpegawai'], 3);
             $status_kepegawaian = $getValue(['statuskepegawaian', 'statuspegawai'], 4);
             $jenis_kelamin      = $getValue(['jeniskelamin', 'jk'], 5) ?: 'L';
             $pendidikan         = $getValue(['pendidikan'], 6);
             $serdik             = $getValue(['serdik'], 7);
-            $tempat_lahir       = $getValue(['tempatlahir'], 8);
-            
+            $tugas_tambahan     = $getValue(['tugastambahan'], 8);
+            $tempat_lahir       = $getValue(['tempatlahir'], 9);
+
             // Tanggal Lahir
-            $raw_tgl_lahir      = $getValue(['tanggallahir', 'tgllahir'], 9);
-            $tanggal_lahir      = null;
+            $raw_tgl_lahir = $getValue(['tanggallahir', 'tgllahir'], 10);
+            $tanggal_lahir = null;
             if (!empty($raw_tgl_lahir)) {
                 try {
                     if (is_numeric($raw_tgl_lahir)) {
@@ -90,39 +90,47 @@ class GuruImport implements ToCollection
                 }
             }
 
-            $email_pribadi      = $getValue(['emailpribadi', 'email'], 10);
-            $email_resmi        = $getValue(['emailresmi'], 11);
-            
-            $alamat_jalan       = $getValue(['alamat', 'alamatjalan'], 12);
-            $rt                 = $getValue(['rt'], 13);
-            $rw                 = $getValue(['rw'], 14);
-            $dusun              = $getValue(['dusun'], 15);
-            $kelurahan          = $getValue(['kelurahan', 'desa', 'desakel'], 16);
-            $kecamatan          = $getValue(['kecamatan', 'kec'], 17);
-            $kode_pos           = $getValue(['kodepos', 'pos'], 18);
-            $telepon            = $getValue(['nohp', 'telepon', 'hp'], 19);
+            $email_pribadi = $getValue(['emailpribadi', 'email'], 11);
+            $email_resmi   = $getValue(['emailresmi'], 12);
 
-            // Gabungkan alamat lengkap
+            // Alamat
+            $alamat_jalan = $getValue(['alamat', 'alamatjalan'], 13);
+            $rt           = $getValue(['rt'], 14);
+            $rw           = $getValue(['rw'], 15);
+            $dusun        = $getValue(['dusun'], 16);
+
+            // PENTING: DB kamu TIDAK punya kolom 'kelurahan'.
+            // Jadi kita ambil dari header 'desa'/'kelurahan', lalu simpan ke kolom 'desa'.
+            $desa         = $getValue(['desa', 'kelurahan', 'desakel'], 17);
+
+            $kecamatan    = $getValue(['kecamatan', 'kec'], 18);
+            $kode_pos     = $getValue(['kodepos', 'pos'], 19);
+            $telepon      = $getValue(['nohp', 'telepon', 'hp'], 20);
+
+            // Gabungkan alamat lengkap (untuk kolom 'alamat')
             $array_alamat = [];
             if ($alamat_jalan) $array_alamat[] = $alamat_jalan;
-            if ($rt && $rw) $array_alamat[] = "RT {$rt}/RW {$rw}";
-            if ($dusun) $array_alamat[] = "Dusun {$dusun}";
-            if ($kelurahan) $array_alamat[] = "Desa/Kel. {$kelurahan}";
-            if ($kecamatan) $array_alamat[] = "Kec. {$kecamatan}";
-            if ($kode_pos) $array_alamat[] = $kode_pos;
-            
+            if ($rt && $rw)     $array_alamat[] = "RT {$rt}/RW {$rw}";
+            if ($dusun)         $array_alamat[] = "Dusun {$dusun}";
+            if ($desa)          $array_alamat[] = "Desa/Kel. {$desa}";
+            if ($kecamatan)     $array_alamat[] = "Kec. {$kecamatan}";
+            if ($kode_pos)      $array_alamat[] = $kode_pos;
+
             $alamat_gabung = count($array_alamat) > 0 ? implode(', ', $array_alamat) : null;
 
             try {
                 $nomor_induk = $nip ?: ($nik ?: $nama);
 
-                $superAdmin = User::where('nomor_induk', $nomor_induk)->where('role', 'super_admin')->first();
+                $superAdmin = User::where('nomor_induk', $nomor_induk)
+                    ->where('role', 'super_admin')
+                    ->first();
                 if ($superAdmin) {
                     $this->errors[] = "SKIP: Identitas {$nomor_induk} milik SUPER ADMIN.";
                     continue;
                 }
 
-                $email = $email_pribadi ?: (strtolower(str_replace(' ', '', $nama)) . time() . "@smkn1x.sch.id");
+                $email = $email_pribadi
+                    ?: (strtolower(str_replace(' ', '', $nama)) . time() . "@smkn1x.sch.id");
 
                 $existingUser = User::where('nomor_induk', $nomor_induk)->first();
                 if ($existingUser) {
@@ -133,17 +141,17 @@ class GuruImport implements ToCollection
                     $user->update(['name' => $nama, 'email' => $email]);
                 } else {
                     $user = User::create([
-                        'name' => $nama,
+                        'name'        => $nama,
                         'nomor_induk' => $nomor_induk,
-                        'email' => $email,
-                        'password' => Hash::make($this->defaultPassword),
-                        'role' => 'guru',
+                        'email'       => $email,
+                        'password'    => Hash::make($this->defaultPassword),
+                        'role'        => 'guru',
                     ]);
                 }
 
                 Guru::updateOrCreate(
                     [
-                        'nip' => $nip ?: $nomor_induk
+                        'nip' => $nip ?: $nomor_induk,
                     ],
                     [
                         'nama'               => $nama,
@@ -154,16 +162,18 @@ class GuruImport implements ToCollection
                         'jenis_kelamin'      => $jenis_kelamin,
                         'pendidikan'         => $pendidikan,
                         'serdik'             => $serdik,
+                        'tugas_tambahan'     => $tugas_tambahan,
                         'tempat_lahir'       => $tempat_lahir,
                         'tanggal_lahir'      => $tanggal_lahir,
-                        'email'              => $email_pribadi ?: $email, // <-- INI YANG DITAMBAHKAN
+                        'email'              => $email_pribadi ?: $email,
                         'email_pribadi'      => $email_pribadi ?: $email,
                         'email_resmi'        => $email_resmi,
-                        'alamat_jalan'       => $alamat_gabung,
+                        'alamat'             => $alamat_gabung,   // alamat lengkap
+                        'alamat_jalan'       => $alamat_jalan,    // jalan saja
                         'rt'                 => $rt,
                         'rw'                 => $rw,
                         'dusun'              => $dusun,
-                        'desa'               => $kelurahan,
+                        'desa'               => $desa,            // ← kelurahan disimpan ke 'desa'
                         'kecamatan'          => $kecamatan,
                         'kode_pos'           => $kode_pos,
                         'telepon'            => $telepon,

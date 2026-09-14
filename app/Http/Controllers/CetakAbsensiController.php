@@ -73,12 +73,12 @@ class CetakAbsensiController extends Controller
 
     // ==========================================================
     // ABSENSI KEGIATAN GABUNGAN (GURU + PEGAWAI)
-    // - Nama TANPA GELAR
-    // - TANPA DUPLIKAT
+    // - Kirim $gurus & $pegawais TERPISAH (untuk section di view)
+    // - TIDAK ada deduplikasi (ELIN HERLINA Guru & Pegawai tetap muncul)
     // ==========================================================
     public function absensiKegiatanSemua()
     {
-        // Helper: hapus gelar dari nama
+        // ═══ Helper: hapus gelar dari nama ═══
         $bersihkanNama = function ($nama) {
             if (empty($nama)) return '-';
 
@@ -101,53 +101,54 @@ class CetakAbsensiController extends Controller
             return $nama ?: '-';
         };
 
-        $gurus = Guru::orderBy('nama', 'asc')->get();
+        // ═══ Ambil data TERPISAH ═══
+        $gurus    = Guru::orderBy('nama', 'asc')->get();
         $pegawais = Pegawai::orderBy('nama', 'asc')->get();
 
-        $semuaOrang = collect();
-        $namaSudahAda = []; // cek duplikat nama
-
-        // Loop data guru dulu
+        // ═══ Bersihkan nama (TANPA deduplikasi) ═══
         foreach ($gurus as $g) {
-            $namaBersih = $bersihkanNama($g->nama);
-            $key = strtolower($namaBersih);
+            $g->nama_bersih = $bersihkanNama($g->nama);
+        }
 
-            if (in_array($key, $namaSudahAda)) {
-                continue;
-            }
+        foreach ($pegawais as $p) {
+            $p->nama_bersih = $bersihkanNama($p->nama);
+        }
 
-            $namaSudahAda[] = $key;
+        // ═══ Opsional: $semuaOrang untuk keperluan lain ═══
+        $semuaOrang = collect();
 
+        foreach ($gurus as $g) {
             $semuaOrang->push([
-                'nama' => $namaBersih,
+                'nama' => $g->nama_bersih,
                 'nip'  => $g->nip ?? '-',
+                'tipe' => 'Guru',
             ]);
         }
 
-        // Loop data pegawai
         foreach ($pegawais as $p) {
-            $namaBersih = $bersihkanNama($p->nama);
-            $key = strtolower($namaBersih);
-
-            if (in_array($key, $namaSudahAda)) {
-                continue;
-            }
-
-            $namaSudahAda[] = $key;
-
             $semuaOrang->push([
-                'nama' => $namaBersih,
+                'nama' => $p->nama_bersih,
                 'nip'  => $p->nip ?? '-',
+                'tipe' => 'Pegawai',
             ]);
         }
 
         $semuaOrang = $semuaOrang->sortBy('nama')->values();
 
-        $tahun = date('Y');
-        $hari = strtoupper(now()->translatedFormat('l'));
+        // ═══ Tanggal ═══
+        $tahun   = date('Y');
+        $hari    = strtoupper(now()->translatedFormat('l'));
         $tanggal = strtoupper(now()->translatedFormat('d F Y'));
 
-        return view('tu_kepegawaian.absensi_kegiatan_semua', compact('semuaOrang', 'tahun', 'hari', 'tanggal'));
+        // ═══ KIRIM SEMUA KE VIEW ═══
+        return view('tu_kepegawaian.absensi_kegiatan_semua', compact(
+            'gurus',
+            'pegawais',
+            'semuaOrang',
+            'tahun',
+            'hari',
+            'tanggal'
+        ));
     }
 
     // ==========================================================

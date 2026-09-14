@@ -35,7 +35,6 @@ class Guru extends Model
         'rw',
         'dusun',
         'desa',
-        'kelurahan',
         'kecamatan',
         'kode_pos',
         'jurusan_id',

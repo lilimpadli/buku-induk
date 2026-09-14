@@ -6,15 +6,15 @@
     <title>Daftar Hadir Kegiatan (Guru & Pegawai)</title>
 <style>
 
-    table th:last-child, 
+    table th:last-child,
     table td:last-child {
         border-right: 2px solid #000 !important;
     }
 
-    * { 
-        margin: 0; 
-        padding: 0; 
-        box-sizing: border-box; 
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
 
     body {
@@ -129,6 +129,58 @@
         margin-bottom: 10px;
     }
 
+    /* ═══ GROUP SECTION (GURU / PEGAWAI) ═══ */
+    .group-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        margin-top: 6px;
+        font-weight: 700;
+        font-size: 13px;
+        letter-spacing: .5px;
+        text-transform: uppercase;
+    }
+
+    .group-header.guru {
+        background: #eef2ff;
+        color: #4f46e5;
+        border: 1px solid #c7d2fe;
+    }
+
+    .group-header.pegawai {
+        background: #ecfdf5;
+        color: #059669;
+        border: 1px solid #a7f3d0;
+    }
+
+    .group-header .group-icon {
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .group-header.guru .group-icon { background: #4f46e5; }
+    .group-header.pegawai .group-icon { background: #059669; }
+
+    .group-header .group-count {
+        margin-left: auto;
+        font-size: 11px;
+        padding: 3px 10px;
+        border-radius: 99px;
+        background: rgba(255,255,255,.7);
+        font-weight: 700;
+    }
+
+    /* ============ SEARCH ============ */
     .search-wrap { position: relative; margin-bottom: 18px; }
 
     .search-wrap svg {
@@ -159,11 +211,12 @@
         box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
     }
 
+    /* ============ GRID CHECKLIST ============ */
     .grid-orang {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
         gap: 8px;
-        max-height: 300px;
+        max-height: 260px;
         overflow-y: auto;
         padding: 4px;
     }
@@ -196,6 +249,12 @@
         font-weight: 600;
     }
 
+    .item-orang.is-checked.is-pegawai {
+        border-color: #059669;
+        background: #ecfdf5;
+        color: #064e3b;
+    }
+
     .item-orang input { display: none; }
 
     .checkmark {
@@ -209,6 +268,7 @@
     }
 
     .item-orang.is-checked .checkmark { background: #4f46e5; border-color: #4f46e5; }
+    .item-orang.is-checked.is-pegawai .checkmark { background: #059669; border-color: #059669; }
 
     .item-orang.is-checked .checkmark::after {
         content: "";
@@ -342,7 +402,7 @@
         text-transform: uppercase;
     }
 
-    /* --- TABEL 4 KOLOM --- */
+    /* --- TABEL --- */
     table {
         width: 100% !important;
         border-collapse: collapse;
@@ -371,33 +431,39 @@
         overflow-wrap: break-word;
     }
 
-    table th:nth-child(1), table td.no { width: 7%; text-align: center; }
-    table th:nth-child(2), table td.nama { width: 38%; padding-left: 6px; }
-    table th:nth-child(3), table td.nip { width: 25%; text-align: center; font-size: 9.5pt; }
-    table th:nth-child(4), table td.ttd { width: 30%; padding: 0 !important; }
+    /* Helper class lebar */
+    table td.no { text-align: center; }
+    table td.nama { padding-left: 6px; }
+    table td.nip { text-align: center; font-size: 9.5pt; }
 
-    .ttd-box {
-        display: flex;
-        width: 100%;
-        height: 38px;
+    /* KOLOM TANDA TANGAN */
+    table td.ttd-left, table td.ttd-right {
+        height: 70px;
+        vertical-align: top;
+        padding: 4px 6px !important;
         font-weight: bold;
-    }
-
-    .ttd-cell {
-        width: 50%;
-        height: 100%;
-        padding: 2px 4px;
-        box-sizing: border-box;
         font-size: 9pt;
-        color: #000;
     }
 
-    .ttd-cell.kiri {
+    table td.ttd-left {
         border-right: 1px solid #000;
         text-align: left;
     }
-    .ttd-cell.kanan {
+
+    table td.ttd-right {
         text-align: left;
+    }
+
+    /* ═══ SECTION DIVIDER DI TABEL CETAK ═══ */
+    tr.row-section td {
+        background: #f0f0f0;
+        font-weight: 800;
+        font-size: 10pt;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 6px 10px !important;
+        text-align: left;
+        border: 1px solid #000;
     }
 
     .footer-cetak {
@@ -417,43 +483,43 @@
     .footer-cetak .underline { text-decoration: underline; font-weight: bold; }
 
     /* ============ PRINT ============ */
-   @media print {
-    @page {
-        size: 215mm 330mm portrait; 
-        margin: 10mm;
-    }
+    @media print {
+        @page {
+            size: 215mm 330mm portrait;
+            margin: 10mm;
+        }
 
-    html, body {
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background: #fff !important;
-    }
+        html, body {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #fff !important;
+        }
 
-    .sheet {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        box-shadow: none !important;
-        border: none !important;
-    }
+        .sheet {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
 
-    table {
-        width: 100% !important;
-        table-layout: fixed !important;
-    }
+        table {
+            width: 100% !important;
+            table-layout: fixed !important;
+        }
 
-    .no-print { display: none !important; }
-    tr { page-break-inside: avoid; }
-    thead { display: table-header-group; }
-    tr.hidden-print { display: none !important; }
-}
+        .no-print { display: none !important; }
+        tr { page-break-inside: avoid; }
+        thead { display: table-header-group; }
+        tr.hidden-print { display: none !important; }
+    }
 </style>
 </head>
 <body>
 
-    <!-- ============ PANEL KONTROL (TIDAK TERCETAK) ============ -->
+    <!-- ============ PANEL KONTROL ============ -->
     <div class="no-print panel">
         <div class="panel-header">
             <div class="panel-title">
@@ -466,7 +532,7 @@
                 <span class="counter" id="counterOrang">0 dipilih</span>
                 <button type="button" class="btn-toggle" onclick="toggleSelectAll(true)">Pilih Semua</button>
                 <button type="button" class="btn-toggle" onclick="toggleSelectAll(false)">Hapus Semua</button>
-                
+
                 <button type="button" class="btn-close-tab" onclick="window.close()">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     Tutup Tab
@@ -481,16 +547,48 @@
                 <input type="text" id="searchOrang" placeholder="Ketik nama guru / pegawai..." oninput="filterOrang()">
             </div>
 
-            <div class="section-label">Daftar Guru & Pegawai</div>
-            <div class="grid-orang" id="gridOrang">
-                @foreach($semuaOrang as $index => $orang)
-                    <label class="item-orang" data-nama="{{ strtolower($orang['nama']) }}">
-                        <input type="checkbox" class="cb-orang" value="{{ $index }}" checked onchange="updateTable()">
-                        <div class="checkmark"></div>
-                        <span class="nama-text">{{ $orang['nama'] }}</span>
-                    </label>
-                @endforeach
+            {{-- ═══════════════════════════════════════════════ --}}
+            {{-- SECTION GURU --}}
+            {{-- ═══════════════════════════════════════════════ --}}
+            <div class="group-header guru">
+                <span class="group-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+                <span>Guru</span>
+                <span class="group-count" id="countGuru">0</span>
             </div>
+
+            <div class="grid-orang" id="gridGuru">
+                @forelse($gurus ?? [] as $guru)
+                    <label class="item-orang item-guru" data-nama="{{ strtolower($guru->nama) }}" data-tipe="Guru">
+                        <input type="checkbox" class="cb-orang cb-guru" value="guru-{{ $guru->id }}" checked onchange="updateTable()">
+                        <div class="checkmark"></div>
+                        <span class="nama-text">{{ $guru->nama }}</span>
+                    </label>
+                @empty
+                    <div class="empty-search" style="grid-column: 1/-1;">Tidak ada data guru.</div>
+                @endforelse
+            </div>
+
+            {{-- ═══════════════════════════════════════════════ --}}
+            {{-- SECTION PEGAWAI --}}
+            {{-- ═══════════════════════════════════════════════ --}}
+            <div class="group-header pegawai" style="margin-top: 22px;">
+                <span class="group-icon"><i class="fas fa-user-tie"></i></span>
+                <span>Pegawai</span>
+                <span class="group-count" id="countPegawai">0</span>
+            </div>
+
+            <div class="grid-orang" id="gridPegawai">
+                @forelse($pegawais ?? [] as $pegawai)
+                    <label class="item-orang item-pegawai" data-nama="{{ strtolower($pegawai->nama) }}" data-tipe="Pegawai">
+                        <input type="checkbox" class="cb-orang cb-pegawai" value="pegawai-{{ $pegawai->id }}" checked onchange="updateTable()">
+                        <div class="checkmark"></div>
+                        <span class="nama-text">{{ $pegawai->nama }}</span>
+                    </label>
+                @empty
+                    <div class="empty-search" style="grid-column: 1/-1;">Tidak ada data pegawai.</div>
+                @endforelse
+            </div>
+
             <div class="empty-search" id="emptySearch" style="display:none;">Tidak ada yang cocok dengan pencarian.</div>
 
             <div class="divider"></div>
@@ -535,29 +633,58 @@
         <div class="judul" id="judulCetak">DAFTAR HADIR KEGIATAN</div>
         <div class="judul-hari" id="tanggalCetak">HARI/TANGGAL: {{ strtoupper($hari ?? '') }}, {{ strtoupper($tanggal ?? '') }}</div>
 
-        <!-- TABEL 4 KOLOM -->
         <table>
+            <colgroup>
+                <col style="width: 7%;">
+                <col style="width: 38%;">
+                <col style="width: 25%;">
+                <col style="width: 15%;">
+                <col style="width: 15%;">
+            </colgroup>
             <thead>
                 <tr>
-                    <th style="width: 7%;">NO</th>
-                    <th style="width: 38%;">NAMA</th>
-                    <th style="width: 25%;">NIP</th>
-                    <th style="width: 30%;">TANDA TANGAN</th>
+                    <th>NO</th>
+                    <th>NAMA</th>
+                    <th>NIP</th>
+                    <th colspan="2">TANDA TANGAN</th>
                 </tr>
             </thead>
             <tbody id="tabelBody">
-                @forelse($semuaOrang as $index => $orang)
-                    <tr class="row-orang" data-id="{{ $index }}">
-                        <td class="no cell-no"></td>
-                        <td class="nama">{{ strtoupper($orang['nama']) }}</td>
-                        <td class="nip">{{ $orang['nip'] }}</td>
-                        <td class="ttd cell-ttd"></td>
+
+                {{-- ══════════ SECTION GURU ══════════ --}}
+                @if(!empty($gurus) && count($gurus) > 0)
+                    <tr class="row-section row-section-guru" data-section="guru">
+                        <td colspan="5">A. GURU</td>
                     </tr>
-                @empty
+                    @foreach($gurus as $guru)
+                        <tr class="row-orang row-guru" data-id="guru-{{ $guru->id }}">
+                            <td class="no cell-no"></td>
+                            <td class="nama">{{ strtoupper($guru->nama) }}</td>
+                            <td class="nip">{{ $guru->nip ?? '-' }}</td>
+                        </tr>
+                    @endforeach
+                @endif
+
+                {{-- ══════════ SECTION PEGAWAI ══════════ --}}
+                @if(!empty($pegawais) && count($pegawais) > 0)
+                    <tr class="row-section row-section-pegawai" data-section="pegawai">
+                        <td colspan="5">B. PEGAWAI</td>
+                    </tr>
+                    @foreach($pegawais as $pegawai)
+                        <tr class="row-orang row-pegawai" data-id="pegawai-{{ $pegawai->id }}">
+                            <td class="no cell-no"></td>
+                            <td class="nama">{{ strtoupper($pegawai->nama) }}</td>
+                            <td class="nip">{{ $pegawai->nip ?? '-' }}</td>
+                        </tr>
+                    @endforeach
+                @endif
+
+                @if((empty($gurus) || count($gurus) == 0) && (empty($pegawais) || count($pegawais) == 0))
                     <tr id="emptyRow">
-                        <td colspan="4" style="text-align: center; padding: 15px;"><strong>Tidak ada data</strong></td>
+                        <td colspan="5" style="text-align: center; padding: 15px;"><strong>Tidak ada data</strong></td>
                     </tr>
-                @endforelse
+                @endif
+
             </tbody>
         </table>
 
@@ -572,53 +699,98 @@
 
     <script>
         function updateTable() {
-            const checkedIds = Array.from(document.querySelectorAll('.cb-orang:checked')).map(cb => cb.value);
-            const rows = document.querySelectorAll('.row-orang');
-            let currentNo = 1;
+            const checkedIds = Array.from(document.querySelectorAll('.cb-orang:checked')).map(cb => String(cb.value));
+            const allRows = Array.from(document.querySelectorAll('.row-orang'));
 
-            rows.forEach(row => {
-                const id = row.getAttribute('data-id');
+            // Hapus sel TTD lama
+            allRows.forEach(row => {
+                const oldLeft = row.querySelector('.cell-ttd-left');
+                const oldRight = row.querySelector('.cell-ttd-right');
+                if (oldLeft) oldLeft.remove();
+                if (oldRight) oldRight.remove();
+            });
+
+            // Filter baris yang dicentang
+            const visibleRows = allRows.filter(row => {
+                const id = String(row.getAttribute('data-id'));
                 if (checkedIds.includes(id)) {
                     row.classList.remove('hidden-print');
                     row.style.display = '';
-                    row.querySelector('.cell-no').innerText = currentNo;
-
-                    const cellTtd = row.querySelector('.cell-ttd');
-                    if (currentNo % 2 !== 0) {
-                        cellTtd.innerHTML = `
-                            <div class="ttd-box">
-                                <div class="ttd-cell kiri">${currentNo}.</div>
-                                <div class="ttd-cell kanan"></div>
-                            </div>`;
-                    } else {
-                        cellTtd.innerHTML = `
-                            <div class="ttd-box">
-                                <div class="ttd-cell kiri"></div>
-                                <div class="ttd-cell kanan">${currentNo}.</div>
-                            </div>`;
-                    }
-                    currentNo++;
+                    return true;
                 } else {
                     row.classList.add('hidden-print');
                     row.style.display = 'none';
+                    return false;
                 }
             });
 
+            // Sembunyikan section header kalau semua anggotanya tidak dicentang
+            document.querySelectorAll('.row-section-guru').forEach(sec => {
+                const anyVisible = visibleRows.some(r => r.classList.contains('row-guru'));
+                sec.style.display = anyVisible ? '' : 'none';
+            });
+            document.querySelectorAll('.row-section-pegawai').forEach(sec => {
+                const anyVisible = visibleRows.some(r => r.classList.contains('row-pegawai'));
+                sec.style.display = anyVisible ? '' : 'none';
+            });
+
+            // Render ulang nomor & TTD rowspan=2 (per section)
+            renderSectionNumbers('.row-guru');
+            renderSectionNumbers('.row-pegawai');
+
             syncCards();
             updateCounter();
+        }
+
+        // Render nomor urut + sel TTD untuk satu section (guru atau pegawai)
+        function renderSectionNumbers(selector) {
+            const rows = Array.from(document.querySelectorAll(selector)).filter(r => r.style.display !== 'none');
+            let no = 1;
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                row.querySelector('.cell-no').innerText = no;
+
+                // Setiap 2 baris → 1 pasang TTD (kiri & kanan)
+                if (no % 2 !== 0) {
+                    const isLastOdd = (i === rows.length - 1);
+                    const rSpan = isLastOdd ? 1 : 2;
+
+                    const tdLeft = document.createElement('td');
+                    tdLeft.className = 'ttd-left cell-ttd-left';
+                    tdLeft.setAttribute('rowspan', rSpan);
+                    tdLeft.innerText = no + '.';
+
+                    const tdRight = document.createElement('td');
+                    tdRight.className = 'ttd-right cell-ttd-right';
+                    tdRight.setAttribute('rowspan', rSpan);
+                    tdRight.innerText = isLastOdd ? '' : (no + 1) + '.';
+
+                    row.appendChild(tdLeft);
+                    row.appendChild(tdRight);
+                }
+                no++;
+            }
         }
 
         function syncCards() {
             document.querySelectorAll('.item-orang').forEach(item => {
                 const cb = item.querySelector('.cb-orang');
                 item.classList.toggle('is-checked', cb.checked);
+                item.classList.toggle('is-pegawai', item.classList.contains('item-pegawai'));
             });
         }
 
         function updateCounter() {
-            const total = document.querySelectorAll('.cb-orang').length;
+            const total   = document.querySelectorAll('.cb-orang').length;
             const checked = document.querySelectorAll('.cb-orang:checked').length;
+
+            const guruChecked    = document.querySelectorAll('.cb-guru:checked').length;
+            const pegawaiChecked = document.querySelectorAll('.cb-pegawai:checked').length;
+
             document.getElementById('counterOrang').innerText = checked + ' / ' + total + ' dipilih';
+            document.getElementById('countGuru').innerText    = guruChecked + ' guru';
+            document.getElementById('countPegawai').innerText = pegawaiChecked + ' pegawai';
         }
 
         function toggleSelectAll(status) {

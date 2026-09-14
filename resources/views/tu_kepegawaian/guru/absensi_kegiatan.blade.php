@@ -4,18 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar Hadir Kegiatan</title>
-<style>
-
+    <style>
         /* Mengubah ketebalan garis tepi kanan seluruh sel kolom paling kanan */
-        table th:last-child, 
+        table th:last-child,
         table td:last-child {
-            border-right: 2px solid #000 !important; /* Ganti 2px ke 3px atau 4px jika ingin lebih tebal */
+            border-right: 2px solid #000 !important;
         }
 
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
@@ -103,7 +102,6 @@
 
         .btn-toggle:hover { background: #f1f5f9; border-color: #94a3b8; }
 
-        /* Tombol Tutup Tab */
         .btn-close-tab {
             padding: 7px 14px;
             font-size: 12.5px;
@@ -298,7 +296,7 @@
            PRATINJAU DOKUMEN (KERTAS DI LAYAR)
            ========================================================= */
         .sheet {
-            width: 215mm; /* Lebar F4 */
+            width: 215mm;
             max-width: 100%;
             margin: 0 auto;
             background: #fff;
@@ -377,33 +375,26 @@
             overflow-wrap: break-word;
         }
 
-        /* Pembagian Lebar Persis Total 100% */
-        table th:nth-child(1), table td.no { width: 7%; text-align: center; }
-        table th:nth-child(2), table td.nama { width: 38%; padding-left: 6px; }
-        table th:nth-child(3), table td.nip { width: 25%; text-align: center; font-size: 9.5pt; }
-        table th:nth-child(4), table td.ttd { width: 30%; padding: 0 !important; }
+        /* Helper class lebar */
+        table td.no { text-align: center; }
+        table td.nama { padding-left: 6px; }
+        table td.nip { text-align: center; font-size: 9.5pt; }
 
-        .ttd-box {
-            display: flex;
-            width: 100%;
-            height: 38px;
+        /* KOLOM TANDA TANGAN (KIRI & KANAN BERBAGI ROWSPAN) */
+        table td.ttd-left, table td.ttd-right {
+            height: 70px;
+            vertical-align: top;
+            padding: 4px 6px !important;
             font-weight: bold;
-        }
-
-        .ttd-cell {
-            width: 50%;
-            height: 100%;
-            padding: 2px 4px;
-            box-sizing: border-box;
             font-size: 9pt;
-            color: #000;
         }
 
-        .ttd-cell.kiri {
+        table td.ttd-left {
             border-right: 1px solid #000;
             text-align: left;
         }
-        .ttd-cell.kanan {
+
+        table td.ttd-right {
             text-align: left;
         }
 
@@ -424,41 +415,40 @@
         .footer-cetak .underline { text-decoration: underline; font-weight: bold; }
 
         /* =========================================================
-           SETTING CETAK / PRINT (DOKUMEN TIDAK TERPOTONG)
+           SETTING CETAK / PRINT
            ========================================================= */
-       @media print {
-        @page {
-            /* Ukuran F4 Potret (215mm x 330mm) */
-            size: 215mm 330mm portrait; 
-            margin: 10mm 10mm 10mm 10mm; /* Margin aman atas, kanan, bawah, kiri */
-        }
+        @media print {
+            @page {
+                size: 215mm 330mm portrait;
+                margin: 10mm 10mm 10mm 10mm;
+            }
 
-        html, body {
-            width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            background: #fff !important;
-        }
+            html, body {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #fff !important;
+            }
 
-        .sheet {
-            width: 100% !important;
-            max-width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            box-shadow: none !important;
-            border: none !important;
-        }
+            .sheet {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
 
-        table {
-            width: 100% !important;
-            table-layout: fixed !important;
-        }
+            table {
+                width: 100% !important;
+                table-layout: fixed !important;
+            }
 
-        .no-print { display: none !important; }
-        tr { page-break-inside: avoid; }
-        thead { display: table-header-group; }
-        tr.hidden-print { display: none !important; }
-    }
+            .no-print { display: none !important; }
+            tr { page-break-inside: avoid; }
+            thead { display: table-header-group; }
+            tr.hidden-print { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -476,8 +466,7 @@
                 <span class="counter" id="counterGuru">0 dipilih</span>
                 <button type="button" class="btn-toggle" onclick="toggleSelectAll(true)">Pilih Semua</button>
                 <button type="button" class="btn-toggle" onclick="toggleSelectAll(false)">Hapus Semua</button>
-                
-                <!-- TOMBOL TUTUP TAB -->
+
                 <button type="button" class="btn-close-tab" onclick="window.close()">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     Tutup Tab
@@ -486,14 +475,12 @@
         </div>
 
         <div class="panel-body">
-            <!-- PENCARIAN -->
             <div class="section-label">Cari Guru</div>
             <div class="search-wrap">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 <input type="text" id="searchGuru" placeholder="Ketik nama guru..." oninput="filterGuru()">
             </div>
 
-            <!-- DAFTAR GURU -->
             <div class="section-label">Daftar Guru</div>
             <div class="grid-guru" id="gridGuru">
                 @foreach($gurus as $guru)
@@ -508,7 +495,6 @@
 
             <div class="divider"></div>
 
-            <!-- PENGATURAN DOKUMEN -->
             <div class="section-label">Pengaturan Dokumen</div>
             <div class="form-row">
                 <div class="form-group">
@@ -528,7 +514,7 @@
         </div>
     </div>
 
-    <!-- ============ PRATINJAU DOKUMEN (KERTAS F4) ============ -->
+    <!-- ============ PRATINJAU DOKUMEN ============ -->
     <div class="sheet">
 
         <!-- KOP SURAT -->
@@ -553,12 +539,19 @@
 
         <!-- TABEL ABSENSI -->
         <table>
+            <colgroup>
+                <col style="width: 7%;">
+                <col style="width: 38%;">
+                <col style="width: 25%;">
+                <col style="width: 15%;">
+                <col style="width: 15%;">
+            </colgroup>
             <thead>
                 <tr>
-                    <th style="width: 7%;">NO</th>
-                    <th style="width: 38%;">NAMA</th>
-                    <th style="width: 25%;">NIP</th>
-                    <th style="width: 30%;">TANDA TANGAN</th>
+                    <th>NO</th>
+                    <th>NAMA</th>
+                    <th>NIP</th>
+                    <th colspan="2">TANDA TANGAN</th>
                 </tr>
             </thead>
             <tbody id="tabelBody">
@@ -567,11 +560,11 @@
                         <td class="no cell-no"></td>
                         <td class="nama">{{ strtoupper($guru->nama) }}</td>
                         <td class="nip">{{ $guru->nip ?? '-' }}</td>
-                        <td class="ttd cell-ttd"></td>
+                        <!-- Sel TTD akan diatur secara dinamis oleh JS dengan rowspan="2" -->
                     </tr>
                 @empty
                     <tr id="emptyRow">
-                        <td colspan="4" style="text-align: center; padding: 15px;"><strong>Tidak ada data guru</strong></td>
+                        <td colspan="5" style="text-align: center; padding: 15px;"><strong>Tidak ada data guru</strong></td>
                     </tr>
                 @endforelse
             </tbody>
@@ -589,45 +582,59 @@
 
     <!-- ============ JAVASCRIPT ============ -->
     <script>
-        // Update tabel + nomor urut + tata letak tanda tangan
         function updateTable() {
-            const checkedIds = Array.from(document.querySelectorAll('.cb-guru:checked')).map(cb => cb.value);
-            const rows = document.querySelectorAll('.row-guru');
-            let currentNo = 1;
+            const checkedIds = Array.from(document.querySelectorAll('.cb-guru:checked')).map(cb => String(cb.value));
+            const allRows = Array.from(document.querySelectorAll('.row-guru'));
 
-            rows.forEach(row => {
-                const id = row.getAttribute('data-id');
+            allRows.forEach(row => {
+                const oldLeft = row.querySelector('.cell-ttd-left');
+                const oldRight = row.querySelector('.cell-ttd-right');
+                if (oldLeft) oldLeft.remove();
+                if (oldRight) oldRight.remove();
+            });
+
+            const visibleRows = allRows.filter(row => {
+                const id = String(row.getAttribute('data-id'));
                 if (checkedIds.includes(id)) {
                     row.classList.remove('hidden-print');
                     row.style.display = '';
-                    row.querySelector('.cell-no').innerText = currentNo;
-
-                    const cellTtd = row.querySelector('.cell-ttd');
-                    if (currentNo % 2 !== 0) {
-                        cellTtd.innerHTML = `
-                            <div class="ttd-box">
-                                <div class="ttd-cell kiri">${currentNo}.</div>
-                                <div class="ttd-cell kanan"></div>
-                            </div>`;
-                    } else {
-                        cellTtd.innerHTML = `
-                            <div class="ttd-box">
-                                <div class="ttd-cell kiri"></div>
-                                <div class="ttd-cell kanan">${currentNo}.</div>
-                            </div>`;
-                    }
-                    currentNo++;
+                    return true;
                 } else {
                     row.classList.add('hidden-print');
                     row.style.display = 'none';
+                    return false;
                 }
             });
+
+            for (let i = 0; i < visibleRows.length; i++) {
+                const currentNo = i + 1;
+                const currentRow = visibleRows[i];
+
+                currentRow.querySelector('.cell-no').innerText = currentNo;
+
+                if (currentNo % 2 !== 0) {
+                    const isLastOdd = (i === visibleRows.length - 1);
+                    const rSpan = isLastOdd ? 1 : 2;
+
+                    const tdLeft = document.createElement('td');
+                    tdLeft.className = 'ttd-left cell-ttd-left';
+                    tdLeft.setAttribute('rowspan', rSpan);
+                    tdLeft.innerText = currentNo + '.';
+
+                    const tdRight = document.createElement('td');
+                    tdRight.className = 'ttd-right cell-ttd-right';
+                    tdRight.setAttribute('rowspan', rSpan);
+                    tdRight.innerText = isLastOdd ? '' : (currentNo + 1) + '.';
+
+                    currentRow.appendChild(tdLeft);
+                    currentRow.appendChild(tdRight);
+                }
+            }
 
             syncCards();
             updateCounter();
         }
 
-        // Sinkronkan tampilan kartu guru dengan status checkbox
         function syncCards() {
             document.querySelectorAll('.item-guru').forEach(item => {
                 const cb = item.querySelector('.cb-guru');
@@ -635,7 +642,6 @@
             });
         }
 
-        // Update teks counter "X / Y guru dipilih"
         function updateCounter() {
             const total = document.querySelectorAll('.cb-guru').length;
             const checked = document.querySelectorAll('.cb-guru:checked').length;
@@ -647,7 +653,6 @@
             updateTable();
         }
 
-        // Pencarian guru
         function filterGuru() {
             const keyword = document.getElementById('searchGuru').value.toLowerCase().trim();
             let visible = 0;
@@ -667,7 +672,9 @@
         }
 
         function ubahTanggal() {
-            document.getElementById('tanggalCetak').innerText = 'HARI/TANGGAL: ' + document.getElementById('inputTanggal').value;
+            const val = document.getElementById('inputTanggal').value;
+            document.getElementById('tanggalCetak').innerText = 'HARI/TANGGAL: ' + val;
+            document.getElementById('ttdTanggal').innerText = val;
         }
 
         document.addEventListener('DOMContentLoaded', function() {

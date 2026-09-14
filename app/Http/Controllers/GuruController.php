@@ -18,14 +18,14 @@ class GuruController extends Controller
     // ==========================================
     // 1. METHOD UNTUK TU KEPEGAWAIAN (MANAJEMEN GURU)
     // ==========================================
-    
+
     public function index(Request $request)
     {
         $query = Guru::query();
 
-        $isFiltered = $request->filled('search') || 
-                      $request->filled('status_kepegawaian') || 
-                      $request->filled('jenis_kelamin') || 
+        $isFiltered = $request->filled('search') ||
+                      $request->filled('status_kepegawaian') ||
+                      $request->filled('jenis_kelamin') ||
                       $request->filled('pendidikan');
 
         if ($request->filled('search')) {
@@ -58,7 +58,7 @@ class GuruController extends Controller
         }
 
         $allFilteredGurus = (clone $query)->get();
-        
+
         $rekap = [
             'Total'        => $allFilteredGurus->count(),
             'L'            => $allFilteredGurus->filter(function($item) {
@@ -74,7 +74,7 @@ class GuruController extends Controller
         ];
 
         $perPage = $request->input('per_page', 25);
-        
+
         if ($perPage === 'all') {
             $gurus = $query->get();
         } else {
@@ -110,9 +110,9 @@ class GuruController extends Controller
 
         $defaultPassword = '12345678';
         $nomorInduk = $request->nip ?: ($request->nik ?: uniqid());
-        
+
         $existingUser = User::where('nomor_induk', $nomorInduk)->first();
-        
+
         if ($existingUser) {
             $user = $existingUser;
         } else {
@@ -144,15 +144,15 @@ class GuruController extends Controller
         $guru->rt                 = $request->rt;
         $guru->rw                 = $request->rw;
         $guru->dusun              = $request->dusun;
-        $guru->desa               = $request->desa;
-        $guru->kelurahan          = $request->kelurahan ?? $request->desa;
+        // FIX: DB tidak punya kolom 'kelurahan' → pakai 'desa' saja
+        $guru->desa               = $request->desa ?? $request->kelurahan;
         $guru->kecamatan          = $request->kecamatan;
         $guru->kode_pos           = $request->kode_pos;
         $guru->telepon            = $request->telepon;
         $guru->gelar_depan        = $request->gelar_depan;
         $guru->gelar_belakang     = $request->gelar_belakang;
         $guru->user_id            = $user->id;
-        
+
         $guru->save();
 
         return redirect()->route('tu_kepegawaian.guru.index')
@@ -174,7 +174,7 @@ class GuruController extends Controller
     public function update(Request $request, $id)
     {
         $guru = Guru::findOrFail($id);
-        
+
         // Update data user juga kalau ada perubahan
         if ($guru->user) {
             $userData = [];
@@ -194,9 +194,9 @@ class GuruController extends Controller
                 $guru->user->update($userData);
             }
         }
-        
+
         $guru->update($request->all());
-        
+
         return redirect()->route('tu_kepegawaian.guru.show', $guru->id)
                        ->with('success', 'Data guru berhasil diperbarui.');
     }
@@ -204,7 +204,7 @@ class GuruController extends Controller
     public function destroy($id)
     {
         $guru = Guru::findOrFail($id);
-        
+
         if ($guru->user_id) {
             User::where('id', $guru->user_id)->delete();
         }
@@ -217,8 +217,8 @@ class GuruController extends Controller
     public function template(Request $request)
     {
         $fields = $request->input('fields', [
-            'nama', 'nik', 'nuptk', 'nip', 'status_kepegawaian', 
-            'jenis_kelamin', 'pendidikan', 'serdik', 'tempat_lahir', 'tanggal_lahir', 
+            'nama', 'nik', 'nuptk', 'nip', 'status_kepegawaian',
+            'jenis_kelamin', 'pendidikan', 'serdik', 'tempat_lahir', 'tanggal_lahir',
             'email_pribadi', 'email_resmi', 'alamat_jalan', 'rt', 'rw', 'dusun', 'desa', 'kecamatan', 'kode_pos', 'telepon'
         ]);
 
@@ -237,7 +237,7 @@ class GuruController extends Controller
 
         try {
             $file = $request->file('file');
-            
+
             $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getRealPath());
             $sheet = $spreadsheet->getActiveSheet();
             $rows = $sheet->toArray();
@@ -252,7 +252,7 @@ class GuruController extends Controller
                 }
 
                 $nama = trim($row[0] ?? '');
-                
+
                 if (empty($nama)) {
                     continue;
                 }
@@ -268,7 +268,7 @@ class GuruController extends Controller
                 $tanggal_lahir  = trim($row[9] ?? null);
                 $email_pribadi  = trim($row[10] ?? null);
                 $email_resmi    = trim($row[11] ?? null);
-                
+
                 $alamat_jalan   = trim($row[12] ?? null);
                 $rt             = trim($row[13] ?? null);
                 $rw             = trim($row[14] ?? null);
@@ -323,14 +323,14 @@ class GuruController extends Controller
                 $guru->email                = $email;
                 $guru->email_pribadi        = $email;
                 $guru->email_resmi          = $email_resmi;
-                
+
                 $guru->alamat_jalan         = $alamat_jalan;
                 $guru->alamat               = $alamat_jalan;
                 $guru->rt                   = $rt;
                 $guru->rw                   = $rw;
                 $guru->dusun                = $dusun;
+                // FIX: DB tidak punya kolom 'kelurahan' → pakai 'desa' saja
                 $guru->desa                 = $desa;
-                $guru->kelurahan            = $desa;
                 $guru->kecamatan            = $kecamatan;
                 $guru->kode_pos             = $kode_pos;
                 $guru->telepon              = $no_hp;
@@ -368,7 +368,6 @@ class GuruController extends Controller
     // ==========================================
     public function cetakAbsensi(Request $request)
     {
-        // Validasi input
         $request->validate([
             'bulan'    => 'required|integer|min:1|max:12',
             'tahun'    => 'required|integer|min:2000|max:2100',
@@ -381,24 +380,20 @@ class GuruController extends Controller
             'guru_ids.*.exists' => 'Data guru tidak ditemukan.'
         ]);
 
-        // Ambil data guru
         $gurus = Guru::whereIn('id', $request->guru_ids)
                      ->orderBy('nama', 'asc')
                      ->get();
 
-        // Jika tidak ada guru
         if ($gurus->isEmpty()) {
             return redirect()->back()->with('error', 'Tidak ada data guru yang dipilih.');
         }
 
-        // Format tanggal
         $bulan = (int) $request->bulan;
         $tahun = (int) $request->tahun;
         $tanggalObj = Carbon::createFromDate($tahun, $bulan, 1);
         $hari = strtoupper($tanggalObj->translatedFormat('l'));
         $tanggal = strtoupper($tanggalObj->translatedFormat('j F Y'));
 
-        // Kirim ke view cetak
         return view('tu_kepegawaian.guru.cetak_absensi', compact('gurus', 'tahun', 'hari', 'tanggal'));
     }
 

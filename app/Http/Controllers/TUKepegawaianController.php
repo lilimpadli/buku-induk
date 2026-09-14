@@ -88,7 +88,7 @@ class TUKepegawaianController extends Controller
             'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir',
             'status_kepegawaian', 'status_aktif', 'pendidikan', 'serdik',
             'telepon', 'no_hp', 'email', 'email_pribadi', 'email_resmi',
-            'alamat', 'alamat_jalan', 'rt', 'rw', 'dusun', 'desa', 'kelurahan',
+            'alamat', 'alamat_jalan', 'rt', 'rw', 'dusun', 'desa',
             'kecamatan', 'kode_pos', 'jurusan_id', 'gelar_belakang',
             'gelar_depan',
         ];
@@ -100,12 +100,9 @@ class TUKepegawaianController extends Controller
         }
         $guruColumns = self::$guruColumnsCache;
 
-        // Alias field untuk kompatibilitas antar versi
         $aliases = [
             'alamat_jalan' => 'alamat',
             'alamat'       => 'alamat_jalan',
-            'desa'         => 'kelurahan',
-            'kelurahan'    => 'desa',
             'no_hp'        => 'telepon',
             'telepon'      => 'no_hp',
             'email_pribadi' => 'email',
@@ -119,6 +116,13 @@ class TUKepegawaianController extends Controller
             }
         }
 
+        if (isset($data['kelurahan']) && !in_array('kelurahan', $guruColumns)) {
+            if (!isset($data['desa']) || empty($data['desa'])) {
+                $data['desa'] = $data['kelurahan'];
+            }
+            unset($data['kelurahan']);
+        }
+
         return array_filter($data, function ($value, $key) use ($guruColumns) {
             return in_array($key, $guruColumns);
         }, ARRAY_FILTER_USE_BOTH);
@@ -127,42 +131,46 @@ class TUKepegawaianController extends Controller
     // ==========================================================
     // DASHBOARD
     // ==========================================================
-    public function dashboard()
+        public function dashboard()
     {
+        // ==========================================================
+        // DATA INTI
+        // ==========================================================
         $totalGuru          = Guru::count();
-        
-        // Cek apakah tabel pegawais ada
         $pegawaiTableExists = Schema::hasTable('pegawais');
-        
+
         if ($pegawaiTableExists) {
-            $totalTU            = Pegawai::where('jabatan', 'tu')->count();
-            $totalTUKepegawaian = Pegawai::where('jabatan', 'tu_kepegawaian')->count();
-            $totalPegawai       = Pegawai::count();
+            $totalTU             = Pegawai::where('jabatan', 'tu')->count();
+            $totalTUKepegawaian  = Pegawai::where('jabatan', 'tu_kepegawaian')->count();
+            $totalPegawai        = Pegawai::count();
             $totalPegawaiLainnya = max(0, $totalPegawai - $totalTU - $totalTUKepegawaian);
-            $totalStaffAktif    = $totalGuru + $totalPegawai;
+            $totalStaffAktif     = $totalGuru + $totalPegawai;
         } else {
-            $totalTU            = User::where('role', 'tu')->count();
-            $totalTUKepegawaian = User::where('role', 'tu_kepegawaian')->count();
-            $totalPegawai       = User::whereIn('role', ['tu', 'tu_kepegawaian'])->count();
+            $totalTU             = User::where('role', 'tu')->count();
+            $totalTUKepegawaian  = User::where('role', 'tu_kepegawaian')->count();
+            $totalPegawai        = User::whereIn('role', ['tu', 'tu_kepegawaian'])->count();
             $totalPegawaiLainnya = 0;
-            $totalStaffAktif    = $totalGuru + $totalPegawai;
+            $totalStaffAktif     = $totalGuru + $totalPegawai;
         }
 
         $guruBaru = Guru::with('user')->latest()->take(5)->get();
 
+        // ==========================================================
+        // REKAP STATUS KEPEGAWAIAN
+        // ==========================================================
         $hitungStatus = function ($query, string $status) {
             return (clone $query)
                 ->whereRaw("LOWER(TRIM(status_kepegawaian)) = ?", [strtolower($status)])
                 ->count();
         };
 
-        $guruQuery = Guru::query();
+        $guruQuery          = Guru::query();
         $totalGuruPNS       = $hitungStatus($guruQuery, 'PNS');
         $totalGuruPPPK      = $hitungStatus($guruQuery, 'PPPK');
         $totalGuruPPPKParuh = $hitungStatus($guruQuery, 'PPPK Paruh Waktu');
 
         if ($pegawaiTableExists) {
-            $tuQuery = Pegawai::query();
+            $tuQuery         = Pegawai::query();
             $totalTUPNS      = $hitungStatus($tuQuery, 'PNS');
             $totalTUPPPK     = $hitungStatus($tuQuery, 'PPPK');
             $totalTUPPKParuh = $hitungStatus($tuQuery, 'PPPK Paruh Waktu');
@@ -172,11 +180,68 @@ class TUKepegawaianController extends Controller
             $totalTUPPKParuh = 0;
         }
 
+        // ==========================================================
+        // STATISTIK KARTU DASHBOARD
+        // ==========================================================
+
+        // 1. Guru aktif vs nonaktif
+        $guruAktif = 0;
+        if (Schema::hasColumn('gurus', 'status_keaktifan')) {
+            $guruAktif = Guru::whereRaw("LOWER(TRIM(status_keaktifan)) = 'aktif'")->count();
+        }
+        $guruNonaktif = max(0, $totalGuru - $guruAktif);
+
+        // 2. Gender guru
+        $guruLakiLaki  = Guru::where('jenis_kelamin', 'L')->count();
+        $guruPerempuan = Guru::where('jenis_kelamin', 'P')->count();
+
+        // 3. Ditambahkan bulan ini
+        $guruBulanIni = Guru::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        $pegawaiBulanIni = 0;
+        if ($pegawaiTableExists) {
+            $pegawaiBulanIni = Pegawai::whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+                ->count();
+        }
+
+        // 4. Ditambahkan 6 bulan terakhir
+        $batas6Bulan = now()->subMonthsNoOverflow(6)->startOfDay();
+
+        $masuk6BulanGuru = Guru::where('created_at', '>=', $batas6Bulan)->count();
+
+        $masuk6BulanPegawai = 0;
+        if ($pegawaiTableExists) {
+            $masuk6BulanPegawai = Pegawai::where('created_at', '>=', $batas6Bulan)->count();
+        }
+
+        // ==========================================================
+        // KIRIM KE VIEW
+        // ==========================================================
         return view('tu_kepegawaian.dashboard', compact(
-            'totalGuru', 'totalTU', 'totalTUKepegawaian', 'totalStaffAktif', 'guruBaru',
-            'totalPegawai', 'totalPegawaiLainnya',
-            'totalGuruPNS', 'totalGuruPPPK', 'totalGuruPPPKParuh',
-            'totalTUPNS', 'totalTUPPPK', 'totalTUPPKParuh'
+            'totalGuru',
+            'totalTU',
+            'totalTUKepegawaian',
+            'totalStaffAktif',
+            'guruBaru',
+            'totalPegawai',
+            'totalPegawaiLainnya',
+            'totalGuruPNS',
+            'totalGuruPPPK',
+            'totalGuruPPPKParuh',
+            'totalTUPNS',
+            'totalTUPPPK',
+            'totalTUPPKParuh',
+            'guruAktif',
+            'guruNonaktif',
+            'guruLakiLaki',
+            'guruPerempuan',
+            'guruBulanIni',
+            'pegawaiBulanIni',
+            'masuk6BulanGuru',
+            'masuk6BulanPegawai'
         ));
     }
 
@@ -755,8 +820,14 @@ class TUKepegawaianController extends Controller
                 $nuptk = trim($row[2] ?? null);
                 $nip = trim($row[3] ?? null);
                 if (empty($nip)) {
+                if (!empty($nik)) {
+                    $nip = $nik;
+                } elseif (!empty($email)) {
+                    $nip = $email;
+                } else {
                     $nip = 'IMP-' . time() . '-' . $index;
                 }
+            }
 
                 $tempat_lahir = trim($row[6] ?? null);
                 $jenis_kelamin = trim($row[8] ?? null);
@@ -795,15 +866,54 @@ class TUKepegawaianController extends Controller
                     $email = strtolower(str_replace(' ', '', $nama)) . time() . "@smkn1x.sch.id";
                 }
 
-                $user = User::firstOrCreate(
-                    ['nomor_induk' => $nip],
-                    [
-                        'name'      => $nama,
-                        'email'     => $email,
-                        'password'  => Hash::make($password),
-                        'role'      => $jabatan,
-                    ]
-                );
+                // ============================================================
+                // FIX: Cegah duplikat email di tabel users
+                // Kalau email sudah dipakai user lain, tambahkan suffix unik
+                // ============================================================
+                $emailExists = User::where('email', $email)->exists();
+                if ($emailExists) {
+                    $existingByEmail = User::where('email', $email)->first();
+
+                    if ($existingByEmail && $existingByEmail->nomor_induk === $nip) {
+                        $user = $existingByEmail;
+                        $user->update([
+                            'name' => $nama,
+                            'role' => $jabatan,
+                        ]);
+                    } else {
+                        $baseEmail = explode('@', $email)[0];
+                        $domain    = explode('@', $email)[1] ?? 'smkn1x.sch.id';
+                        $counter   = 1;
+                        $newEmail  = $email;
+
+                        while (User::where('email', $newEmail)->exists()) {
+                            $newEmail = $baseEmail . $counter . '@' . $domain;
+                            $counter++;
+                        }
+
+                        $email = $newEmail;
+
+                        $user = User::firstOrCreate(
+                            ['nomor_induk' => $nip],
+                            [
+                                'name'     => $nama,
+                                'email'    => $email,
+                                'password' => Hash::make($password),
+                                'role'     => $jabatan,
+                            ]
+                        );
+                    }
+                } else {
+                    $user = User::firstOrCreate(
+                        ['nomor_induk' => $nip],
+                        [
+                            'name'     => $nama,
+                            'email'    => $email,
+                            'password' => Hash::make($password),
+                            'role'     => $jabatan,
+                        ]
+                    );
+                }
 
                 if (Schema::hasTable('pegawais')) {
                     Pegawai::updateOrCreate(

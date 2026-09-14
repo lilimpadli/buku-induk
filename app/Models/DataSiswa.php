@@ -8,45 +8,53 @@ class DataSiswa extends Model
 {
     protected $table = 'data_siswa';
 
-protected $fillable = [
-    'user_id',
-    'nama_lengkap',
-    'nis',
-    'nisn',
-    'tempat_lahir',
-    'tanggal_lahir',
-    'jenis_kelamin_id',
-    'agama_id',
-    'agama_lainnya',
-    'kewarganegaraan',
-    'status_keluarga',
-    'anak_ke',
-    'rt',
-    'rw',
-    'dusun',
-    'kelurahan',
-    'kecamatan',
-    'kode_pos',
-    'no_hp',
-    'sekolah_asal',
-    'tanggal_diterima',
-    'nama_ayah',
-    'pekerjaan_ayah',
-    'telepon_ayah',
-    'alamat_ayah',
-    'nama_ibu',
-    'pekerjaan_ibu',
-    'telepon_ibu',
-    'alamat_ibu',
-    'nama_wali',
-    'pekerjaan_wali',
-    'telepon_wali',
-    'alamat_wali',
-    'foto',
-    'catatan_wali_kelas',
-    'rombel_id',
-    'kurikulum_id',
-];
+    protected $fillable = [
+        'user_id',
+        'nama_lengkap',
+        'nis',
+        'nisn',
+        'tempat_lahir',
+        'tanggal_lahir',
+        'jenis_kelamin_id',
+        'agama_id',
+        'agama_lainnya',
+        'kewarganegaraan',
+        'status_keluarga',
+        'anak_ke',
+        'rt',
+        'rw',
+        'dusun',
+        'kelurahan',
+        'kecamatan',
+        'kode_pos',
+        'no_hp',
+        'sekolah_asal',
+        'tanggal_diterima',
+        'nama_ayah',
+        'pekerjaan_ayah',
+        'telepon_ayah',
+        'alamat_ayah',
+        'nama_ibu',
+        'pekerjaan_ibu',
+        'telepon_ibu',
+        'alamat_ibu',
+        'nama_wali',
+        'pekerjaan_wali',
+        'telepon_wali',
+        'alamat_wali',
+        'foto',
+        'catatan_wali_kelas',
+        'rombel_id',
+        'kurikulum_id',
+        'ayah_id',
+        'ibu_id',
+        'wali_id',
+    ];
+
+    // ============================================
+    // RELASI
+    // ============================================
+    
     public function nilai()
     {
         return $this->hasMany(NilaiRaport::class, 'siswa_id');
@@ -117,6 +125,34 @@ protected $fillable = [
         return $this->hasOne(MutasiSiswa::class, 'siswa_id')->latestOfMany();
     }
 
+    /**
+     * Relasi ke Ayah
+     */
+    public function ayah()
+    {
+        return $this->belongsTo(\App\Models\Ayah::class, 'ayah_id');
+    }
+
+    /**
+     * Relasi ke Ibu
+     */
+    public function ibu()
+    {
+        return $this->belongsTo(\App\Models\Ibu::class, 'ibu_id');
+    }
+
+    /**
+     * Relasi ke Wali
+     */
+    public function wali()
+    {
+        return $this->belongsTo(\App\Models\Wali::class, 'wali_id');
+    }
+
+    // ============================================
+    // ACCESSOR
+    // ============================================
+
     public function getJenisKelaminAttribute()
     {
         if (!empty($this->jenis_kelamin_id)) {
@@ -160,6 +196,22 @@ protected $fillable = [
     {
         return $this->attributes['nama_wali'] ?? '-';
     }
+
+    public function getAlamatLengkapAttribute()
+    {
+        $parts = [];
+        if (!empty($this->dusun)) $parts[] = "Dusun {$this->dusun}";
+        if (!empty($this->rt) || !empty($this->rw)) $parts[] = "RT/RW {$this->rt}/{$this->rw}";
+        if (!empty($this->kelurahan)) $parts[] = $this->kelurahan;
+        if (!empty($this->kecamatan)) $parts[] = $this->kecamatan;
+        if (!empty($this->kode_pos)) $parts[] = $this->kode_pos;
+        
+        return implode(', ', $parts) ?: '-';
+    }
+
+    // ============================================
+    // SCOPE
+    // ============================================
 
     public function scopeFilterByJenisKelamin($query, $value)
     {
