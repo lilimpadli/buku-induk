@@ -662,16 +662,6 @@
                                     <i class="fas fa-user-graduate"></i> <span>Data Alumni</span>
                                 </a>
 
-                                <div class="nav-section-title">MUTASI & KENAIKAN</div>
-
-                                <a href="{{ route('kurikulum.mutasi.index') }}" class="nav-link {{ request()->routeIs('kurikulum.mutasi*') ? 'active' : '' }}">
-                                    <i class="fas fa-exchange-alt"></i> <span>Riwayat Mutasi</span>
-                                </a>
-
-                                <a href="{{ route('kurikulum.kenaikan-kelas.index') }}" class="nav-link {{ request()->routeIs('kurikulum.kenaikan-kelas*') ? 'active' : '' }}">
-                                    <i class="fas fa-arrow-up"></i> <span>Kenaikan Kelas</span>
-                                </a>
-
                                 <div class="nav-section-title">KEAHLIAN</div>
 
                                 <a href="{{ route('kurikulum.bidang-keahlian.index') }}" class="nav-link {{ request()->routeIs('kurikulum.bidang-keahlian*') ? 'active' : '' }}">

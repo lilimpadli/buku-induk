@@ -300,14 +300,22 @@
                     <div class="info-row">
                         <div class="info-label">Jenis Kelamin</div>
                         <div class="info-value">
-                            <span class="badge-gender {{ strtolower($siswa->jenis_kelamin) == 'laki-laki' ? 'laki' : 'perempuan' }}">
-                                {{ $siswa->jenis_kelamin ?? '-' }}
+                            @php
+                                $jk = $siswa->jenis_kelamin;
+                                if (!$jk && $siswa->jenisKelamin) {
+                                    $jk = $siswa->jenisKelamin->nama;
+                                }
+                                $jkLower = strtolower($jk ?? '');
+                                $jkClass = (str_contains($jkLower, 'laki') || $jkLower == 'l') ? 'laki' : 'perempuan';
+                            @endphp
+                            <span class="badge-gender {{ $jkClass }}">
+                                {{ $jk ?? '-' }}
                             </span>
                         </div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">Agama</div>
-                        <div class="info-value">{{ $siswa->agama ?? '-' }}</div>
+                        <div class="info-value">{{ $siswa->nama_agama ?? '-' }}</div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">Kewarganegaraan</div>
@@ -315,7 +323,7 @@
                     </div>
                     <div class="info-row">
                         <div class="info-label">Alamat</div>
-                        <div class="info-value">{{ $siswa->alamat ?? '-' }}</div>
+                        <div class="info-value">{{ $siswa->alamat_lengkap }}</div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">No HP</div>
@@ -340,27 +348,27 @@
                 <div class="card-body">
                     <div class="info-row">
                         <div class="info-label">Nama Ayah</div>
-                        <div class="info-value">{{ $siswa->ayah->nama ?? '-' }}</div>
+                        <div class="info-value">{{ $siswa->ayah->nama ?? $siswa->nama_ayah ?? '-' }}</div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">Pekerjaan Ayah</div>
-                        <div class="info-value">{{ $siswa->ayah->pekerjaan ?? '-' }}</div>
+                        <div class="info-value">{{ $siswa->ayah->pekerjaan ?? $siswa->pekerjaan_ayah ?? '-' }}</div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">Nama Ibu</div>
-                        <div class="info-value">{{ $siswa->ibu->nama ?? '-' }}</div>
+                        <div class="info-value">{{ $siswa->ibu->nama ?? $siswa->nama_ibu ?? '-' }}</div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">Pekerjaan Ibu</div>
-                        <div class="info-value">{{ $siswa->ibu->pekerjaan ?? '-' }}</div>
+                        <div class="info-value">{{ $siswa->ibu->pekerjaan ?? $siswa->pekerjaan_ibu ?? '-' }}</div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">Nama Wali</div>
-                        <div class="info-value">{{ $siswa->wali->nama ?? '-' }}</div>
+                        <div class="info-value">{{ $siswa->wali->nama ?? $siswa->nama_wali ?? '-' }}</div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">Pekerjaan Wali</div>
-                        <div class="info-value">{{ $siswa->wali->pekerjaan ?? '-' }}</div>
+                        <div class="info-value">{{ $siswa->wali->pekerjaan ?? $siswa->pekerjaan_wali ?? '-' }}</div>
                     </div>
                 </div>
             </div>

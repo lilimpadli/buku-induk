@@ -121,67 +121,109 @@
         transform: translateY(-2px);
     }
 
-    .btn-edit {
-        background: #F59E0B;
-        border: none;
-        color: white;
-        padding: 4px 12px;
-        border-radius: 8px;
-        font-size: 0.75rem;
-        transition: var(--transition);
-        text-decoration: none;
-        display: inline-flex;
+    /* ===== TOMBOL AKSI - REDESIGN ===== */
+    .action-buttons {
+        display: flex;
         align-items: center;
-        gap: 4px;
-        white-space: nowrap;
+        justify-content: center;
+        gap: 6px;
+        flex-wrap: nowrap;
     }
 
-    .btn-edit:hover {
-        background: #D97706;
-        transform: translateY(-1px);
-        color: white;
-    }
-
-    .btn-delete {
-        background: #EF4444;
-        border: none;
-        color: white;
-        padding: 4px 12px;
-        border-radius: 8px;
-        font-size: 0.75rem;
-        transition: var(--transition);
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        white-space: nowrap;
+        justify-content: center;
+        border: none;
         cursor: pointer;
-    }
-
-    .btn-delete:hover {
-        background: #DC2626;
-        transform: translateY(-1px);
-        color: white;
-    }
-
-    .btn-detail {
-        background: #667eea;
-        border: none;
-        color: white;
-        padding: 4px 12px;
-        border-radius: 8px;
-        font-size: 0.75rem;
-        transition: var(--transition);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        white-space: nowrap;
+        font-size: 14px;
+        position: relative;
+        color: white;
+        flex-shrink: 0;
     }
 
-    .btn-detail:hover {
-        background: #5a67d8;
-        transform: translateY(-1px);
+    /* Tombol Detail (Eye) - Biru */
+    .action-btn.detail {
+        background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+        box-shadow: 0 3px 10px rgba(59, 130, 246, 0.35);
+    }
+    .action-btn.detail:hover {
+        background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
         color: white;
+    }
+
+    /* Tombol Edit (Pencil) - Orange */
+    .action-btn.edit {
+        background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+        box-shadow: 0 3px 10px rgba(245, 158, 11, 0.35);
+    }
+    .action-btn.edit:hover {
+        background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 6px 16px rgba(245, 158, 11, 0.5);
+        color: white;
+    }
+
+    /* Tombol Delete (Trash) - Merah */
+    .action-btn.delete {
+        background: linear-gradient(135deg, #EF4444 0%, #F87171 100%);
+        box-shadow: 0 3px 10px rgba(239, 68, 68, 0.35);
+    }
+    .action-btn.delete:hover {
+        background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 6px 16px rgba(239, 68, 68, 0.5);
+        color: white;
+    }
+
+    /* Tooltip untuk tombol aksi */
+    .action-btn[data-tooltip]::before {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 130%;
+        left: 50%;
+        transform: translateX(-50%) translateY(4px);
+        background: linear-gradient(135deg, #1e293b, #334155);
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.25s ease;
+        z-index: 100;
+        pointer-events: none;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        font-weight: 600;
+    }
+
+    .action-btn[data-tooltip]::after {
+        content: "";
+        position: absolute;
+        bottom: 110%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: #1e293b;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.25s ease;
+        z-index: 100;
+    }
+
+    .action-btn[data-tooltip]:hover::before,
+    .action-btn[data-tooltip]:hover::after {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
     }
 
     /* ===== FILTER ===== */
@@ -272,7 +314,7 @@
 
     .table {
         width: 100%;
-        min-width: 750px;
+        min-width: 900px;
         margin-bottom: 0;
         font-size: 0.85rem;
     }
@@ -321,9 +363,9 @@
     }
 
     .badge-role {
-        padding: 2px 10px;
+        padding: 4px 10px;
         border-radius: 20px;
-        font-size: 0.6rem;
+        font-size: 0.7rem;
         font-weight: 600;
         display: inline-block;
         white-space: nowrap;
@@ -362,27 +404,13 @@
     .badge-class {
         background: rgba(102, 126, 234, 0.1);
         color: #667eea;
-        padding: 2px 8px;
+        padding: 3px 10px;
         border-radius: 12px;
-        font-size: 0.6rem;
-        font-weight: 500;
+        font-size: 0.7rem;
+        font-weight: 600;
         display: inline-block;
-        margin: 1px;
+        margin: 2px;
         white-space: nowrap;
-    }
-
-    .action-buttons {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        flex-wrap: nowrap;
-        white-space: nowrap;
-    }
-
-    .action-buttons form {
-        margin: 0;
-        padding: 0;
-        display: inline;
     }
 
     .empty-state {
@@ -438,39 +466,33 @@
         }
 
         .table {
-            min-width: 600px;
+            min-width: 700px;
             font-size: 0.75rem;
         }
         .table th,
         .table td {
             padding: 0.5rem 0.5rem;
         }
-        .btn-edit,
-        .btn-delete,
-        .btn-detail {
-            padding: 3px 8px;
-            font-size: 0.65rem;
-        }
-        .action-buttons {
-            flex-wrap: wrap;
-            gap: 3px;
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            font-size: 12px;
         }
     }
 
     @media (max-width: 576px) {
         .table {
-            min-width: 500px;
+            min-width: 600px;
             font-size: 0.65rem;
         }
         .table th,
         .table td {
             padding: 0.3rem 0.4rem;
         }
-        .btn-edit,
-        .btn-delete,
-        .btn-detail {
-            padding: 2px 6px;
-            font-size: 0.55rem;
+        .action-btn {
+            width: 28px;
+            height: 28px;
+            font-size: 11px;
         }
         .teacher-avatar {
             width: 30px;
@@ -478,12 +500,12 @@
             font-size: 12px;
         }
         .badge-role {
-            font-size: 0.5rem;
-            padding: 1px 6px;
+            font-size: 0.6rem;
+            padding: 2px 8px;
         }
         .badge-class {
-            font-size: 0.5rem;
-            padding: 1px 4px;
+            font-size: 0.6rem;
+            padding: 2px 6px;
         }
     }
 </style>
@@ -496,14 +518,14 @@
                 <h3><i class="fas fa-chalkboard-teacher me-2"></i> Manajemen Guru</h3>
                 <div class="text-muted">Kelola data guru dan wali kelas</div>
             </div>
-            <div class="mt-2 mt-sm-0">
-                <a href="{{ route('kurikulum.guru.export', request()->only(['search','jurusan'])) }}" class="btn-gradient" style="padding:0.4rem 1rem; font-size:0.75rem;">
+            <div class="mt-2 mt-sm-0 d-flex gap-2 flex-wrap">
+                <a href="{{ route('kurikulum.guru.export', request()->only(['search','jurusan'])) }}" class="btn-gradient" style="padding:0.5rem 1.1rem; font-size:0.85rem;">
                     <i class="fas fa-file-export"></i> Export
                 </a>
-                <a href="{{ route('kurikulum.guru.importForm') }}" class="btn-gradient" style="padding:0.4rem 1rem; font-size:0.75rem;">
+                <a href="{{ route('kurikulum.guru.importForm') }}" class="btn-gradient" style="padding:0.5rem 1.1rem; font-size:0.85rem;">
                     <i class="fas fa-file-import"></i> Import
                 </a>
-                <a href="{{ route('kurikulum.guru.manage.create') }}" class="btn-gradient" style="padding:0.4rem 1rem; font-size:0.75rem;">
+                <a href="{{ route('kurikulum.guru.manage.create') }}" class="btn-gradient" style="padding:0.5rem 1.1rem; font-size:0.85rem;">
                     <i class="fas fa-plus"></i> Tambah
                 </a>
             </div>
@@ -545,10 +567,10 @@
                 </div>
                 <div class="col-md-2">
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn-gradient" style="padding:0.4rem 1.2rem; width:100%; justify-content:center;">
+                        <button type="submit" class="btn-gradient" style="padding:0.5rem 1.2rem; width:100%; justify-content:center;">
                             <i class="fas fa-search me-1"></i> Cari
                         </button>
-                        <a href="{{ route('kurikulum.guru.index') }}" class="btn-outline-gradient" style="padding:0.4rem 1.2rem; width:100%; justify-content:center;">
+                        <a href="{{ route('kurikulum.guru.index') }}" class="btn-outline-gradient" style="padding:0.5rem 1.2rem; width:100%; justify-content:center;">
                             <i class="fas fa-undo-alt me-1"></i> Reset
                         </a>
                     </div>
@@ -565,7 +587,7 @@
         </div>
         <div class="card-body p-0">
             @if(session('success'))
-                <div class="alert alert-success m-3" id="successAlert" style="font-size:0.85rem; padding:0.6rem 1rem;">
+                <div class="alert alert-success m-3" id="successAlert" style="font-size:0.85rem; padding:0.6rem 1rem; border-radius:10px;">
                     <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
                 </div>
             @endif
@@ -580,13 +602,13 @@
                             <th>Email</th>
                             <th>Role</th>
                             <th>Rombel</th>
-                            <th width="15%">Aksi</th>
+                            <th width="15%" class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($gurus as $key => $g)
                         <tr>
-                            <td>{{ $key + 1 }}</td>
+                            <td class="fw-semibold text-secondary">{{ $key + 1 }}</td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="teacher-avatar">
@@ -599,8 +621,8 @@
                                     <span class="fw-semibold">{{ $g->nama }}</span>
                                 </div>
                             </td>
-                            <td>{{ $g->nip ?? '-' }}</td>
-                            <td>{{ $g->email ?? '-' }}</td>
+                            <td class="text-secondary">{{ $g->nip ?? '-' }}</td>
+                            <td class="text-secondary">{{ $g->email ?? '-' }}</td>
                             <td>
                                 @php
                                     $role = optional($g->user)->role ?? '-';
@@ -619,7 +641,7 @@
                                         {{ ucfirst(str_replace('_', ' ', $role)) }}
                                     </span>
                                 @else
-                                    <span style="font-size:0.6rem; color:#94A3B8;">-</span>
+                                    <span style="font-size:0.7rem; color:#94A3B8;">-</span>
                                 @endif
                             </td>
                             <td>
@@ -628,21 +650,30 @@
                                         <span class="badge-class">{{ $r->nama }}</span>
                                     @endforeach
                                 @else
-                                    <span style="font-size:0.6rem; color:#94A3B8;">-</span>
+                                    <span style="font-size:0.7rem; color:#94A3B8;">-</span>
                                 @endif
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="{{ route('kurikulum.guru.manage.show', $g->id) }}" class="btn-detail">
+                                    <a href="{{ route('kurikulum.guru.manage.show', $g->id) }}" 
+                                       class="action-btn detail" 
+                                       data-tooltip="Lihat Detail">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('kurikulum.guru.manage.edit', $g->id) }}" class="btn-edit">
-                                        <i class="fas fa-edit"></i>
+                                    <a href="{{ route('kurikulum.guru.manage.edit', $g->id) }}" 
+                                       class="action-btn edit" 
+                                       data-tooltip="Edit Data">
+                                        <i class="fas fa-pen"></i>
                                     </a>
-                                    <form action="{{ route('kurikulum.guru.manage.destroy', $g->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus guru ini?')">
+                                    <form action="{{ route('kurikulum.guru.manage.destroy', $g->id) }}" 
+                                          method="POST" 
+                                          onsubmit="return confirm('Yakin ingin menghapus guru ini?')"
+                                          style="display:inline;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn-delete">
+                                        <button type="submit" 
+                                                class="action-btn delete" 
+                                                data-tooltip="Hapus Data">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>

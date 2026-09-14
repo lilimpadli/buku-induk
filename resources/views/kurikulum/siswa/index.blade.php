@@ -111,46 +111,6 @@
         border-color: transparent;
     }
 
-    .btn-edit {
-        background: #F59E0B;
-        border: none;
-        color: white;
-        padding: 3px 10px;
-        border-radius: 6px;
-        font-size: 0.65rem;
-        transition: var(--transition);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 3px;
-        white-space: nowrap;
-    }
-
-    .btn-edit:hover {
-        background: #D97706;
-        color: white;
-    }
-
-    .btn-delete {
-        background: #EF4444;
-        border: none;
-        color: white;
-        padding: 3px 10px;
-        border-radius: 6px;
-        font-size: 0.65rem;
-        transition: var(--transition);
-        display: inline-flex;
-        align-items: center;
-        gap: 3px;
-        white-space: nowrap;
-        cursor: pointer;
-    }
-
-    .btn-delete:hover {
-        background: #DC2626;
-        color: white;
-    }
-
     .btn-detail {
         background: #667eea;
         border: none;
@@ -312,12 +272,6 @@
         white-space: nowrap;
     }
 
-    .action-buttons form {
-        margin: 0;
-        padding: 0;
-        display: inline;
-    }
-
     .empty-state {
         text-align: center;
         padding: 3rem 1rem;
@@ -364,10 +318,6 @@
         .table-card .card-header {
             flex-wrap: wrap;
         }
-        .table-card .card-header .btn-gradient {
-            width: 100%;
-            justify-content: center;
-        }
 
         .table {
             min-width: 550px;
@@ -377,15 +327,9 @@
         .table td {
             padding: 0.4rem 0.5rem;
         }
-        .btn-edit,
-        .btn-delete,
         .btn-detail {
             padding: 2px 6px;
             font-size: 0.55rem;
-        }
-        .action-buttons {
-            flex-wrap: wrap;
-            gap: 3px;
         }
     }
 
@@ -398,8 +342,6 @@
         .table td {
             padding: 0.3rem 0.4rem;
         }
-        .btn-edit,
-        .btn-delete,
         .btn-detail {
             padding: 1px 5px;
             font-size: 0.5rem;
@@ -416,18 +358,7 @@
         <div class="d-flex align-items-center justify-content-between flex-wrap">
             <div>
                 <h3><i class="fas fa-user-graduate me-2"></i> Manajemen Siswa</h3>
-                <div class="text-muted">Kelola data siswa</div>
-            </div>
-            <div class="mt-2 mt-sm-0 d-flex gap-2 flex-wrap">
-                <a href="{{ route('kurikulum.siswa.import.form') }}" class="btn-outline-gradient" style="padding:0.3rem 0.8rem; font-size:0.75rem;">
-                    <i class="fas fa-file-import"></i> Import
-                </a>
-                <a href="#" class="btn-outline-gradient" style="padding:0.3rem 0.8rem; font-size:0.75rem;">
-                    <i class="fas fa-file-export"></i> Export
-                </a>
-                <a href="{{ route('kurikulum.siswa.create') }}" class="btn-gradient">
-                    <i class="fas fa-plus"></i> Tambah
-                </a>
+                <div class="text-muted">Lihat data siswa</div>
             </div>
         </div>
     </div>
@@ -497,7 +428,7 @@
                             <th>Nama</th>
                             <th>Jenis Kelamin</th>
                             <th>Rombel</th>
-                            <th width="18%">Aksi</th>
+                            <th width="15%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -507,29 +438,24 @@
                             <td>{{ $s->nis ?? '-' }}</td>
                             <td><span class="fw-semibold">{{ $s->nama_lengkap }}</span></td>
                             <td>
-                                <span class="badge-gender {{ strtolower($s->jenis_kelamin) == 'laki-laki' ? 'laki' : 'perempuan' }}">
-                                    {{ $s->jenis_kelamin ?? '-' }}
+                                @php
+                                    $jk = $s->jenis_kelamin;
+                                    if (!$jk && $s->jenisKelamin) {
+                                        $jk = $s->jenisKelamin->nama;
+                                    }
+                                    $jkLower = strtolower($jk ?? '');
+                                    $jkClass = (str_contains($jkLower, 'laki') || $jkLower == 'l') ? 'laki' : 'perempuan';
+                                @endphp
+                                <span class="badge-gender {{ $jkClass }}">
+                                    {{ $jk ?? '-' }}
                                 </span>
                             </td>
                             <td>{{ optional($s->rombel)->nama ?? '-' }}</td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="{{ route('kurikulum.siswa.show', $s->id) }}" class="btn-detail">
-                                        <i class="fas fa-eye"></i>
+                                    <a href="{{ route('kurikulum.data-siswa.show', $s->id) }}" class="btn-detail">
+                                        <i class="fas fa-eye"></i> Lihat
                                     </a>
-                                    <a href="{{ route('kurikulum.siswa.data-diri.edit', $s->id) }}" class="btn-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a href="{{ route('kurikulum.siswa.edit-password', $s->id) }}" class="btn-edit" style="background:#6B7280;">
-                                        <i class="fas fa-key"></i>
-                                    </a>
-                                    <form action="{{ route('kurikulum.siswa.destroy', $s->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus siswa ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn-delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -539,7 +465,7 @@
                                 <div class="empty-state">
                                     <i class="fas fa-user-graduate"></i>
                                     <h5 class="fw-bold text-muted">Belum ada data siswa</h5>
-                                    <p class="text-muted">Silakan tambah data baru melalui tombol di atas.</p>
+                                    <p class="text-muted">Data siswa akan tampil di sini.</p>
                                 </div>
                             </td>
                         </tr>
