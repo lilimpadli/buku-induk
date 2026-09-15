@@ -17,113 +17,179 @@ class GuruImport implements ToCollection
     protected $successCount = 0;
     protected $defaultPassword = '12345678';
 
-    protected $selectedColumns = [];
-    protected $columnMap = [];
-    protected $headerRow = [];
+    /**
+     * DAFTAR ALIAS HEADER
+     * Kunci   = judul kolom Excel yang sudah dinormalisasi
+     *           (huruf kecil, tanpa spasi/simbol)
+     * Nilai   = key internal
+     */
+    protected $headerAliases = [
+        'nama'               => 'nama',
+        'nik'                => 'nik',
+        'nuptk'              => 'nuptk',
+        'nip'                => 'nip',
+        'statuskepegawaian'  => 'status_kepegawaian',
+        'status'             => 'status_kepegawaian',
+        'jenisptk'           => 'status_kepegawaian',
+        'jeniskelamin'       => 'jenis_kelamin',
+        'jk'                 => 'jenis_kelamin',
+        'gender'             => 'jenis_kelamin',
+        'pendidikan'         => 'pendidikan',
+        'pendidikanterakhir' => 'pendidikan',
+        'serdik'             => 'serdik',
+        'serdiksertifikasi'  => 'serdik',
+        'sertifikasi'        => 'serdik',
+        'tugastambahan'      => 'tugas_tambahan',
+        'tempatlahir'        => 'tempat_lahir',
+        'tanggallahir'       => 'tanggal_lahir',
+        'emailpribadi'       => 'email_pribadi',
+        'emailresmi'         => 'email_resmi',
+        'email'              => 'email_pribadi',
+        'alamatjalan'        => 'alamat_jalan',
+        'alamat'             => 'alamat_jalan',
+        'rt'                 => 'rt',
+        'rw'                 => 'rw',
+        'dusun'              => 'dusun',
+        'desakelurahan'      => 'desa',
+        'desa'               => 'desa',
+        'kelurahan'          => 'desa',
+        'kecamatan'          => 'kecamatan',
+        'kodepos'            => 'kode_pos',
+        'nohp'               => 'telepon',
+        'nohpwa'             => 'telepon',
+        'nohpwhatsapp'       => 'telepon',
+        'notelepon'          => 'telepon',
+        'telepon'            => 'telepon',
+        'hp'                 => 'telepon',
+    ];
 
-    public function setSelectedColumns(array $columns)
+    /** Hasil mapping: key internal => index kolom di Excel */
+    protected $map = [];
+
+    protected function normalizeHeader(?string $header): string
     {
-        $this->selectedColumns = $columns;
+        return preg_replace('/[^a-z0-9]/', '', strtolower(trim((string) $header)));
     }
 
-    public function setColumnMap(array $map)
+    protected function buildMap(Collection $headerRow): void
     {
-        $this->columnMap = $map;
+        $this->map = [];
+
+        foreach ($headerRow as $index => $header) {
+            $key = $this->normalizeHeader($header);
+
+            if ($key === '' || !isset($this->headerAliases[$key])) {
+                continue;
+            }
+
+            $field = $this->headerAliases[$key];
+
+            // Ambil kemunculan pertama saja (antisipasi header dobel)
+            if (!array_key_exists($field, $this->map)) {
+                $this->map[$field] = $index;
+            }
+        }
+
+        Log::info('GuruImport MAP: ' . json_encode($this->map));
+    }
+
+    /**
+     * Ambil nilai cell berdasarkan NAMA KOLOM (bukan index).
+     * Aman: kalau kolom tidak ada di Excel, hasilnya null.
+     */
+    protected function cell(Collection $row, string $field): ?string
+    {
+        if (!array_key_exists($field, $this->map)) {
+            return null;
+        }
+
+        $value = trim((string) ($row[$this->map[$field]] ?? ''));
+
+        return $value !== '' ? $value : null;
     }
 
     public function collection(Collection $rows)
     {
-        foreach ($rows as $index => $row) {
-            // Baris pertama = header
-            if ($index === 0) {
-                foreach ($row as $colIdx => $colVal) {
-                    if (!empty($colVal)) {
-                        $cleanHeader = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $colVal)));
-                        $this->headerRow[$cleanHeader] = $colIdx;
-                    }
-                }
-                continue;
-            }
+        if ($rows->isEmpty()) {
+            $this->errors[] = 'File Excel kosong / tidak terbaca.';
+            return;
+        }
 
-            // Helper ambil nilai berdasarkan nama kolom header
-            $getValue = function ($possibleKeys, $fallbackIndex) use ($row) {
-                foreach ((array) $possibleKeys as $key) {
-                    $cleanKey = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $key)));
-                    if (isset($this->headerRow[$cleanKey])) {
-                        $idx = $this->headerRow[$cleanKey];
-                        if (isset($row[$idx]) && trim((string) $row[$idx]) !== '') {
-                            return trim((string) $row[$idx]);
-                        }
-                    }
-                }
-                return isset($row[$fallbackIndex]) ? trim((string) $row[$fallbackIndex]) : null;
-            };
+        // ── BARIS PERTAMA = HEADER ──
+        $this->buildMap($rows->first());
 
-            $nama = $getValue(['nama', 'namalengkap'], 0);
-            if (empty($nama)) {
-                continue;
-            }
+        if (!array_key_exists('nama', $this->map)) {
+            $this->errors[] = 'Kolom "Nama" tidak ditemukan. Pastikan baris pertama Excel berisi judul kolom (Nama, NIK, NIP, dst).';
+            return;
+        }
 
-            $nik                = $getValue(['nik'], 1);
-            $nuptk              = $getValue(['nuptk'], 2);
-            $nip                = $getValue(['nip', 'nomorindukpegawai'], 3);
-            $status_kepegawaian = $getValue(['statuskepegawaian', 'statuspegawai'], 4);
-            $jenis_kelamin      = $getValue(['jeniskelamin', 'jk'], 5) ?: 'L';
-            $pendidikan         = $getValue(['pendidikan'], 6);
-            $serdik             = $getValue(['serdik'], 7);
-            $tugas_tambahan     = $getValue(['tugastambahan'], 8);
-            $tempat_lahir       = $getValue(['tempatlahir'], 9);
+        foreach ($rows->skip(1) as $index => $row) {
 
-            // Tanggal Lahir
-            $raw_tgl_lahir = $getValue(['tanggallahir', 'tgllahir'], 10);
+            $nama = $this->cell($row, 'nama');
+            if (empty($nama)) continue;
+
+            $nik                = $this->cell($row, 'nik');
+            $nuptk              = $this->cell($row, 'nuptk');
+            $nip                = $this->cell($row, 'nip');
+            $status_kepegawaian = $this->cell($row, 'status_kepegawaian');
+            $pendidikan         = $this->cell($row, 'pendidikan');
+
+            $jk            = strtoupper((string) $this->cell($row, 'jenis_kelamin'));
+            $jenis_kelamin = in_array($jk, ['L', 'P']) ? $jk : 'L';
+
+            // ✅ FIX UTAMA: serdik & tugas_tambahan kini dibaca
+            //    SESUAI JUDUL KOLOMNYA — urutan kolom Excel bebas
+            $serdik         = $this->cell($row, 'serdik');
+            $tugas_tambahan = $this->cell($row, 'tugas_tambahan');
+            $tempat_lahir   = $this->cell($row, 'tempat_lahir');
+
+            // ── Tanggal lahir (dukung tanggal Excel & teks) ──
             $tanggal_lahir = null;
-            if (!empty($raw_tgl_lahir)) {
+            $raw_tgl = $this->cell($row, 'tanggal_lahir');
+
+            if (!empty($raw_tgl)) {
                 try {
-                    if (is_numeric($raw_tgl_lahir)) {
-                        $tanggal_lahir = ExcelDate::excelToDateTimeObject($raw_tgl_lahir)->format('Y-m-d');
+                    if (is_numeric($raw_tgl)) {
+                        $tanggal_lahir = ExcelDate::excelToDateTimeObject($raw_tgl)->format('Y-m-d');
                     } else {
-                        $clean_date = trim(str_replace('/', '-', $raw_tgl_lahir));
-                        $tanggal_lahir = Carbon::parse($clean_date)->format('Y-m-d');
+                        $clean         = trim(str_replace('/', '-', $raw_tgl));
+                        $tanggal_lahir = Carbon::parse($clean)->format('Y-m-d');
                     }
                 } catch (\Exception $e) {
                     $tanggal_lahir = null;
                 }
             }
 
-            $email_pribadi = $getValue(['emailpribadi', 'email'], 11);
-            $email_resmi   = $getValue(['emailresmi'], 12);
+            $email_pribadi = $this->cell($row, 'email_pribadi');
+            $email_resmi   = $this->cell($row, 'email_resmi');
+            $alamat_jalan  = $this->cell($row, 'alamat_jalan');
+            $rt            = $this->cell($row, 'rt');
+            $rw            = $this->cell($row, 'rw');
+            $dusun         = $this->cell($row, 'dusun');
+            $desa          = $this->cell($row, 'desa');
+            $kecamatan     = $this->cell($row, 'kecamatan');
+            $kode_pos      = $this->cell($row, 'kode_pos');
+            $telepon       = $this->cell($row, 'telepon');
 
-            // Alamat
-            $alamat_jalan = $getValue(['alamat', 'alamatjalan'], 13);
-            $rt           = $getValue(['rt'], 14);
-            $rw           = $getValue(['rw'], 15);
-            $dusun        = $getValue(['dusun'], 16);
-
-            // PENTING: DB kamu TIDAK punya kolom 'kelurahan'.
-            // Jadi kita ambil dari header 'desa'/'kelurahan', lalu simpan ke kolom 'desa'.
-            $desa         = $getValue(['desa', 'kelurahan', 'desakel'], 17);
-
-            $kecamatan    = $getValue(['kecamatan', 'kec'], 18);
-            $kode_pos     = $getValue(['kodepos', 'pos'], 19);
-            $telepon      = $getValue(['nohp', 'telepon', 'hp'], 20);
-
-            // Gabungkan alamat lengkap (untuk kolom 'alamat')
+            // ── Gabungkan alamat ──
             $array_alamat = [];
             if ($alamat_jalan) $array_alamat[] = $alamat_jalan;
-            if ($rt && $rw)     $array_alamat[] = "RT {$rt}/RW {$rw}";
-            if ($dusun)         $array_alamat[] = "Dusun {$dusun}";
-            if ($desa)          $array_alamat[] = "Desa/Kel. {$desa}";
-            if ($kecamatan)     $array_alamat[] = "Kec. {$kecamatan}";
-            if ($kode_pos)      $array_alamat[] = $kode_pos;
+            if ($rt && $rw)    $array_alamat[] = "RT {$rt}/RW {$rw}";
+            if ($dusun)        $array_alamat[] = "Dusun {$dusun}";
+            if ($desa)         $array_alamat[] = "Desa/Kel. {$desa}";
+            if ($kecamatan)    $array_alamat[] = "Kec. {$kecamatan}";
+            if ($kode_pos)     $array_alamat[] = $kode_pos;
 
             $alamat_gabung = count($array_alamat) > 0 ? implode(', ', $array_alamat) : null;
 
             try {
                 $nomor_induk = $nip ?: ($nik ?: $nama);
 
+                // Cegah menimpa akun super admin
                 $superAdmin = User::where('nomor_induk', $nomor_induk)
                     ->where('role', 'super_admin')
                     ->first();
+
                 if ($superAdmin) {
                     $this->errors[] = "SKIP: Identitas {$nomor_induk} milik SUPER ADMIN.";
                     continue;
@@ -133,6 +199,7 @@ class GuruImport implements ToCollection
                     ?: (strtolower(str_replace(' ', '', $nama)) . time() . "@smkn1x.sch.id");
 
                 $existingUser = User::where('nomor_induk', $nomor_induk)->first();
+
                 if ($existingUser) {
                     if ($existingUser->role === 'super_admin') {
                         continue;
@@ -150,17 +217,15 @@ class GuruImport implements ToCollection
                 }
 
                 Guru::updateOrCreate(
-                    [
-                        'nip' => $nip ?: $nomor_induk,
-                    ],
+                    ['nip' => $nip ?: $nomor_induk],
                     [
                         'nama'               => $nama,
                         'nik'                => $nik,
                         'nuptk'              => $nuptk,
                         'status_kepegawaian' => $status_kepegawaian,
                         'status_keaktifan'   => 'Aktif',
-                        'jenis_kelamin'      => $jenis_kelamin,
                         'pendidikan'         => $pendidikan,
+                        'jenis_kelamin'      => $jenis_kelamin,
                         'serdik'             => $serdik,
                         'tugas_tambahan'     => $tugas_tambahan,
                         'tempat_lahir'       => $tempat_lahir,
@@ -168,12 +233,12 @@ class GuruImport implements ToCollection
                         'email'              => $email_pribadi ?: $email,
                         'email_pribadi'      => $email_pribadi ?: $email,
                         'email_resmi'        => $email_resmi,
-                        'alamat'             => $alamat_gabung,   // alamat lengkap
-                        'alamat_jalan'       => $alamat_jalan,    // jalan saja
+                        'alamat'             => $alamat_gabung,
+                        'alamat_jalan'       => $alamat_jalan,
                         'rt'                 => $rt,
                         'rw'                 => $rw,
                         'dusun'              => $dusun,
-                        'desa'               => $desa,            // ← kelurahan disimpan ke 'desa'
+                        'desa'               => $desa,
                         'kecamatan'          => $kecamatan,
                         'kode_pos'           => $kode_pos,
                         'telepon'            => $telepon,
@@ -188,6 +253,22 @@ class GuruImport implements ToCollection
                 Log::error('GuruImport Error: ' . $e->getMessage());
             }
         }
+    }
+
+    // ==========================================================
+    // KOMPATIBILITAS DENGAN CONTROLLER
+    // Controller memanggil 2 method ini jika checkbox dikirim.
+    // Dengan mapping berbasis header, keduanya tidak diperlukan,
+    // tapi WAJIB ada agar tidak error "undefined method".
+    // ==========================================================
+    public function setSelectedColumns(array $columns)
+    {
+        // Kolom dideteksi otomatis dari baris header — tidak dipakai.
+    }
+
+    public function setColumnMap(array $map)
+    {
+        // Kolom dideteksi otomatis dari baris header — tidak dipakai.
     }
 
     public function getErrors()

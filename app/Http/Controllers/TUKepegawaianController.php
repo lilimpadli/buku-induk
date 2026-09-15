@@ -65,6 +65,7 @@ class TUKepegawaianController extends Controller
         'jenis_kelamin' => 'Jenis Kelamin',
         'pendidikan' => 'Pendidikan',
         'serdik' => 'Serdik',
+        'tugas_tambahan' => 'Tugas Tambahan',
         'tempat_lahir' => 'Tempat Lahir',
         'tanggal_lahir' => 'Tanggal Lahir',
         'email_pribadi' => 'Email Pribadi',
@@ -87,6 +88,7 @@ class TUKepegawaianController extends Controller
             'nama', 'nik', 'nuptk', 'nip',
             'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir',
             'status_kepegawaian', 'status_aktif', 'pendidikan', 'serdik',
+            'tugas_tambahan',
             'telepon', 'no_hp', 'email', 'email_pribadi', 'email_resmi',
             'alamat', 'alamat_jalan', 'rt', 'rw', 'dusun', 'desa',
             'kecamatan', 'kode_pos', 'jurusan_id', 'gelar_belakang',
@@ -131,7 +133,7 @@ class TUKepegawaianController extends Controller
     // ==========================================================
     // DASHBOARD
     // ==========================================================
-        public function dashboard()
+    public function dashboard()
     {
         // ==========================================================
         // DATA INTI
@@ -184,18 +186,15 @@ class TUKepegawaianController extends Controller
         // STATISTIK KARTU DASHBOARD
         // ==========================================================
 
-        // 1. Guru aktif vs nonaktif
         $guruAktif = 0;
         if (Schema::hasColumn('gurus', 'status_keaktifan')) {
             $guruAktif = Guru::whereRaw("LOWER(TRIM(status_keaktifan)) = 'aktif'")->count();
         }
         $guruNonaktif = max(0, $totalGuru - $guruAktif);
 
-        // 2. Gender guru
         $guruLakiLaki  = Guru::where('jenis_kelamin', 'L')->count();
         $guruPerempuan = Guru::where('jenis_kelamin', 'P')->count();
 
-        // 3. Ditambahkan bulan ini
         $guruBulanIni = Guru::whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
@@ -207,9 +206,7 @@ class TUKepegawaianController extends Controller
                 ->count();
         }
 
-        // 4. Ditambahkan 6 bulan terakhir
         $batas6Bulan = now()->subMonthsNoOverflow(6)->startOfDay();
-
         $masuk6BulanGuru = Guru::where('created_at', '>=', $batas6Bulan)->count();
 
         $masuk6BulanPegawai = 0;
@@ -217,9 +214,6 @@ class TUKepegawaianController extends Controller
             $masuk6BulanPegawai = Pegawai::where('created_at', '>=', $batas6Bulan)->count();
         }
 
-        // ==========================================================
-        // KIRIM KE VIEW
-        // ==========================================================
         return view('tu_kepegawaian.dashboard', compact(
             'totalGuru',
             'totalTU',
@@ -316,7 +310,13 @@ class TUKepegawaianController extends Controller
     public function guruShow($id)
     {
         $guru = Guru::with(['user', 'jurusan', 'rombels.kelas.jurusan'])->findOrFail($id);
-        return view('tu_kepegawaian.guru.show', compact('guru'));
+
+        $tugasTambahan = collect();
+        if (Schema::hasTable('tugas_tambahans')) {
+            $tugasTambahan = \App\Models\TugasTambahan::where('guru_id', $guru->id)->get();
+        }
+
+        return view('tu_kepegawaian.guru.show', compact('guru', 'tugasTambahan'));
     }
 
     public function guruEdit($id)
@@ -820,14 +820,15 @@ class TUKepegawaianController extends Controller
                 $nuptk = trim($row[2] ?? null);
                 $nip = trim($row[3] ?? null);
                 if (empty($nip)) {
-                if (!empty($nik)) {
-                    $nip = $nik;
-                } elseif (!empty($email)) {
-                    $nip = $email;
-                } else {
-                    $nip = 'IMP-' . time() . '-' . $index;
+                    if (!empty($nik)) {
+                        $nip = $nik;
+                    } else {
+                        $nip = 'IMP-' . time() . '-' . $index;
+                    }
                 }
-            }
+
+                // ✅ FIX A: Baca tugas_tambahan (index 5)
+                $tugas_tambahan = trim($row[5] ?? null);
 
                 $tempat_lahir = trim($row[6] ?? null);
                 $jenis_kelamin = trim($row[8] ?? null);
@@ -868,7 +869,6 @@ class TUKepegawaianController extends Controller
 
                 // ============================================================
                 // FIX: Cegah duplikat email di tabel users
-                // Kalau email sudah dipakai user lain, tambahkan suffix unik
                 // ============================================================
                 $emailExists = User::where('email', $email)->exists();
                 if ($emailExists) {
@@ -930,6 +930,14 @@ class TUKepegawaianController extends Controller
                             'no_hp'                 => $no_hp,
                             'jabatan'               => $jabatan,
                             'alamat'                => $alamat,
+                            // ✅ FIX B: Tambah 7 field
+                            'rt'                    => $rt,
+                            'rw'                    => $rw,
+                            'dusun'                 => $dusun,
+                            'desa'                  => $desa,
+                            'kecamatan'             => $kecamatan,
+                            'kode_pos'              => $kode_pos,
+                            'tugas_tambahan'        => $tugas_tambahan,
                             'user_id'               => $user->id,
                         ]
                     );
@@ -997,7 +1005,7 @@ class TUKepegawaianController extends Controller
     }
 
     // ==========================================================
-    // RIWAYAT TUGAS (Model: RiwayatTugas)
+    // RIWAYAT TUGAS
     // ==========================================================
     public function riwayat()
     {
@@ -1069,7 +1077,7 @@ class TUKepegawaianController extends Controller
     }
 
     // ==========================================================
-    // MUTASI (Model: Mutasi)
+    // MUTASI
     // ==========================================================
     public function mutasiIndex()
     {

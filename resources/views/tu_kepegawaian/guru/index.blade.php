@@ -234,6 +234,9 @@
         gap: 10px;
     }
 
+    /* ==========================================
+       TABEL — RAPI & KOMPAK
+       ========================================== */
     .table-container {
         overflow-x: auto;
         padding: 0;
@@ -241,23 +244,26 @@
     .table-premium {
         width: 100%;
         border-collapse: collapse;
-        font-size: 14px;
+        font-size: 13.5px;
     }
     .table-premium thead th {
-        padding: 14px 20px;
+        padding: 13px 16px;
         text-align: left;
-        font-weight: 600;
-        font-size: 12px;
+        font-weight: 700;
+        font-size: 11px;
         text-transform: uppercase;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.07em;
         color: var(--text-muted);
         background: #FAFBFC;
         border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+        vertical-align: middle;
     }
     .table-premium tbody td {
-        padding: 16px 20px;
+        padding: 13px 16px;
         border-bottom: 1px solid #F1F5F9;
         color: var(--text-body);
+        vertical-align: middle;
     }
     .table-premium tbody tr {
         transition: background 0.15s;
@@ -268,26 +274,80 @@
     .table-premium tbody tr:last-child td {
         border-bottom: none;
     }
+    .table-premium th.text-center,
+    .table-premium td.text-center {
+        text-align: center;
+    }
 
     .data-name {
-        font-weight: 600;
+        font-weight: 700;
         color: var(--text-heading);
+        font-size: 14px;
+        line-height: 1.3;
     }
     .data-email {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        font-size: 13px;
+        display: inline-block;
+        max-width: 180px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: middle;
+        font-size: 12px;
         color: var(--text-muted);
     }
+    .data-email i {
+        font-size: 10px;
+    }
 
+    /* Identitas nomor: ringkas 2 baris dengan label kecil */
+    .num-line {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        line-height: 1.5;
+        white-space: nowrap;
+    }
+    .num-line .tag {
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: .06em;
+        color: var(--text-muted);
+        background: #F1F5F9;
+        border-radius: 5px;
+        padding: 1.5px 6px;
+        flex-shrink: 0;
+        min-width: 44px;
+        text-align: center;
+    }
+    .num-line .val {
+        font-family: monospace;
+        font-size: 12.5px;
+        color: var(--text-body);
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .nip-val {
+        font-family: monospace;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text-body);
+        white-space: nowrap;
+    }
+
+    /* ==========================================
+       BADGE — ANTI PATAH BARIS
+       ========================================== */
     .badge-pill {
         display: inline-flex;
         align-items: center;
-        padding: 4px 14px;
+        padding: 4px 12px;
         border-radius: 100px;
-        font-size: 12px;
+        font-size: 11.5px;
         font-weight: 600;
+        white-space: nowrap;
+        line-height: 1.4;
     }
     .badge-blue {
         background: #EEF2FF;
@@ -313,7 +373,6 @@
         background: #F3E8FF;
         color: #7E22CE;
     }
-
     .badge-outline-green {
         border: 1px solid #A7F3D0;
         color: #047857;
@@ -325,15 +384,47 @@
         background: transparent;
     }
 
+    /* JK: chip kecil ikon + huruf */
+    .jk-chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        width: 40px;
+        padding: 4px 0;
+        border-radius: 8px;
+        font-size: 11.5px;
+        font-weight: 700;
+    }
+    .jk-l { background: #EEF2FF; color: #4F46E5; }
+    .jk-p { background: #FDF2F8; color: #DB2777; }
+
+    /* Serdik & tugas: indikator ringkas */
+    .mark-yes {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #047857;
+        white-space: nowrap;
+    }
+    .mark-yes i { font-size: 12px; }
+    .mark-no {
+        color: #CBD5E1;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
     .action-btn-group {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 6px;
     }
     .action-btn {
-        width: 34px;
-        height: 34px;
+        width: 32px;
+        height: 32px;
         border: none;
         border-radius: 8px;
         display: inline-flex;
@@ -342,6 +433,7 @@
         transition: all 0.2s ease;
         cursor: pointer;
         text-decoration: none;
+        font-size: 12.5px;
     }
     .action-btn-view {
         background: #EEF2FF;
@@ -429,6 +521,9 @@
             flex-direction: column;
             align-items: center;
         }
+        .data-email {
+            max-width: 130px;
+        }
     }
 </style>
 
@@ -475,7 +570,7 @@
                     <li><h6 class="dropdown-header">Absensi Kegiatan</h6></li>
                     <li>
                         <a class="dropdown-item" href="{{ route('tu_kepegawaian.guru.absensi_kegiatan') }}" target="_blank">
-                            <i class="fas fa-users"></i> Semua Guru (PKKS / Rapat)
+                            <i class="fas fa-users"></i> Semua Guru
                         </a>
                     </li>
                 </ul>
@@ -585,33 +680,55 @@
             <table class="table-premium">
                 <thead>
                     <tr>
-                        <th style="width: 50px;">#</th>
-                        <th style="min-width: 200px;">Identitas</th>
+                        <th style="width: 46px;" class="text-center">#</th>
+                        <th style="min-width: 210px;">Identitas</th>
                         <th>NIK / NUPTK</th>
                         <th>NIP</th>
                         <th>Status</th>
-                        <th class="text-center">JK</th>
-                        <th class="text-center">Serdik</th>
-                        <th class="text-center" style="width: 140px;">Aksi</th>
+                        <th class="text-center" style="width: 70px;">JK</th>
+                        <th class="text-center" style="width: 80px;">Serdik</th>
+                        <th style="min-width: 150px;">Tugas Tambahan</th>
+                        <th class="text-center" style="width: 128px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($gurus as $guru)
                         <tr>
-                            <td class="fw-bold text-secondary" style="font-size: 13px;">
+                            {{-- Nomor urut --}}
+                            <td class="text-center fw-bold text-secondary" style="font-size: 12.5px;">
                                 {{ $loop->iteration + $offset }}
                             </td>
+
+                            {{-- Identitas: nama + email terpotong rapi --}}
                             <td>
                                 <div class="data-name">{{ $guru->nama }}</div>
-                                <div class="data-email">
-                                    <i class="fas fa-envelope text-secondary"></i> {{ $guru->email ?? '-' }}
+                                @if (!empty($guru->email))
+                                    <span class="data-email" title="{{ $guru->email }}">
+                                        <i class="fas fa-envelope me-1"></i>{{ $guru->email }}
+                                    </span>
+                                @else
+                                    <span class="text-muted small">—</span>
+                                @endif
+                            </td>
+
+                            {{-- NIK / NUPTK: 2 baris ringkas dengan tag label --}}
+                            <td>
+                                <div class="num-line">
+                                    <span class="tag">NIK</span>
+                                    <span class="val">{{ $guru->nik ?? '—' }}</span>
+                                </div>
+                                <div class="num-line">
+                                    <span class="tag">NUPTK</span>
+                                    <span class="val">{{ $guru->nuptk ?? '—' }}</span>
                                 </div>
                             </td>
-                            <td class="text-secondary">
-                                <div class="fw-bold">{{ $guru->nik ?? '-' }}</div>
-                                <div class="text-muted small">NUPTK: {{ $guru->nuptk ?? '-' }}</div>
+
+                            {{-- NIP --}}
+                            <td>
+                                <span class="nip-val">{{ $guru->nip ?? '—' }}</span>
                             </td>
-                            <td class="text-secondary fw-semibold" style="font-family: monospace; font-size: 13px;">{{ $guru->nip ?? '-' }}</td>
+
+                            {{-- Status: badge anti patah --}}
                             <td>
                                 @php
                                     $status = strtolower(str_replace(' ', '-', $guru->status_kepegawaian ?? ''));
@@ -623,17 +740,42 @@
                                     elseif($status == 'guru-tidak-tetap') $class = 'badge-purple';
                                 @endphp
                                 <span class="badge-pill {{ $class }}">
-                                    {{ $guru->status_kepegawaian ?? '-' }}
+                                    {{ $guru->status_kepegawaian ?? '—' }}
                                 </span>
                             </td>
-                            <td class="text-center fw-bold text-secondary">{{ $guru->jenis_kelamin ?? '-' }}</td>
+
+                            {{-- JK: chip ikon --}}
                             <td class="text-center">
-                                @if(!empty($guru->serdik))
-                                    <span class="badge-pill badge-outline-green">Tersertifikasi</span>
+                                @if ($guru->jenis_kelamin === 'L')
+                                    <span class="jk-chip jk-l" title="Laki-laki"><i class="fas fa-mars"></i> L</span>
+                                @elseif ($guru->jenis_kelamin === 'P')
+                                    <span class="jk-chip jk-p" title="Perempuan"><i class="fas fa-venus"></i> P</span>
                                 @else
-                                    <span class="badge-pill badge-outline-gray">Belum</span>
+                                    <span class="mark-no">—</span>
                                 @endif
                             </td>
+
+                            {{-- Serdik: centang / garis --}}
+                            <td class="text-center">
+                                @if(!empty($guru->serdik))
+                                    <span class="mark-yes" title="{{ $guru->serdik }}"><i class="fas fa-circle-check"></i> Ada</span>
+                                @else
+                                    <span class="mark-no">—</span>
+                                @endif
+                            </td>
+
+                            {{-- Tugas Tambahan: badge amber anti patah --}}
+                            <td>
+                                @if(!empty($guru->tugas_tambahan))
+                                    <span class="badge-pill badge-yellow">
+                                        <i class="fas fa-award me-1" style="font-size:10px;"></i>{{ $guru->tugas_tambahan }}
+                                    </span>
+                                @else
+                                    <span class="mark-no">—</span>
+                                @endif
+                            </td>
+
+                            {{-- Aksi --}}
                             <td class="text-center">
                                 <div class="action-btn-group">
                                     <a href="{{ route('tu_kepegawaian.guru.show', $guru->id) }}" class="action-btn action-btn-view" data-bs-toggle="tooltip" title="Lihat Detail">
@@ -649,8 +791,8 @@
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="8">
+                        <tr> 
+                            <td colspan="9">
                                 <div class="text-center py-5">
                                     <i class="fas fa-inbox fs-1 text-muted mb-3"></i>
                                     <h5 class="fw-bold">Tidak ada data</h5>
@@ -691,7 +833,7 @@
                     <p class="text-secondary mb-3">Pilih kolom yang ingin disertakan:</p>
                     <div class="row g-3">
                         @php
-                            $fields = ['nama'=>'Nama', 'nik'=>'NIK', 'nuptk'=>'NUPTK', 'nip'=>'NIP', 'status_kepegawaian'=>'Status', 'jenis_kelamin'=>'JK', 'tempat_lahir'=>'Tempat Lahir', 'tanggal_lahir'=>'Tanggal Lahir', 'serdik'=>'Serdik', 'email_pribadi'=>'Email Pribadi', 'email_resmi'=>'Email Resmi', 'alamat_jalan'=>'Alamat', 'rt'=>'RT', 'rw'=>'RW', 'dusun'=>'Dusun', 'desa'=>'Desa/Kelurahan', 'kecamatan'=>'Kecamatan', 'kode_pos'=>'Kode Pos', 'telepon'=>'No HP'];
+                            $fields = ['nama'=>'Nama', 'nik'=>'NIK', 'nuptk'=>'NUPTK', 'nip'=>'NIP', 'status_kepegawaian'=>'Status', 'jenis_kelamin'=>'JK', 'tempat_lahir'=>'Tempat Lahir', 'tanggal_lahir'=>'Tanggal Lahir', 'serdik'=>'Serdik', 'tugas_tambahan'=>'Tugas Tambahan', 'email_pribadi'=>'Email Pribadi', 'email_resmi'=>'Email Resmi', 'alamat_jalan'=>'Alamat', 'rt'=>'RT', 'rw'=>'RW', 'dusun'=>'Dusun', 'desa'=>'Desa/Kelurahan', 'kecamatan'=>'Kecamatan', 'kode_pos'=>'Kode Pos', 'telepon'=>'No HP'];
                         @endphp
                         @foreach($fields as $key => $label)
                             <div class="col-md-6 col-lg-4">
@@ -733,7 +875,7 @@
                         <label class="form-label fw-bold text-secondary small text-uppercase">Kolom Import</label>
                         <div class="row g-3">
                             @php
-                                $importFields = ['nama'=>'Nama', 'nik'=>'NIK', 'nuptk'=>'NUPTK', 'nip'=>'NIP', 'status_kepegawaian'=>'Status', 'jenis_kelamin'=>'JK', 'tempat_lahir'=>'Tempat Lahir', 'tanggal_lahir'=>'Tanggal Lahir', 'serdik'=>'Serdik', 'email_pribadi'=>'Email Pribadi', 'email_resmi'=>'Email Resmi', 'alamat_jalan'=>'Alamat', 'rt'=>'RT', 'rw'=>'RW', 'dusun'=>'Dusun', 'desa'=>'Desa/Kelurahan', 'kecamatan'=>'Kecamatan', 'kode_pos'=>'Kode Pos', 'telepon'=>'No HP'];
+                                $importFields = ['nama'=>'Nama', 'nik'=>'NIK', 'nuptk'=>'NUPTK', 'nip'=>'NIP', 'status_kepegawaian'=>'Status', 'jenis_kelamin'=>'JK', 'tempat_lahir'=>'Tempat Lahir', 'tanggal_lahir'=>'Tanggal Lahir', 'serdik'=>'Serdik', 'tugas_tambahan'=>'Tugas Tambahan', 'email_pribadi'=>'Email Pribadi', 'email_resmi'=>'Email Resmi', 'alamat_jalan'=>'Alamat', 'rt'=>'RT', 'rw'=>'RW', 'dusun'=>'Dusun', 'desa'=>'Desa/Kelurahan', 'kecamatan'=>'Kecamatan', 'kode_pos'=>'Kode Pos', 'telepon'=>'No HP'];
                             @endphp
                             @foreach($importFields as $key => $label)
                                 <div class="col-md-6 col-lg-4">

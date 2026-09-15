@@ -98,7 +98,7 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::get('/ppdb', [App\Http\Controllers\TU\PpdbController::class, 'index'])->name('ppdb.index');
+//Route::get('/ppdb', [App\Http\Controllers\TU\PpdbController::class, 'index'])->name('ppdb.index');
 
 // Reset password siswa
 Route::get('/siswa/reset-password', [SiswaResetPasswordController::class, 'showResetForm'])->name('siswa.password.reset.form');

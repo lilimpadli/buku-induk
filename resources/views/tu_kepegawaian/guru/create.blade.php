@@ -4,7 +4,7 @@
 
 @section('content')
 <style>
-    /* ===== PREMIUM DESIGN 2.0 — FORM (konsisten dgn halaman index) ===== */
+    /* ===== PREMIUM DESIGN 2.0 — FORM ===== */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
     :root {
@@ -31,35 +31,32 @@
         overflow: hidden;
         animation: fadeUp .4s ease both;
     }
-    .stagger-1 { animation-delay: .06s; } .stagger-2 { animation-delay: .12s; }
-    .stagger-3 { animation-delay: .18s; } .stagger-4 { animation-delay: .24s; }
+    .stagger-1 { animation-delay: .06s; }
+    .stagger-2 { animation-delay: .12s; }
+    .stagger-3 { animation-delay: .18s; }
+    .stagger-4 { animation-delay: .24s; }
 
-    /* Header */
     .header-premium { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
     .header-title-wrap { display: flex; align-items: center; gap: 16px; }
     .header-icon { width: 48px; height: 48px; background: var(--primary-light); color: var(--primary); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
     .header-title { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; color: var(--text-heading); margin: 0 0 2px; }
     .header-subtitle { font-size: 14px; color: var(--text-muted); font-weight: 500; margin: 0; }
 
-    /* Tombol */
     .btn-premium { padding: 10px 22px; border-radius: 100px; font-weight: 600; font-size: 14px; transition: all .25s ease; display: inline-flex; align-items: center; gap: 8px; border: none; text-decoration: none; cursor: pointer; }
     .btn-premium-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(79, 70, 229, .25); }
     .btn-premium-primary:hover { background: var(--primary-dark); color: #fff; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79, 70, 229, .35); }
     .btn-premium-ghost { background: #F1F5F9; color: var(--text-body); }
     .btn-premium-ghost:hover { background: #E2E8F0; color: var(--text-body); transform: translateY(-2px); }
 
-    /* Alert error */
     .alert-premium { display: flex; align-items: flex-start; gap: 14px; background-color: #FEF2F2; border: 1px solid #FECACA; border-radius: 16px; padding: 18px 22px; margin-bottom: 24px; animation: fadeUp .4s ease both; }
     .alert-premium > i { color: var(--danger); font-size: 20px; margin-top: 2px; }
 
-    /* Section dalam kartu */
     .section-header { display: flex; align-items: center; gap: 14px; padding: 22px 28px; background: linear-gradient(135deg, #FAFBFC, #fff); border-bottom: 1px solid #F1F5F9; }
     .section-icon { width: 42px; height: 42px; flex-shrink: 0; background: var(--primary-light); color: var(--primary); border-radius: 12px; font-size: 16px; display: flex; align-items: center; justify-content: center; }
     .section-title { font-size: 16px; font-weight: 700; color: var(--text-heading); margin: 0; }
     .section-desc { font-size: 13px; color: var(--text-muted); margin: 2px 0 0; }
     .section-body { padding: 24px 28px; }
 
-    /* Form */
     .form-label-premium { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; color: var(--text-body); margin-bottom: 8px; }
     .form-label-premium i { color: var(--primary); font-size: 12px; }
     .required-star { color: var(--danger); }
@@ -86,7 +83,6 @@
     .field-error { display: flex; align-items: center; gap: 5px; color: var(--danger); font-size: 12px; font-weight: 500; margin-top: 6px; }
     .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; display: flex; align-items: center; gap: 5px; }
 
-    /* Footer form */
     .form-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 20px 28px; background-color: #FAFBFC; border-top: 1px solid #F1F5F9; }
     .form-footer-note { font-size: 13px; color: var(--text-muted); display: inline-flex; align-items: center; gap: 7px; }
 
@@ -102,7 +98,7 @@
 
 <div class="app-container">
 
-    {{-- ================= HEADER ================= --}}
+    {{-- HEADER --}}
     <div class="header-premium">
         <div class="header-title-wrap">
             <div class="header-icon"><i class="fas fa-user-plus"></i></div>
@@ -116,7 +112,7 @@
         </a>
     </div>
 
-    {{-- ================= ALERT ERROR ================= --}}
+    {{-- ALERT ERROR --}}
     @if ($errors->any())
         <div class="alert-premium">
             <i class="fas fa-exclamation-triangle"></i>
@@ -136,12 +132,12 @@
 
         @php
             $statusKepegawaianOptions = ['PNS', 'PPPK', 'PPPK Paruh Waktu', 'Honorer', 'Guru Tetap Yayasan', 'Guru Tidak Tetap'];
-            $statusAktifOptions      = ['Aktif', 'Non-Aktif', 'Cuti', 'Mutasi', 'Pensiun', 'Keluar'];
-            $pendidikanOptions       = ['S3', 'S2', 'S1', 'D4', 'D3'];
-            $currentAktif            = old('status_aktif', 'Aktif');
+            $statusAktifOptions       = ['Aktif', 'Non-Aktif', 'Cuti', 'Mutasi', 'Pensiun', 'Keluar'];
+            $pendidikanOptions        = ['S3', 'S2', 'S1', 'D4', 'D3'];
+            $currentAktif             = old('status_aktif', 'Aktif');
         @endphp
 
-        {{-- ====== SECTION 1: IDENTITAS ====== --}}
+        {{-- ===== SECTION 1: IDENTITAS ===== --}}
         <div class="card-premium mb-4">
             <div class="section-header">
                 <div class="section-icon"><i class="fas fa-id-card"></i></div>
@@ -195,13 +191,13 @@
             </div>
         </div>
 
-        {{-- ====== SECTION 2: KEPEGAWAIAN ====== --}}
+        {{-- ===== SECTION 2: KEPEGAWAIAN ===== --}}
         <div class="card-premium mb-4 stagger-1">
             <div class="section-header">
                 <div class="section-icon"><i class="fas fa-briefcase"></i></div>
                 <div>
                     <h2 class="section-title">Kepegawaian & Kualifikasi</h2>
-                    <p class="section-desc">Status kepegawaian, keaktifan, dan kualifikasi akademik</p>
+                    <p class="section-desc">Status kepegawaian, keaktifan, kualifikasi akademik, dan tugas tambahan</p>
                 </div>
             </div>
             <div class="section-body">
@@ -241,11 +237,17 @@
                         @error('serdik')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                         <div class="form-hint"><i class="fas fa-circle-info"></i> Kosongkan jika belum tersertifikasi.</div>
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label-premium"><i class="fas fa-tasks"></i> Tugas Tambahan</label>
+                        <input type="text" name="tugas_tambahan" value="{{ old('tugas_tambahan') }}" class="form-control-premium @error('tugas_tambahan') is-invalid-premium @enderror" placeholder="Contoh: Wali Kelas XI RPL 1 / Kaprog">
+                        @error('tugas_tambahan')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
+                        <div class="form-hint"><i class="fas fa-circle-info"></i> Kosongkan jika tidak ada tugas tambahan.</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        {{-- ====== SECTION 3: KONTAK ====== --}}
+        {{-- ===== SECTION 3: KONTAK ===== --}}
         <div class="card-premium mb-4 stagger-2">
             <div class="section-header">
                 <div class="section-icon"><i class="fas fa-address-book"></i></div>
@@ -275,7 +277,7 @@
             </div>
         </div>
 
-        {{-- ====== SECTION 4: ALAMAT ====== --}}
+        {{-- ===== SECTION 4: ALAMAT ===== --}}
         <div class="card-premium mb-4 stagger-3">
             <div class="section-header">
                 <div class="section-icon"><i class="fas fa-map-marked-alt"></i></div>
@@ -325,7 +327,7 @@
             </div>
         </div>
 
-        {{-- ====== FOOTER AKSI ====== --}}
+        {{-- ===== FOOTER ===== --}}
         <div class="card-premium stagger-4">
             <div class="form-footer">
                 <div class="form-footer-note">

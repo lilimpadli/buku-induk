@@ -10,22 +10,29 @@ class Pegawai extends Model
      *
      */
     protected $fillable = [
-        'nama',
-        'nik',
-        'nuptk',
-        'nip',
-        'jenis_kelamin',
-        'tempat_lahir',
-        'tanggal_lahir',
-        'status_kepegawaian',
-        'pendidikan',
-        'tugas_tambahan',   
-        'email',
-        'no_hp',
-        'jabatan',
-        'alamat',
-        'user_id',
-    ];
+    'nama',
+    'nik',
+    'nuptk',
+    'nip',
+    'jenis_kelamin',
+    'tempat_lahir',
+    'tanggal_lahir',
+    'status_kepegawaian',
+    'pendidikan',
+    'tugas_tambahan',
+    'email',
+    'no_hp',
+    'jabatan',
+    'alamat',
+    'rt',
+    'rw',
+    'dusun',
+    'desa',
+    'kecamatan',
+    'kode_pos',
+    'user_id',
+     ];
+    
 
     /**
      * 

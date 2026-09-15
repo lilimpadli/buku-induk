@@ -100,16 +100,40 @@
     .link-premium { color: var(--primary); text-decoration: none; font-weight: 600; }
     .link-premium:hover { text-decoration: underline; }
 
-    .table-premium { width: 100%; border-collapse: collapse; font-size: 14px; }
-    .table-premium thead th {
-        padding: 14px 28px; text-align: left; font-weight: 600; font-size: 12px;
-        text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted);
-        background: #FAFBFC; border-bottom: 1px solid var(--border); white-space: nowrap;
+    /* ==========================================
+       KOTAK TUGAS TAMBAHAN (GAYA AMBER)
+       ========================================== */
+    .tugas-box {
+        padding: 16px 20px;
+        background-color: #FFFBEB;
+        border: 1px solid #FDE68A;
+        border-radius: 14px;
+        height: 100%;
+        transition: all .2s ease;
     }
-    .table-premium tbody td { padding: 16px 28px; border-bottom: 1px solid #F1F5F9; color: var(--text-body); }
-    .table-premium tbody tr { transition: background .15s; }
-    .table-premium tbody tr:hover { background: #F8FAFC; }
-    .table-premium tbody tr:last-child td { border-bottom: none; }
+    .tugas-box:hover {
+        background-color: #FEF3C7;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px -6px rgba(245, 158, 11, 0.35);
+    }
+    .tugas-label {
+        display: flex; align-items: center; gap: 7px;
+        font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
+        color: #B45309; font-weight: 700; margin-bottom: 8px;
+    }
+    .tugas-label i { font-size: 11px; }
+    .tugas-value {
+        font-size: 15px;
+        color: #92400E;
+        font-weight: 700;
+        word-break: break-word;
+    }
+    .tugas-sub {
+        font-size: 12px;
+        color: #B45309;
+        opacity: .75;
+        margin-top: 4px;
+    }
 
     .empty-state { text-align: center; padding: 56px 24px; }
     .empty-state i { font-size: 44px; color: #CBD5E1; margin-bottom: 14px; }
@@ -120,9 +144,31 @@
         .app-container { padding: 16px; }
         .header-premium { flex-direction: column; align-items: flex-start; }
         .profile-banner, .section-body, .section-header { padding-left: 16px; padding-right: 16px; }
-        .table-premium thead th, .table-premium tbody td { padding-left: 16px; padding-right: 16px; }
     }
 </style>
+
+{{-- ════════════════════════════════════════════════════════════
+     PERSIAPAN DATA TUGAS TAMBAHAN
+     Prioritas: tabel relasi tugas_tambahans.
+     Fallback : kolom gurus.tugas_tambahan (hasil import Excel)
+══════════════════════════════════════════════════════════════ --}}
+@php
+    $daftarTugas = collect();
+
+    if (isset($tugasTambahan) && $tugasTambahan->count()) {
+        $daftarTugas = $tugasTambahan;
+    } elseif (!empty($guru->tugas_tambahan)) {
+        // Buat item fallback dari kolom gurus.tugas_tambahan
+        $daftarTugas = collect([
+            (object) [
+                'jabatan'  => $guru->tugas_tambahan,
+                'nama_tugas' => $guru->tugas_tambahan,
+                'instansi' => null,
+                'mulai'    => null,
+            ],
+        ]);
+    }
+@endphp
 
 <div class="app-container">
 
@@ -158,7 +204,7 @@
         ];
         $kepegawaianBadge = $statusColors[$guru->status_kepegawaian] ?? 'badge-gray';
 
-        $statusAktifRaw = $guru->status_aktif ?? $guru->status ?? 'Aktif';
+        $statusAktifRaw = $guru->status_aktif ?? $guru->status_keaktifan ?? 'Aktif';
         $statusAktifKey = strtolower(trim($statusAktifRaw));
         $aktifBadge = 'badge-green'; $aktifIcon = 'fa-user-check';
         if (strpos($statusAktifKey, 'keluar') !== false || strpos($statusAktifKey, 'non') !== false) {
@@ -196,14 +242,12 @@
                         <span class="badge-pill badge-gray"><i class="fas fa-certificate"></i> Belum Serdik</span>
                     @endif
 
-                    {{-- TUGAS TAMBAHAN (loop dari $tugasTambahan) --}}
-                    @if (isset($tugasTambahan) && $tugasTambahan->count())
-                        @foreach ($tugasTambahan as $t)
-                            <span class="badge-pill badge-yellow">
-                                <i class="fas fa-award"></i> {{ $t->jabatan }}
-                            </span>
-                        @endforeach
-                    @endif
+                    {{-- TUGAS TAMBAHAN (badge ringkas di profil) --}}
+                    @foreach ($daftarTugas as $t)
+                        <span class="badge-pill badge-yellow">
+                            <i class="fas fa-award"></i> {{ $t->jabatan ?? $t->nama_tugas ?? 'Tugas Tambahan' }}
+                        </span>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -374,7 +418,9 @@
         </div>
     </div>
 
-    {{-- TUGAS TAMBAHAN --}}
+    {{-- ══════════════════════════════════════════════════════════
+         TUGAS TAMBAHAN — GAYA KOTAK AMBER (SESUAI SCREENSHOT)
+    ═══════════════════════════════════════════════════════════ --}}
     <div class="card-premium stagger-3">
         <div class="section-header">
             <div class="section-icon" style="background: #FEF3C7; color: #B45309;">
@@ -382,41 +428,44 @@
             </div>
             <div>
                 <h2 class="section-title">Tugas Tambahan</h2>
-                <p class="section-desc">Daftar tugas tambahan yang diemban guru ini</p>
+                <p class="section-desc">Tugas tambahan yang diemban guru ini</p>
             </div>
-            @if (isset($tugasTambahan) && $tugasTambahan->count())
+            @if ($daftarTugas->count())
                 <span class="badge-pill badge-yellow ms-auto">
-                    <i class="fas fa-list"></i> {{ $tugasTambahan->count() }} Tugas
+                    <i class="fas fa-list"></i> {{ $daftarTugas->count() }} Tugas
                 </span>
             @endif
         </div>
 
-        @if (isset($tugasTambahan) && $tugasTambahan->count())
-            <div class="table-responsive">
-                <table class="table-premium">
-                    <thead>
-                        <tr>
-                            <th style="width: 60px;">#</th>
-                            <th>Nama Tugas</th>
-                            <th>Instansi</th>
-                            <th>Tanggal Mulai</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($tugasTambahan as $t)
-                            <tr>
-                                <td class="fw-bold text-muted">{{ $loop->iteration }}</td>
-                                <td>
-                                    <span class="badge-pill badge-yellow">
-                                        <i class="fas fa-award"></i> {{ $t->jabatan ?? '—' }}
-                                    </span>
-                                </td>
-                                <td>{{ $t->instansi ?? '—' }}</td>
-                                <td>{{ $t->mulai ? \Carbon\Carbon::parse($t->mulai)->translatedFormat('d F Y') : '—' }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+        @if ($daftarTugas->count())
+            <div class="section-body">
+                <div class="row g-3">
+                    @foreach ($daftarTugas as $t)
+                        @php
+                            $namaTugas = $t->jabatan ?? $t->nama_tugas ?? $t->nama ?? '—';
+                        @endphp
+                        <div class="col-12">
+                            <div class="tugas-box">
+                                <span class="tugas-label">
+                                    <i class="fas fa-award"></i> Tugas Tambahan
+                                </span>
+                                <div class="tugas-value">{{ $namaTugas }}</div>
+
+                                {{-- Info tambahan kalau datanya ada (dari tabel relasi) --}}
+                                @if (!empty($t->instansi) || !empty($t->mulai))
+                                    <div class="tugas-sub">
+                                        @if (!empty($t->instansi))
+                                            <i class="fas fa-building me-1"></i>{{ $t->instansi }}
+                                        @endif
+                                        @if (!empty($t->mulai))
+                                            &nbsp;·&nbsp;<i class="far fa-calendar me-1"></i>Sejak {{ \Carbon\Carbon::parse($t->mulai)->translatedFormat('d F Y') }}
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
         @else
             <div class="empty-state">

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Hadir Kegiatan (Guru & Pegawai)</title>
+    <title>Daftar Hadir Kegiatan</title>
 <style>
 
     table th:last-child,
@@ -129,7 +129,7 @@
         margin-bottom: 10px;
     }
 
-    /* ═══ GROUP SECTION (GURU / PEGAWAI) ═══ */
+    /* ═══ GROUP HEADER (Khusus Panel Kontrol) ═══ */
     .group-header {
         display: flex;
         align-items: center;
@@ -454,18 +454,6 @@
         text-align: left;
     }
 
-    /* ═══ SECTION DIVIDER DI TABEL CETAK ═══ */
-    tr.row-section td {
-        background: #f0f0f0;
-        font-weight: 800;
-        font-size: 10pt;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        padding: 6px 10px !important;
-        text-align: left;
-        border: 1px solid #000;
-    }
-
     .footer-cetak {
         margin-top: 20px;
         text-align: right;
@@ -547,9 +535,7 @@
                 <input type="text" id="searchOrang" placeholder="Ketik nama guru / pegawai..." oninput="filterOrang()">
             </div>
 
-            {{-- ═══════════════════════════════════════════════ --}}
-            {{-- SECTION GURU --}}
-            {{-- ═══════════════════════════════════════════════ --}}
+            {{-- ══════════ SECTION GURU ══════════ --}}
             <div class="group-header guru">
                 <span class="group-icon"><i class="fas fa-chalkboard-teacher"></i></span>
                 <span>Guru</span>
@@ -558,7 +544,7 @@
 
             <div class="grid-orang" id="gridGuru">
                 @forelse($gurus ?? [] as $guru)
-                    <label class="item-orang item-guru" data-nama="{{ strtolower($guru->nama) }}" data-tipe="Guru">
+                    <label class="item-orang item-guru" data-nama="{{ strtolower($guru->nama) }}">
                         <input type="checkbox" class="cb-orang cb-guru" value="guru-{{ $guru->id }}" checked onchange="updateTable()">
                         <div class="checkmark"></div>
                         <span class="nama-text">{{ $guru->nama }}</span>
@@ -568,9 +554,7 @@
                 @endforelse
             </div>
 
-            {{-- ═══════════════════════════════════════════════ --}}
-            {{-- SECTION PEGAWAI --}}
-            {{-- ═══════════════════════════════════════════════ --}}
+            {{-- ══════════ SECTION PEGAWAI ══════════ --}}
             <div class="group-header pegawai" style="margin-top: 22px;">
                 <span class="group-icon"><i class="fas fa-user-tie"></i></span>
                 <span>Pegawai</span>
@@ -579,7 +563,7 @@
 
             <div class="grid-orang" id="gridPegawai">
                 @forelse($pegawais ?? [] as $pegawai)
-                    <label class="item-orang item-pegawai" data-nama="{{ strtolower($pegawai->nama) }}" data-tipe="Pegawai">
+                    <label class="item-orang item-pegawai" data-nama="{{ strtolower($pegawai->nama) }}">
                         <input type="checkbox" class="cb-orang cb-pegawai" value="pegawai-{{ $pegawai->id }}" checked onchange="updateTable()">
                         <div class="checkmark"></div>
                         <span class="nama-text">{{ $pegawai->nama }}</span>
@@ -612,7 +596,7 @@
         </div>
     </div>
 
-    <!-- ============ PRATINJAU DOKUMEN ============ -->
+    <!-- ============ PRATINJAU DOKUMEN (TANPA SECTION GURU/PEGAWAI) ============ -->
     <div class="sheet">
 
         <div class="kop">
@@ -651,33 +635,23 @@
             </thead>
             <tbody id="tabelBody">
 
-                {{-- ══════════ SECTION GURU ══════════ --}}
-                @if(!empty($gurus) && count($gurus) > 0)
-                    <tr class="row-section row-section-guru" data-section="guru">
-                        <td colspan="5">A. GURU</td>
+                {{-- ══════════ GURU ══════════ --}}
+                @foreach($gurus ?? [] as $guru)
+                    <tr class="row-orang row-guru" data-id="guru-{{ $guru->id }}">
+                        <td class="no cell-no"></td>
+                        <td class="nama">{{ strtoupper($guru->nama) }}</td>
+                        <td class="nip">{{ $guru->nip ?? '-' }}</td>
                     </tr>
-                    @foreach($gurus as $guru)
-                        <tr class="row-orang row-guru" data-id="guru-{{ $guru->id }}">
-                            <td class="no cell-no"></td>
-                            <td class="nama">{{ strtoupper($guru->nama) }}</td>
-                            <td class="nip">{{ $guru->nip ?? '-' }}</td>
-                        </tr>
-                    @endforeach
-                @endif
+                @endforeach
 
-                {{-- ══════════ SECTION PEGAWAI ══════════ --}}
-                @if(!empty($pegawais) && count($pegawais) > 0)
-                    <tr class="row-section row-section-pegawai" data-section="pegawai">
-                        <td colspan="5">B. PEGAWAI</td>
+                {{-- ══════════ PEGAWAI ══════════ --}}
+                @foreach($pegawais ?? [] as $pegawai)
+                    <tr class="row-orang row-pegawai" data-id="pegawai-{{ $pegawai->id }}">
+                        <td class="no cell-no"></td>
+                        <td class="nama">{{ strtoupper($pegawai->nama) }}</td>
+                        <td class="nip">{{ $pegawai->nip ?? '-' }}</td>
                     </tr>
-                    @foreach($pegawais as $pegawai)
-                        <tr class="row-orang row-pegawai" data-id="pegawai-{{ $pegawai->id }}">
-                            <td class="no cell-no"></td>
-                            <td class="nama">{{ strtoupper($pegawai->nama) }}</td>
-                            <td class="nip">{{ $pegawai->nip ?? '-' }}</td>
-                        </tr>
-                    @endforeach
-                @endif
+                @endforeach
 
                 @if((empty($gurus) || count($gurus) == 0) && (empty($pegawais) || count($pegawais) == 0))
                     <tr id="emptyRow">
@@ -724,36 +698,14 @@
                 }
             });
 
-            // Sembunyikan section header kalau semua anggotanya tidak dicentang
-            document.querySelectorAll('.row-section-guru').forEach(sec => {
-                const anyVisible = visibleRows.some(r => r.classList.contains('row-guru'));
-                sec.style.display = anyVisible ? '' : 'none';
-            });
-            document.querySelectorAll('.row-section-pegawai').forEach(sec => {
-                const anyVisible = visibleRows.some(r => r.classList.contains('row-pegawai'));
-                sec.style.display = anyVisible ? '' : 'none';
-            });
-
-            // Render ulang nomor & TTD rowspan=2 (per section)
-            renderSectionNumbers('.row-guru');
-            renderSectionNumbers('.row-pegawai');
-
-            syncCards();
-            updateCounter();
-        }
-
-        // Render nomor urut + sel TTD untuk satu section (guru atau pegawai)
-        function renderSectionNumbers(selector) {
-            const rows = Array.from(document.querySelectorAll(selector)).filter(r => r.style.display !== 'none');
+            // Render ulang nomor & TTD rowspan=2 (GLOBAL, tidak per section)
             let no = 1;
-
-            for (let i = 0; i < rows.length; i++) {
-                const row = rows[i];
+            for (let i = 0; i < visibleRows.length; i++) {
+                const row = visibleRows[i];
                 row.querySelector('.cell-no').innerText = no;
 
-                // Setiap 2 baris → 1 pasang TTD (kiri & kanan)
                 if (no % 2 !== 0) {
-                    const isLastOdd = (i === rows.length - 1);
+                    const isLastOdd = (i === visibleRows.length - 1);
                     const rSpan = isLastOdd ? 1 : 2;
 
                     const tdLeft = document.createElement('td');
@@ -771,6 +723,9 @@
                 }
                 no++;
             }
+
+            syncCards();
+            updateCounter();
         }
 
         function syncCards() {

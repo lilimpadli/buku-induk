@@ -4,7 +4,7 @@
 
 @section('content')
 <style>
-    /* ===== PREMIUM DESIGN 2.0 — FORM (identik dgn create) ===== */
+    /* ===== PREMIUM DESIGN 2.0 — FORM ===== */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
     :root {
@@ -31,8 +31,10 @@
         overflow: hidden;
         animation: fadeUp .4s ease both;
     }
-    .stagger-1 { animation-delay: .06s; } .stagger-2 { animation-delay: .12s; }
-    .stagger-3 { animation-delay: .18s; } .stagger-4 { animation-delay: .24s; }
+    .stagger-1 { animation-delay: .06s; }
+    .stagger-2 { animation-delay: .12s; }
+    .stagger-3 { animation-delay: .18s; }
+    .stagger-4 { animation-delay: .24s; }
 
     .header-premium { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
     .header-title-wrap { display: flex; align-items: center; gap: 16px; }
@@ -96,7 +98,7 @@
 
 <div class="app-container">
 
-    {{-- ================= HEADER ================= --}}
+    {{-- HEADER --}}
     <div class="header-premium">
         <div class="header-title-wrap">
             <div class="header-icon"><i class="fas fa-user-pen"></i></div>
@@ -110,7 +112,7 @@
         </a>
     </div>
 
-    {{-- ================= ALERT ERROR ================= --}}
+    {{-- ALERT ERROR --}}
     @if ($errors->any())
         <div class="alert-premium">
             <i class="fas fa-exclamation-triangle"></i>
@@ -131,8 +133,8 @@
 
         @php
             $statusKepegawaianOptions = ['PNS', 'PPPK', 'PPPK Paruh Waktu', 'Honorer', 'Guru Tetap Yayasan', 'Guru Tidak Tetap'];
-            $statusAktifOptions      = ['Aktif', 'Non-Aktif', 'Cuti', 'Mutasi', 'Pensiun', 'Keluar'];
-            $pendidikanOptions       = ['S3', 'S2', 'S1', 'D4', 'D3'];
+            $statusAktifOptions       = ['Aktif', 'Non-Aktif', 'Cuti', 'Mutasi', 'Pensiun', 'Keluar'];
+            $pendidikanOptions        = ['S3', 'S2', 'S1', 'D4', 'D3'];
 
             $currentKepegawaian = old('status_kepegawaian', $guru->status_kepegawaian);
             $currentAktif       = old('status_aktif', $guru->status_aktif ?? 'Aktif');
@@ -140,7 +142,7 @@
             $currentTglLahir    = old('tanggal_lahir', $guru->tanggal_lahir ? \Carbon\Carbon::parse($guru->tanggal_lahir)->format('Y-m-d') : '');
         @endphp
 
-        {{-- ====== SECTION 1: IDENTITAS ====== --}}
+        {{-- ===== SECTION 1: IDENTITAS ===== --}}
         <div class="card-premium mb-4">
             <div class="section-header">
                 <div class="section-icon"><i class="fas fa-id-card"></i></div>
@@ -193,13 +195,13 @@
             </div>
         </div>
 
-        {{-- ====== SECTION 2: KEPEGAWAIAN ====== --}}
+        {{-- ===== SECTION 2: KEPEGAWAIAN ===== --}}
         <div class="card-premium mb-4 stagger-1">
             <div class="section-header">
                 <div class="section-icon"><i class="fas fa-briefcase"></i></div>
                 <div>
                     <h2 class="section-title">Kepegawaian & Kualifikasi</h2>
-                    <p class="section-desc">Status kepegawaian, keaktifan, dan kualifikasi akademik</p>
+                    <p class="section-desc">Status kepegawaian, keaktifan, kualifikasi akademik, dan tugas tambahan</p>
                 </div>
             </div>
             <div class="section-body">
@@ -248,11 +250,17 @@
                         @error('serdik')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                         <div class="form-hint"><i class="fas fa-circle-info"></i> Kosongkan jika belum tersertifikasi.</div>
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label-premium"><i class="fas fa-tasks"></i> Tugas Tambahan</label>
+                        <input type="text" name="tugas_tambahan" value="{{ old('tugas_tambahan', $guru->tugas_tambahan) }}" class="form-control-premium @error('tugas_tambahan') is-invalid-premium @enderror" placeholder="Contoh: Wali Kelas XI RPL 1 / Kaprog">
+                        @error('tugas_tambahan')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
+                        <div class="form-hint"><i class="fas fa-circle-info"></i> Kosongkan jika tidak ada tugas tambahan.</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        {{-- ====== SECTION 3: KONTAK ====== --}}
+        {{-- ===== SECTION 3: KONTAK ===== --}}
         <div class="card-premium mb-4 stagger-2">
             <div class="section-header">
                 <div class="section-icon"><i class="fas fa-address-book"></i></div>
@@ -282,7 +290,7 @@
             </div>
         </div>
 
-        {{-- ====== SECTION 4: ALAMAT ====== --}}
+        {{-- ===== SECTION 4: ALAMAT ===== --}}
         <div class="card-premium mb-4 stagger-3">
             <div class="section-header">
                 <div class="section-icon"><i class="fas fa-map-marked-alt"></i></div>
@@ -332,7 +340,7 @@
             </div>
         </div>
 
-        {{-- ====== FOOTER AKSI ====== --}}
+        {{-- ===== FOOTER ===== --}}
         <div class="card-premium stagger-4">
             <div class="form-footer">
                 <div class="form-footer-note">

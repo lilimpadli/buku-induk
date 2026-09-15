@@ -17,6 +17,7 @@ class Guru extends Model
         'nik',
         'nuptk',
         'serdik',
+        'tugas_tambahan',       // ← TAMBAH INI
         'email_resmi',
         'email_pribadi',
         'status_keaktifan',
