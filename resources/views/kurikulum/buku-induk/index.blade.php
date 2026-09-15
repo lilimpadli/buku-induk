@@ -502,8 +502,16 @@
                             <td>{{ $s->nis ?? '-' }}</td>
                             <td><span class="fw-semibold">{{ $s->nama_lengkap }}</span></td>
                             <td>
-                                <span class="badge-gender {{ strtolower($s->jenis_kelamin) == 'laki-laki' ? 'laki' : 'perempuan' }}">
-                                    {{ $s->jenis_kelamin ?? '-' }}
+                                @php
+                                    $jk = $s->jenis_kelamin;
+                                    if (!$jk && $s->jenisKelamin) {
+                                        $jk = $s->jenisKelamin->nama;
+                                    }
+                                    $jkLower = strtolower($jk ?? '');
+                                    $jkClass = (str_contains($jkLower, 'laki') || $jkLower == 'l') ? 'laki' : 'perempuan';
+                                @endphp
+                                <span class="badge-gender {{ $jkClass }}">
+                                    {{ $jk ?? '-' }}
                                 </span>
                             </td>
                             <td><span class="badge-rombel">{{ optional($s->rombel)->nama ?? '-' }}</span></td>
@@ -541,15 +549,4 @@
         </div>
     </div>
 </div>
-
-<script>
-    setTimeout(function() {
-        let alert = document.getElementById('successAlert');
-        if(alert) {
-            alert.style.transition = 'opacity 0.5s';
-            alert.style.opacity = '0';
-            setTimeout(function() { alert.remove(); }, 500);
-        }
-    }, 3000);
-</script>
 @endsection

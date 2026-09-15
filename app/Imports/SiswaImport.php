@@ -25,6 +25,25 @@ class SiswaImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsOnE
     protected $skippedEmptyRows = 0;
     protected $updatedCount = 0;
 
+    /**
+     * Helper: Kapitalkan semua huruf (uppercase) & trim
+     */
+    private function upper($value)
+    {
+        if ($value === null || $value === '') return null;
+        return strtoupper(trim($value));
+    }
+
+    /**
+     * Helper: Title case untuk nama (opsional)
+     * Contoh: "budi santoso" -> "Budi Santoso"
+     */
+    private function titleCase($value)
+    {
+        if ($value === null || $value === '') return null;
+        return ucwords(strtolower(trim($value)));
+    }
+
     public function model(array $row)
     {
         $this->rowCount++;
@@ -55,7 +74,6 @@ class SiswaImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsOnE
             // ============================================================
             $existingSiswa = DataSiswa::where('nis', $nis)->first();
             if ($existingSiswa) {
-                // UPDATE data yang sudah ada
                 $this->updateExistingSiswa($existingSiswa, $row);
                 $this->updatedCount++;
                 $this->successCount++;
@@ -68,7 +86,6 @@ class SiswaImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsOnE
             // ============================================================
             $existingUser = User::where('nomor_induk', $nis)->first();
             if ($existingUser) {
-                // Hapus user yang sudah ada (karena akan dibuat ulang)
                 $existingUser->delete();
                 Log::info("SiswaImport: User dengan NIS {$nis} dihapus (akan dibuat ulang)");
             }
@@ -90,7 +107,6 @@ class SiswaImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsOnE
      */
     private function updateExistingSiswa($siswa, $row)
     {
-        // Resolve data
         $agamaId = $this->resolveAgama($row);
         $jenisKelaminId = $this->resolveJenisKelamin($row);
         $rombelId = $this->resolveRombel($row);
@@ -99,11 +115,13 @@ class SiswaImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsOnE
         $tanggalDiterima = $this->parseDate($row['mulai_tanggal_diterima'] ?? $row['tanggal_diterima'] ?? null);
 
         $siswa->update([
-            'nama_lengkap' => $row['nama_lengkap'] ?? $row['nama'] ?? $siswa->nama_lengkap,
+            // ✅ NAMA JADI KAPITAL SEMUA
+            'nama_lengkap' => $this->upper($row['nama_lengkap'] ?? $row['nama'] ?? null) ?? $siswa->nama_lengkap,
             'nisn' => $row['nisn'] ?? $siswa->nisn,
             'jenis_kelamin_id' => $jenisKelaminId ?? $siswa->jenis_kelamin_id,
             'agama_id' => $agamaId ?? $siswa->agama_id,
-            'tempat_lahir' => $row['tempat_lahir'] ?? $siswa->tempat_lahir,
+            // ✅ TEMPAT LAHIR JADI KAPITAL SEMUA
+            'tempat_lahir' => $this->upper($row['tempat_lahir'] ?? null) ?? $siswa->tempat_lahir,
             'tanggal_lahir' => $tanggalLahir ?? $siswa->tanggal_lahir,
             'kewarganegaraan' => $row['kewarganegaraan'] ?? $siswa->kewarganegaraan ?? 'Indonesia',
             'rt' => $row['rt'] ?? $siswa->rt,
@@ -117,33 +135,27 @@ class SiswaImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsOnE
             'tanggal_diterima' => $tanggalDiterima ?? $siswa->tanggal_diterima,
             'rombel_id' => $rombelId ?? $siswa->rombel_id,
             
-            // ============================================================
-            // DATA AYAH
-            // ============================================================
-            'nama_ayah' => $row['nama_ayah'] ?? $siswa->nama_ayah,
-            'pekerjaan_ayah' => $row['pekerjaan_ayah'] ?? $siswa->pekerjaan_ayah,
+            // ✅ DATA AYAH JADI KAPITAL SEMUA
+            'nama_ayah' => $this->upper($row['nama_ayah'] ?? null) ?? $siswa->nama_ayah,
+            'pekerjaan_ayah' => $this->upper($row['pekerjaan_ayah'] ?? null) ?? $siswa->pekerjaan_ayah,
             'telepon_ayah' => $row['telepon_ayah'] ?? $row['no_hp_ayah'] ?? $siswa->telepon_ayah,
             
-            // ============================================================
-            // DATA IBU
-            // ============================================================
-            'nama_ibu' => $row['nama_ibu'] ?? $siswa->nama_ibu,
-            'pekerjaan_ibu' => $row['pekerjaan_ibu'] ?? $siswa->pekerjaan_ibu,
+            // ✅ DATA IBU JADI KAPITAL SEMUA
+            'nama_ibu' => $this->upper($row['nama_ibu'] ?? null) ?? $siswa->nama_ibu,
+            'pekerjaan_ibu' => $this->upper($row['pekerjaan_ibu'] ?? null) ?? $siswa->pekerjaan_ibu,
             'telepon_ibu' => $row['telepon_ibu'] ?? $row['no_hp_ibu'] ?? $siswa->telepon_ibu,
             
-            // ============================================================
-            // DATA WALI
-            // ============================================================
-            'nama_wali' => $row['nama_wali'] ?? $siswa->nama_wali,
-            'pekerjaan_wali' => $row['pekerjaan_wali'] ?? $siswa->pekerjaan_wali,
+            // ✅ DATA WALI JADI KAPITAL SEMUA
+            'nama_wali' => $this->upper($row['nama_wali'] ?? null) ?? $siswa->nama_wali,
+            'pekerjaan_wali' => $this->upper($row['pekerjaan_wali'] ?? null) ?? $siswa->pekerjaan_wali,
             'telepon_wali' => $row['telepon_wali'] ?? $row['no_hp_wali'] ?? $siswa->telepon_wali,
             'alamat_wali' => $row['alamat_wali'] ?? $siswa->alamat_wali,
         ]);
 
-        // Update user jika ada
         if ($siswa->user) {
             $siswa->user->update([
-                'name' => $row['nama_lengkap'] ?? $row['nama'] ?? $siswa->nama_lengkap,
+                // ✅ NAMA USER JADI KAPITAL SEMUA
+                'name' => $this->upper($row['nama_lengkap'] ?? $row['nama'] ?? null) ?? $siswa->nama_lengkap,
                 'nomor_induk' => $row['nis'] ?? $siswa->nis,
             ]);
         }
@@ -155,9 +167,9 @@ class SiswaImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsOnE
     private function createNewSiswa($row)
     {
         $nis = $row['nis'] ?? null;
-        $nama = $row['nama_lengkap'] ?? $row['nama'] ?? null;
+        // ✅ NAMA JADI KAPITAL SEMUA
+        $nama = $this->upper($row['nama_lengkap'] ?? $row['nama'] ?? null);
 
-        // Resolve data
         $agamaId = $this->resolveAgama($row);
         $jenisKelaminId = $this->resolveJenisKelamin($row);
         $rombelId = $this->resolveRombel($row);
@@ -177,13 +189,15 @@ class SiswaImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsOnE
         // Buat data siswa
         $siswa = DataSiswa::create([
             'user_id' => $user->id,
+            // ✅ NAMA JADI KAPITAL SEMUA
             'nama_lengkap' => $nama,
             'nis' => $nis,
             'nisn' => $row['nisn'] ?? null,
             'jenis_kelamin_id' => $jenisKelaminId,
             'agama_id' => $agamaId,
             'agama_lainnya' => null,
-            'tempat_lahir' => $row['tempat_lahir'] ?? null,
+            // ✅ TEMPAT LAHIR JADI KAPITAL SEMUA
+            'tempat_lahir' => $this->upper($row['tempat_lahir'] ?? null),
             'tanggal_lahir' => $tanggalLahir,
             'kewarganegaraan' => $row['kewarganegaraan'] ?? 'Indonesia',
             'rt' => $row['rt'] ?? null,
@@ -197,25 +211,19 @@ class SiswaImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsOnE
             'tanggal_diterima' => $tanggalDiterima,
             'rombel_id' => $rombelId,
             
-            // ============================================================
-            // DATA AYAH
-            // ============================================================
-            'nama_ayah' => $row['nama_ayah'] ?? null,
-            'pekerjaan_ayah' => $row['pekerjaan_ayah'] ?? null,
+            // ✅ DATA AYAH JADI KAPITAL SEMUA
+            'nama_ayah' => $this->upper($row['nama_ayah'] ?? null),
+            'pekerjaan_ayah' => $this->upper($row['pekerjaan_ayah'] ?? null),
             'telepon_ayah' => $row['telepon_ayah'] ?? $row['no_hp_ayah'] ?? null,
             
-            // ============================================================
-            // DATA IBU
-            // ============================================================
-            'nama_ibu' => $row['nama_ibu'] ?? null,
-            'pekerjaan_ibu' => $row['pekerjaan_ibu'] ?? null,
+            // ✅ DATA IBU JADI KAPITAL SEMUA
+            'nama_ibu' => $this->upper($row['nama_ibu'] ?? null),
+            'pekerjaan_ibu' => $this->upper($row['pekerjaan_ibu'] ?? null),
             'telepon_ibu' => $row['telepon_ibu'] ?? $row['no_hp_ibu'] ?? null,
             
-            // ============================================================
-            // DATA WALI
-            // ============================================================
-            'nama_wali' => $row['nama_wali'] ?? null,
-            'pekerjaan_wali' => $row['pekerjaan_wali'] ?? null,
+            // ✅ DATA WALI JADI KAPITAL SEMUA
+            'nama_wali' => $this->upper($row['nama_wali'] ?? null),
+            'pekerjaan_wali' => $this->upper($row['pekerjaan_wali'] ?? null),
             'telepon_wali' => $row['telepon_wali'] ?? $row['no_hp_wali'] ?? null,
             'alamat_wali' => $row['alamat_wali'] ?? null,
         ]);
@@ -226,9 +234,6 @@ class SiswaImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsOnE
         return $siswa;
     }
 
-    /**
-     * Resolve agama
-     */
     private function resolveAgama($row)
     {
         $agamaNama = trim($row['agama'] ?? '');
@@ -242,9 +247,6 @@ class SiswaImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsOnE
         return $agama->id;
     }
 
-    /**
-     * Resolve jenis kelamin
-     */
     private function resolveJenisKelamin($row)
     {
         $jk = trim($row['jenis_kelamin'] ?? '');
@@ -261,9 +263,6 @@ class SiswaImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsOnE
         return $jenisKelamin->id;
     }
 
-    /**
-     * Resolve rombel
-     */
     private function resolveRombel($row)
     {
         $rombelNama = trim($row['nama_rombel'] ?? $row['rombel'] ?? '');
@@ -287,35 +286,12 @@ class SiswaImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsOnE
         Log::error('SiswaImport Error: ' . $e->getMessage());
     }
 
-    public function getSuccessCount()
-    {
-        return $this->successCount;
-    }
-
-    public function getUpdatedCount()
-    {
-        return $this->updatedCount;
-    }
-
-    public function getErrors()
-    {
-        return $this->errors;
-    }
-
-    public function getProcessedRows()
-    {
-        return $this->processedRows;
-    }
-
-    public function getRowCount()
-    {
-        return $this->rowCount;
-    }
-
-    public function getSkippedEmptyRows()
-    {
-        return $this->skippedEmptyRows;
-    }
+    public function getSuccessCount() { return $this->successCount; }
+    public function getUpdatedCount() { return $this->updatedCount; }
+    public function getErrors() { return $this->errors; }
+    public function getProcessedRows() { return $this->processedRows; }
+    public function getRowCount() { return $this->rowCount; }
+    public function getSkippedEmptyRows() { return $this->skippedEmptyRows; }
 
     private function parseDate($date)
     {
@@ -323,22 +299,18 @@ class SiswaImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsOnE
 
         $date = trim($date);
 
-        // Excel serial number
         if (is_numeric($date)) {
             return date('Y-m-d', strtotime('1899-12-30 + ' . ((int)$date) . ' days'));
         }
 
-        // Format DD/MM/YYYY atau DD-MM-YYYY
         if (preg_match('/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/', $date, $matches)) {
             return "{$matches[3]}-{$matches[2]}-{$matches[1]}";
         }
 
-        // Format YYYY-MM-DD
         if (preg_match('/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/', $date, $matches)) {
             return "{$matches[1]}-{$matches[2]}-{$matches[3]}";
         }
 
-        // Fallback ke Carbon
         try {
             return date('Y-m-d', strtotime($date));
         } catch (\Exception $e) {

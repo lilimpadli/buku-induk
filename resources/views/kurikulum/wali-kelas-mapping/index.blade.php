@@ -2,6 +2,12 @@
 
 @section('title', 'Mapping Wali Kelas')
 
+@push('styles')
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+@endpush
+
 @section('content')
 <style>
     :root {
@@ -323,18 +329,47 @@
         border: 2px solid white;
     }
 
-    /* ============ GURU SELECT ============ */
-    .guru-select {
-        min-width: 200px;
-        border-radius: 9px;
-        border: 1.5px solid #e2e8f0;
+    /* ============ SELECT2 CUSTOM ============ */
+    .select2-container--bootstrap-5 .select2-selection {
+        min-height: 38px;
+        border-radius: 9px !important;
+        border: 1.5px solid #e2e8f0 !important;
         font-size: 0.85rem;
-        transition: all 0.2s;
     }
 
-    .guru-select:focus {
-        border-color: #8b5cf6;
-        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+    .select2-container--bootstrap-5.select2-container--focus .select2-selection {
+        border-color: #8b5cf6 !important;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        color: #334155;
+        padding-left: 0.6rem;
+        line-height: 36px;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+        height: 36px;
+    }
+
+    .select2-container {
+        min-width: 220px;
+    }
+
+    .select2-results__option--highlighted {
+        background: var(--primary-gradient) !important;
+    }
+
+    .select2-search--dropdown .select2-search__field {
+        border-radius: 8px !important;
+        border: 1.5px solid #e2e8f0 !important;
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.85rem !important;
+    }
+
+    .select2-search--dropdown .select2-search__field:focus {
+        border-color: #8b5cf6 !important;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15) !important;
     }
 
     /* ============ TOOLTIP KETERANGAN TOMBOL ============ */
@@ -560,6 +595,9 @@
         .page-header h3 {
             font-size: 1.05rem;
         }
+        .select2-container {
+            min-width: 100%;
+        }
     }
 </style>
 
@@ -752,7 +790,9 @@
                                 <form action="{{ route('kurikulum.wali-kelas-mapping.update') }}" method="POST" class="d-flex gap-2 align-items-center flex-wrap">
                                     @csrf
                                     <input type="hidden" name="rombel_id" value="{{ $rombel->id }}">
-                                    <select name="guru_id" class="form-select form-select-sm guru-select" style="min-width:180px;">
+                                    
+                                    {{-- SELECT2 DROPDOWN - SEARCHABLE BY NAMA / NIP --}}
+                                    <select name="guru_id" class="form-select form-select-sm guru-select2" style="width: 100%;">
                                         <option value="">-- Pilih Wali Kelas --</option>
                                         @foreach($allGurus as $id => $nama)
                                             <option value="{{ $id }}" {{ $rombel->guru_id == $id ? 'selected' : '' }}>
@@ -798,7 +838,43 @@
     </div>
 </div>
 
+@endsection
+
+@push('scripts')
+<!-- 1. JQuery (WAJIB DIMUAT DULU) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- 2. Select2 JS (butuh JQuery) -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- 3. Inisialisasi -->
 <script>
+    $(document).ready(function() {
+        console.log('✅ JQuery:', typeof $);
+        console.log('✅ Select2:', typeof $.fn.select2);
+        
+        // Inisialisasi Select2 untuk semua dropdown guru
+        $('.guru-select2').select2({
+            theme: 'bootstrap-5',
+            placeholder: '-- Pilih Wali Kelas --',
+            allowClear: true,
+            width: '100%',
+            language: {
+                noResults: function() {
+                    return "Guru tidak ditemukan";
+                },
+                searching: function() {
+                    return "Mencari...";
+                },
+                inputTooShort: function() {
+                    return "Ketik minimal 1 karakter";
+                }
+            }
+        });
+        
+        console.log('✅ Select2 initialized');
+    });
+
     // Validasi sebelum tombol simpan diklik
     function validateGuru(button) {
         const form = button.closest('form');
@@ -806,42 +882,37 @@
         
         if (!select.value) {
             showToast('Harap pilih wali kelas terlebih dahulu!', 'warning');
-            select.focus();
-            return false; // Mencegah form submit
+            if (typeof jQuery !== 'undefined' && jQuery.fn.select2) {
+                jQuery(select).select2('open');
+            } else {
+                select.focus();
+            }
+            return false;
         }
-        return true; // Lanjut submit jika sudah dipilih
+        return true;
     }
 
-    // Fungsi untuk membuat Toast Notification
+    // Fungsi Toast Notification
     function showToast(message, type = 'warning') {
         let container = document.getElementById('toast-container');
         if (!container) {
             container = document.createElement('div');
             container.id = 'toast-container';
-            container.style.position = 'fixed';
-            container.style.top = '24px';
-            container.style.right = '24px';
-            container.style.zIndex = '9999';
+            container.style.cssText = 'position:fixed;top:24px;right:24px;z-index:9999;';
             document.body.appendChild(container);
         }
 
         const toast = document.createElement('div');
         toast.className = 'toast-item';
         
-        let icon = 'fas fa-exclamation-triangle';
-        let bg = 'linear-gradient(135deg, #f59e0b, #ef4444)'; // Warning/Danger
-        
-        if (type === 'warning') {
-            icon = 'fas fa-exclamation-circle';
-            bg = 'linear-gradient(135deg, #f59e0b, #f43f5e)';
-        }
+        let icon = 'fas fa-exclamation-circle';
+        let bg = 'linear-gradient(135deg, #f59e0b, #f43f5e)';
         
         toast.style.background = bg;
         toast.innerHTML = `<i class="${icon}"></i> ${message}`;
         
         container.appendChild(toast);
         
-        // Auto remove setelah 3 detik
         setTimeout(() => {
             toast.style.animation = 'toastOut 0.3s ease forwards';
             setTimeout(() => toast.remove(), 300);
@@ -865,4 +936,4 @@
         }
     }, 3000);
 </script>
-@endsection
+@endpush

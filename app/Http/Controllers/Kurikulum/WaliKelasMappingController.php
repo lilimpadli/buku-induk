@@ -15,76 +15,85 @@ class WaliKelasMappingController extends Controller
     /**
      * Menampilkan halaman mapping wali kelas
      */
-    public function index(Request $request)
-    {
-        // Ambil filter dari request
-        $jurusan_id = $request->query('jurusan', '');
-        $status_filter = $request->query('status', '');
-        $search = $request->query('search', '');
+   public function index(Request $request)
+{
+    // Ambil filter dari request
+    $jurusan_id = $request->query('jurusan', '');
+    $status_filter = $request->query('status', '');
+    $search = $request->query('search', '');
+    
+    // Ambil semua jurusan untuk filter
+    $allJurusans = Jurusan::orderBy('nama')->get();
+    
+    // Query rombel dengan relasi
+    $query = Rombel::with(['kelas.jurusan', 'guru', 'siswa'])
+        ->whereHas('kelas', function($q) {
+            $q->whereIn('tingkat', ['X', 'XI', 'XII']);
+        })
+        ->orderBy('kelas_id')
+        ->orderBy('nama');
         
-        // Ambil semua jurusan untuk filter
-        $allJurusans = Jurusan::orderBy('nama')->get();
-        
-        // Query rombel dengan relasi
-        $query = Rombel::with(['kelas.jurusan', 'guru', 'siswa'])
-            ->whereHas('kelas', function($q) {
-                $q->whereIn('tingkat', ['X', 'XI', 'XII']);
-            })
-            ->orderBy('kelas_id')
-            ->orderBy('nama');
-            
-        // Filter by jurusan
-        if (!empty($jurusan_id)) {
-            $query->whereHas('kelas', function($q) use ($jurusan_id) {
-                $q->where('jurusan_id', $jurusan_id);
-            });
-        }
-        
-        // Filter by status
-        if ($status_filter === 'sudah') {
-            $query->whereNotNull('guru_id');
-        } elseif ($status_filter === 'belum') {
-            $query->whereNull('guru_id');
-        }
-        
-        // Filter by search (nama rombel)
-        if (!empty($search)) {
-            $query->where('nama', 'like', "%{$search}%");
-        }
-        
-        $rombels = $query->paginate(20)->withQueryString();
-        
-        // Ambil semua guru untuk dropdown
-        $allGurus = Guru::with('user')
-            ->orderBy('nama')
-            ->get()
-            ->mapWithKeys(function($guru) {
-                $roleLabel = '';
-                if ($guru->user) {
-                    $roleLabel = ' - ' . ucfirst(str_replace('_', ' ', $guru->user->role));
-                }
-                return [
-                    $guru->id => $guru->nama . $roleLabel
-                ];
-            });
-            
-        // Statistik untuk widget
-        $statistics = [
-            'total_rombels' => Rombel::count(),
-            'total_wali_kelas' => Rombel::whereNotNull('guru_id')->count(),
-            'belum_wali_kelas' => Rombel::whereNull('guru_id')->count(),
-        ];
-        
-        return view('kurikulum.wali-kelas-mapping.index', compact(
-            'rombels', 
-            'allGurus', 
-            'allJurusans', 
-            'jurusan_id',
-            'status_filter',
-            'search',
-            'statistics'
-        ));
+    // Filter by jurusan
+    if (!empty($jurusan_id)) {
+        $query->whereHas('kelas', function($q) use ($jurusan_id) {
+            $q->where('jurusan_id', $jurusan_id);
+        });
     }
+    
+    // Filter by status
+    if ($status_filter === 'sudah') {
+        $query->whereNotNull('guru_id');
+    } elseif ($status_filter === 'belum') {
+        $query->whereNull('guru_id');
+    }
+    
+    // Filter by search (nama rombel)
+    if (!empty($search)) {
+        $query->where('nama', 'like', "%{$search}%");
+    }
+    
+    $rombels = $query->paginate(20)->withQueryString();
+    
+    // ============================================================
+    // AMBIL SEMUA GURU UNTUK DROPDOWN — PAKAI NIP SEBAGAI LABEL
+    // ============================================================
+    $allGurus = Guru::with('user')
+        ->orderBy('nama')
+        ->get()
+        ->mapWithKeys(function($guru) {
+            // Tampilkan: Nama - NIP - Role
+            $label = $guru->nama;
+            
+            if (!empty($guru->nip)) {
+                $label .= ' - ' . $guru->nip;
+            }
+            
+            if ($guru->user) {
+                $label .= ' (' . ucfirst(str_replace('_', ' ', $guru->user->role)) . ')';
+            }
+            
+            return [
+                $guru->id => $label
+            ];
+        });
+        
+    // Statistik untuk widget
+    $statistics = [
+        'total_rombels' => Rombel::count(),
+        'total_wali_kelas' => Rombel::whereNotNull('guru_id')->count(),
+        'belum_wali_kelas' => Rombel::whereNull('guru_id')->count(),
+    ];
+    
+    return view('kurikulum.wali-kelas-mapping.index', compact(
+        'rombels', 
+        'allGurus', 
+        'allJurusans', 
+        'jurusan_id',
+        'status_filter',
+        'search',
+        'statistics'
+    ));
+}
     
     /**
      * Update wali kelas untuk satu rombel

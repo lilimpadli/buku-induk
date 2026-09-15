@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMK Negeri 1 Kawali - Buku Induk & PPDB 2025</title>
+    <title>Buku Induk Siswa - SMK Negeri 1 Kawali</title>
     <link rel="icon" href="{{ asset('images/bg.png') }}" type="image/png">
-<link rel="apple-touch-icon" href="{{ asset('images/bg.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/bg.png') }}">
 
-    
     <!-- External CSS Libraries -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Custom Styles -->
     <style>
         :root {
@@ -20,6 +19,7 @@
             --accent-red: #e53935;
             --accent-yellow: #fdd835;
             --accent-orange: #ff9800;
+            --accent-green: #10b981;
         }
 
         * {
@@ -203,20 +203,10 @@
         .btn-login:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(255,152,0,0.6);
+            color: #003d82;
         }
 
-        .btn-ppdb {
-            background: white;
-            color: var(--primary-blue);
-            box-shadow: 0 5px 20px rgba(255,255,255,0.3);
-        }
-
-        .btn-ppdb:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255,255,255,0.5);
-        }
-
-        /* INFO SECTION STYLES */
+        /* SECTION STYLES */
         .info-section {
             padding: 80px 0;
             background: linear-gradient(to bottom, white 0%, #f8f9fa 100%);
@@ -286,15 +276,15 @@
             line-height: 1.8;
         }
 
-        /* PPDB SECTION STYLES */
-        .ppdb-section {
+        /* FITUR SECTION */
+        .feature-section {
             padding: 100px 0;
             background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
             position: relative;
             overflow: hidden;
         }
 
-        .ppdb-section::before {
+        .feature-section::before {
             content: "";
             position: absolute;
             top: 0;
@@ -305,12 +295,12 @@
             opacity: 0.3;
         }
 
-        .ppdb-content {
+        .feature-content {
             position: relative;
             z-index: 2;
         }
 
-        .ppdb-title {
+        .feature-title {
             font-size: 3rem;
             font-weight: 800;
             color: white;
@@ -319,90 +309,31 @@
             text-shadow: 0 3px 10px rgba(0,0,0,0.3);
         }
 
-        .ppdb-subtitle {
+        .feature-subtitle {
             font-size: 1.3rem;
             color: #d4e8ff;
             text-align: center;
             margin-bottom: 60px;
         }
 
-        .timeline-card {
+        .feature-card {
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            padding: 40px;
+            padding: 30px;
             margin-bottom: 30px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             transition: all 0.3s ease;
             border-left: 5px solid var(--accent-orange);
+            height: 100%;
         }
 
-        .timeline-card:hover {
+        .feature-card:hover {
             transform: translateX(10px);
             box-shadow: 0 15px 50px rgba(0,0,0,0.3);
         }
 
-        .timeline-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #fdd835 0%, #ff9800 100%);
-            color: #003d82;
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-        }
-
-        .timeline-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary-blue);
-            margin-bottom: 10px;
-        }
-
-        .timeline-date {
-            font-size: 1.2rem;
-            color: var(--accent-red);
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .timeline-detail {
-            background: #f8f9fa;
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            font-size: 1rem;
-            color: #444;
-            border-left: 3px solid var(--primary-blue);
-        }
-
-        /* PROGRAM SECTION STYLES */
-        .program-section {
-            padding: 80px 0;
-            background: white;
-        }
-
-        .program-card {
-            background: linear-gradient(135deg, #f8f9fa 0%, white 100%);
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-
-        .program-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            border-color: var(--primary-blue);
-        }
-
-        .program-icon {
+        .feature-icon {
             width: 60px;
             height: 60px;
             background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
@@ -415,53 +346,67 @@
             margin-bottom: 15px;
         }
 
-        .program-name {
-            font-size: 1.1rem;
-            font-weight: 600;
+        .feature-card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
             color: var(--primary-blue);
+            margin-bottom: 10px;
         }
 
-        /* DOCUMENT SECTION STYLES */
-        .document-section {
+        .feature-card-text {
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.7;
+        }
+
+        /* ROLE SECTION */
+        .role-section {
             padding: 80px 0;
-            background: linear-gradient(to bottom, #f8f9fa 0%, white 100%);
-        }
-
-        .document-card {
             background: white;
+        }
+
+        .role-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, white 100%);
             border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            display: flex;
-            align-items: center;
-            gap: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
             transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-align: center;
         }
 
-        .document-card:hover {
-            transform: translateX(10px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        .role-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-color: var(--primary-blue);
         }
 
-        .document-number {
-            width: 50px;
-            height: 50px;
+        .role-icon {
+            width: 70px;
+            height: 70px;
             background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: 700;
-            font-size: 1.2rem;
-            flex-shrink: 0;
+            font-size: 2rem;
+            margin: 0 auto 15px;
+            box-shadow: 0 5px 15px rgba(0,86,179,0.3);
         }
 
-        .document-text {
-            font-size: 1rem;
-            color: #333;
-            font-weight: 500;
+        .role-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+        }
+
+        .role-desc {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.6;
         }
 
         /* FOOTER STYLES */
@@ -508,27 +453,16 @@
             transform: translateY(-5px);
         }
 
-        .alert-box {
-            background: linear-gradient(135deg, #ffd54f 0%, #ff9800 100%);
-            color: #003d82;
-            padding: 20px 30px;
-            border-radius: 15px;
-            font-weight: 600;
-            text-align: center;
-            margin-top: 40px;
-            box-shadow: 0 5px 20px rgba(255,152,0,0.3);
-        }
-
         /* RESPONSIVE STYLES */
         @media (max-width: 768px) {
             .welcome-title {
                 font-size: 2.2rem;
             }
-            
-            .ppdb-title {
+
+            .feature-title {
                 font-size: 2rem;
             }
-            
+
             .section-title {
                 font-size: 1.8rem;
             }
@@ -540,7 +474,7 @@
     <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <img src="{{ asset('images/biskaone.jpeg') }}?v={{ filemtime(public_path('images/biskaone.jpeg')) }}" class="logo rounded-circle" alt="BISKAONE" style="border-radius:50% !important; width:70px; height:70px; object-fit:cover; display:block;" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%23fdd835\'/%3E%3Ctext x=\'50\' y=\'65\' font-size=\'50\' font-weight=\'bold\' text-anchor=\'middle\' fill=\'%230056b3\'\%3ESMK%3C/text%3E%3C/svg%3E'">
+                <img src="{{ asset('images/biskaone.jpeg') }}?v={{ filemtime(public_path('images/biskaone.jpeg')) }}" class="logo rounded-circle" alt="BISKAONE" style="border-radius:50% !important; width:70px; height:70px; object-fit:cover; display:block;" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%23fdd835\'/%3E%3Ctext x=\'50\' y=\'65\' font-size=\'50\' font-weight=\'bold\' text-anchor=\'middle\' fill=\'%230056b3\'%3ESMK%3C/text%3E%3C/svg%3E'">
                 <div>
                     <h5 class="school-name">SMKN 1 KAWALI</h5>
                     <p class="school-location">KAB. CIAMIS</p>
@@ -554,8 +488,9 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#program">Program</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#dokumen">Dokumen</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#tentang">Tentang</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#fitur">Fitur</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#akses">Akses</a></li>
                 </ul>
             </div>
         </div>
@@ -596,7 +531,7 @@
     </section>
 
     <!-- INFO CARDS SECTION -->
-    <section class="info-section">
+    <section class="info-section" id="tentang">
         <div class="container">
             <div class="text-center mb-5">
                 <h2 class="section-title">Tentang Sistem</h2>
@@ -643,340 +578,157 @@
         </div>
     </section>
 
-   <!-- PPDB SECTION -->
-<section class="ppdb-section" id="ppdb">
-    <div class="container ppdb-content">
-        <h2 class="ppdb-title">
-            <i class="fas fa-calendar-alt me-3"></i>
-            PPDB 2025/2026
-        </h2>
-        <p class="ppdb-subtitle">Sistem Penerimaan Murid Baru - Tahun Ajaran 2025/2026</p>
+    <!-- FITUR SECTION -->
+    <section class="feature-section" id="fitur">
+        <div class="container feature-content">
+            <h2 class="feature-title">
+                <i class="fas fa-cogs me-3"></i>
+                Fitur Unggulan
+            </h2>
+            <p class="feature-subtitle">Berbagai fitur untuk mempermudah pengelolaan data siswa</p>
 
-       
             <div class="row align-items-stretch g-4">
-                @php
-                    $ppdbData = $ppdb ?? null;
-                    $t1 = $ppdbData['tahap1'] ?? null;
-                    $t2 = $ppdbData['tahap2'] ?? null;
-                @endphp
-
-                <div class="col-lg-6 mb-4 d-flex">
-                    <div class="timeline-card flex-fill">
-                        <span class="timeline-badge">TAHAP 1</span>
-                        <h3 class="timeline-title">{{ $t1['title'] ?? 'Pendaftaran Tahap 1' }} @if(!empty($t1['open'])) — Terbuka @else — Ditutup @endif</h3>
-                        @if(empty($t1['open']))
-                        <div class="alert alert-danger mt-3" role="alert">
-                            <strong>Perhatian:</strong> Tahap 1 telah ditutup. Pendaftaran Tahap 1 saat ini tidak tersedia.
+                <div class="col-lg-4 mb-4 d-flex">
+                    <div class="feature-card flex-fill">
+                        <div class="feature-icon">
+                            <i class="fas fa-book"></i>
                         </div>
-                        @endif
-                        <div class="timeline-date">
-                            <i class="fas fa-calendar-check"></i>
-                            {{ $t1['pendaftaran'] ?? 'Periode belum diset' }}
-                        </div>
-
-                        @if(!empty($t1['pendaftaran']))
-                        <div class="timeline-detail">
-                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Pendaftaran & Verifikasi:</strong> {{ $t1['pendaftaran'] }}
-                        </div>
-                        @endif
-
-                        @if(!empty($t1['sanggah']))
-                        <div class="timeline-detail">
-                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Masa Sanggah:</strong> {{ $t1['sanggah'] }}
-                        </div>
-                        @endif
-
-                        @if(!empty($t1['rapat']))
-                        <div class="timeline-detail">
-                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Rapat Dewan Guru:</strong> {{ $t1['rapat'] }}
-                        </div>
-                        @endif
-
-                        @if(!empty($t1['pengumuman']))
-                        <div class="timeline-detail">
-                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Pengumuman Hasil:</strong> {{ $t1['pengumuman'] }}
-                        </div>
-                        @endif
-
-                        @if(!empty($t1['daftar_ulang']))
-                        <div class="timeline-detail">
-                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Daftar Ulang:</strong> {{ $t1['daftar_ulang'] }}
-                        </div>
-                        @endif
-
-                        <div class="mt-3 p-3 bg-light rounded">
-                            <strong>Jalur & Kuota Tahap 1:</strong>
-                            <ul class="mb-0 mt-2">
-                                <li>Domisili Terdekat: 10%</li>
-                                <li>Afirmasi: 30% (KETM 25%, PDBK 5%)</li>
-                                <li>Mutasi: 5% (Perpindahan 2%, Anak Guru 3%)</li>
-                            </ul>
-                        </div>
+                        <h3 class="feature-card-title">Buku Induk Digital</h3>
+                        <p class="feature-card-text">
+                            Data lengkap siswa mulai dari identitas pribadi, data orang tua, riwayat pendidikan, hingga prestasi akademik.
+                        </p>
                     </div>
                 </div>
 
-                <div class="col-lg-6 mb-4 d-flex">
-                    <div class="timeline-card flex-fill">
-                        <span class="timeline-badge">TAHAP 2</span>
-                        @php
-                            $t2_open = !empty($t2['open']);
-                            $t2_has_dates = !empty($t2['pendaftaran']) || !empty($t2['sanggah']) || !empty($t2['tes']) || !empty($t2['rapat']) || !empty($t2['pengumuman']) || !empty($t2['daftar_ulang']);
-                        @endphp
-
-                        <h3 class="timeline-title">
-                            {{ $t2['title'] ?? 'Pendaftaran Tahap 2' }}
-                            @if($t2_open) — Terbuka @elseif($t2_has_dates) — Ditutup @else — Belum Dibuka @endif
-                        </h3>
-
-                        @if(!$t2_open)
-                            @if($t2_has_dates)
-                                <div class="alert alert-danger mt-3" role="alert">
-                                    <strong>Perhatian:</strong> Tahap 2 telah ditutup. Pendaftaran Tahap 2 saat ini tidak tersedia.
-                                </div>
-                            @else
-                                <div class="alert alert-warning mt-3" role="alert">
-                                    <strong>Info:</strong> Tahap 2 belum dibuka. Pantau pengumuman resmi untuk jadwal pembukaan Tahap 2.
-                                </div>
-                            @endif
-                        @endif
-
-                        @if(!empty($t2['pendaftaran']))
-                        <div class="timeline-detail">
-                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Pendaftaran & Verifikasi:</strong> {{ $t2['pendaftaran'] }}
+                <div class="col-lg-4 mb-4 d-flex">
+                    <div class="feature-card flex-fill">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
                         </div>
-                        @endif
-
-                        @if(!empty($t2['sanggah']))
-                        <div class="timeline-detail">
-                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Masa Sanggah:</strong> {{ $t2['sanggah'] }}
-                        </div>
-                        @endif
-
-                        @if(!empty($t2['rapat']))
-                        <div class="timeline-detail">
-                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Rapat Dewan Guru:</strong> {{ $t2['rapat'] }}
-                        </div>
-                        @endif
-
-                        @if(!empty($t2['pengumuman']))
-                        <div class="timeline-detail">
-                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Pengumuman Hasil:</strong> {{ $t2['pengumuman'] }}
-                        </div>
-                        @endif
-
-                        @if(!empty($t2['daftar_ulang']))
-                        <div class="timeline-detail">
-                            <i class="fas fa-check-circle me-2" style="color: var(--primary-blue);"></i>
-                            <strong>Daftar Ulang:</strong> {{ $t2['daftar_ulang'] }}
-                        </div>
-                        @endif
-
-                        <div class="mt-3 p-3 bg-light rounded">
-                            <strong>Jalur & Kuota Tahap 1:</strong>
-                            <ul class="mb-0 mt-2">
-                                <li>Domisili Terdekat: 10%</li>
-                                <li>Afirmasi: 30% (KETM 25%, PDBK 5%)</li>
-                                <li>Mutasi: 5% (Perpindahan 2%, Anak Guru 3%)</li>
-                            </ul>
-                        </div>
-                    </div>
-                    </div>
-                </div>
-            </div>
-
-        <div class="alert-box">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            <strong>PENTING:</strong> Pendaftaran dapat dilakukan secara <strong>DARING</strong> melalui 
-            <a href="https://spmb.jabarprov.go.id" style="color: #003d82; text-decoration: underline;"><strong>spmb.jabarprov.go.id</strong></a>
-            (08:00-20:00 WIB) atau <strong>LURING</strong> di Sekretariat SPMB SMKN 1 Kawali (08:00-14:00 WIB)
-        </div>
-    </div>
-</section>
-
-    <!-- PROGRAM SECTION -->
-    <section class="program-section" id="program">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="section-title">Program Keahlian</h2>
-                <p class="section-subtitle">7 Program keahlian unggulan dengan fasilitas lengkap dan industri</p>
-            </div>
-
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <div class="program-card">
-                        <div class="program-icon">
-                            <i class="fas fa-car"></i>
-                        </div>
-                        <div class="program-name">Teknik Otomotif</div>
+                        <h3 class="feature-card-title">Nilai Raport</h3>
+                        <p class="feature-card-text">
+                            Pencatatan nilai raport per semester dengan kategorisasi mata pelajaran umum dan kejuruan.
+                        </p>
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-3">
-                    <div class="program-card">
-                        <div class="program-icon">
-                            <i class="fas fa-laptop-code"></i>
+                <div class="col-lg-4 mb-4 d-flex">
+                    <div class="feature-card flex-fill">
+                        <div class="feature-icon">
+                            <i class="fas fa-exchange-alt"></i>
                         </div>
-                        <div class="program-name">Teknik Jaringan Komputer dan Telekomunikasi</div>
+                        <h3 class="feature-card-title">Mutasi Siswa</h3>
+                        <p class="feature-card-text">
+                            Pencatatan riwayat mutasi siswa masuk dan keluar, termasuk siswa pindahan dan lulusan.
+                        </p>
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-3">
-                    <div class="program-card">
-                        <div class="program-icon">
-                            <i class="fas fa-utensils"></i>
+                <div class="col-lg-4 mb-4 d-flex">
+                    <div class="feature-card flex-fill">
+                        <div class="feature-icon">
+                            <i class="fas fa-user-graduate"></i>
                         </div>
-                        <div class="program-name">Pengembangan Perangkat Lunak dan Gim</div>
+                        <h3 class="feature-card-title">Data Alumni</h3>
+                        <p class="feature-card-text">
+                            Pencatatan data siswa yang telah lulus beserta riwayat akademik dan pencapaian mereka.
+                        </p>
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-3">
-                    <div class="program-card">
-                        <div class="program-icon">
-                            <i class="fas fa-palette"></i>
+                <div class="col-lg-4 mb-4 d-flex">
+                    <div class="feature-card flex-fill">
+                        <div class="feature-icon">
+                            <i class="fas fa-print"></i>
                         </div>
-                        <div class="program-name">Desain Pemodelan dan Informasi Bangunan</div>
+                        <h3 class="feature-card-title">Cetak Dokumen</h3>
+                        <p class="feature-card-text">
+                            Cetak buku induk, raport, surat keterangan aktif, biodata siswa, dan dokumen lainnya secara instan.
+                        </p>
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-3">
-                    <div class="program-card">
-                        <div class="program-icon">
-                            <i class="fas fa-store"></i>
+                <div class="col-lg-4 mb-4 d-flex">
+                    <div class="feature-card flex-fill">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-import"></i>
                         </div>
-                        <div class="program-name">Manajemen Perkantoran dan Layanan Bisnis</div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <div class="program-card">
-                        <div class="program-icon">
-                            <i class="fas fa-calculator"></i>
-                        </div>
-                        <div class="program-name">Akuntansi dan Keuangan Lembaga</div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <div class="program-card">
-                        <div class="program-icon">
-                            <i class="fas fa-music"></i>
-                        </div>
-                        <div class="program-name">Seni Pertunjukan</div>
+                        <h3 class="feature-card-title">Import & Export</h3>
+                        <p class="feature-card-text">
+                            Import data siswa dan nilai dari Excel, serta export data ke berbagai format dokumen.
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- DOCUMENT SECTION -->
-    <section class="document-section" id="dokumen">
+    <!-- ROLE SECTION -->
+    <section class="role-section" id="akses">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="section-title">Dokumen Persyaratan</h2>
-                <p class="section-subtitle">Dokumen yang harus dibawa saat daftar ulang</p>
+                <h2 class="section-title">Akses Multi Role</h2>
+                <p class="section-subtitle">Sistem dapat diakses oleh berbagai pengguna sesuai dengan perannya</p>
             </div>
 
             <div class="row">
-                <div class="col-lg-8 mx-auto">
-                    <div class="document-card">
-                        <div class="document-number">1</div>
-                        <div class="document-text">Bukti di terima</div>
-                    </div>
-
-                    <div class="document-card">
-                        <div class="document-number">2</div>
-                        <div class="document-text">Bukti Pendaftaran</div>
-                    </div>
-
-                    <div class="document-card">
-                        <div class="document-number">3</div>
-                        <div class="document-text">Surat keterangan Lulus</div>
-                    </div>
-
-                    <div class="document-card">
-                        <div class="document-number">4</div>
-                        <div class="document-text">FC Akta Kelahiran / KIA</div>
-                    </div>
-
-                    <div class="document-card">
-                        <div class="document-number">5</div>
-                        <div class="document-text">FC KTP Orang Tua</div>
-                    </div>
-
-                    <div class="document-card">
-                        <div class="document-number">6</div>
-                        <div class="document-text">FC Kartu Keluarga</div>
-                    </div>
-
-                    <div class="document-card">
-                        <div class="document-number">7</div>
-                        <div class="document-text">FC Buku Rapor (Semester 1 s.d. 5)</div>
-                    </div>
-
-                    <div class="document-card">
-                        <div class="document-number">8</div>
-                        <div class="document-text">Surat Tanggung Jawab Mutlak Orang Tua</div>
-                    </div>
-
-                    <div class="document-card">
-                        <div class="document-number">9</div>
-                        <div class="document-text">Surat keterangan sehat, tidak buta warna</div>
-                    </div>
-
-                    <div class="document-card">
-                        <div class="document-number">10</div>
-                        <div class="document-text">Surat Keterangan tidak bertato dan bertindik</div>
-                    </div>
-
-                    <div class="document-card">
-                        <div class="document-number">11</div>
-                        <div class="document-text">Bukti Layanan Informasi</div>
-                    </div>
-
-                    <div class="document-card">
-                        <div class="document-number">12</div>
-                        <div class="document-text">Surat Memenuhi Tata Tertib</div>
-                    </div>
-
-                    <div class="alert alert-warning mt-4" role="alert">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <strong>Catatan:</strong> Bagi calon murid yang tidak mendaftar ulang sesuai jadwal 
-                        <strong>TANPA PEMBERITAHUAN</strong> dianggap <strong>MENGUNDURKAN DIRI</strong>
-                    </div>
-
-                    <div class="mt-4 p-4 bg-white rounded shadow-sm">
-                        <h5 class="text-primary mb-3"><i class="fas fa-folder-open me-2"></i>Warna Map Dokumen</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-2">
-                                <span class="badge" style="background: #0056b3; padding: 10px 20px; font-size: 1rem;">
-                                    <i class="fas fa-file me-2"></i>BIRU - TO & DPIB
-                                </span>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <span class="badge" style="background: #ffc107; padding: 10px 20px; font-size: 1rem; color: #003d82;">
-                                    <i class="fas fa-file me-2"></i>KUNING - MPLB & AKL
-                                </span>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <span class="badge" style="background: #28a745; padding: 10px 20px; font-size: 1rem;">
-                                    <i class="fas fa-file me-2"></i>HIJAU - SP
-                                </span>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <span class="badge" style="background: #dc3545; padding: 10px 20px; font-size: 1rem;">
-                                    <i class="fas fa-file me-2"></i>MERAH - TJKT & PPLG
-                                </span>
-                            </div>
+                <div class="col-md-4 mb-3">
+                    <div class="role-card">
+                        <div class="role-icon">
+                            <i class="fas fa-user-shield"></i>
                         </div>
+                        <div class="role-name">Super Admin</div>
+                        <div class="role-desc">Kelola seluruh sistem, user, dan konfigurasi</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="role-card">
+                        <div class="role-icon">
+                            <i class="fas fa-users-cog"></i>
+                        </div>
+                        <div class="role-name">TU Kesiswaan</div>
+                        <div class="role-desc">Kelola data siswa, buku induk, mutasi, dan alumni</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="role-card">
+                        <div class="role-icon">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div class="role-name">TU Kepegawaian</div>
+                        <div class="role-desc">Kelola data guru, pegawai, dan kepegawaian</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="role-card">
+                        <div class="role-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <div class="role-name">Kurikulum</div>
+                        <div class="role-desc">Kelola kurikulum, kelas, dan mata pelajaran</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="role-card">
+                        <div class="role-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="role-name">Wali Kelas & Guru</div>
+                        <div class="role-desc">Input nilai raport dan kelola data siswa kelas</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="role-card">
+                        <div class="role-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="role-name">Siswa</div>
+                        <div class="role-desc">Lihat data pribadi dan nilai akademik sendiri</div>
                     </div>
                 </div>
             </div>
@@ -998,15 +750,15 @@
                     </p>
                     <p class="footer-text">
                         <i class="fas fa-phone me-2"></i>
-                        0851 8799 9991
+                        (0265) 791727
                     </p>
                     <p class="footer-text">
                         <i class="fas fa-globe me-2"></i>
-                        <a href="https://spmb.jabarprov.go.id" style="color: #b3d9ff; text-decoration: none;">
-                            spmb.jabarprov.go.id
+                        <a href="http://www.smkn1kawali.sch.id" style="color: #b3d9ff; text-decoration: none;">
+                            www.smkn1kawali.sch.id
                         </a>
                     </p>
-                    
+
                     <div class="social-links">
                         <a href="#" class="social-link" title="Instagram">
                             <i class="fab fa-instagram"></i>
@@ -1025,22 +777,20 @@
 
                 <div class="col-md-6 mb-4">
                     <h5 class="footer-title">
-                        <i class="fas fa-clock me-2"></i>
-                        Jam Operasional
+                        <i class="fas fa-info-circle me-2"></i>
+                        Tentang Buku Induk
                     </h5>
                     <div class="footer-text">
-                        <p class="mb-2"><strong>Pendaftaran Daring:</strong></p>
+                        <p class="mb-2"><strong>Buku Induk Digital</strong></p>
                         <p class="mb-3">
-                            <i class="fas fa-laptop me-2"></i>
-                            https://spmb.jabarprov.go.id<br>
-                            Senin - Minggu: 08:00 - 20:00 WIB
+                            Sistem pengelolaan data siswa yang lengkap dan terintegrasi, mencakup data pribadi, akademik, dan riwayat pendidikan.
                         </p>
-                        
-                        <p class="mb-2"><strong>Pendaftaran Luring:</strong></p>
+
+                        <p class="mb-2"><strong>Dikembangkan Untuk:</strong></p>
                         <p class="mb-0">
-                            <i class="fas fa-building me-2"></i>
-                            Sekretariat SPMB SMKN 1 Kawali<br>
-                            Senin - Jumat: 08:00 - 14:00 WIB
+                            <i class="fas fa-users me-2"></i>
+                            SMK Negeri 1 Kawali<br>
+                            Kabupaten Ciamis, Jawa Barat
                         </p>
                     </div>
                 </div>
@@ -1051,7 +801,7 @@
             <div class="row">
                 <div class="col-md-12 text-center">
                     <p class="footer-text mb-0">
-                        &copy; 2025 SMK Negeri 1 Kawali | #TerdidikTerbaik
+                        &copy; {{ date('Y') }} SMK Negeri 1 Kawali | Sistem Buku Induk Digital
                     </p>
                 </div>
             </div>
@@ -1060,7 +810,7 @@
 
     <!-- External JavaScript Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- Custom JavaScript -->
     <script>
         // Smooth scrolling for navigation links
@@ -1081,7 +831,7 @@
         window.addEventListener('scroll', () => {
             let current = '';
             const sections = document.querySelectorAll('section[id]');
-            
+
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
                 const sectionHeight = section.clientHeight;
