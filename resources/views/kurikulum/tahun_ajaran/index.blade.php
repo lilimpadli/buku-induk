@@ -7,6 +7,7 @@
     :root {
         --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --card-hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
         --border-radius: 16px;
         --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -30,215 +31,172 @@
         overflow-x: auto !important;
     }
 
+    /* ============ HEADER ============ */
     .page-header {
         background: var(--primary-gradient);
         color: white;
-        padding: 1.5rem 1.5rem;
+        padding: 1.8rem 2rem;
         border-radius: var(--border-radius);
         margin-bottom: 1.5rem;
-        box-shadow: var(--card-shadow);
+        box-shadow: 0 15px 35px -8px rgba(139, 92, 246, 0.45);
         position: relative;
         overflow: hidden;
         width: 100%;
     }
 
-    .page-header::before {
+    .page-header::before,
+    .page-header::after {
         content: "";
         position: absolute;
-        top: 0;
-        right: 0;
-        width: 300px;
-        height: 300px;
-        background: rgba(255, 255, 255, 0.1);
         border-radius: 50%;
-        transform: translate(100px, -100px);
+        background: rgba(255,255,255,0.12);
         pointer-events: none;
+    }
+
+    .page-header::before {
+        top: -60px;
+        right: -40px;
+        width: 220px;
+        height: 220px;
+    }
+
+    .page-header::after {
+        bottom: -90px;
+        right: 120px;
+        width: 160px;
+        height: 160px;
+        background: rgba(255,255,255,0.08);
     }
 
     .page-header h3 {
         font-weight: 700;
-        margin-bottom: 0.25rem;
-        font-size: 1.3rem;
+        letter-spacing: -0.3px;
         position: relative;
         z-index: 1;
+        margin-bottom: 0.25rem;
+        font-size: 1.4rem;
+    }
+
+    .page-header h3 i {
+        background: rgba(255,255,255,0.2);
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        margin-right: 8px;
     }
 
     .page-header .text-muted {
-        color: rgba(255, 255, 255, 0.8) !important;
+        color: rgba(255,255,255,0.85) !important;
         font-size: 0.9rem;
         position: relative;
         z-index: 1;
     }
 
-    .btn-gradient {
-        background: var(--primary-gradient);
-        border: none;
+    .btn-header {
+        background: rgba(255,255,255,0.2);
+        backdrop-filter: blur(10px);
+        border: 1.5px solid rgba(255,255,255,0.3);
         color: white;
         font-weight: 600;
-        padding: 0.4rem 1rem;
-        border-radius: 8px;
+        padding: 0.55rem 1.3rem;
+        border-radius: 10px;
         transition: var(--transition);
         text-decoration: none;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        font-size: 0.8rem;
-        white-space: nowrap;
+        gap: 7px;
+        font-size: 0.88rem;
+        position: relative;
+        z-index: 2;
     }
 
-    .btn-gradient:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-        color: white;
-    }
-
-    .btn-outline-gradient {
-        background: transparent;
-        border: 1px solid #667eea;
-        color: #667eea;
-        font-weight: 600;
-        padding: 0.3rem 0.8rem;
-        border-radius: 8px;
-        transition: var(--transition);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 0.8rem;
-        white-space: nowrap;
-    }
-
-    .btn-outline-gradient:hover {
-        background: var(--primary-gradient);
-        color: white;
-        border-color: transparent;
-    }
-
-    .btn-edit {
-        background: #F59E0B;
-        border: none;
-        color: white;
-        padding: 3px 10px;
-        border-radius: 6px;
-        font-size: 0.65rem;
-        transition: var(--transition);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 3px;
-        white-space: nowrap;
-    }
-
-    .btn-edit:hover {
-        background: #D97706;
-        color: white;
-    }
-
-    .btn-delete {
-        background: #EF4444;
-        border: none;
-        color: white;
-        padding: 3px 10px;
-        border-radius: 6px;
-        font-size: 0.65rem;
-        transition: var(--transition);
-        display: inline-flex;
-        align-items: center;
-        gap: 3px;
-        white-space: nowrap;
-        cursor: pointer;
-    }
-
-    .btn-delete:hover {
-        background: #DC2626;
-        color: white;
-    }
-
-    .btn-set-current {
-        background: #10B981;
-        border: none;
-        color: white;
-        padding: 3px 10px;
-        border-radius: 6px;
-        font-size: 0.65rem;
-        transition: var(--transition);
-        display: inline-flex;
-        align-items: center;
-        gap: 3px;
-        white-space: nowrap;
-        cursor: pointer;
-    }
-
-    .btn-set-current:hover {
-        background: #059669;
-        color: white;
-    }
-
-    .filter-card {
-        border-radius: var(--border-radius);
-        border: none;
-        box-shadow: var(--card-shadow);
-        margin-bottom: 1.5rem;
-        overflow: hidden;
-        transition: var(--transition);
-        width: 100%;
-    }
-
-    .filter-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-    }
-
-    .filter-card .card-body {
-        padding: 1rem 1.5rem;
-    }
-
-    .filter-card .form-label {
-        font-size: 0.7rem;
-        font-weight: 600;
-        color: #64748B;
-        margin-bottom: 2px;
-    }
-
-    .filter-card .form-control {
-        font-size: 0.8rem;
-        padding: 0.3rem 0.7rem;
-        border-radius: 8px;
-        border: 1px solid #E2E8F0;
-        height: 36px;
-    }
-
-    .filter-card .input-group-text {
-        font-size: 0.8rem;
-        padding: 0.3rem 0.7rem;
+    .btn-header:hover {
         background: white;
-        border: 1px solid #E2E8F0;
+        color: #6366f1;
+        border-color: white;
+        transform: translateY(-2px);
     }
 
+    /* ============ STAT CARD ============ */
+    .stat-card {
+        background: white;
+        border-radius: 14px;
+        padding: 1.3rem 1.5rem;
+        box-shadow: var(--card-shadow);
+        border-left: 4px solid #667eea;
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        background: radial-gradient(circle, rgba(102,126,234,0.06) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--card-hover-shadow);
+    }
+
+    .stat-card .number {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1E293B;
+        line-height: 1.2;
+        letter-spacing: -0.5px;
+    }
+
+    .stat-card .label {
+        font-size: 0.82rem;
+        color: #64748B;
+        margin-top: 6px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+    }
+
+    .stat-card.info { border-left-color: #3B82F6; }
+    .stat-card.success { border-left-color: #10B981; }
+    .stat-card.warning { border-left-color: #F59E0B; }
+    .stat-card.purple { border-left-color: #8B5CF6; }
+
+    /* ============ TABLE CARD ============ */
     .table-card {
         border-radius: var(--border-radius);
-        border: none;
+        border: 1px solid #eef0f4;
         box-shadow: var(--card-shadow);
         overflow: hidden;
-        width: 100%;
+        background: white;
     }
 
     .table-card .card-header {
-        background: white;
-        border-bottom: 1px solid #E2E8F0;
-        padding: 0.7rem 1.5rem;
+        background: linear-gradient(to bottom, #ffffff 0%, #fafbfd 100%);
+        border-bottom: 1px solid #eef0f4;
+        padding: 1.1rem 1.5rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 10px;
     }
 
     .table-card .card-header h5 {
         margin: 0;
         font-weight: 700;
         color: #1E293B;
-        font-size: 0.95rem;
+        font-size: 1rem;
     }
 
     .table-card .card-header h5 i {
@@ -246,12 +204,7 @@
         margin-right: 6px;
     }
 
-    .table-card .card-header .badge {
-        font-size: 0.7rem;
-        padding: 3px 10px;
-        white-space: nowrap;
-    }
-
+    /* ============ TABLE ============ */
     .table-responsive {
         width: 100%;
         overflow-x: auto;
@@ -260,88 +213,236 @@
 
     .table {
         width: 100%;
-        min-width: 650px;
+        min-width: 850px;
         margin-bottom: 0;
-        font-size: 0.85rem;
+        font-size: 0.88rem;
     }
 
     .table th {
-        font-weight: 600;
-        font-size: 0.7rem;
+        font-weight: 700;
+        font-size: 0.72rem;
         text-transform: uppercase;
-        letter-spacing: 0.3px;
+        letter-spacing: 0.6px;
         color: #64748B;
-        padding: 0.6rem 0.8rem;
+        padding: 0.9rem 0.85rem;
         white-space: nowrap;
         background-color: #F8FAFC;
-        border-bottom: none;
+        border-bottom: 2px solid #eef0f4 !important;
     }
 
     .table td {
-        padding: 0.6rem 0.8rem;
+        padding: 0.85rem 0.85rem;
         vertical-align: middle;
-        border-color: #E2E8F0;
+        border-color: #f1f5f9;
+        color: #334155;
+    }
+
+    .table tbody tr {
+        transition: background-color 0.2s ease;
     }
 
     .table tbody tr:hover {
-        background-color: rgba(102, 126, 234, 0.03);
+        background-color: #f8faff;
+    }
+
+    /* ============ BADGES ============ */
+    .badge-tahun {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(139,92,246,0.25);
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-current {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(16,185,129,0.25);
+        animation: pulse-green 2s infinite;
+    }
+
+    @keyframes pulse-green {
+        0%, 100% { box-shadow: 0 2px 8px rgba(16,185,129,0.25); }
+        50% { box-shadow: 0 4px 16px rgba(16,185,129,0.5); }
     }
 
     .badge-status {
-        padding: 2px 10px;
-        border-radius: 12px;
-        font-size: 0.65rem;
-        font-weight: 500;
-        display: inline-block;
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
         white-space: nowrap;
     }
 
     .badge-status.active {
-        background: #D1FAE5;
-        color: #065F46;
+        background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+        color: #047857;
+        box-shadow: 0 2px 8px rgba(16,185,129,0.15);
     }
 
     .badge-status.inactive {
-        background: #FEE2E2;
-        color: #991B1B;
-    }
-
-    .badge-current {
-        background: var(--primary-gradient);
-        color: white;
-        padding: 2px 10px;
-        border-radius: 12px;
-        font-size: 0.6rem;
-        font-weight: 500;
-        display: inline-block;
-        white-space: nowrap;
+        background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+        color: #B91C1C;
+        box-shadow: 0 2px 8px rgba(239,68,68,0.15);
     }
 
     .badge-semester {
-        background: #DBEAFE;
+        background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
         color: #1E40AF;
-        padding: 2px 10px;
-        border-radius: 12px;
-        font-size: 0.6rem;
-        font-weight: 500;
-        display: inline-block;
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
         white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(59,130,246,0.15);
     }
 
+    .date-badge {
+        background: #F1F5F9;
+        color: #475569;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+        font-family: 'Courier New', monospace;
+    }
+
+    /* ============ ACTION BUTTONS ============ */
     .action-buttons {
         display: flex;
         align-items: center;
-        gap: 4px;
+        justify-content: center;
+        gap: 6px;
         flex-wrap: nowrap;
-        white-space: nowrap;
     }
 
     .action-buttons form {
         margin: 0;
         padding: 0;
-        display: inline;
+        display: inline-flex;
     }
 
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        font-size: 14px;
+        position: relative;
+        color: white;
+        flex-shrink: 0;
+        padding: 0;
+    }
+
+    .action-btn.set-current {
+        background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+        box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35);
+    }
+    .action-btn.set-current:hover {
+        background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
+        color: white;
+    }
+
+    .action-btn.edit {
+        background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+        box-shadow: 0 3px 10px rgba(245, 158, 11, 0.35);
+    }
+    .action-btn.edit:hover {
+        background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 6px 16px rgba(245, 158, 11, 0.5);
+        color: white;
+    }
+
+    .action-btn.delete {
+        background: linear-gradient(135deg, #EF4444 0%, #F87171 100%);
+        box-shadow: 0 3px 10px rgba(239, 68, 68, 0.35);
+    }
+    .action-btn.delete:hover {
+        background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 6px 16px rgba(239, 68, 68, 0.5);
+        color: white;
+    }
+
+    /* Tooltip */
+    .action-btn[data-tooltip]::before {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 130%;
+        left: 50%;
+        transform: translateX(-50%) translateY(4px);
+        background: linear-gradient(135deg, #1e293b, #334155);
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.25s ease;
+        z-index: 100;
+        pointer-events: none;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        font-weight: 600;
+    }
+
+    .action-btn[data-tooltip]::after {
+        content: "";
+        position: absolute;
+        bottom: 110%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: #1e293b;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.25s ease;
+        z-index: 100;
+    }
+
+    .action-btn[data-tooltip]:hover::before,
+    .action-btn[data-tooltip]:hover::after {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    /* ============ EMPTY STATE ============ */
     .empty-state {
         text-align: center;
         padding: 3rem 1rem;
@@ -352,111 +453,94 @@
         color: #CBD5E1;
         display: block;
         margin-bottom: 0.5rem;
+        animation: floatY 3s ease-in-out infinite;
     }
 
+    @keyframes floatY {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+
+    /* ============ FADE IN ============ */
+    .stat-card, .table-card, .page-header {
+        animation: fadeInUp 0.5s ease both;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.05s; }
+    .stat-card:nth-child(2) { animation-delay: 0.1s; }
+    .stat-card:nth-child(3) { animation-delay: 0.15s; }
+    .stat-card:nth-child(4) { animation-delay: 0.2s; }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============ RESPONSIVE ============ */
     @media (max-width: 768px) {
-        .page-header {
-            padding: 1rem 1rem;
-        }
-        .page-header h3 {
-            font-size: 1.05rem;
-        }
-        .page-header .text-muted {
-            font-size: 0.75rem;
-        }
+        .page-header { padding: 1.3rem 1.2rem; }
+        .page-header h3 { font-size: 1.05rem; }
+        .table { min-width: 700px; font-size: 0.78rem; }
+        .stat-card .number { font-size: 1.5rem; }
+        .action-btn { width: 32px; height: 32px; font-size: 12px; }
+    }
 
-        .table-card .card-header {
-            flex-wrap: wrap;
-        }
-        .table-card .card-header .btn-gradient {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .table {
-            min-width: 550px;
-            font-size: 0.75rem;
-        }
-        .table th,
-        .table td {
-            padding: 0.4rem 0.5rem;
-        }
-        .btn-edit,
-        .btn-delete,
-        .btn-set-current {
-            padding: 2px 6px;
-            font-size: 0.55rem;
-        }
-        .badge-status,
-        .badge-current,
-        .badge-semester {
-            font-size: 0.55rem;
-            padding: 1px 6px;
-        }
-        .action-buttons {
-            flex-wrap: wrap;
-            gap: 3px;
-        }
+    @media (max-width: 576px) {
+        .table { min-width: 600px; font-size: 0.7rem; }
+        .action-btn { width: 28px; height: 28px; font-size: 11px; }
+        .badge-tahun, .badge-status, .badge-semester { font-size: 0.65rem; padding: 3px 10px; }
     }
 </style>
 
-<div class="container-fluid px-4">
+<div class="container-fluid px-3 px-md-4">
+    <!-- HEADER -->
     <div class="page-header">
-        <div class="d-flex align-items-center justify-content-between flex-wrap">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
             <div>
-                <h3><i class="fas fa-calendar-alt me-2"></i> Manajemen Tahun Ajaran</h3>
+                <h3><i class="fas fa-calendar-alt"></i> Manajemen Tahun Ajaran</h3>
                 <div class="text-muted">Kelola data tahun ajaran yang tersedia di sekolah</div>
             </div>
-            <div class="mt-2 mt-sm-0">
-                <a href="{{ route('kurikulum.tahun-ajaran.create') }}" class="btn-gradient">
-                    <i class="fas fa-plus"></i> Tambah Tahun Ajaran
-                </a>
+            <a href="{{ route('kurikulum.tahun-ajaran.create') }}" class="btn-header">
+                <i class="fas fa-plus"></i> Tambah Tahun Ajaran
+            </a>
+        </div>
+    </div>
+
+    <!-- STATISTIK -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-card info">
+                <div class="number">{{ $tahunAjarans->count() }}</div>
+                <div class="label"><i class="fas fa-calendar-alt me-1"></i> Total Tahun Ajaran</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card success">
+                <div class="number">{{ $tahunAjarans->where('is_active', true)->count() }}</div>
+                <div class="label"><i class="fas fa-check-circle me-1 text-success"></i> Aktif</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card purple">
+                <div class="number">{{ $tahunAjarans->where('is_current', true)->count() }}</div>
+                <div class="label"><i class="fas fa-flag me-1" style="color:#8B5CF6;"></i> Sedang Berjalan</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card warning">
+                <div class="number">{{ $tahunAjarans->sum(function($ta) { return $ta->semesters->count(); }) }}</div>
+                <div class="label"><i class="fas fa-book me-1 text-warning"></i> Total Semester</div>
             </div>
         </div>
     </div>
 
-    <div class="card filter-card">
-        <div class="card-body">
-            <form method="GET" action="{{ route('kurikulum.tahun-ajaran.index') }}" class="row g-2 align-items-end">
-                <div class="col-md-9">
-                    <label class="form-label"><i class="fas fa-search me-1"></i> Cari Tahun Ajaran</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        <input type="text" name="search" class="form-control" placeholder="Cari tahun ajaran..." value="{{ request('search') }}">
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="d-flex gap-1">
-                        <button type="submit" class="btn-gradient" style="flex:1; justify-content:center; padding:0.3rem 0.8rem; font-size:0.75rem;">
-                            <i class="fas fa-search me-1"></i> Cari
-                        </button>
-                        <a href="{{ route('kurikulum.tahun-ajaran.index') }}" class="btn-outline-gradient" style="flex:1; justify-content:center; padding:0.3rem 0.8rem; font-size:0.75rem;">
-                            <i class="fas fa-undo-alt"></i>
-                        </a>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
+    <!-- TABLE -->
     <div class="card table-card">
         <div class="card-header">
             <h5><i class="fas fa-list"></i> Daftar Tahun Ajaran</h5>
-            <span class="badge bg-primary">{{ $tahunAjarans->count() }}</span>
+            <span class="badge bg-primary">{{ $tahunAjarans->count() }} Data</span>
         </div>
         <div class="card-body p-0">
-            @if(session('success'))
-                <div class="alert alert-success m-3" id="successAlert" style="font-size:0.8rem; padding:0.5rem 1rem;">
-                    <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                </div>
-            @endif
-
-            @if(session('error'))
-                <div class="alert alert-danger m-3" id="errorAlert" style="font-size:0.8rem; padding:0.5rem 1rem;">
-                    <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
-                </div>
-            @endif
-
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
@@ -467,48 +551,92 @@
                             <th>Tanggal Selesai</th>
                             <th>Status</th>
                             <th class="text-center">Semester</th>
-                            <th>Keterangan</th>
-                            <th width="18%">Aksi</th>
+                            <th class="text-center" width="20%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($tahunAjarans as $key => $ta)
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
+                            <td class="fw-semibold text-secondary">{{ $loop->iteration }}</td>
                             <td>
-                                <span class="fw-semibold">{{ $ta->tahun }}</span>
+                                <span class="badge-tahun">
+                                    <i class="fas fa-calendar"></i>
+                                    {{ $ta->tahun }}
+                                </span>
                                 @if($ta->is_current)
-                                    <span class="badge-current ms-1"><i class="fas fa-check-circle me-1"></i>Berjalan</span>
+                                    <span class="badge-current ms-2">
+                                        <i class="fas fa-check-circle"></i> Berjalan
+                                    </span>
                                 @endif
                             </td>
-                            <td>{{ $ta->tanggal_mulai ? date('d/m/Y', strtotime($ta->tanggal_mulai)) : '-' }}</td>
-                            <td>{{ $ta->tanggal_selesai ? date('d/m/Y', strtotime($ta->tanggal_selesai)) : '-' }}</td>
                             <td>
-                                <span class="badge-status {{ $ta->is_active ? 'active' : 'inactive' }}">
-                                    {{ $ta->is_active ? 'Aktif' : 'Tidak Aktif' }}
-                                </span>
+                                @if($ta->tanggal_mulai)
+                                    <span class="date-badge">
+                                        <i class="fas fa-play-circle"></i>
+                                        {{ date('d/m/Y', strtotime($ta->tanggal_mulai)) }}
+                                    </span>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($ta->tanggal_selesai)
+                                    <span class="date-badge">
+                                        <i class="fas fa-stop-circle"></i>
+                                        {{ date('d/m/Y', strtotime($ta->tanggal_selesai)) }}
+                                    </span>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($ta->is_active)
+                                    <span class="badge-status active">
+                                        <i class="fas fa-check-circle"></i> Aktif
+                                    </span>
+                                @else
+                                    <span class="badge-status inactive">
+                                        <i class="fas fa-times-circle"></i> Tidak Aktif
+                                    </span>
+                                @endif
                             </td>
                             <td class="text-center">
-                                <span class="badge-semester">{{ $ta->semesters->count() }} Semester</span>
+                                <span class="badge-semester">
+                                    <i class="fas fa-book-open"></i>
+                                    {{ $ta->semesters->count() }} Semester
+                                </span>
                             </td>
-                            <td>{{ $ta->keterangan ?? '-' }}</td>
                             <td>
                                 <div class="action-buttons">
-                                    @if(!$ta->is_current)
-                                        <form action="{{ route('kurikulum.tahun-ajaran.set-current', $ta->id) }}" method="POST" class="d-inline">
+                                    {{-- SET CURRENT --}}
+                                    @if(!$ta->is_current || !$ta->is_active)
+                                        <form action="{{ route('kurikulum.tahun-ajaran.set-current', $ta->id) }}" method="POST">
                                             @csrf
-                                            <button type="submit" class="btn-set-current" title="Set sebagai tahun berjalan">
-                                                <i class="fas fa-check-circle"></i> Set
+                                            <button type="submit" 
+                                                    class="action-btn set-current" 
+                                                    data-tooltip="Set Jadi Berjalan"
+                                                    onclick="return confirmSetCurrent('{{ $ta->tahun }}')">
+                                                <i class="fas fa-flag"></i>
                                             </button>
                                         </form>
                                     @endif
-                                    <a href="{{ route('kurikulum.tahun-ajaran.edit', $ta->id) }}" class="btn-edit">
-                                        <i class="fas fa-edit"></i>
+
+                                    {{-- EDIT --}}
+                                    <a href="{{ route('kurikulum.tahun-ajaran.edit', $ta->id) }}" 
+                                       class="action-btn edit" 
+                                       data-tooltip="Edit Tahun Ajaran">
+                                        <i class="fas fa-pen"></i>
                                     </a>
-                                    <form action="{{ route('kurikulum.tahun-ajaran.destroy', $ta->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus tahun ajaran ini?')">
+
+                                    {{-- HAPUS --}}
+                                    <form action="{{ route('kurikulum.tahun-ajaran.destroy', $ta->id) }}" 
+                                          method="POST" 
+                                          onsubmit="return confirmDelete(event, '{{ $ta->tahun }}')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn-delete">
+                                        <button type="submit" 
+                                                class="action-btn delete" 
+                                                data-tooltip="Hapus Tahun Ajaran">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
@@ -517,11 +645,11 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8">
+                            <td colspan="7">
                                 <div class="empty-state">
                                     <i class="fas fa-calendar-alt"></i>
-                                    <h5 class="fw-bold text-muted">Belum ada data tahun ajaran</h5>
-                                    <p class="text-muted">Silakan tambah data baru melalui tombol di atas.</p>
+                                    <h5 class="fw-bold text-muted mt-3">Belum Ada Data Tahun Ajaran</h5>
+                                    <p class="text-muted mb-0">Silakan tambah data baru melalui tombol di atas.</p>
                                 </div>
                             </td>
                         </tr>
@@ -534,19 +662,16 @@
 </div>
 
 <script>
-    setTimeout(function() {
-        let alert = document.getElementById('successAlert');
-        if(alert) {
-            alert.style.transition = 'opacity 0.5s';
-            alert.style.opacity = '0';
-            setTimeout(function() { alert.remove(); }, 500);
+    function confirmSetCurrent(tahun) {
+        return confirm('Set tahun ajaran "' + tahun + '" sebagai tahun berjalan?\n\nTahun ajaran yang lama akan otomatis tidak berjalan.');
+    }
+    
+    function confirmDelete(e, tahun) {
+        e.preventDefault();
+        if (confirm('Yakin ingin menghapus tahun ajaran "' + tahun + '"?\n\nTindakan ini tidak bisa dibatalkan!')) {
+            e.target.submit();
         }
-        let errorAlert = document.getElementById('errorAlert');
-        if(errorAlert) {
-            errorAlert.style.transition = 'opacity 0.5s';
-            errorAlert.style.opacity = '0';
-            setTimeout(function() { errorAlert.remove(); }, 500);
-        }
-    }, 3000);
+        return false;
+    }
 </script>
 @endsection

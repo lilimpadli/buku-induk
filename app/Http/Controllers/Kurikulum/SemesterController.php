@@ -144,6 +144,24 @@ class SemesterController extends Controller
         return redirect()->back()->with('success', 'Semester ' . $nama . ' ditetapkan sebagai semester berjalan.');
     }
 
+    public function setActive($id)
+{
+    $semester = Semester::findOrFail($id);
+    
+    // Nonaktifkan semua semester yang current
+    Semester::where('is_current', true)->update(['is_current' => false]);
+    
+    // Set semester yang dipilih jadi current & active
+    $semester->update([
+        'is_current' => true,
+        'is_active' => true,
+    ]);
+    
+    $nama = $semester->semester == '1' ? 'Ganjil' : 'Genap';
+    $tahun = $semester->tahunAjaran?->tahun ?? '';
+    
+    return redirect()->back()->with('success', 'Semester ' . $nama . ' ' . $tahun . ' ditetapkan sebagai semester berjalan.');
+}
     public function toggleActive($id)
     {
         $semester = Semester::findOrFail($id);

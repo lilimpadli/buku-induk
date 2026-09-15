@@ -34,6 +34,8 @@ use App\Http\Controllers\Kurikulum\JurusanController;
 use App\Http\Controllers\Kurikulum\ProgramKeahlianController;
 use App\Http\Controllers\Kurikulum\KonsentrasiKeahlianController;
 use App\Http\Controllers\Kurikulum\BidangKeahlianController;
+use App\Http\Controllers\Kurikulum\TahunAjaranController;
+use App\Http\Controllers\Kurikulum\SemesterController;
 
 // KELAS KAPROG
 use App\Http\Controllers\KelaskaprogController;
@@ -852,6 +854,34 @@ Route::group([], function () {
                 Route::get('/{id}/edit', [ProgramKeahlianController::class, 'edit'])->name('edit');
                 Route::put('/{id}', [ProgramKeahlianController::class, 'update'])->name('update');
                 Route::delete('/{id}', [ProgramKeahlianController::class, 'destroy'])->name('destroy');
+            });
+
+            // ============================================================
+            // MASTER DATA: TAHUN AJARAN  ← DIPINDAH KE DALAM GRUP KURIKULUM
+            // ============================================================
+            Route::prefix('tahun-ajaran')->name('tahun-ajaran.')->group(function () {
+                Route::get('/', [TahunAjaranController::class, 'index'])->name('index');
+                Route::get('/create', [TahunAjaranController::class, 'create'])->name('create');
+                Route::post('/', [TahunAjaranController::class, 'store'])->name('store');
+                Route::get('/{id}/edit', [TahunAjaranController::class, 'edit'])->name('edit');
+                Route::put('/{id}', [TahunAjaranController::class, 'update'])->name('update');
+                Route::delete('/{id}', [TahunAjaranController::class, 'destroy'])->name('destroy');
+                Route::post('/{id}/set-current', [TahunAjaranController::class, 'setCurrent'])->name('set-current');
+                Route::post('/{id}/toggle-active', [TahunAjaranController::class, 'toggleActive'])->name('toggle-active');
+            });
+
+            // ============================================================
+            // MASTER DATA: SEMESTER  ← DIPINDAH KE DALAM GRUP KURIKULUM
+            // ============================================================
+            Route::prefix('semester')->name('semester.')->group(function () {
+                Route::get('/', [SemesterController::class, 'index'])->name('index');
+                Route::get('/create', [SemesterController::class, 'create'])->name('create');
+                Route::post('/', [SemesterController::class, 'store'])->name('store');
+                Route::get('/{id}/edit', [SemesterController::class, 'edit'])->name('edit');
+                Route::put('/{id}', [SemesterController::class, 'update'])->name('update');
+                Route::delete('/{id}', [SemesterController::class, 'destroy'])->name('destroy');
+                Route::post('/{id}/set-active', [SemesterController::class, 'setActive'])->name('set-active');
+                Route::post('/{id}/toggle-active', [SemesterController::class, 'toggleActive'])->name('toggle-active');
             });
 
             // Guru import

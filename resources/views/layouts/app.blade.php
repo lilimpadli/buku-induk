@@ -618,6 +618,17 @@
                                     <i class="fas fa-home"></i> <span>Dashboard</span>
                                 </a>
 
+                                {{-- 🔥 MASTER DATA - TAHUN AJARAN & SEMESTER --}}
+                                <div class="nav-section-title">MASTER DATA</div>
+
+                                <a href="{{ route('kurikulum.tahun-ajaran.index') }}" class="nav-link {{ request()->routeIs('kurikulum.tahun-ajaran*') ? 'active' : '' }}">
+                                    <i class="fas fa-calendar-alt"></i> <span>Tahun Ajaran</span>
+                                </a>
+
+                                <a href="{{ route('kurikulum.semester.index') }}" class="nav-link {{ request()->routeIs('kurikulum.semester*') ? 'active' : '' }}">
+                                    <i class="fas fa-calendar-check"></i> <span>Semester</span>
+                                </a>
+
                                 <div class="nav-section-title">DATA</div>
 
                                 <a href="{{ route('kurikulum.data-pribadi.index') }}" class="nav-link {{ request()->routeIs('kurikulum.data-pribadi*') ? 'active' : '' }}">

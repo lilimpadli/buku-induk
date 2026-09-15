@@ -105,14 +105,20 @@ class TahunAjaranController extends Controller
     }
 
     public function setCurrent($id)
-    {
-        $tahunAjaran = TahunAjaran::findOrFail($id);
-        
-        TahunAjaran::where('is_current', true)->update(['is_current' => false]);
-        $tahunAjaran->update(['is_current' => true]);
+{
+    $tahunAjaran = TahunAjaran::findOrFail($id);
 
-        return redirect()->back()->with('success', 'Tahun Ajaran ' . $tahunAjaran->tahun . ' ditetapkan sebagai tahun berjalan.');
-    }
+    // Nonaktifkan semua current
+    TahunAjaran::where('is_current', true)->update(['is_current' => false]);
+    
+    // Set yang dipilih jadi current DAN active
+    $tahunAjaran->update([
+        'is_current' => true,
+        'is_active' => true,  // ← TAMBAHAN: biar status langsung aktif
+    ]);
+
+    return redirect()->back()->with('success', 'Tahun Ajaran ' . $tahunAjaran->tahun . ' ditetapkan sebagai tahun berjalan.');
+}
 
     public function toggleActive($id)
     {
