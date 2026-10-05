@@ -138,17 +138,16 @@ $selected_jurusan = old('jurusan_id', $siswa?->rombel?->kelas?->jurusan?->id);
         <span class="badge-required">WAJIB</span>
     </label>
 
-    <select name="jenis_kelamin" class="form-select" required>
+    <select name="jenis_kelamin_id" class="form-select" required>
         <option value="">-- Pilih Jenis Kelamin --</option>
-        <option value="Laki-laki" {{ old('jenis_kelamin', $siswa->jenis_kelamin ?? '') == 'Laki-laki' ? 'selected' : '' }}>
-            Laki-laki
-        </option>
-        <option value="Perempuan" {{ old('jenis_kelamin', $siswa->jenis_kelamin ?? '') == 'Perempuan' ? 'selected' : '' }}>
-            Perempuan
-        </option>
+        @foreach($jenisKelamins as $jk)
+            <option value="{{ $jk->id }}" {{ old('jenis_kelamin_id', $siswa->jenis_kelamin_id ?? '') == $jk->id ? 'selected' : '' }}>
+                {{ $jk->nama }}
+            </option>
+        @endforeach
     </select>
 
-    @error('jenis_kelamin')
+    @error('jenis_kelamin_id')
         <div class="text-danger" style="font-size:12px;margin-top:4px;">
             <i class="fas fa-exclamation-circle"></i> {{ $message }}
         </div>

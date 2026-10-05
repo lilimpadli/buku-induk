@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\DataSiswa;
 use Illuminate\Support\Facades\Log;
 
 class MutasiSiswa extends Model
@@ -59,8 +60,8 @@ class MutasiSiswa extends Model
     // Relasi
     public function siswa()
     {
-        return $this->belongsTo(Siswa::class, 'siswa_id');
-    }
+ return $this->belongsTo(DataSiswa::class, 'siswa_id');
+     }
 
     public function rombelAsal()
     {

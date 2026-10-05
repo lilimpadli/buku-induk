@@ -27,10 +27,10 @@ class SiswaController extends Controller
      * Mendapatkan data siswa milik user yang login
      */
     private function getSiswaLogin()
-    {
-        $user = Auth::user();
-        return DataSiswa::where('nis', $user->nomor_induk)->first();
-    }
+{
+    $user = Auth::user();
+    return DataSiswa::where('user_id', $user->id)->first();  // ⬅️ LEBIH AMAN
+}
 
     /**
      * Menampilkan halaman data diri siswa
@@ -103,85 +103,85 @@ class SiswaController extends Controller
         return view('siswa.data-diri-create');
     }
 
-    public function store(Request $request)
-    {
-        $user = Auth::user();
+public function store(Request $request)
+{
+    $user = Auth::user();
 
-        $request->validate([
-            // Data siswa
-            'nama_lengkap'     => 'required|string|max:255',
-            'nisn'             => 'required|string|max:20|unique:data_siswa',
-            'jenis_kelamin'    => 'required|in:Laki-laki,Perempuan',
-            'tempat_lahir'     => 'required|string|max:255',
-            'tanggal_lahir'    => 'required|date',
-            'agama'            => 'required|string|max:50',
-            'kewarganegaraan'  => 'required|string|max:100',
-            'dusun'            => 'required|string|max:255',
-            'rt'               => 'required|string|max:10',
-            'rw'               => 'required|string|max:10',
-            'kelurahan'        => 'required|string|max:255',
-            'kecamatan'        => 'required|string|max:255',
-            'kode_pos'         => 'required|string|max:10',
-            'no_hp'            => 'required|string|max:20',
+    $request->validate([
+        'nama_lengkap'     => 'required|string|max:255',
+        'nisn'             => 'required|string|max:20|unique:data_siswa,nisn',
+        
+        // 1. Validasi jenis_kelamin_id langsung ke tabel jenis_kelamins
+        'jenis_kelamin_id' => 'required|exists:jenis_kelamins,id',
+        
+        'tempat_lahir'     => 'required|string|max:255',
+        'tanggal_lahir'    => 'required|date',
+        'agama'            => 'required|string|max:50',
+        'kewarganegaraan'  => 'required|string|max:100',
+        'dusun'            => 'required|string|max:255',
+        'rt'               => 'required|string|max:10',
+        'rw'               => 'required|string|max:10',
+        'kelurahan'        => 'required|string|max:255',
+        'kecamatan'        => 'required|string|max:255',
+        'kode_pos'         => 'required|string|max:10',
+        'no_hp'            => 'required|string|max:20',
 
-            // Data Ayah - LANGSUNG KE TABEL data_siswa
-            'nama_ayah'        => 'required|string|max:255',
-            'pekerjaan_ayah'   => 'required|string|max:255',
-            'telepon_ayah'     => 'nullable|string|max:20',
-            'alamat_ayah'      => 'required|string',
+        // Data Ortu
+        'nama_ayah'        => 'required|string|max:255',
+        'pekerjaan_ayah'   => 'required|string|max:255',
+        'telepon_ayah'     => 'nullable|string|max:20',
+        'alamat_ayah'      => 'required|string',
+        'nama_ibu'         => 'required|string|max:255',
+        'pekerjaan_ibu'    => 'required|string|max:255',
+        'telepon_ibu'      => 'nullable|string|max:20',
+        'alamat_ibu'       => 'required|string',
+        'nama_wali'        => 'nullable|string|max:255',
+        'pekerjaan_wali'   => 'nullable|string|max:255',
+        'telepon_wali'     => 'nullable|string|max:20',
+        'alamat_wali'      => 'nullable|string',
+    ]);
 
-            // Data Ibu - LANGSUNG KE TABEL data_siswa
-            'nama_ibu'         => 'required|string|max:255',
-            'pekerjaan_ibu'    => 'required|string|max:255',
-            'telepon_ibu'      => 'nullable|string|max:20',
-            'alamat_ibu'       => 'required|string',
+    // Cari ID Agama dari tabel master
+    $agama = \App\Models\Agama::where('nama', $request->agama)->first();
 
-            // Data Wali (opsional) - LANGSUNG KE TABEL data_siswa
-            'nama_wali'        => 'nullable|string|max:255',
-            'pekerjaan_wali'   => 'nullable|string|max:255',
-            'telepon_wali'     => 'nullable|string|max:20',
-            'alamat_wali'      => 'nullable|string',
-        ]);
+    $siswa = DataSiswa::create([
+        'user_id'          => $user->id,
+        'nis'              => $user->nomor_induk,
+        'nama_lengkap'     => $request->nama_lengkap,
+        'nisn'             => $request->nisn,
+        
+        // 2. Simpan jenis_kelamin_id (bukan kolom jenis_kelamin)
+        'jenis_kelamin_id' => $request->jenis_kelamin_id,
+        'agama_id'         => $agama ? $agama->id : null,
+        
+        'tempat_lahir'     => $request->tempat_lahir,
+        'tanggal_lahir'    => $request->tanggal_lahir,
+        'kewarganegaraan'  => $request->kewarganegaraan,
+        'dusun'            => $request->dusun,
+        'rt'               => $request->rt,
+        'rw'               => $request->rw,
+        'kelurahan'        => $request->kelurahan,
+        'kecamatan'        => $request->kecamatan,
+        'kode_pos'         => $request->kode_pos,
+        'no_hp'            => $request->no_hp,
+        
+        'nama_ayah'        => $request->nama_ayah,
+        'pekerjaan_ayah'   => $request->pekerjaan_ayah,
+        'telepon_ayah'     => $request->telepon_ayah,
+        'alamat_ayah'      => $request->alamat_ayah,
+        'nama_ibu'         => $request->nama_ibu,
+        'pekerjaan_ibu'    => $request->pekerjaan_ibu,
+        'telepon_ibu'      => $request->telepon_ibu,
+        'alamat_ibu'       => $request->alamat_ibu,
+        'nama_wali'        => $request->nama_wali,
+        'pekerjaan_wali'   => $request->pekerjaan_wali,
+        'telepon_wali'     => $request->telepon_wali,
+        'alamat_wali'      => $request->alamat_wali,
+    ]);
 
-        // ✅ SIMPAN LANGSUNG KE data_siswa (TANPA buat ayah, ibu, wali terpisah)
-        $siswa = DataSiswa::create([
-            'user_id' => $user->id,
-            'nis' => $user->nomor_induk,
-            'nama_lengkap' => $request->nama_lengkap,
-            'nisn' => $request->nisn,
-            'jenis_kelamin' => $request->jenis_kelamin,
-            'tempat_lahir' => $request->tempat_lahir,
-            'tanggal_lahir' => $request->tanggal_lahir,
-            'agama' => $request->agama,
-            'kewarganegaraan' => $request->kewarganegaraan,
-            'dusun' => $request->dusun,
-            'rt' => $request->rt,
-            'rw' => $request->rw,
-            'kelurahan' => $request->kelurahan,
-            'kecamatan' => $request->kecamatan,
-            'kode_pos' => $request->kode_pos,
-            'no_hp' => $request->no_hp,
-            // ✅ DATA AYAH LANGSUNG
-            'nama_ayah' => $request->nama_ayah,
-            'pekerjaan_ayah' => $request->pekerjaan_ayah,
-            'telepon_ayah' => $request->telepon_ayah,
-            'alamat_ayah' => $request->alamat_ayah,
-            // ✅ DATA IBU LANGSUNG
-            'nama_ibu' => $request->nama_ibu,
-            'pekerjaan_ibu' => $request->pekerjaan_ibu,
-            'telepon_ibu' => $request->telepon_ibu,
-            'alamat_ibu' => $request->alamat_ibu,
-            // ✅ DATA WALI LANGSUNG
-            'nama_wali' => $request->nama_wali,
-            'pekerjaan_wali' => $request->pekerjaan_wali,
-            'telepon_wali' => $request->telepon_wali,
-            'alamat_wali' => $request->alamat_wali,
-        ]);
-
-        return redirect()->route('siswa.dataDiri')
-            ->with('success', 'Data diri berhasil disimpan.');
-    }
-
+    return redirect()->route('siswa.dataDiri')
+        ->with('success', 'Data diri berhasil disimpan.');
+}
     public function edit()
     {
         $siswa = $this->getSiswaLogin();

@@ -177,14 +177,13 @@ class SiswaImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsOnE
         $tanggalLahir = $this->parseDate($row['tanggal_lahir'] ?? null);
         $tanggalDiterima = $this->parseDate($row['mulai_tanggal_diterima'] ?? $row['tanggal_diterima'] ?? null);
 
-        // Buat user
         $user = User::create([
-            'name' => $nama,
-            'email' => $nis . '@siswa.local',
-            'password' => Hash::make('password123'),
-            'role' => 'siswa',
-            'nomor_induk' => $nis,
-        ]);
+    'name' => $nama,
+    'email' => $nis . '@siswa.local',
+    'password' => Hash::make($nis . '123'),   // ⬅️ UBAH JADI INI
+    'role' => 'siswa',
+    'nomor_induk' => $nis,
+]);
 
         // Buat data siswa
         $siswa = DataSiswa::create([

@@ -4,7 +4,6 @@
 
 @section('content')
 <style>
-    /* 🔥 FONT TIMES NEW ROMAN HANYA UNTUK ISI BUKU INDUK */
     .buku-induk-container {
         font-family: 'Times New Roman', Times, serif;
         line-height: 1.1;
@@ -15,31 +14,16 @@
         box-shadow: 0 0 20px rgba(0,0,0,0.1);
         border-radius: 8px;
     }
-    
-    /* 🔥 HEADER DAN TOMBOL TETAP POPPINS */
-    .page-header,
-    .page-title,
-    .page-title i,
-    .action-buttons .btn,
-    .action-buttons .btn * {
+    .page-header, .page-title, .page-title i, .action-buttons .btn, .action-buttons .btn * {
         font-family: 'Poppins', sans-serif !important;
     }
-    
-    /* 🔥 KONTEN DI LUAR BUKU INDUK TETAP POPPINS */
     body {
         font-family: 'Poppins', sans-serif;
         background-color: #f8f9fa;
         color: #000;
         line-height: 1.1;
     }
-
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    /* --- MAIN LAYOUT: TWO COLUMNS --- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     .main-content-wrapper {
         display: flex;
         gap: 8px;
@@ -47,397 +31,80 @@
         overflow: hidden;
         margin-top: 10px;
     }
-    
-    .nilai-column {
-        flex: 2.2;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-    .data-column {
-        flex: 1.8;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-
-    /* --- Right Column: Student Data (VERTICAL) --- */
-    .data-section {
-        margin-bottom: 6px;
-    }
-    .data-section-title {
-        font-weight: bold;
-        margin-bottom: 3px;
-        font-size: 8px;
-        text-decoration: underline;
-        font-family: 'Times New Roman', Times, serif;
-    }
-    .data-row {
-        display: flex;
-        margin-bottom: 2px;
-        align-items: flex-end;
-    }
-    .data-label {
-        width: 85px;
-        font-weight: normal;
-        padding-right: 4px;
-        flex-shrink: 0;
-        font-size: 8px;
-        font-family: 'Times New Roman', Times, serif;
-    }
-    .data-value {
-        flex: 1;
-        border-bottom: 0.6px dotted #000;
-        min-height: 12px;
-        font-size: 8px;
-        padding-bottom: 1px;
-        font-family: 'Times New Roman', Times, serif;
-    }
-    
-    /* --- Photo --- */
-    .photo-info-container {
-        text-align: center;
-        margin-bottom: 8px;
-    }
-    .photo-box {
-        width: 70px;
-        height: 95px;
-        border: 1px solid #000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 6px;
-        background: #f8f9fa;
-    }
-    .photo-box img {
-        width: 68px;
-        height: 93px;
-        object-fit: cover;
-    }
-    .photo-box .no-photo {
-        font-size: 8px;
-        color: #999;
-    }
-
-    /* --- Left Column: Grades Table --- */
-    .hasil-prestasi-title {
-        text-align: center;
-        font-weight: 700;
-        margin: 0 0 6px;
-        font-size: 10px;
-        font-family: 'Times New Roman', Times, serif;
-    }
-    .table-responsive {
-        flex-grow: 1;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-    }
-    .buku-induk-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 6px;
-        table-layout: fixed;
-        height: 100%;
-        font-family: 'Times New Roman', Times, serif;
-    }
-    .buku-induk-table th, .buku-induk-table td {
-        border: 1px solid #000;
-        padding: 2px 3px;
-        text-align: center;
-        vertical-align: middle;
-    }
-    .buku-induk-table th {
-        background-color: #f0f0f0;
-        font-weight: bold;
-        font-size: 6px;
-        padding: 2px 1px;
-    }
-    .buku-induk-table tbody td:first-child {
-        text-align: left;
-        font-weight: normal;
-        font-size: 6px;
-        padding: 2px 4px;
-        line-height: 1.1;
-    }
-    .buku-induk-table tbody td:not(:first-child) {
-        font-size: 5.5px;
-    }
-    .buku-induk-table th:first-child {
-        text-align: center;
-    }
-    .buku-induk-table tbody tr.group-row td {
-        background-color: #e8e8e8;
-        font-weight: bold;
-        text-align: left;
-        font-size: 6px;
-    }
-
-    /* --- Signature --- */
-    .signature-section {
-        margin-top: auto;
-        padding-top: 8px;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        font-size: 6px;
-        font-family: 'Times New Roman', Times, serif;
-    }
-    .signature-box {
-        text-align: center;
-        width: 110px;
-    }
-    .signature-box p {
-        margin: 0;
-        font-size: 8px;
-        line-height: 1.2;
-        font-family: 'Times New Roman', Times, serif;
-    }
-    .signature-line {
-        border-top: 1px solid #000;
-        height: 36px;
-        margin-top: 6px;
-    }
-    .stamp-box {
-        width: 45px;
-        height: 45px;
-        border: 1px solid #000;
-    }
-    .signature-info {
-        margin-top: 6px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    .signature-box-small {
-        width: 110px;
-        height: 40px;
-        border: 1px solid #000;
-        margin-bottom: 4px;
-    }
-
-    /* Page Header */
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-        gap: 15px;
-        flex-wrap: wrap;
-    }
-
-    .page-title {
-        font-size: clamp(18px, 4vw, 24px);
-        margin: 0;
-        font-family: 'Poppins', sans-serif !important;
-    }
-
-    .page-title i {
-        color: #2F53FF;
-        font-family: 'Font Awesome 6 Free' !important;
-    }
-
-/* 🔥 ACTION BUTTONS - FIX ICON */
-    .action-buttons {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        align-items: center;
-    }
-
-    .action-buttons .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 10px 24px;
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 14px;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        min-height: 44px;
-        min-width: 120px;
-        font-family: 'Poppins', sans-serif !important;
-        border: none;
-        cursor: pointer;
-    }
-
-    /* Pastikan tag <i> untuk ikon tetap memakai Font Awesome */
-    .action-buttons .btn i {
-        font-size: 16px;
-        font-family: 'Font Awesome 6 Free', 'FontAwesome', sans-serif !important;
-        font-weight: 900; /* Diperlukan agar Font Awesome Solid ter-render dengan benar */
-    }
-
-    .action-buttons .btn-outline-secondary {
-        background: #f1f5f9;
-        color: #475569;
-        border: 2px solid #e2e8f0;
-    }
-
-    .action-buttons .btn-outline-secondary:hover {
-        background: #e2e8f0;
-        color: #1e293b;
-        border-color: #cbd5e1;
-        transform: translateY(-2px);
-        text-decoration: none;
-    }
-
-    .action-buttons .btn-primary {
-        background: linear-gradient(135deg, #2F53FF, #6366F1);
-        color: white;
-        border: none;
-        box-shadow: 0 4px 12px rgba(47, 83, 255, 0.3);
-    }
-
-    .action-buttons .btn-primary:hover {
-        background: linear-gradient(135deg, #6366F1, #2F53FF);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(47, 83, 255, 0.4);
-        color: white;
-        text-decoration: none;
-    }
-    /* Buku Induk Header - Times New Roman */
-    .buku-induk-header {
-        text-align: center;
-        margin-bottom: 6px;
-        padding-bottom: 4px;
-        border-bottom: 2px solid #000;
-        font-family: 'Times New Roman', Times, serif;
-    }
-
-    .buku-induk-header h1 {
-        font-size: 14px;
-        margin-bottom: 2px;
-        font-weight: bold;
-        text-transform: uppercase;
-        font-family: 'Times New Roman', Times, serif;
-    }
-
-    .buku-induk-header h2 {
-        font-size: 9px;
-        margin-bottom: 2px;
-        font-weight: normal;
-        font-family: 'Times New Roman', Times, serif;
-    }
-
+    .nilai-column { flex: 2.2; display: flex; flex-direction: column; overflow: hidden; }
+    .data-column { flex: 1.8; display: flex; flex-direction: column; overflow: hidden; }
+    .data-section { margin-bottom: 6px; }
+    .data-section-title { font-weight: bold; margin-bottom: 3px; font-size: 8px; text-decoration: underline; }
+    .data-row { display: flex; margin-bottom: 2px; align-items: flex-end; }
+    .data-label { width: 85px; font-weight: normal; padding-right: 4px; flex-shrink: 0; font-size: 8px; }
+    .data-value { flex: 1; border-bottom: 0.6px dotted #000; min-height: 12px; font-size: 8px; padding-bottom: 1px; }
+    .photo-info-container { text-align: center; margin-bottom: 8px; }
+    .photo-box { width: 70px; height: 95px; border: 1px solid #000; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; background: #f8f9fa; }
+    .photo-box img { width: 68px; height: 93px; object-fit: cover; }
+    .photo-box .no-photo { font-size: 8px; color: #999; }
+    .hasil-prestasi-title { text-align: center; font-weight: 700; margin: 0 0 6px; font-size: 10px; }
+    .table-responsive { flex-grow: 1; overflow: hidden; display: flex; flex-direction: column; }
+    .buku-induk-table { width: 100%; border-collapse: collapse; font-size: 6px; table-layout: fixed; height: 100%; }
+    .buku-induk-table th, .buku-induk-table td { border: 1px solid #000; padding: 2px 3px; text-align: center; vertical-align: middle; }
+    .buku-induk-table th { background-color: #f0f0f0; font-weight: bold; font-size: 6px; padding: 2px 1px; }
+    .buku-induk-table tbody td:first-child { text-align: left; font-weight: normal; font-size: 6px; padding: 2px 4px; line-height: 1.1; }
+    .buku-induk-table tbody td:not(:first-child) { font-size: 5.5px; }
+    .buku-induk-table th:first-child { text-align: center; }
+    .buku-induk-table tbody tr.group-row td { background-color: #e8e8e8; font-weight: bold; text-align: left; font-size: 6px; }
+    .signature-section { margin-top: auto; padding-top: 8px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 6px; }
+    .signature-box { text-align: center; width: 110px; }
+    .signature-box p { margin: 0; font-size: 8px; line-height: 1.2; }
+    .signature-line { border-top: 1px solid #000; height: 36px; margin-top: 6px; }
+    .stamp-box { width: 45px; height: 45px; border: 1px solid #000; }
+    .signature-info { margin-top: 6px; display: flex; flex-direction: column; align-items: center; }
+    .signature-box-small { width: 110px; height: 40px; border: 1px solid #000; margin-bottom: 4px; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 15px; flex-wrap: wrap; }
+    .page-title { font-size: clamp(18px, 4vw, 24px); margin: 0; font-family: 'Poppins', sans-serif !important; }
+    .page-title i { color: #2F53FF; font-family: 'Font Awesome 6 Free' !important; }
+    .action-buttons { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .action-buttons .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 24px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.3s ease; text-decoration: none; min-height: 44px; min-width: 120px; font-family: 'Poppins', sans-serif !important; border: none; cursor: pointer; }
+    .action-buttons .btn i { font-size: 16px; font-family: 'Font Awesome 6 Free', 'FontAwesome', sans-serif !important; font-weight: 900; }
+    .action-buttons .btn-outline-secondary { background: #f1f5f9; color: #475569; border: 2px solid #e2e8f0; }
+    .action-buttons .btn-outline-secondary:hover { background: #e2e8f0; color: #1e293b; border-color: #cbd5e1; transform: translateY(-2px); text-decoration: none; }
+    .action-buttons .btn-primary { background: linear-gradient(135deg, #2F53FF, #6366F1); color: white; border: none; box-shadow: 0 4px 12px rgba(47, 83, 255, 0.3); }
+    .action-buttons .btn-primary:hover { background: linear-gradient(135deg, #6366F1, #2F53FF); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(47, 83, 255, 0.4); color: white; text-decoration: none; }
+    .buku-induk-header { text-align: center; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 2px solid #000; }
+    .buku-induk-header h1 { font-size: 14px; margin-bottom: 2px; font-weight: bold; text-transform: uppercase; }
+    .buku-induk-header h2 { font-size: 9px; margin-bottom: 2px; font-weight: normal; }
     @media print {
-        @page { 
-            size: A4 portrait; 
-            margin: 5mm;
-            -webkit-print-color-adjust: exact;
-        }
-        body {
-            padding: 0;
-            margin: 0;
-            background-color: white;
-        }
-        .buku-induk-container {
-            box-shadow: none;
-            width: 210mm;
-            height: 297mm;
-            overflow: hidden;
-            page-break-after: always;
-            padding: 5mm;
-            margin: 0;
-            border-radius: 0;
-        }
-        .main-content-wrapper {
-            flex-direction: row;
-            height: calc(100% - 40px);
-        }
-        .buku-induk-table {
-            font-size: 6pt;
-        }
-        .data-label, .data-value {
-            font-size: 7pt;
-        }
-        .table-responsive {
-            height: 100%;
-        }
-        .page-header, .action-buttons, .btn {
-            display: none !important;
-        }
-        .buku-induk-header h1 {
-            font-size: 14pt;
-        }
-        .buku-induk-header h2 {
-            font-size: 9pt;
-        }
-        .hasil-prestasi-title {
-            font-size: 10pt;
-        }
-        .signature-box p {
-            font-size: 8pt;
-        }
+        @page { size: A4 portrait; margin: 5mm; -webkit-print-color-adjust: exact; }
+        body { padding: 0; margin: 0; background-color: white; }
+        .buku-induk-container { box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; page-break-after: always; padding: 5mm; margin: 0; border-radius: 0; }
+        .main-content-wrapper { flex-direction: row; height: calc(100% - 40px); }
+        .buku-induk-table { font-size: 6pt; }
+        .data-label, .data-value { font-size: 7pt; }
+        .table-responsive { height: 100%; }
+        .page-header, .action-buttons, .btn { display: none !important; }
+        .buku-induk-header h1 { font-size: 14pt; }
+        .buku-induk-header h2 { font-size: 9pt; }
+        .hasil-prestasi-title { font-size: 10pt; }
+        .signature-box p { font-size: 8pt; }
     }
-
-    /* Responsive */
     @media (max-width: 768px) {
-        .buku-induk-container {
-            padding: 4mm;
-            margin: 10px;
-        }
-        .main-content-wrapper {
-            flex-direction: column;
-        }
-        .nilai-column {
-            flex: 1;
-        }
-        .data-column {
-            flex: 1;
-        }
-        .page-header {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        .action-buttons {
-            flex-direction: column;
-            width: 100%;
-        }
-        .action-buttons .btn {
-            width: 100%;
-            min-width: unset;
-            justify-content: center;
-            padding: 12px 20px;
-        }
-        .data-label {
-            width: 70px;
-            font-size: 7px;
-        }
-        .data-value {
-            font-size: 7px;
-        }
+        .buku-induk-container { padding: 4mm; margin: 10px; }
+        .main-content-wrapper { flex-direction: column; }
+        .nilai-column, .data-column { flex: 1; }
+        .page-header { flex-direction: column; align-items: stretch; }
+        .action-buttons { flex-direction: column; width: 100%; }
+        .action-buttons .btn { width: 100%; min-width: unset; justify-content: center; padding: 12px 20px; }
+        .data-label { width: 70px; font-size: 7px; }
+        .data-value { font-size: 7px; }
     }
-
     @media (max-width: 576px) {
-        .buku-induk-container {
-            padding: 3mm;
-            margin: 5px;
-        }
-        .action-buttons .btn {
-            font-size: 13px;
-            padding: 10px 16px;
-            min-height: 40px;
-        }
-        .page-title {
-            font-size: 18px;
-        }
-        .photo-box {
-            width: 60px;
-            height: 80px;
-        }
-        .photo-box img {
-            width: 58px;
-            height: 78px;
-        }
+        .buku-induk-container { padding: 3mm; margin: 5px; }
+        .action-buttons .btn { font-size: 13px; padding: 10px 16px; min-height: 40px; }
+        .page-title { font-size: 18px; }
+        .photo-box { width: 60px; height: 80px; }
+        .photo-box img { width: 58px; height: 78px; }
     }
 </style>
 
-<!-- ISI KONTEN -->
 <div class="buku-induk-container">
-    <!-- PAGE HEADER -->
     <div class="page-header">
         <h1 class="page-title">
             <i class="fas fa-book"></i> Buku Induk Siswa
@@ -452,16 +119,13 @@
         </div>
     </div>
 
-    <!-- HEADER BUKU INDUK -->
     <div class="buku-induk-header">
         <h1>BUKU INDUK SISWA</h1>
         <h2>SMKN 1 KAWALI</h2>
-        <h2>KONSENTRASI: {{ $siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan ? $siswa->rombel->kelas->jurusan->nama : 'REKAYASA PERANGKAT LUNAK' }}</h2>
+        <h2>KONSENTRASI: {{ $konsentrasi ?? 'Tidak Tersedia' }}</h2>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div class="main-content-wrapper">
-        <!-- KOLOM KIRI: TABEL NILAI -->
         <div class="nilai-column">
             <div class="hasil-prestasi-title">HASIL PRESTASI PEMBELAJARAN</div>
             <div class="table-responsive">
@@ -532,9 +196,16 @@
                                 @endforeach
                             </tr>
                         @endif
-                        
-                        {{-- BARIS KOSONG UNTUK MEMANJANGKAN TABEL --}}
-                        @for ($i = 0; $i < 15; $i++)
+
+                        <tr>
+                            <td>Praktek Kerja Lapangan</td>
+                            @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                <td>{{ $siswa->pkl_nilai ?? '-' }}</td>
+                                <td>{{ $siswa->pkl_nilai ?? '-' }}</td>
+                            @endforeach
+                        </tr>
+
+                        @for ($i = 0; $i < 14; $i++)
                             <tr>
                                 <td>&nbsp;</td>
                                 @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
@@ -548,9 +219,7 @@
             </div>
         </div>
 
-        <!-- KOLOM KANAN: DATA SISWA -->
         <div class="data-column">
-            <!-- Photo -->
             <div class="photo-info-container">
                 <div class="photo-box">
                     @if(isset($siswa->user) && isset($siswa->user->photo))
@@ -561,7 +230,6 @@
                 </div>
             </div>
 
-            <!-- Data Siswa -->
             <div class="data-section">
                 <div class="data-row">
                     <div class="data-label">NIS / NISN</div>
@@ -601,7 +269,6 @@
                 </div>
             </div>
 
-            <!-- Orang Tua -->
             <div class="data-section">
                 <div class="data-row">
                     <div class="data-label">Nama Orang Tua</div>
@@ -637,7 +304,6 @@
                 </div>
             </div>
 
-            <!-- Diterima -->
             <div class="data-section">
                 <div class="data-section-title">Diterima menjadi Siswa</div>
                 <div class="data-row">
@@ -650,7 +316,6 @@
                 </div>
             </div>
 
-            <!-- Meninggalkan Sekolah -->
             <div class="data-section">
                 <div class="data-section-title">Meninggalkan Sekolah</div>
                 <div class="data-row">
@@ -675,7 +340,6 @@
                 </div>
             </div>
 
-            <!-- Lulus/Tamat -->
             <div class="data-section">
                 <div class="data-section-title">Lulus/Tamat</div>
                 <div class="data-row">
@@ -704,7 +368,6 @@
                 </div>
             </div>
 
-            <!-- PKL -->
             <div class="data-section">
                 <div class="data-section-title">Praktek Kerja Industri</div>
                 <div class="data-row">
@@ -725,7 +388,6 @@
                 </div>
             </div>
             
-            <!-- Signature -->
             <div class="signature-section">
                 <div class="signature-info">
                     <div class="signature-box-small"></div>

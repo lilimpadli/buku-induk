@@ -61,10 +61,62 @@ class NilaiRaportTemplateByFilters implements FromCollection, WithHeadings, With
         return array_unique($variants);
     }
 
+    protected function getTingkatNormalized(): array
+    {
+        $tingkatNormalized = [];
+        foreach ($this->tingkatLevels as $t) {
+            $val = trim((string)$t);
+            $cleaned = preg_replace('/[^0-9]/', '', $val);
+            if (!empty($cleaned)) {
+                $tingkatNormalized[] = (int)$cleaned;
+            } else {
+                $upper = strtoupper($val);
+                if ($upper === 'X') $tingkatNormalized[] = 10;
+                if ($upper === 'XI') $tingkatNormalized[] = 11;
+                if ($upper === 'XII') $tingkatNormalized[] = 12;
+            }
+        }
+        return array_unique($tingkatNormalized);
+    }
+
+    protected function isKelasXIAtas(): bool
+    {
+        $tingkat = $this->getTingkatNormalized();
+        if (empty($tingkat)) {
+            return false;
+        }
+        return in_array(11, $tingkat) || in_array(12, $tingkat);
+    }
+
+    protected function isKelasXII(): bool
+    {
+        $tingkat = $this->getTingkatNormalized();
+        if (empty($tingkat)) {
+            return false;
+        }
+        return in_array(12, $tingkat);
+    }
+
     protected function loadMataPelajaran()
     {
         $tingkatVariants = $this->getFormattedTingkatVariants();
         $mataPelajaranQuery = MataPelajaran::query();
+
+        $mapelExclude = [
+            'Pengembangan Gim',
+            'Pemrograman Web',
+            'BIM',
+            'Kerja Bangku',
+            'Pengelasan',
+            'Musik Nusantara',
+            'Musik Kolaborasi',
+            'Layanan Perbankan',
+            'Desain Grafis',
+            'Kreativitas, Inovasi, dan Kewirausahaan',
+            'Muatan Lokal Bahasa Daerah',
+        ];
+
+        $mataPelajaranQuery->whereNotIn('nama', $mapelExclude);
 
         if (!empty($this->kurikulumIds)) {
             $mataPelajaranQuery->whereHas('kurikulums', function ($q) {
@@ -79,13 +131,16 @@ class NilaiRaportTemplateByFilters implements FromCollection, WithHeadings, With
         }
 
         if (!empty($tingkatVariants)) {
-            $mataPelajaranQuery->whereHas('tingkats', function ($q) use ($tingkatVariants) {
-                $q->where(function ($sub) use ($tingkatVariants) {
-                    $sub->whereIn('tingkat', $tingkatVariants);
-                    if (\Schema::hasColumn('mata_pelajaran_tingkat', 'tingkat_id')) {
-                        $sub->orWhereIn('tingkat_id', $tingkatVariants);
-                    }
-                });
+            $mataPelajaranQuery->where(function ($query) use ($tingkatVariants) {
+                $query->whereHas('tingkats', function ($q) use ($tingkatVariants) {
+                    $q->where(function ($sub) use ($tingkatVariants) {
+                        $sub->whereIn('tingkat', $tingkatVariants);
+                        if (\Schema::hasColumn('mata_pelajaran_tingkat', 'tingkat_id')) {
+                            $sub->orWhereIn('tingkat_id', $tingkatVariants);
+                        }
+                    });
+                })
+                ->orWhereIn('nama', ['Projek Kreatif dan Kewirausahaan', 'Muatan Lokal']);
             });
         }
 
@@ -100,8 +155,17 @@ class NilaiRaportTemplateByFilters implements FromCollection, WithHeadings, With
     public function headings(): array
     {
         $headerRow = ['No', 'NIS', 'NISN', 'Nama Siswa', 'Rombel', 'Semester', 'Tahun Ajaran'];
+
         foreach ($this->mataPelajarans as $mapel) {
             $headerRow[] = $mapel->nama;
+        }
+
+        if ($this->isKelasXIAtas()) {
+            $headerRow[] = 'Mata Pelajaran Pilihan';
+        }
+
+        if ($this->isKelasXII()) {
+            $headerRow[] = 'Praktek Kerja Lapangan';
         }
 
         $this->headersCount = count($headerRow);
@@ -129,6 +193,8 @@ class NilaiRaportTemplateByFilters implements FromCollection, WithHeadings, With
 
         $data = collect();
         $no = 1;
+        $isKelasXIAtas = $this->isKelasXIAtas();
+        $isKelasXII = $this->isKelasXII();
 
         foreach ($siswas as $siswa) {
             $row = [
@@ -142,6 +208,14 @@ class NilaiRaportTemplateByFilters implements FromCollection, WithHeadings, With
             ];
 
             foreach ($this->mataPelajarans as $mapel) {
+                $row[] = '';
+            }
+
+            if ($isKelasXIAtas) {
+                $row[] = '';
+            }
+
+            if ($isKelasXII) {
                 $row[] = '';
             }
 

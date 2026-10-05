@@ -11,41 +11,57 @@ use Maatwebsite\Excel\Events\AfterSheet;
 
 class SiswaAktifExport implements FromCollection, WithHeadings, ShouldAutoSize, WithEvents
 {
-    public function collection()
-    {
-        return DataSiswa::with(['rombel.kelas.jurusan'])
-            ->whereNotIn('id', function ($query) {
-                $query->select('siswa_id')
-                    ->from('kenaikan_kelas')
-                    ->where('status', 'lulus');
-            })
-            ->orderBy('nama_lengkap')
-            ->get()
-            ->map(function ($siswa, $index) {
-                $rombelModel = $siswa->rombel;
-                $kelasModel = $rombelModel ? $rombelModel->kelas : null;
-                $jurusanModel = $kelasModel ? $kelasModel->jurusan : null;
+   public function collection()
+{
+    // 🔥 Exclude alumni dari mutasi (lowercase)
+    $excludedByMutasi = \App\Models\MutasiSiswa::whereRaw('LOWER(status) = ?', ['lulus'])
+        ->pluck('siswa_id')
+        ->unique()
+        ->filter()
+        ->toArray();
 
-                $rombel = $rombelModel ? $rombelModel->nama : '';
-                $kelas = $kelasModel ? $kelasModel->tingkat : '';
-                $jurusan = $jurusanModel ? $jurusanModel->nama : '';
-                $tanggalLahir = $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d-m-Y') : '';
+    // 🔥 Exclude alumni dari kenaikan_kelas (case-insensitive)
+    $excludedByKenaikan = \App\Models\KenaikanKelas::whereRaw('LOWER(status) = ?', ['lulus'])
+        ->pluck('siswa_id')
+        ->unique()
+        ->filter()
+        ->toArray();
 
-                return [
-                    'No' => $index + 1,
-                    'NIS' => $siswa->nis ?? '',
-                    'NISN' => $siswa->nisn ?? '',
-                    'Nama Lengkap' => $siswa->nama_lengkap ?? '',
-                    'Jenis Kelamin' => $siswa->jenis_kelamin ?? '',
-                    'Tempat Lahir' => $siswa->tempat_lahir ?? '',
-                    'Tanggal Lahir' => $tanggalLahir,
-                    'Alamat' => $siswa->alamat ?? '',
-                    'Kelas' => $kelas,
-                    'Rombel' => $rombel,
-                    'Jurusan' => $jurusan,
-                ];
-            });
+    $excludedIds = array_values(array_unique(array_merge($excludedByMutasi, $excludedByKenaikan)));
+
+    $query = DataSiswa::with(['rombel.kelas.jurusan'])->orderBy('nama_lengkap');
+
+    if (!empty($excludedIds)) {
+        $query->whereNotIn('id', $excludedIds);
     }
+
+    return $query->get()->map(function ($siswa, $index) {
+        $rombelModel = $siswa->rombel;
+        $kelasModel = $rombelModel ? $rombelModel->kelas : null;
+        $jurusanModel = $kelasModel ? $kelasModel->jurusan : null;
+
+        $rombel = $rombelModel ? $rombelModel->nama : '';
+        $kelas = $kelasModel ? $kelasModel->tingkat : '';
+        $jurusan = $jurusanModel ? $jurusanModel->nama : '';
+        $tanggalLahir = $siswa->tanggal_lahir
+            ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d-m-Y')
+            : '';
+
+        return [
+            'No' => $index + 1,
+            'NIS' => $siswa->nis ?? '',
+            'NISN' => $siswa->nisn ?? '',
+            'Nama Lengkap' => $siswa->nama_lengkap ?? '',
+            'Jenis Kelamin' => $siswa->jenis_kelamin ?? '',
+            'Tempat Lahir' => $siswa->tempat_lahir ?? '',
+            'Tanggal Lahir' => $tanggalLahir,
+            'Alamat' => $siswa->alamat ?? '',
+            'Kelas' => $kelas,
+            'Rombel' => $rombel,
+            'Jurusan' => $jurusan,
+        ];
+    });
+}
 
     public function headings(): array
     {

@@ -139,9 +139,7 @@ class GuruController extends Controller
         $guru->email              = $user->email;
         $guru->email_pribadi      = $request->email_pribadi;
         $guru->email_resmi        = $request->email_resmi;
-        $guru->alamat_jalan       = $request->alamat_jalan;
-        $guru->alamat             = $request->alamat_jalan ?? $request->alamat;
-        $guru->rt                 = $request->rt;
+        $guru->alamat             = $request->alamat_jalan ?? $request->alamat;        $guru->rt                 = $request->rt;
         $guru->rw                 = $request->rw;
         $guru->dusun              = $request->dusun;
         // FIX: DB tidak punya kolom 'kelurahan' → pakai 'desa' saja

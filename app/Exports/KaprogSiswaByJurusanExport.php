@@ -23,57 +23,70 @@ class KaprogSiswaByJurusanExport implements FromCollection, WithHeadings, Should
     /**
      * @return \Illuminate\Support\Collection
      */
-    public function collection()
-    {
-        $students = DataSiswa::with('rombel.kelas.jurusan')
-            ->whereHas('rombel.kelas', function ($q) {
-                $q->where('jurusan_id', $this->jurusanId);
-            })
-            ->orderBy('nama_lengkap')
-            ->get();
-        
-        $rows = $students->map(function ($s, $k) {
-            $tempatTanggalLahir = '';
-            if ($s->tempat_lahir && $s->tanggal_lahir) {
-                $tanggal = \Carbon\Carbon::parse($s->tanggal_lahir)->format('d-m-Y');
-                $tempatTanggalLahir = $s->tempat_lahir . ',' . $tanggal;
-            } elseif ($s->tempat_lahir) {
-                $tempatTanggalLahir = $s->tempat_lahir;
-            } elseif ($s->tanggal_lahir) {
-                $tanggal = \Carbon\Carbon::parse($s->tanggal_lahir)->format('d-m-Y');
-                $tempatTanggalLahir = $tanggal;
-            }
-
-            $kelas = optional(optional($s->rombel)->kelas)->tingkat ?? '-';
-            $rombel = optional($s->rombel)->nama ?? '-';
-
-            return [
-                'No' => $k + 1,
-                'NIS' => $s->nis ?? '',
-                'NISN' => $s->nisn,
-                'Nama' => $s->nama_lengkap,
-                'Kelas' => $kelas,
-                'Rombel' => $rombel,
-                'JK' => $s->jenis_kelamin,
-                'TTL' => $tempatTanggalLahir,
-            ];
+   public function collection()
+{
+    $query = DataSiswa::with('rombel.kelas.jurusan')
+        ->whereHas('rombel.kelas', function ($q) {
+            $q->where('jurusan_id', $this->jurusanId);
         });
 
-        // Add total row
-        $rows->push([
-            'No' => '',
-            'NIS' => '',
-            'NISN' => '',
-            'Nama' => 'JUMLAH',
-            'Kelas' => '',
-            'Rombel' => '',
-            'JK' => '',
-            'TTL' => $students->count(),
-        ]);
+    // 🔥 TAMBAHAN: Exclude alumni (mutasi + kenaikan_kelas)
+    $query->whereDoesntHave('mutasis', function ($q) {
+        $q->whereRaw('LOWER(status) = ?', ['lulus']);
+    });
 
-        return $rows;
+    $excludedIds = \App\Models\KenaikanKelas::whereRaw('LOWER(status) = ?', ['lulus'])
+        ->pluck('siswa_id')
+        ->unique()
+        ->filter()
+        ->toArray();
+
+    if (!empty($excludedIds)) {
+        $query->whereNotIn('id', $excludedIds);
     }
 
+    $students = $query->orderBy('nama_lengkap')->get();
+
+    $rows = $students->map(function ($s, $k) {
+        $tempatTanggalLahir = '';
+        if ($s->tempat_lahir && $s->tanggal_lahir) {
+            $tanggal = \Carbon\Carbon::parse($s->tanggal_lahir)->format('d-m-Y');
+            $tempatTanggalLahir = $s->tempat_lahir . ',' . $tanggal;
+        } elseif ($s->tempat_lahir) {
+            $tempatTanggalLahir = $s->tempat_lahir;
+        } elseif ($s->tanggal_lahir) {
+            $tanggal = \Carbon\Carbon::parse($s->tanggal_lahir)->format('d-m-Y');
+            $tempatTanggalLahir = $tanggal;
+        }
+
+        $kelas = optional(optional($s->rombel)->kelas)->tingkat ?? '-';
+        $rombel = optional($s->rombel)->nama ?? '-';
+
+        return [
+            'No' => $k + 1,
+            'NIS' => $s->nis ?? '',
+            'NISN' => $s->nisn,
+            'Nama' => $s->nama_lengkap,
+            'Kelas' => $kelas,
+            'Rombel' => $rombel,
+            'JK' => $s->jenis_kelamin,
+            'TTL' => $tempatTanggalLahir,
+        ];
+    });
+
+    $rows->push([
+        'No' => '',
+        'NIS' => '',
+        'NISN' => '',
+        'Nama' => 'JUMLAH',
+        'Kelas' => '',
+        'Rombel' => '',
+        'JK' => '',
+        'TTL' => $students->count(),
+    ]);
+
+    return $rows;
+}
     public function headings(): array
     {
         return [

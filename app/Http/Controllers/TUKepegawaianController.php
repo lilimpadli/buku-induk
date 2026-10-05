@@ -135,9 +135,6 @@ class TUKepegawaianController extends Controller
     // ==========================================================
     public function dashboard()
     {
-        // ==========================================================
-        // DATA INTI
-        // ==========================================================
         $totalGuru          = Guru::count();
         $pegawaiTableExists = Schema::hasTable('pegawais');
 
@@ -157,9 +154,6 @@ class TUKepegawaianController extends Controller
 
         $guruBaru = Guru::with('user')->latest()->take(5)->get();
 
-        // ==========================================================
-        // REKAP STATUS KEPEGAWAIAN
-        // ==========================================================
         $hitungStatus = function ($query, string $status) {
             return (clone $query)
                 ->whereRaw("LOWER(TRIM(status_kepegawaian)) = ?", [strtolower($status)])
@@ -181,10 +175,6 @@ class TUKepegawaianController extends Controller
             $totalTUPPPK     = 0;
             $totalTUPPKParuh = 0;
         }
-
-        // ==========================================================
-        // STATISTIK KARTU DASHBOARD
-        // ==========================================================
 
         $guruAktif = 0;
         if (Schema::hasColumn('gurus', 'status_keaktifan')) {
@@ -363,7 +353,7 @@ class TUKepegawaianController extends Controller
 
             $password = $request->filled('password')
                 ? $request->password
-                : ($request->filled('nip') ? $request->nip : '12345678');
+                : 'GuruBiskaone';
 
             $user = User::create([
                 'name' => $request->nama,
@@ -561,44 +551,57 @@ class TUKepegawaianController extends Controller
     public function tuStore(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
-            'nomor_induk' => 'required|string|unique:users,nomor_induk',
-            'email' => 'nullable|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-            'role' => 'required|in:tu,tu_kepegawaian',
+            'nama' => 'required|string|max:255',
+            'nik' => 'nullable|string|max:20',
+            'nuptk' => 'nullable|string|max:30',
+            'nip' => 'nullable|string|max:30|unique:pegawais,nip',
+            'jenis_kelamin' => 'nullable|in:L,P',
+            'tanggal_lahir' => 'nullable|date',
+            'email_pribadi' => 'nullable|email',
+            'email_resmi' => 'nullable|email',
         ]);
 
         DB::beginTransaction();
         try {
-            $user = User::create([
-                'name' => $request->name,
-                'nomor_induk' => $request->nomor_induk,
-                'email' => $request->email,
-                'password' => bcrypt($request->password),
-                'role' => $request->role,
-            ]);
-
-            if (Schema::hasTable('pegawais')) {
-                Pegawai::create([
-                    'nama' => $request->name,
-                    'nip' => $request->nomor_induk,
-                    'nik' => $request->nik,
-                    'nuptk' => $request->nuptk,
-                    'jenis_kelamin' => $request->jenis_kelamin,
-                    'tempat_lahir' => $request->tempat_lahir,
-                    'tanggal_lahir' => $request->tanggal_lahir,
-                    'status_kepegawaian' => $request->status_kepegawaian,
-                    'pendidikan' => $request->pendidikan,
-                    'email' => $request->email,
-                    'no_hp' => $request->no_hp,
-                    'jabatan' => $request->role,
-                    'alamat' => $request->alamat,
-                    'user_id' => $user->id,
-                ]);
+            if (!Schema::hasTable('pegawais')) {
+                return back()->withInput()->with('error', 'Tabel pegawai belum tersedia.');
             }
 
+            // ✅ SIMPAN DATA PEGAWAI SAJA — TANPA BIKIN AKUN USER
+            Pegawai::create([
+                // === VERSI BARU ===
+                'nama'               => $request->nama,
+                'nip'                => $request->nip,
+                'nik'                => $request->nik,
+                'nuptk'              => $request->nuptk,
+                'jenis_kelamin'      => $request->jenis_kelamin,
+                'tempat_lahir'       => $request->tempat_lahir ?: '-',
+                'tanggal_lahir'      => $request->tanggal_lahir,
+                'status_kepegawaian' => $request->status_kepegawaian ?: '-',
+                'pendidikan'         => $request->pendidikan,
+                'tugas_tambahan'     => $request->tugas_tambahan,
+                'email_pribadi'      => $request->email_pribadi,
+                'email_resmi'        => $request->email_resmi,
+                'no_hp'              => $request->no_hp ?: '-',
+                'jabatan'            => 'pegawai',
+                'alamat'             => $request->alamat ?: '-',
+                'rt'                 => $request->rt,
+                'rw'                 => $request->rw,
+                'dusun'              => $request->dusun,
+                'desa'               => $request->desa,
+                'kecamatan'          => $request->kecamatan,
+                'kode_pos'           => $request->kode_pos,
+                'user_id'            => null,
+
+                // === VERSI LAMA (NOT NULL) — WAJIB ===
+                'nama_lengkap'       => $request->nama,
+                'nip_nuptk'          => $request->nip ?: ($request->nik ?: ('IMP-' . time())),
+                'jk'                 => $request->jenis_kelamin ?: 'L',
+                'tgl_lahir'          => $request->tanggal_lahir ?: now()->format('Y-m-d'),
+            ]);
+
             DB::commit();
-            return redirect()->route('tu_kepegawaian.tu.index')->with('success', 'Akun dan Data Pegawai berhasil ditambahkan');
+            return redirect()->route('tu_kepegawaian.tu.index')->with('success', 'Data pegawai berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
@@ -667,10 +670,19 @@ class TUKepegawaianController extends Controller
                         'tanggal_lahir' => $request->tanggal_lahir,
                         'status_kepegawaian' => $request->status_kepegawaian,
                         'pendidikan' => $request->pendidikan,
+                        'tugas_tambahan' => $request->tugas_tambahan,
                         'email' => $request->email,
+                        'email_pribadi' => $request->email_pribadi,
+                        'email_resmi' => $request->email_resmi,
                         'no_hp' => $request->no_hp,
                         'jabatan' => $request->role,
                         'alamat' => $request->alamat,
+                        'rt' => $request->rt,
+                        'rw' => $request->rw,
+                        'dusun' => $request->dusun,
+                        'desa' => $request->desa,
+                        'kecamatan' => $request->kecamatan,
+                        'kode_pos' => $request->kode_pos,
                     ]);
                 }
             }
@@ -827,9 +839,7 @@ class TUKepegawaianController extends Controller
                     }
                 }
 
-                // ✅ FIX A: Baca tugas_tambahan (index 5)
                 $tugas_tambahan = trim($row[5] ?? null);
-
                 $tempat_lahir = trim($row[6] ?? null);
                 $jenis_kelamin = trim($row[8] ?? null);
 
@@ -867,9 +877,7 @@ class TUKepegawaianController extends Controller
                     $email = strtolower(str_replace(' ', '', $nama)) . time() . "@smkn1x.sch.id";
                 }
 
-                // ============================================================
-                // FIX: Cegah duplikat email di tabel users
-                // ============================================================
+                // Cegah duplikat email di tabel users
                 $emailExists = User::where('email', $email)->exists();
                 if ($emailExists) {
                     $existingByEmail = User::where('email', $email)->first();
@@ -919,26 +927,32 @@ class TUKepegawaianController extends Controller
                     Pegawai::updateOrCreate(
                         ['nip' => $nip],
                         [
-                            'nama'                  => $nama,
-                            'nik'                   => $nik,
-                            'nuptk'                 => $nuptk,
-                            'jenis_kelamin'         => $jenis_kelamin,
-                            'tempat_lahir'          => $tempat_lahir,
-                            'tanggal_lahir'         => $tanggal_lahir,
-                            'status_kepegawaian'    => $status_kepegawaian,
-                            'email'                 => $email,
-                            'no_hp'                 => $no_hp,
-                            'jabatan'               => $jabatan,
-                            'alamat'                => $alamat,
-                            // ✅ FIX B: Tambah 7 field
-                            'rt'                    => $rt,
-                            'rw'                    => $rw,
-                            'dusun'                 => $dusun,
-                            'desa'                  => $desa,
-                            'kecamatan'             => $kecamatan,
-                            'kode_pos'              => $kode_pos,
-                            'tugas_tambahan'        => $tugas_tambahan,
-                            'user_id'               => $user->id,
+                            // === VERSI BARU ===
+                            'nama'               => $nama,
+                            'nik'                => $nik,
+                            'nuptk'              => $nuptk,
+                            'jenis_kelamin'      => $jenis_kelamin,
+                            'tempat_lahir'       => $tempat_lahir ?: '-',
+                            'tanggal_lahir'      => $tanggal_lahir,
+                            'status_kepegawaian' => $status_kepegawaian ?: '-',
+                            'email'              => $email,
+                            'no_hp'              => $no_hp ?: '-',
+                            'jabatan'            => $jabatan,
+                            'alamat'             => $alamat ?: '-',
+                            'rt'                 => $rt,
+                            'rw'                 => $rw,
+                            'dusun'              => $dusun,
+                            'desa'               => $desa,
+                            'kecamatan'          => $kecamatan,
+                            'kode_pos'           => $kode_pos,
+                            'tugas_tambahan'     => $tugas_tambahan,
+                            'user_id'            => $user->id,
+
+                            // === VERSI LAMA (NOT NULL) ===
+                            'nama_lengkap'       => $nama,
+                            'nip_nuptk'          => $nip,
+                            'jk'                 => $jenis_kelamin ?: 'L',
+                            'tgl_lahir'          => $tanggal_lahir ?: now()->format('Y-m-d'),
                         ]
                     );
                 }

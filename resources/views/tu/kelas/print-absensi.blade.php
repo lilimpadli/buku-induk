@@ -16,13 +16,14 @@
         box-sizing: border-box;
     }
 
+    /* 🔥 FIX MASALAH 7: font-family DIHAPUS dari body — biar Poppins dari layout tetap dipakai di sidebar */
     body {
-        font-family: 'Times New Roman', Times, serif;
         font-size: 10pt;
         color: #000;
         background: #e5e7eb;
     }
     
+    /* 🔥 FIX MASALAH 7: font-family DIPINDAH ke sini — biar cuma dokumen cetak yang pakai Times New Roman */
     .print-wrapper {
         width: 210mm;
         min-height: 297mm;
@@ -33,6 +34,7 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        font-family: 'Times New Roman', Times, serif;
     }
 
     /* TOMBOL KEMBALI & PRINT */

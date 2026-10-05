@@ -3,423 +3,248 @@
 @section('title', 'Alumni - ' . ($namaJurusan ?? 'Jurusan'))
 
 @section('content')
+
 <style>
     :root {
         --primary: #4F46E5;
-        --primary-dark: #4338CA;
-        --gray-50: #f8fafc;
-        --gray-100: #f1f5f9;
-        --gray-200: #e2e8f0;
-        --gray-300: #cbd5e1;
-        --gray-400: #94a3b8;
-        --gray-500: #64748b;
-        --gray-600: #475569;
-        --gray-700: #334155;
-        --gray-800: #1e293b;
-        --gray-900: #0f172a;
-        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        --border-radius: 12px;
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --primary-light: #6366F1;
+        --secondary: #7C3AED;
+        --success: #10B981;
+        --warning: #F59E0B;
+        --danger: #EF4444;
+        --info: #3B82F6;
     }
 
-    body {
-        background-color: var(--gray-50);
-        color: var(--gray-800);
-        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    }
+    body { background: linear-gradient(180deg, #F8FAFF 0%, #EEF2FF 100%); }
 
-    /* Header Section */
-    .page-header {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: white;
-        padding: 32px 0;
-        margin-bottom: 32px;
+    /* HERO */
+    .hero-banner {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        border-radius: 28px;
+        padding: 40px;
+        margin-bottom: 28px;
         position: relative;
         overflow: hidden;
+        box-shadow: 0 18px 35px rgba(15,23,42,.12);
+    }
+    .hero-banner::before,
+    .hero-banner::after {
+        content: ''; position: absolute; border-radius: 50%;
+        background: rgba(255,255,255,.08); pointer-events: none;
+    }
+    .hero-banner::before { width: 300px; height: 300px; top: -120px; right: -80px; }
+    .hero-banner::after { width: 200px; height: 200px; bottom: -80px; left: -60px; background: rgba(255,255,255,.05); }
+
+    .hero-content {
+        position: relative; z-index: 2;
+        display: flex; justify-content: space-between;
+        align-items: center; gap: 24px; flex-wrap: wrap;
     }
 
-    .page-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        animation: pulse 3s ease-in-out infinite;
+    .hero-title { font-size: 32px; font-weight: 800; color: white; margin: 0 0 8px; letter-spacing: -.5px; }
+    .hero-subtitle { color: rgba(255,255,255,.85); font-size: 15px; margin: 0; }
+    .hero-stats { display: flex; gap: 16px; margin-top: 24px; flex-wrap: wrap; }
+    .hero-stat {
+        background: rgba(255,255,255,.15);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,.2);
+        border-radius: 16px; padding: 14px 22px; min-width: 120px; color: white;
     }
+    .hero-stat-value { font-size: 26px; font-weight: 800; line-height: 1.1; }
+    .hero-stat-label { font-size: 11px; opacity: .85; text-transform: uppercase; letter-spacing: .5px; margin-top: 4px; }
 
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 0.5; }
-        50% { transform: scale(1.1); opacity: 0.3; }
+    .btn-hero {
+        background: rgba(255,255,255,.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,.25);
+        color: white; border-radius: 14px;
+        padding: 12px 22px; font-weight: 700; font-size: 14px;
+        display: inline-flex; align-items: center; gap: 8px;
+        text-decoration: none; transition: all .25s; cursor: pointer;
     }
+    .btn-hero:hover { background: white; color: var(--primary); border-color: white; transform: translateY(-2px); }
 
-    .page-header h1 {
-        font-size: clamp(24px, 4vw, 36px);
-        font-weight: 700;
-        margin: 0;
-        position: relative;
-        z-index: 1;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    /* FILTER */
+    .filter-card {
+        background: white; border-radius: 24px; padding: 24px;
+        margin-bottom: 28px; border: 1px solid #EEF2FF;
+        box-shadow: 0 10px 25px rgba(15,23,42,.08);
     }
-
-    .page-header .subtitle {
-        font-size: clamp(14px, 2.5vw, 18px);
-        opacity: 0.9;
-        margin-top: 8px;
-        position: relative;
-        z-index: 1;
-    }
-
-    .btn-back {
-        background: rgba(255, 255, 255, 0.15);
-        color: white;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 12px;
-        padding: 10px 20px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        position: relative;
-        z-index: 1;
-    }
-
-    .btn-back:hover {
-        background: rgba(255, 255, 255, 0.25);
-        color: white;
-        transform: translateY(-2px);
-    }
-
-    /* Filter Section */
-    .filter-section {
-        background: white;
-        border-radius: var(--border-radius);
-        padding: 24px;
-        margin-bottom: 24px;
-        box-shadow: var(--shadow-md);
-        transition: var(--transition);
-    }
-
-    .filter-section:hover {
-        box-shadow: var(--shadow-lg);
-    }
-
     .filter-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: var(--gray-800);
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+        font-size: 16px; font-weight: 700; color: #1E293B;
+        margin-bottom: 18px; display: flex; align-items: center; gap: 10px;
+    }
+    .filter-title i { color: var(--primary); }
+    .filter-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+    .form-select-modern {
+        width: 100%; height: 46px; border-radius: 12px;
+        border: 1.5px solid #E2E8F0; padding: 0 16px; font-size: 14px;
+        background: #F8FAFF; transition: all .2s;
+    }
+    .form-select-modern:focus {
+        outline: none; border-color: var(--primary);
+        background: white; box-shadow: 0 0 0 4px rgba(79,70,229,.08);
     }
 
-    .filter-title i {
+    /* ROMBEL CARD */
+    .rombel-card {
+        background: white; border-radius: 22px;
+        border: 1px solid #EEF2FF; box-shadow: 0 10px 25px rgba(15,23,42,.08);
+        overflow: hidden; margin-bottom: 20px;
+        transition: all .25s;
+    }
+    .rombel-card:hover { box-shadow: 0 15px 35px rgba(15,23,42,.12); }
+
+    .rombel-header-modern {
+        padding: 18px 22px;
+        background: linear-gradient(135deg, #F8FAFF 0%, #EEF2FF 100%);
+        border-bottom: 1px solid #EEF2FF;
+        display: flex; justify-content: space-between; align-items: center;
+        cursor: pointer; transition: all .2s;
+    }
+    .rombel-header-modern:hover { background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%); }
+
+    .rombel-title-modern {
+        display: flex; align-items: center; gap: 12px;
+        font-weight: 800; color: #1E293B; font-size: 16px;
+    }
+
+    .rombel-title-modern i.collapse-icon {
         color: var(--primary);
+        transition: transform .3s;
     }
 
-    .filter-form {
-        display: flex;
-        gap: 12px;
-        align-items: flex-end;
-        flex-wrap: wrap;
+    .rombel-badge-modern {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white; padding: 6px 14px; border-radius: 20px;
+        font-size: 12px; font-weight: 700;
+        display: inline-flex; align-items: center; gap: 6px;
+        box-shadow: 0 4px 12px rgba(79,70,229,.25);
     }
 
-    .form-group {
-        flex: 1;
-        min-width: 200px;
-    }
+    /* TABLE */
+    .table-modern { width: 100%; border-collapse: collapse; }
 
-    .form-label {
-        font-weight: 600;
-        color: var(--gray-700);
-        margin-bottom: 8px;
-        font-size: 14px;
-    }
-
-    .form-select {
-        border: 2px solid var(--gray-200);
-        border-radius: 10px;
-        padding: 10px 16px;
-        font-size: 14px;
-        transition: var(--transition);
-        background: white;
-        width: 100%;
-    }
-
-    .form-select:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        outline: none;
-    }
-
-    .btn {
-        border-radius: 10px;
-        font-weight: 600;
-        padding: 10px 20px;
-        transition: var(--transition);
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
-        font-size: 14px;
-    }
-
-    .btn-primary {
-        background: var(--primary);
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: var(--primary-dark);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-    }
-
-    .btn-secondary {
-        background: var(--gray-200);
-        color: var(--gray-700);
-    }
-
-    .btn-secondary:hover {
-        background: var(--gray-300);
-        transform: translateY(-2px);
-    }
-
-    .btn-sm {
-        padding: 6px 14px;
-        font-size: 13px;
-    }
-
-    /* Alumni Cards Container */
-    .alumni-container {
-        display: grid;
-        gap: 24px;
-    }
-
-    .rombel-section {
-        background: white;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow-md);
-        overflow: hidden;
-        transition: var(--transition);
-        border: 1px solid var(--gray-200);
-        position: relative;
-    }
-
-    .rombel-section::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
-        background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
-    }
-
-    .rombel-header {
-        background: linear-gradient(135deg, var(--gray-50), var(--gray-100));
-        padding: 16px 24px;
-        border-bottom: 1px solid var(--gray-200);
-        cursor: pointer;
-        transition: var(--transition);
-    }
-
-    .rombel-header:hover {
-        background: linear-gradient(135deg, var(--gray-100), var(--gray-200));
-    }
-
-    .rombel-header-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .rombel-title {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .rombel-title h5 {
-        font-size: 18px;
+    .table-modern thead th {
+        background: #F8FAFF;
+        color: #64748B;
         font-weight: 700;
-        color: var(--gray-800);
-        margin: 0;
-    }
-
-    .rombel-badge {
-        background: var(--primary);
-        color: white;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    /* Table */
-    .table-responsive {
-        border-radius: 0 0 var(--border-radius) var(--border-radius);
-        overflow: hidden;
-    }
-
-    .table {
-        margin-bottom: 0;
-    }
-
-    .table thead th {
-        background: var(--gray-50);
-        color: var(--gray-700);
-        font-weight: 600;
-        font-size: 13px;
-        padding: 12px 16px;
-        border: none;
-        border-bottom: 2px solid var(--gray-200);
+        font-size: 11px;
+        padding: 14px 18px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: .5px;
+        border-bottom: 2px solid #EEF2FF;
+        text-align: left;
+        white-space: nowrap;
     }
 
-    .table tbody td {
-        padding: 12px 16px;
+    .table-modern tbody td {
+        padding: 14px 18px;
         vertical-align: middle;
-        border-color: var(--gray-200);
+        border-bottom: 1px solid #F1F5F9;
         font-size: 14px;
+        color: #334155;
     }
 
-    .table tbody tr:hover {
-        background-color: rgba(79, 70, 229, 0.04);
-    }
+    .table-modern tbody tr:hover { background: #F8FAFF; }
+    .table-modern tbody tr:last-child td { border-bottom: none; }
 
-    /* Student Info */
-    .student-info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
+    /* STUDENT INFO */
+    .student-info-modern {
+        display: flex; align-items: center; gap: 12px;
     }
-
-    .student-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
+    .student-avatar-modern {
+        width: 40px; height: 40px; border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white; display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 16px; flex-shrink: 0;
         overflow: hidden;
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 16px;
-        flex-shrink: 0;
     }
-
-    .student-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+    .student-avatar-modern img {
+        width: 100%; height: 100%; object-fit: cover;
     }
+    .student-name-modern { font-weight: 700; color: #1E293B; }
 
-    .student-name {
-        font-weight: 600;
-        color: var(--gray-800);
+    .btn-detail-modern {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white; border: none; border-radius: 10px;
+        padding: 8px 14px; font-weight: 700; font-size: 12px;
+        display: inline-flex; align-items: center; gap: 6px;
+        text-decoration: none; transition: all .25s; cursor: pointer;
     }
+    .btn-detail-modern:hover { color: white; transform: translateY(-1px); box-shadow: 0 6px 15px rgba(79,70,229,.3); }
 
-    /* Empty State */
+    /* EMPTY */
     .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        background: white;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow);
+        background: white; border-radius: 24px; padding: 70px 24px;
+        text-align: center; box-shadow: 0 10px 25px rgba(15,23,42,.08);
     }
-
-    .empty-state-icon {
-        font-size: 48px;
-        color: var(--gray-300);
-        margin-bottom: 20px;
+    .empty-icon {
+        width: 90px; height: 90px;
+        background: linear-gradient(135deg, #EEF2FF, #E0E7FF);
+        color: var(--primary); border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 22px; font-size: 40px;
     }
+    .empty-title { font-size: 22px; font-weight: 800; color: #1E293B; margin-bottom: 8px; }
+    .empty-desc { font-size: 14px; color: #64748B; max-width: 400px; margin: 0 auto 24px; }
 
-    .empty-state-title {
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--gray-800);
-        margin-bottom: 8px;
-    }
-
-    .empty-state-description {
-        font-size: 14px;
-        color: var(--gray-500);
-        margin-bottom: 24px;
-    }
-
-    .empty-state-actions {
-        display: flex;
-        gap: 12px;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    /* Responsive */
-    @media (max-width: 767px) {
-        .page-header { padding: 24px 0; }
-        .filter-section { padding: 16px; }
-        .filter-form { flex-direction: column; gap: 12px; }
-        .form-group { width: 100%; }
-        .rombel-header { padding: 12px 16px; }
-        .rombel-title h5 { font-size: 15px; }
-        .table thead th { font-size: 11px; padding: 8px 10px; }
-        .table tbody td { font-size: 12px; padding: 8px 10px; }
-        .student-avatar { width: 32px; height: 32px; font-size: 12px; }
-    }
-
-    .fade-in {
-        animation: fadeIn 0.5s ease-in;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+    @media (max-width: 768px) {
+        .hero-banner { padding: 26px; }
+        .hero-title { font-size: 24px; }
+        .filter-grid { grid-template-columns: 1fr; }
+        .table-modern thead th, .table-modern tbody td { padding: 10px 12px; font-size: 12px; }
     }
 </style>
 
-<!-- Page Header -->
-<div class="page-header">
-    <div class="container">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+<div class="container-fluid px-3 px-md-4 py-4">
+
+    <!-- HERO -->
+    <div class="hero-banner">
+        <div class="hero-content">
             <div>
-                <h1 class="mb-2">📋 Alumni {{ $namaJurusan ?? 'Jurusan' }}</h1>
-                <p class="subtitle mb-0">Tahun Ajaran: {{ $tahun ?? 'Semua Tahun' }}</p>
+                <h1 class="hero-title">
+                    <i class="fas fa-users me-2"></i> Alumni {{ $namaJurusan ?? 'Jurusan' }}
+                </h1>
+                <p class="hero-subtitle">
+                    Tahun Ajaran: {{ $tahun ?? 'Semua Tahun' }}
+                </p>
+                <div class="hero-stats">
+                    @php
+                        $totalAlumni = 0;
+                        foreach ($groupedAlumni as $g) {
+                            $totalAlumni += count($g['students'] ?? []);
+                        }
+                    @endphp
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">{{ $totalAlumni }}</div>
+                        <div class="hero-stat-label">Total Alumni</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">{{ count($groupedAlumni) }}</div>
+                        <div class="hero-stat-label">Rombel</div>
+                    </div>
+                </div>
             </div>
-            <a href="{{ route('tu.alumni.index') }}" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Kembali
-            </a>
+            <div>
+                <a href="{{ route('tu.alumni.index') }}" class="btn-hero">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="container">
-
-    <!-- Filter Section -->
-    <div class="filter-section fade-in">
-        <h3 class="filter-title">
-            <i class="fas fa-filter"></i>
-            Filter Tahun Ajaran
-        </h3>
-        <form method="GET" action="{{ route('tu.alumni.by-jurusan', ['jurusanId' => $jurusanId ?? 0]) }}" class="filter-form">
-            <div class="form-group">
-                <label for="tahun" class="form-label">Pilih Tahun Ajaran</label>
-                <select name="tahun" class="form-select" id="tahun">
-                    <option value="Semua Tahun" {{ ($tahun ?? 'Semua Tahun') === 'Semua Tahun' ? 'selected' : '' }}>Semua Tahun Ajaran</option>
+    <!-- FILTER -->
+    <div class="filter-card">
+        <div class="filter-title">
+            <i class="fas fa-filter"></i> Filter Tahun Ajaran
+        </div>
+        <form method="GET" action="{{ route('tu.alumni.by-jurusan', ['jurusanId' => $jurusanId ?? 0]) }}">
+            <div class="filter-grid">
+                <select name="tahun" class="form-select-modern" id="tahun">
+                    <option value="Semua Tahun" {{ ($tahun ?? 'Semua Tahun') === 'Semua Tahun' ? 'selected' : '' }}>
+                        Semua Tahun Ajaran
+                    </option>
                     @forelse($tahunAjaranList ?? [] as $t)
                         <option value="{{ $t }}" {{ ($tahun ?? '') === $t ? 'selected' : '' }}>
                             Tahun Ajaran {{ $t }}
@@ -428,108 +253,99 @@
                         <option value="">Belum ada data</option>
                     @endforelse
                 </select>
-            </div>
-            <div class="form-group" style="flex:0 0 auto;">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i> Cari
-                </button>
-            </div>
-            @if(($tahun ?? '') && ($tahun ?? '') !== 'Semua Tahun')
-                <div class="form-group" style="flex:0 0 auto;">
-                    <a href="{{ route('tu.alumni.by-jurusan', ['jurusanId' => $jurusanId ?? 0]) }}" class="btn btn-secondary">
-                        <i class="fas fa-undo"></i> Reset
-                    </a>
+                <div style="display: flex; gap: 8px;">
+                    <button type="submit" class="btn-hero" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; padding: 0 20px; flex: 1;">
+                        <i class="fas fa-search"></i> Cari
+                    </button>
+                    @if(($tahun ?? '') && ($tahun ?? '') !== 'Semua Tahun')
+                        <a href="{{ route('tu.alumni.by-jurusan', ['jurusanId' => $jurusanId ?? 0]) }}" class="btn-hero" style="padding: 0 16px;">
+                            <i class="fas fa-undo"></i>
+                        </a>
+                    @endif
                 </div>
-            @endif
+            </div>
         </form>
     </div>
 
-    <!-- Alumni Container -->
+    <!-- LIST ROMBEL -->
     @php
-        // Pastikan groupedAlumni selalu array
         if (!isset($groupedAlumni) || is_null($groupedAlumni)) {
             $groupedAlumni = [];
         }
     @endphp
 
     @if(!empty($groupedAlumni) && count($groupedAlumni) > 0)
-        <div class="alumni-container">
-            @foreach($groupedAlumni as $compositeKey => $groupData)
-                <div class="rombel-section fade-in" style="animation-delay: {{ $loop->index * 0.1 }}s">
-                    <div class="rombel-header" onclick="toggleCollapse(this)">
-                        <div class="rombel-header-content">
-                            <div class="rombel-title">
-                                <i class="fas fa-chevron-down collapse-icon" style="transition: transform 0.3s ease;"></i>
-                                <h5>{{ $groupData['display_name'] ?? 'Kelas - Rombel' }}</h5>
-                            </div>
-                            <span class="rombel-badge">
-                                <i class="fas fa-users"></i>
-                                {{ count($groupData['students'] ?? []) }} Siswa
-                            </span>
-                        </div>
+        @foreach($groupedAlumni as $compositeKey => $groupData)
+            <div class="rombel-card">
+                <div class="rombel-header-modern" onclick="toggleCollapse(this)">
+                    <div class="rombel-title-modern">
+                        <i class="fas fa-chevron-down collapse-icon"></i>
+                        {{ $groupData['display_name'] ?? 'Kelas - Rombel' }}
                     </div>
+                    <span class="rombel-badge-modern">
+                        <i class="fas fa-users"></i>
+                        {{ count($groupData['students'] ?? []) }} Siswa
+                    </span>
+                </div>
 
-                    <div class="rombel-body" style="display: block;">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
+                <div class="rombel-body" style="display: block;">
+                    <div class="table-responsive">
+                        <table class="table-modern">
+                            <thead>
+                                <tr>
+                                    <th style="width:50px;">#</th>
+                                    <th>Nama Siswa</th>
+                                    <th style="width:15%;">NIS</th>
+                                    <th style="width:15%;">NISN</th>
+                                    <th style="width:12%;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($groupData['students'] ?? [] as $index => $siswa)
                                     <tr>
-                                        <th style="width:50px;">#</th>
-                                        <th>Nama Siswa</th>
-                                        <th style="width:15%;">NIS</th>
-                                        <th style="width:15%;">NISN</th>
-                                        <th style="width:15%;">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($groupData['students'] ?? [] as $index => $siswa)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>
-                                                <div class="student-info">
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>
+                                            <div class="student-info-modern">
+                                                <div class="student-avatar-modern">
                                                     @if($siswa->foto)
-                                                        <div class="student-avatar">
-                                                            <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}">
-                                                        </div>
+                                                        <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}">
                                                     @else
-                                                        <div class="student-avatar">
-                                                            {{ strtoupper(substr($siswa->nama_lengkap ?? 'U', 0, 1)) }}
-                                                        </div>
+                                                        {{ strtoupper(substr($siswa->nama_lengkap ?? 'U', 0, 1)) }}
                                                     @endif
-                                                    <span class="student-name">{{ $siswa->nama_lengkap ?? 'Tidak Diketahui' }}</span>
                                                 </div>
-                                            </td>
-                                            <td>{{ $siswa->nis ?? '-' }}</td>
-                                            <td>{{ $siswa->nisn ?? '-' }}</td>
-                                            <td>
-                                                <a href="{{ route('tu.alumni.show', $siswa->id ?? 0) }}" class="btn btn-primary btn-sm">
-                                                    <i class="fas fa-eye"></i> Detail
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                                <span class="student-name-modern">{{ $siswa->nama_lengkap ?? 'Tidak Diketahui' }}</span>
+                                            </div>
+                                        </td>
+                                        <td>{{ $siswa->nis ?? '-' }}</td>
+                                        <td>{{ $siswa->nisn ?? '-' }}</td>
+                                        <td>
+                                            <a href="{{ route('tu.alumni.show', $siswa->id ?? 0) }}" class="btn-detail-modern">
+                                                <i class="fas fa-eye"></i> Detail
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            @endforeach
-        </div>
+            </div>
+        @endforeach
     @else
-        <div class="empty-state fade-in">
-            <div class="empty-state-icon">
+        <div class="empty-state">
+            <div class="empty-icon">
                 <i class="fas fa-inbox"></i>
             </div>
-            <h3 class="empty-state-title">Tidak Ada Data Alumni</h3>
-            <p class="empty-state-description">
-                Tidak ada alumni untuk jurusan {{ $namaJurusan ?? 'ini' }} pada tahun ajaran {{ $tahun ?? 'yang dipilih' }}.
+            <h3 class="empty-title">Tidak Ada Data Alumni</h3>
+            <p class="empty-desc">
+                Tidak ada alumni untuk jurusan <strong>{{ $namaJurusan ?? 'ini' }}</strong> pada tahun ajaran <strong>{{ $tahun ?? 'yang dipilih' }}</strong>.
             </p>
-            <div class="empty-state-actions">
-                <a href="{{ route('tu.alumni.index') }}" class="btn btn-primary">
-                    <i class="fas fa-arrow-left"></i> Kembali ke Daftar
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <a href="{{ route('tu.alumni.index') }}" class="btn-hero" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none;">
+                    <i class="fas fa-arrow-left"></i> Kembali
                 </a>
                 @if(($tahun ?? '') && ($tahun ?? '') !== 'Semua Tahun')
-                    <a href="{{ route('tu.alumni.by-jurusan', ['jurusanId' => $jurusanId ?? 0]) }}" class="btn btn-secondary">
+                    <a href="{{ route('tu.alumni.by-jurusan', ['jurusanId' => $jurusanId ?? 0]) }}" class="btn-hero">
                         <i class="fas fa-undo"></i> Tampilkan Semua Tahun
                     </a>
                 @endif
@@ -542,7 +358,7 @@
 function toggleCollapse(element) {
     const body = element.nextElementSibling;
     const icon = element.querySelector('.collapse-icon');
-    
+
     if (body.style.display === 'none') {
         body.style.display = 'block';
         icon.style.transform = 'rotate(0deg)';
@@ -553,7 +369,6 @@ function toggleCollapse(element) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto submit filter on change
     const select = document.getElementById('tahun');
     if (select) {
         select.addEventListener('change', function() {

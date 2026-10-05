@@ -63,7 +63,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'nomor_induk' => 'required|string|unique:users,nomor_induk',
-            'role' => 'required|in:siswa,guru,walikelas,kaprog,tu,kurikulum,super_admin',
+            'role' => 'required|in:siswa,guru,walikelas,kaprog,tu,tu_kepegawaian,kurikulum,super_admin',
             'password' => 'required|string|min:6|confirmed',
         ], [
             'nomor_induk.required' => 'Nomor induk wajib diisi!',
@@ -119,7 +119,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
             'nomor_induk' => 'required|string|unique:users,nomor_induk,' . $id,
-            'role' => 'required|in:siswa,guru,walikelas,kaprog,tu,kurikulum,super_admin',
+            'role' => 'required|in:siswa,guru,walikelas,kaprog,tu,tu_kepegawaian,kurikulum,super_admin',
             'password' => 'nullable|string|min:6|confirmed',
         ], [
             'nomor_induk.required' => 'Nomor induk wajib diisi!',

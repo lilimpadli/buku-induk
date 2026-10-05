@@ -586,7 +586,6 @@ body{
     }
 
 }
-
 </style>
 
 <div class="container-fluid px-3 px-md-4 py-4">
@@ -665,9 +664,7 @@ body{
 
     </div>
 
-<!-- ============================================================ -->
 <!-- FILTER TINGKAT -->
-<!-- ============================================================ -->
 <div class="class-filter">
     <a href="{{ request()->url() }}?tingkat=X{{ request()->getQueryString() ? '&' . http_build_query(array_diff_key(request()->query(), ['tingkat' => ''])) : '' }}"
        class="filter-pill {{ $currentTingkat == 'X' ? 'active' : '' }}">
@@ -687,9 +684,7 @@ body{
     </a>
 </div>
 
-<!-- ============================================================ -->
-<!-- FILTER STATUS (BARU) -->
-<!-- ============================================================ -->
+<!-- FILTER STATUS -->
 <div class="class-filter">
     <a href="{{ request()->url() }}?status=aktif{{ request()->getQueryString() ? '&' . http_build_query(array_diff_key(request()->query(), ['status' => ''])) : '' }}"
        class="filter-pill {{ request('status', 'aktif') == 'aktif' ? 'active' : '' }}">
@@ -714,7 +709,6 @@ body{
     </div>
 
     <div class="card-body-modern">
-        <!-- FORM FILTER UTAMA -->
         <form method="GET" action="{{ route('tu.siswa.index') }}">
             <div class="filter-grid">
                 <input type="text"
@@ -763,7 +757,6 @@ body{
             </div>
         </form>
 
-        <!-- FORM EXPORT PER KELAS -->
         <form method="GET" action="{{ route('tu.siswa.exportByKelas') }}" style="margin-top: 16px;">
             <div class="filter-grid">
                 <select name="rombel" class="form-select-modern" required>
@@ -794,7 +787,6 @@ body{
             </div>
         </form>
 
-        <!-- FORM EXPORT PER JURUSAN -->
         <form method="GET" action="{{ route('tu.siswa.exportByJurusan') }}" style="margin-top: 16px;">
             <div class="filter-grid">
                 <select name="jurusan" class="form-select-modern" required>
@@ -810,7 +802,6 @@ body{
             </div>
         </form>
 
-        <!-- FORM EXPORT SISWA AKTIF -->
         <form method="GET" action="{{ route('tu.siswa.exportAktif') }}" style="margin-top: 16px;">
             <div class="filter-grid">
                 <button type="submit" class="btn-modern btn-success-modern" style="grid-column: 1 / -1;">
@@ -888,7 +879,6 @@ body{
                                 ? preg_replace('/(\D+)(\d+)/', '$1 $2', $rombelWithoutTingkat)
                                 : null;
                                 
-                            // Gender icon and badge class
                             $gender = strtolower($siswa->jenis_kelamin);
                             $genderIcon = '';
                             $genderClass = '';
@@ -950,9 +940,6 @@ body{
                                 </span>
                             </td>
 
-                            <!-- ============================================================ -->
-                            <!-- KELAS - DENGAN BADGE ALUMNI -->
-                            <!-- ============================================================ -->
                             <td>
                                 @php
                                     $isLulus = $siswa->mutasiTerakhir && $siswa->mutasiTerakhir->status == 'lulus';
@@ -1076,7 +1063,9 @@ body{
 
 </div>
 
-<!-- Modal: Cetak Biodata -->
+<!-- ============================================================ -->
+<!-- Modal: Cetak Biodata — ROMBEL PAKAI SELECT2 (TYPEAHEAD) -->
+<!-- ============================================================ -->
 <div class="modal fade" id="cetakBiodataModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -1089,18 +1078,18 @@ body{
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Pilih Rombel -->
+                    <!-- Pilih Rombel (Select2) -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">
                             <i class="fas fa-users"></i> Pilih Rombel
                         </label>
-                        <select name="rombel_id" class="form-select" required>
-                            <option value="">-- Pilih Rombel --</option>
+                        <select name="rombel_id" class="form-select select2-rombel" required data-placeholder="Ketik nama rombel...">
+                            <option value=""></option>
                             @foreach(($allRombels ?? collect()) as $r)
                                 <option value="{{ $r->id }}">{{ $r->display_name ?? $r->nama }}</option>
                             @endforeach
                         </select>
-                        <small class="text-muted">Pilih rombel untuk mencetak biodata siswa.</small>
+                        <small class="text-muted">Ketik untuk mencari, misal: <code>XI RPL</code></small>
                     </div>
 
                     <!-- Pilih Tahun Ajaran -->
@@ -1141,7 +1130,9 @@ body{
     </div>
 </div>
 
-<!-- Modal: Cetak Daftar Hadir Rapot -->
+<!-- ============================================================ -->
+<!-- Modal: Cetak Daftar Hadir Rapot — ROMBEL PAKAI SELECT2 -->
+<!-- ============================================================ -->
 <div class="modal fade" id="cetakDaftarHadirRapotModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -1153,10 +1144,10 @@ body{
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Pilih Rombel</label>
-                        <select name="rombel_id" class="form-select" required>
-                            <option value="">-- Pilih Rombel --</option>
+                        <select name="rombel_id" class="form-select select2-rombel" required data-placeholder="Ketik nama rombel...">
+                            <option value=""></option>
                             @foreach(($allRombels ?? collect()) as $r)
-                                <option value="{{ $r->id }}">{{ $r->display_name }}</option>
+                                <option value="{{ $r->id }}">{{ $r->display_name ?? $r->nama }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -1212,4 +1203,106 @@ body{
         </div>
     </div>
 </div>
+
+{{-- ============================================================ --}}
+{{-- SELECT2 UNTUK TYPEAHEAD ROMBEL --}}
+{{-- ============================================================ --}}
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    /* Select2 biar nyatu sama Bootstrap 5 */
+    .select2-container--default .select2-selection--single {
+        height: 46px;
+        border: 1.5px solid #dbe3ff;
+        border-radius: 14px;
+        background: #f9fbff;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 28px;
+        color: #111827;
+        padding-left: 0;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 44px;
+        right: 10px;
+    }
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: #4F46E5;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(79,70,229,.08);
+    }
+    .select2-dropdown {
+        border-radius: 14px;
+        border: 1.5px solid #dbe3ff;
+        box-shadow: 0 10px 25px rgba(15,23,42,.08);
+        overflow: hidden;
+        z-index: 99999;
+    }
+    .select2-search--dropdown .select2-search__field {
+        border-radius: 10px;
+        border: 1.5px solid #dbe3ff;
+        padding: 8px 12px;
+    }
+    .select2-results__option--highlighted {
+        background: #4F46E5 !important;
+    }
+    .select2-container {
+        width: 100% !important;
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Init Select2 buat semua .select2-rombel
+        $('.select2-rombel').each(function() {
+            $(this).select2({
+                placeholder: $(this).data('placeholder') || '-- Pilih Rombel --',
+                allowClear: true,
+                width: '100%',
+                language: {
+                    noResults: function() { return "Rombel tidak ditemukan"; },
+                    searching: function() { return "Mencari..."; },
+                    inputTooShort: function() { return "Ketik minimal 1 huruf..."; }
+                }
+            });
+        });
+
+        // Re-init saat modal dibuka (biar dropdown gak ketutup modal)
+        $('.modal').on('shown.bs.modal', function() {
+            $(this).find('.select2-rombel').each(function() {
+                if ($(this).data('select2')) {
+                    $(this).select2('destroy');
+                }
+                $(this).select2({
+                    placeholder: $(this).data('placeholder') || '-- Pilih Rombel --',
+                    allowClear: true,
+                    width: '100%',
+                    dropdownParent: $(this).closest('.modal'),
+                    language: {
+                        noResults: function() { return "Rombel tidak ditemukan"; },
+                        searching: function() { return "Mencari..."; },
+                        inputTooShort: function() { return "Ketik minimal 1 huruf..."; }
+                    }
+                });
+            });
+        });
+
+        // Reset Select2 saat modal ditutup (biar gak numpuk)
+        $('.modal').on('hidden.bs.modal', function() {
+            $(this).find('.select2-rombel').each(function() {
+                if ($(this).data('select2')) {
+                    $(this).select2('destroy');
+                }
+            });
+        });
+    });
+</script>
+@endpush
+
 @endsection

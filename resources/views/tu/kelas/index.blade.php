@@ -462,66 +462,75 @@
                 </div>
             </div>
             <div class="col-md-5 text-md-end mt-3 mt-md-0">
-    <a href="{{ route('tu.kelas.exportAll') }}" class="btn-modern btn-success-modern">
-        <i class="fas fa-file-excel"></i> Export
-    </a>
-
-    <!-- ========================================== -->
-<!-- ALERT SUCCESS & ERROR -->
-<!-- ========================================== -->
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius:16px;border-left:5px solid #10B981;">
-        <div class="d-flex align-items-center gap-3">
-            <i class="fas fa-check-circle fa-2x" style="color:#10B981;"></i>
-            <div>
-                <div class="fw-bold">Berhasil!</div>
-                <div style="font-size:14px;">{!! nl2br(e(session('success'))) !!}</div>
-            </div>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
-
-@if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius:16px;border-left:5px solid #EF4444;">
-        <div class="d-flex align-items-center gap-3">
-            <i class="fas fa-exclamation-circle fa-2x" style="color:#EF4444;"></i>
-            <div>
-                <div class="fw-bold">Error!</div>
-                <div style="font-size:14px;">{{ session('error') }}</div>
-            </div>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
-
-@if(session('import_warnings'))
-    <div class="alert alert-warning alert-dismissible fade show" role="alert" style="border-radius:16px;border-left:5px solid #F59E0B;">
-        <div class="d-flex align-items-start gap-3">
-            <i class="fas fa-triangle-exclamation fa-2x" style="color:#F59E0B;margin-top:4px;"></i>
-            <div>
-                <div class="fw-bold">⚠️ Perhatian!</div>
-                <div style="font-size:14px;max-height:200px;overflow-y:auto;">
-                    @foreach(session('import_warnings') as $warning)
-                        <div style="border-bottom:1px solid #fef3c7;padding:4px 0;">{{ $warning }}</div>
-                    @endforeach
+                <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+                    <a href="{{ route('tu.kelas.exportAll') }}" class="btn-modern btn-success-modern">
+                        <i class="fas fa-file-excel"></i> Export
+                    </a>
+                    <a href="{{ route('tu.kelas.template') }}" class="btn-modern btn-warning-modern">
+                        <i class="fas fa-download"></i> Download Template
+                    </a>
+                    <button type="button" class="btn-modern btn-info-modern" data-bs-toggle="modal" data-bs-target="#kelasImportModal">
+                        <i class="fas fa-upload"></i> Import
+                    </button>
                 </div>
             </div>
         </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
-@endif
-    
-    {{-- ✅ PERBAIKAN DI SINI --}}
-    <a href="{{ route('tu.kelas.template') }}" class="btn-modern btn-warning-modern ms-2">
-        <i class="fas fa-download"></i> Download Template
-    </a>
-                <button type="button" class="btn-modern btn-info-modern ms-2" data-bs-toggle="modal" data-bs-target="#kelasImportModal">
-                    <i class="fas fa-upload"></i> Import
-                </button>
+
+    <!-- ========================================== -->
+    <!-- ALERT SECTION (DI LUAR HERO) -->
+    <!-- ========================================== -->
+    <!-- @if(session('success') || session('error') || session('import_warnings')) 
+    <div class="alert-wrapper" style="margin-bottom: 24px;">
+
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert"
+                 style="border-radius:16px; border-left:5px solid #10B981; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 12px;">
+                <div class="d-flex align-items-start gap-3">
+                    <i class="fas fa-check-circle fa-2x" style="color:#10B981; margin-top:2px;"></i>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold mb-1">Berhasil!</div>
+                        <div style="font-size:14px; white-space: pre-line;">{{ session('success') }}</div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-        </div>
+        @endif-->
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert"
+                 style="border-radius:16px; border-left:5px solid #EF4444; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 12px;">
+                <div class="d-flex align-items-start gap-3">
+                    <i class="fas fa-exclamation-circle fa-2x" style="color:#EF4444; margin-top:2px;"></i>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold mb-1">Error!</div>
+                        <div style="font-size:14px; white-space: pre-line;">{{ session('error') }}</div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        @if(session('import_warnings'))
+            <div class="alert alert-warning alert-dismissible fade show" role="alert"
+                 style="border-radius:16px; border-left:5px solid #F59E0B; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <div class="d-flex align-items-start gap-3">
+                    <i class="fas fa-triangle-exclamation fa-2x" style="color:#F59E0B; margin-top:2px;"></i>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold mb-2">⚠️ Perhatian ({{ count(session('import_warnings')) }} baris)</div>
+                        <div style="font-size:14px; max-height:300px; overflow-y:auto;">
+                            @foreach(session('import_warnings') as $warning)
+                                <div style="border-bottom:1px solid #fef3c7; padding:6px 0;">{{ $warning }}</div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
     </div>
+    @endif
 
     <!-- FILTER SECTION -->
     <div class="filter-section">

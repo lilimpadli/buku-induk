@@ -185,8 +185,7 @@ class SuperAdminController extends Controller
             'email' => 'required|email|unique:users,email',
             'nomor_induk' => 'required|string|unique:users,nomor_induk',
             'password' => 'required|string|min:6|confirmed',
-            'role' => 'required|string|in:siswa,guru,walikelas,kaprog,tu,kurikulum,super_admin',
-        ], [
+            'role' => 'required|string|in:siswa,guru,walikelas,kaprog,tu,tu_kepegawaian,kurikulum,super_admin',        ], [
             'nomor_induk.required' => 'Nomor induk wajib diisi!',
             'nomor_induk.unique' => 'Nomor induk sudah digunakan!',
         ]);

@@ -18,7 +18,6 @@ class ClaverController extends Controller
      */
     public function index()
     {
-        // Ambil daftar tahun masuk
         $tahunMasuk = DataSiswa::select('tanggal_diterima')
             ->whereNotNull('tanggal_diterima')
             ->distinct()
@@ -31,7 +30,6 @@ class ClaverController extends Controller
             ->unique()
             ->values();
 
-        // Ambil daftar huruf awal nama
         $hurufAwal = DataSiswa::selectRaw('UPPER(LEFT(nama_lengkap, 1)) as huruf')
             ->whereNotNull('nama_lengkap')
             ->where('nama_lengkap', '!=', '')
@@ -59,12 +57,20 @@ class ClaverController extends Controller
 
     /**
      * Generate data untuk Claver
+     * 🔥 FIX 504: eager load mutasi biar gak N+1 query
      */
     public function getData(Request $request)
     {
-        $query = DataSiswa::with(['rombel', 'rombel.kelas'])
-            ->whereNotNull('nis')
-            ->where('nis', '!=', '');
+        $query = DataSiswa::with([
+            'rombel',
+            'rombel.kelas',
+            'mutasis' => function ($q) {
+                $q->with(['rombelAsal.kelas', 'rombelTujuan.kelas'])
+                  ->orderBy('tanggal_mutasi');
+            }
+        ])
+        ->whereNotNull('nis')
+        ->where('nis', '!=', '');
 
         // Filter berdasarkan huruf awal nama
         if ($request->filled('huruf')) {
@@ -93,14 +99,13 @@ class ClaverController extends Controller
         foreach ($siswas as $siswa) {
             $huruf = strtoupper(substr($siswa->nama_lengkap, 0, 1));
             
-            // Reset nomor jika huruf berubah
             if ($huruf !== $currentHuruf) {
                 $no = 1;
                 $currentHuruf = $huruf;
             }
 
-            // Ambil data mutasi
-            $mutasi = $this->getMutasiData($siswa->id);
+            // 🔥 FIX: pakai parse dari collection, gak query DB lagi
+            $mutasi = $this->parseMutasiFromCollection($siswa->mutasis);
 
             $data[] = [
                 'no' => $no++,
@@ -120,15 +125,10 @@ class ClaverController extends Controller
     }
 
     /**
-     * Ambil data mutasi siswa
+     * 🔥 BARU: Parse mutasi dari collection (gak query DB)
      */
-    private function getMutasiData($siswaId)
+    private function parseMutasiFromCollection($mutasiList)
     {
-        $mutasiList = MutasiSiswa::where('siswa_id', $siswaId)
-            ->with(['rombelAsal', 'rombelTujuan'])
-            ->orderBy('tanggal_mutasi')
-            ->get();
-
         $result = [
             'naik_xi' => null,
             'naik_xii' => null,
@@ -136,11 +136,14 @@ class ClaverController extends Controller
             'keterangan' => null,
         ];
 
+        if (!$mutasiList || $mutasiList->isEmpty()) {
+            return $result;
+        }
+
         foreach ($mutasiList as $mutasi) {
             $tanggal = $mutasi->tanggal_mutasi ? $this->formatTanggal($mutasi->tanggal_mutasi) : null;
 
             if ($mutasi->status == 'naik_kelas') {
-                // Cek dari rombel asal
                 $asal = $mutasi->rombelAsal;
                 if ($asal && $asal->kelas) {
                     $tingkat = $asal->kelas->tingkat;
@@ -188,9 +191,14 @@ class ClaverController extends Controller
 
     /**
      * Cetak PDF Claver
+     * 🔥 FIX 504: naikkan memory & time limit + optimasi DomPDF
      */
     public function cetakPdf(Request $request)
     {
+        // Naikkan batas memory & waktu khusus endpoint ini
+        ini_set('memory_limit', '512M');
+        set_time_limit(300);
+
         $groupedData = $this->getData($request);
         
         $pdf = Pdf::loadView('tu.siswa.claver-pdf', [
@@ -202,6 +210,8 @@ class ClaverController extends Controller
         $pdf->setOptions([
             'defaultFont' => 'Times New Roman',
             'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => false,
+            'dpi' => 96,
         ]);
         
         return $pdf->download('claver-buku-induk.pdf');

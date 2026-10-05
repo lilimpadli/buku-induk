@@ -247,38 +247,30 @@ class MutasiController extends Controller
                     case 'lulus':
                         $siswa->update([
                             'rombel_id' => null,
-                            'status_siswa' => 'lulus',
-                            'is_active' => false,
+                            'tanggal_lulus' => $request->tanggal_mutasi,
+                            'status_kelulusan' => 'Lulus',
                         ]);
                         break;
 
                     case 'naik_kelas':
-                        $siswa->update([
-                            'status_siswa' => 'aktif',
-                        ]);
+                        // Sudah ditangani di updateSiswa()
                         break;
 
                     case 'pindah':
                         $siswa->update([
                             'rombel_id' => null,
-                            'status_siswa' => 'pindah',
-                            'is_active' => false,
                         ]);
                         break;
 
                     case 'do':
                         $siswa->update([
                             'rombel_id' => null,
-                            'status_siswa' => 'drop_out',
-                            'is_active' => false,
                         ]);
                         break;
 
                     case 'meninggal':
                         $siswa->update([
                             'rombel_id' => null,
-                            'status_siswa' => 'meninggal',
-                            'is_active' => false,
                         ]);
                         break;
                 }
@@ -307,12 +299,12 @@ class MutasiController extends Controller
     }
 
     /**
-     * 🔥 FIX: Get valid user ID for diproses_oleh
+     * Get valid user ID for diproses_oleh
      */
     private function getValidUserId()
     {
         $userId = auth()->id();
-        
+
         if ($userId) {
             $userExists = User::where('id', $userId)->exists();
             if ($userExists) {
@@ -320,13 +312,13 @@ class MutasiController extends Controller
                 return $userId;
             }
         }
-        
+
         $firstUser = User::first();
         if ($firstUser) {
             Log::info("Using first user ID: {$firstUser->id}");
             return $firstUser->id;
         }
-        
+
         $defaultUser = User::firstOrCreate(
             ['email' => 'admin@sekolah.com'],
             [
@@ -334,20 +326,19 @@ class MutasiController extends Controller
                 'password' => bcrypt('password123'),
             ]
         );
-        
+
         Log::info("Created default user ID: {$defaultUser->id}");
         return $defaultUser->id;
     }
 
     /**
-     * 🔥 FIND TARGET ROMBEL WITH SMART LOGIC
+     * Find target rombel with smart logic
      */
     private function findTargetRombel($rombelAsal, $nextKelas)
     {
         $rombelNumber = preg_replace('/[^0-9]/', '', $rombelAsal->nama);
         $rombelName = $rombelAsal->nama;
-        
-        // STRATEGI 1: Cari berdasarkan angka (untuk rombel bernomor)
+
         if (!empty($rombelNumber)) {
             $found = Rombel::where('kelas_id', $nextKelas->id)
                 ->where('nama', 'like', '%' . $rombelNumber . '%')
@@ -357,12 +348,11 @@ class MutasiController extends Controller
                 return $found;
             }
         }
-        
-        // STRATEGI 2: Ganti 'XI' dengan 'XII' di nama (EXACT MATCH)
+
         $targetName = str_replace('XI', 'XII', $rombelName);
         $targetName = str_replace('X ', 'XII ', $targetName);
         $targetName = str_replace('XII ', 'XII ', $targetName);
-        
+
         $found = Rombel::where('kelas_id', $nextKelas->id)
             ->where('nama', $targetName)
             ->first();
@@ -370,11 +360,10 @@ class MutasiController extends Controller
             Log::info("✅ Found by name replacement: {$found->nama}");
             return $found;
         }
-        
-        // STRATEGI 3: Cari berdasarkan kata kunci (tanpa tingkat)
+
         $keywords = preg_replace('/^(X|XI|XII|10|11|12)\s*/i', '', $rombelName);
         $keywords = trim($keywords);
-        
+
         if (!empty($keywords)) {
             $found = Rombel::where('kelas_id', $nextKelas->id)
                 ->where('nama', 'like', '%' . $keywords . '%')
@@ -384,14 +373,13 @@ class MutasiController extends Controller
                 return $found;
             }
         }
-        
-        // STRATEGI 4: Cari berdasarkan jurusan (ambil rombel pertama di kelas tersebut)
+
         $found = Rombel::where('kelas_id', $nextKelas->id)->first();
         if ($found) {
             Log::warning("⚠️ Fallback to first rombel: {$found->nama}");
             return $found;
         }
-        
+
         return null;
     }
 
@@ -410,8 +398,8 @@ class MutasiController extends Controller
             'keterangan' => 'nullable|string',
             'alasan_pindah' => 'nullable|string|required_if:action,pindah',
             'tujuan_pindah' => 'nullable|string|required_if:action,pindah',
-            'no_sk_keluar' => 'nullable|string|required_if:action,do,meninggal',
-            'tanggal_sk_keluar' => 'nullable|date|required_if:action,do,meninggal',
+            'no_sk_keluar' => 'nullable|string',
+            'tanggal_sk_keluar' => 'nullable|date',
         ]);
 
         $userId = $this->getValidUserId();
@@ -423,7 +411,22 @@ class MutasiController extends Controller
             $action = $validated['action'];
             $nextRombel = null;
             $nextKelas = null;
+            $nomorSurat = null;
 
+            // ============================================================
+            // AUTO-GENERATE NOMOR SURAT (PINDAH / DO / MENINGGAL)
+            // ============================================================
+            if (in_array($action, ['pindah', 'do', 'meninggal'])) {
+                $jenisSurat = $action === 'pindah' ? 'surat_pindah' : 'surat_do';
+                $tahun = date('Y', strtotime($validated['tanggal_mutasi']));
+                $nomorUrut = \App\Models\NomorSurat::getNextNumber($jenisSurat, $tahun);
+                $nomorSurat = sprintf('421.7/%03d/SMK.1.KW/%s', $nomorUrut, $tahun);
+                Log::info("Generated nomor surat: {$nomorSurat}");
+            }
+
+            // ============================================================
+            // PROSES NAIK KELAS
+            // ============================================================
             if ($action === 'naik_kelas') {
                 $currentTingkat = strtoupper($rombelAsal->kelas->tingkat);
                 if (in_array($currentTingkat, ['XII', '12'])) {
@@ -441,25 +444,26 @@ class MutasiController extends Controller
                     return redirect()->back()->with('error', "Kelas tingkat $nextTingkat belum tersedia.");
                 }
 
-                // 🔥 FIX: Gunakan logika cari rombel yang lebih pintar
                 $nextRombel = $this->findTargetRombel($rombelAsal, $nextKelas);
 
-                // 🔥 FIX: Buat rombel baru jika tidak ditemukan
                 if (!$nextRombel) {
                     $newName = str_replace('XI', 'XII', $rombelAsal->nama);
                     $newName = str_replace('X ', 'XII ', $newName);
                     $newName = str_replace('XII ', 'XII ', $newName);
-                    
+
                     $nextRombel = Rombel::create([
                         'kelas_id' => $nextKelas->id,
                         'nama' => $newName,
                         'tahun_ajaran' => $rombelAsal->tahun_ajaran ?? now()->format('Y') . '/' . (now()->format('Y') + 1),
                     ]);
-                    
+
                     Log::info("🔥 Buat rombel baru: {$newName} (ID: {$nextRombel->id})");
                 }
             }
 
+            // ============================================================
+            // LOOP SISWA
+            // ============================================================
             foreach ($validated['siswa_ids'] as $siswaId) {
                 $siswa = DataSiswa::find($siswaId);
                 if (!$siswa) continue;
@@ -473,25 +477,45 @@ class MutasiController extends Controller
                     'diproses_oleh' => $userId,
                 ];
 
+                // TAMBAHKAN FIELD PINDAH
+                if ($action === 'pindah') {
+                    $mutasiData['alasan_pindah'] = $validated['alasan_pindah'] ?? null;
+                    $mutasiData['tujuan_pindah'] = $validated['tujuan_pindah'] ?? null;
+                }
+
+                // ISI NOMOR SURAT
+                if ($nomorSurat) {
+                    $mutasiData['no_sk_keluar'] = $nomorSurat;
+                    $mutasiData['tanggal_sk_keluar'] = $validated['tanggal_mutasi'];
+                }
+
+                // ============================================================
+                // UPDATE SISWA
+                // ============================================================
                 if ($action === 'naik_kelas' && $nextRombel) {
                     $mutasiData['rombel_tujuan_id'] = $nextRombel->id;
                     $siswa->update([
                         'kelas_id' => $nextKelas->id,
                         'rombel_id' => $nextRombel->id,
-                        'status_siswa' => 'aktif',
                     ]);
                 } elseif ($action === 'lulus') {
                     $siswa->update([
                         'rombel_id' => null,
-                        'status_siswa' => 'lulus',
-                        'is_active' => false,
+                        'tanggal_lulus' => $validated['tanggal_mutasi'],
+                        'status_kelulusan' => 'Lulus',
                     ]);
                     $this->lepasWaliKelasXII($siswa);
-                } else {
+                } elseif ($action === 'pindah') {
                     $siswa->update([
                         'rombel_id' => null,
-                        'status_siswa' => $action,
-                        'is_active' => false,
+                    ]);
+                } elseif ($action === 'do') {
+                    $siswa->update([
+                        'rombel_id' => null,
+                    ]);
+                } elseif ($action === 'meninggal') {
+                    $siswa->update([
+                        'rombel_id' => null,
                     ]);
                 }
 
@@ -503,7 +527,7 @@ class MutasiController extends Controller
             }
 
             DB::commit();
-            
+
             $statusLabel = [
                 'lulus' => 'lulus',
                 'naik_kelas' => 'naik kelas',
@@ -511,9 +535,14 @@ class MutasiController extends Controller
                 'do' => 'keluar sekolah',
                 'meninggal' => 'meninggal dunia'
             ][$action] ?? 'dimutasi';
-            
-            return redirect()->back()->with('success', "✅ " . count($validated['siswa_ids']) . " siswa berhasil $statusLabel!");
-            
+
+            $successMsg = "✅ " . count($validated['siswa_ids']) . " siswa berhasil $statusLabel!";
+            if ($nomorSurat) {
+                $successMsg .= " No. Surat: {$nomorSurat}";
+            }
+
+            return redirect()->back()->with('success', $successMsg);
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error updateSiswa: ' . $e->getMessage());
@@ -531,7 +560,7 @@ class MutasiController extends Controller
         }
 
         $guruId = $rombelAsal->guru_id;
-        
+
         if (!$guruId) {
             return;
         }
@@ -576,14 +605,14 @@ class MutasiController extends Controller
 
         $rombel = $siswa->rombel;
         $guruId = $rombel->guru_id;
-        
+
         if (!$guruId) {
             return;
         }
 
         $rombel->guru_id = null;
         $rombel->save();
-        
+
         $guru = Guru::find($guruId);
         if ($guru) {
             $guru->rombel_id = null;
@@ -614,11 +643,24 @@ class MutasiController extends Controller
             $status = $validated['status'];
             $userId = $this->getValidUserId();
 
+            // Auto-generate nomor surat kalau pindah / DO / meninggal
+            $nomorSurat = null;
+            if (in_array($status, ['pindah', 'do', 'meninggal'])) {
+                $jenisSurat = $status === 'pindah' ? 'surat_pindah' : 'surat_do';
+                $tahun = date('Y');
+                $nomorUrut = \App\Models\NomorSurat::getNextNumber($jenisSurat, $tahun);
+                $nomorSurat = sprintf('421.7/%03d/SMK.1.KW/%s', $nomorUrut, $tahun);
+            }
+
             foreach ($validated['siswa_ids'] as $siswaId) {
+                $siswa = DataSiswa::find($siswaId);
+                if (!$siswa) continue;
+
                 $mutasiData = [
                     'siswa_id' => $siswaId,
                     'status' => $status,
                     'tanggal_mutasi' => $today,
+                    'rombel_asal_id' => $siswa->rombel_id,
                     'keterangan' => $validated['keterangan'] ?? null,
                     'diproses_oleh' => $userId,
                 ];
@@ -628,7 +670,24 @@ class MutasiController extends Controller
                     $mutasiData['tujuan_pindah'] = $validated['tujuan_pindah'] ?? null;
                 }
 
+                if ($nomorSurat) {
+                    $mutasiData['no_sk_keluar'] = $nomorSurat;
+                    $mutasiData['tanggal_sk_keluar'] = $today;
+                }
+
                 MutasiSiswa::create($mutasiData);
+
+                // Update siswa
+                if (in_array($status, ['pindah', 'do', 'meninggal'])) {
+                    $siswa->update(['rombel_id' => null]);
+                } elseif ($status === 'lulus') {
+                    $siswa->update([
+                        'rombel_id' => null,
+                        'tanggal_lulus' => $today,
+                        'status_kelulusan' => 'Lulus',
+                    ]);
+                }
+
                 $count++;
             }
 
@@ -643,7 +702,7 @@ class MutasiController extends Controller
             return response()->json([
                 'success' => true,
                 'count' => $count,
-                'message' => "$count siswa berhasil $statusLabel"
+                'message' => "$count siswa berhasil $statusLabel" . ($nomorSurat ? " (No. Surat: {$nomorSurat})" : ''),
             ]);
 
         } catch (\Exception $e) {
@@ -700,18 +759,18 @@ class MutasiController extends Controller
                         $sudahLulus = MutasiSiswa::where('siswa_id', $s->id)
                             ->where('status', 'lulus')
                             ->exists();
-                        
+
                         if ($sudahLulus) {
                             continue;
                         }
-                        
+
                         $lastKenaikanKelas = KenaikanKelas::where('siswa_id', $s->id)
                             ->orderBy('tahun_ajaran', 'desc')
                             ->orderBy('semester', 'desc')
                             ->first();
-                        
+
                         $tahunAjaranLulus = $lastKenaikanKelas ? $lastKenaikanKelas->tahun_ajaran : $tahunAjaran;
-                        
+
                         MutasiSiswa::create([
                             'siswa_id' => $s->id,
                             'status' => 'lulus',
@@ -725,7 +784,7 @@ class MutasiController extends Controller
                     }
                 } else {
                     $nextTingkat = $currentTingkat === 'X' ? 'XI' : 'XII';
-                    
+
                     $targetKelas = Kelas::where('tingkat', $nextTingkat)
                         ->where('jurusan_id', $currentKelas->jurusan_id)
                         ->first();
@@ -752,11 +811,11 @@ class MutasiController extends Controller
                         $hasTerminalStatus = MutasiSiswa::where('siswa_id', $s->id)
                             ->whereIn('status', ['lulus', 'pindah', 'do', 'meninggal'])
                             ->exists();
-                        
+
                         if ($hasTerminalStatus) {
                             continue;
                         }
-                        
+
                         MutasiSiswa::create([
                             'siswa_id' => $s->id,
                             'status' => 'naik_kelas',
@@ -821,5 +880,234 @@ class MutasiController extends Controller
         ];
 
         return view('tu.mutasi.laporan', compact('mutasis', 'statuses'));
+    }
+
+    /**
+     * Form modal pindah (return data siswa terpilih)
+     */
+    public function suratPindahForm(Request $request)
+    {
+        $siswaIds = $request->input('siswa_ids', []);
+        $siswas = DataSiswa::with('rombel.kelas.jurusan')
+            ->whereIn('id', $siswaIds)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'siswas' => $siswas->map(function ($s) {
+                return [
+                    'id' => $s->id,
+                    'nama' => $s->nama_lengkap,
+                    'nis' => $s->nis,
+                    'nisn' => $s->nisn,
+                    'kelas' => $s->rombel->nama ?? '-',
+                    'jurusan' => $s->rombel->kelas->jurusan->nama ?? '-',
+                ];
+            }),
+        ]);
+    }
+
+    /**
+     * Simpan surat pindah
+     */
+    public function simpanSuratPindah(Request $request)
+    {
+        $validated = $request->validate([
+            'siswa_ids' => 'required|array|min:1',
+            'siswa_ids.*' => 'exists:data_siswa,id',
+            'tanggal_mutasi' => 'required|date',
+            'alasan_pindah' => 'required|string|max:255',
+            'tujuan_pindah' => 'required|string|max:255',
+            'keterangan' => 'nullable|string',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $userId = $this->getValidUserId();
+            $tanggalMutasi = $validated['tanggal_mutasi'];
+
+            // Generate nomor surat
+            $tahun = date('Y', strtotime($tanggalMutasi));
+            $nomorUrut = \App\Models\NomorSurat::getNextNumber('surat_pindah', $tahun);
+            $nomorSurat = sprintf('421.7/%03d/SMK.1.KW/%s', $nomorUrut, $tahun);
+
+            $mutasiIds = [];
+
+            foreach ($validated['siswa_ids'] as $siswaId) {
+                $siswa = DataSiswa::find($siswaId);
+                if (!$siswa) continue;
+
+                $mutasi = MutasiSiswa::create([
+                    'siswa_id' => $siswa->id,
+                    'status' => 'pindah',
+                    'tanggal_mutasi' => $tanggalMutasi,
+                    'rombel_asal_id' => $siswa->rombel_id,
+                    'alasan_pindah' => $validated['alasan_pindah'],
+                    'tujuan_pindah' => $validated['tujuan_pindah'],
+                    'no_sk_keluar' => $nomorSurat,
+                    'tanggal_sk_keluar' => $tanggalMutasi,
+                    'keterangan' => $validated['keterangan'] ?? null,
+                    'diproses_oleh' => $userId,
+                ]);
+
+                $mutasiIds[] = $mutasi->id;
+
+                $siswa->update([
+                    'rombel_id' => null,
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => count($mutasiIds) . ' siswa berhasil dipindah.',
+                'surat_url' => count($mutasiIds) > 0 ? route('tu.mutasi.surat-show', $mutasiIds[0]) : null,
+                'count' => count($mutasiIds),
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Simpan surat pindah error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal: ' . $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
+     * Form modal DO
+     */
+    public function suratDoForm(Request $request)
+    {
+        return $this->suratPindahForm($request);
+    }
+
+    /**
+     * Simpan surat DO
+     */
+    public function simpanSuratDo(Request $request)
+    {
+        $validated = $request->validate([
+            'siswa_ids' => 'required|array|min:1',
+            'siswa_ids.*' => 'exists:data_siswa,id',
+            'tanggal_mutasi' => 'required|date',
+            'alasan_do' => 'required|string|max:255',
+            'keterangan' => 'nullable|string',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $userId = $this->getValidUserId();
+            $tanggalMutasi = $validated['tanggal_mutasi'];
+
+            $tahun = date('Y', strtotime($tanggalMutasi));
+            $nomorUrut = \App\Models\NomorSurat::getNextNumber('surat_do', $tahun);
+            $nomorSurat = sprintf('421.7/%03d/SMK.1.KW/%s', $nomorUrut, $tahun);
+
+            $mutasiIds = [];
+
+            foreach ($validated['siswa_ids'] as $siswaId) {
+                $siswa = DataSiswa::find($siswaId);
+                if (!$siswa) continue;
+
+                $mutasi = MutasiSiswa::create([
+                    'siswa_id' => $siswa->id,
+                    'status' => 'do',
+                    'tanggal_mutasi' => $tanggalMutasi,
+                    'rombel_asal_id' => $siswa->rombel_id,
+                    'keterangan' => $validated['alasan_do'] . ($validated['keterangan'] ? ' - ' . $validated['keterangan'] : ''),
+                    'no_sk_keluar' => $nomorSurat,
+                    'tanggal_sk_keluar' => $tanggalMutasi,
+                    'diproses_oleh' => $userId,
+                ]);
+
+                $mutasiIds[] = $mutasi->id;
+
+                $siswa->update([
+                    'rombel_id' => null,
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => count($mutasiIds) . ' siswa berhasil diproses DO.',
+                'surat_url' => count($mutasiIds) > 0 ? route('tu.mutasi.surat-show', $mutasiIds[0]) : null,
+                'count' => count($mutasiIds),
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Simpan surat DO error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal: ' . $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
+     * Preview surat (pindah / DO)
+     */
+    public function suratShow($id)
+    {
+$mutasi = MutasiSiswa::with([
+    'siswa.rombel.kelas.jurusan',
+    'siswa.jenisKelamin',
+    'siswa.agama',
+    'diprosesOleh'
+])->findOrFail($id);
+        $rombel = null;
+        if ($mutasi->siswa && $mutasi->siswa->rombel) {
+            $rombel = $mutasi->siswa->rombel;
+        } elseif ($mutasi->rombel_asal_id) {
+            $rombel = Rombel::with('kelas.jurusan')->find($mutasi->rombel_asal_id);
+        }
+
+        $view = $mutasi->status === 'pindah'
+            ? 'tu.mutasi.surat-pindah'
+            : 'tu.mutasi.surat-do';
+
+        return view($view, compact('mutasi', 'rombel'));
+    }
+
+    /**
+     * Laporan semua surat mutasi (pindah + DO)
+     */
+    public function laporanSurat(Request $request)
+    {
+        $query = MutasiSiswa::with(['siswa', 'diprosesOleh'])
+            ->whereIn('status', ['pindah', 'do'])
+            ->latest('tanggal_mutasi');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('tanggal_dari')) {
+            $query->where('tanggal_mutasi', '>=', $request->tanggal_dari);
+        }
+        if ($request->filled('tanggal_sampai')) {
+            $query->where('tanggal_mutasi', '<=', $request->tanggal_sampai);
+        }
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->whereHas('siswa', function ($q) use ($s) {
+                $q->where('nama_lengkap', 'like', "%{$s}%")
+                  ->orWhere('nis', 'like', "%{$s}%")
+                  ->orWhere('nisn', 'like', "%{$s}%");
+            });
+        }
+
+        $mutasis = $query->paginate(20)->withQueryString();
+
+        $stats = [
+            'total_pindah' => MutasiSiswa::where('status', 'pindah')->count(),
+            'total_do' => MutasiSiswa::where('status', 'do')->count(),
+        ];
+
+        return view('tu.mutasi.laporan-surat', compact('mutasis', 'stats'));
     }
 }

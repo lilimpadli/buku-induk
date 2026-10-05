@@ -15,7 +15,7 @@ class GuruImport implements ToCollection
 {
     protected $errors = [];
     protected $successCount = 0;
-    protected $defaultPassword = '12345678';
+    protected $defaultPassword = 'GuruBiskaone';
 
     /**
      * DAFTAR ALIAS HEADER

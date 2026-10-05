@@ -3,640 +3,618 @@
 @section('title', 'Data Alumni')
 
 @section('content')
+
 <style>
     :root {
-        --primary: #3b82f6;
-        --primary-dark: #2563eb;
-        --success: #10b981;
-        --success-dark: #059669;
-        --warning: #f59e0b;
-        --warning-dark: #d97706;
-        --danger: #ef4444;
-        --danger-dark: #dc2626;
-        --info: #3b82f6;
-        --gray-50: #f8fafc;
-        --gray-100: #f1f5f9;
-        --gray-200: #e2e8f0;
-        --gray-300: #cbd5e1;
-        --gray-400: #94a3b8;
-        --gray-500: #64748b;
-        --gray-600: #475569;
+        --primary: #4F46E5;
+        --primary-light: #6366F1;
+        --secondary: #7C3AED;
+        --success: #10B981;
+        --warning: #F59E0B;
+        --danger: #EF4444;
+        --info: #3B82F6;
+        --gray-50: #F8FAFC;
+        --gray-100: #F1F5F9;
+        --gray-200: #E2E8F0;
+        --gray-500: #64748B;
         --gray-700: #334155;
-        --gray-800: #1e293b;
-        --gray-900: #0f172a;
-        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        --border-radius: 12px;
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --gray-800: #1E293B;
+        --shadow-sm: 0 2px 8px rgba(15,23,42,.05);
+        --shadow-md: 0 10px 25px rgba(15,23,42,.08);
+        --shadow-lg: 0 18px 35px rgba(15,23,42,.12);
     }
 
-    body {
-        background-color: var(--gray-50);
-        color: var(--gray-800);
-        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    }
+    body { background: linear-gradient(180deg, #F8FAFF 0%, #EEF2FF 100%); }
 
-    /* Header Section */
-    .page-header {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: white;
-        padding: 48px 0;
-        margin-bottom: 48px;
+    .hero-banner {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        border-radius: 28px;
+        padding: 40px;
+        margin-bottom: 28px;
         position: relative;
         overflow: hidden;
-    }
-
-    .page-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        animation: pulse 3s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 0.5; }
-        50% { transform: scale(1.1); opacity: 0.3; }
-    }
-
-    .page-header h1 {
-        font-size: clamp(28px, 5vw, 48px);
-        font-weight: 700;
-        margin: 0;
-        position: relative;
-        z-index: 1;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .page-header .subtitle {
-        font-size: clamp(16px, 3vw, 20px);
-        opacity: 0.9;
-        margin-top: 8px;
-        position: relative;
-        z-index: 1;
-    }
-
-    /* Search Section */
-    .search-section {
-        background: white;
-        border-radius: var(--border-radius);
-        padding: 32px;
-        margin-bottom: 40px;
-        box-shadow: var(--shadow-md);
-        transition: var(--transition);
-    }
-
-    .search-section:hover {
         box-shadow: var(--shadow-lg);
     }
 
-    .search-title {
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--gray-800);
-        margin-bottom: 24px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .search-title i {
-        color: var(--primary);
-    }
-
-    .search-form {
-        display: flex;
-        gap: 16px;
-        align-items: flex-end;
-        flex-wrap: wrap;
-    }
-
-    .form-group {
-        flex: 1;
-        min-width: 200px;
-    }
-
-    .form-label {
-        font-weight: 600;
-        color: var(--gray-700);
-        margin-bottom: 8px;
-        font-size: 14px;
-    }
-
-    .form-select,
-    .form-control {
-        border: 2px solid var(--gray-200);
-        border-radius: 10px;
-        padding: 12px 16px;
-        font-size: 15px;
-        transition: var(--transition);
-        background: white;
-    }
-
-    .form-select:focus,
-    .form-control:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        outline: none;
-    }
-
-    .btn {
-        border-radius: 10px;
-        font-weight: 600;
-        padding: 12px 24px;
-        transition: var(--transition);
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
-        font-size: 15px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .btn::before {
+    .hero-banner::before,
+    .hero-banner::after {
         content: '';
         position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
-        transform: translate(-50%, -50%);
-        transition: width 0.6s, height 0.6s;
+        background: rgba(255,255,255,.08);
+        pointer-events: none;
     }
 
-    .btn:active::before {
-        width: 300px;
-        height: 300px;
+    .hero-banner::before {
+        width: 300px; height: 300px;
+        top: -120px; right: -80px;
     }
 
-    .btn-primary {
-        background: var(--primary);
+    .hero-banner::after {
+        width: 200px; height: 200px;
+        bottom: -80px; left: -60px;
+        background: rgba(255,255,255,.05);
+    }
+
+    .hero-content {
+        position: relative; z-index: 2;
+        display: flex; justify-content: space-between;
+        align-items: center; gap: 24px; flex-wrap: wrap;
+    }
+
+    .hero-title {
+        font-size: 36px; font-weight: 800;
+        color: white; margin: 0 0 8px 0;
+        letter-spacing: -0.5px;
+    }
+
+    .hero-subtitle {
+        color: rgba(255,255,255,.85);
+        font-size: 15px; margin: 0;
+    }
+
+    .hero-stats {
+        display: flex; gap: 16px; margin-top: 24px; flex-wrap: wrap;
+    }
+
+    .hero-stat {
+        background: rgba(255,255,255,.15);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,.2);
+        border-radius: 16px;
+        padding: 14px 22px;
+        min-width: 120px;
         color: white;
     }
 
-    .btn-primary:hover {
-        background: var(--primary-dark);
+    .hero-stat-value {
+        font-size: 26px; font-weight: 800; line-height: 1.1;
+    }
+
+    .hero-stat-label {
+        font-size: 11px; opacity: .85;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-top: 4px;
+    }
+
+    .hero-actions {
+        display: flex; gap: 10px; flex-wrap: wrap;
+    }
+
+    .btn-hero {
+        background: white;
+        color: var(--primary);
+        border: none;
+        border-radius: 14px;
+        padding: 12px 22px;
+        font-weight: 700;
+        font-size: 14px;
+        display: inline-flex; align-items: center; gap: 8px;
+        text-decoration: none;
+        transition: all .25s ease;
+        box-shadow: 0 6px 18px rgba(79,70,229,.15);
+        cursor: pointer;
+    }
+
+    .btn-hero:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        box-shadow: 0 10px 25px rgba(79,70,229,.25);
+        color: var(--primary);
     }
 
-    .btn-secondary {
-        background: var(--gray-200);
-        color: var(--gray-700);
+    .btn-hero.btn-hero-success { color: var(--success); }
+    .btn-hero.btn-hero-danger { color: var(--danger); }
+    .btn-hero.btn-hero-warning { color: var(--warning); }
+
+    .filter-card {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        margin-bottom: 28px;
+        border: 1px solid #EEF2FF;
+        box-shadow: var(--shadow-md);
     }
 
-    .btn-secondary:hover {
-        background: var(--gray-300);
-        transform: translateY(-2px);
+    .filter-title {
+        font-size: 16px; font-weight: 700;
+        color: var(--gray-800);
+        margin-bottom: 18px;
+        display: flex; align-items: center; gap: 10px;
     }
 
-    /* Alumni Cards Grid */
+    .filter-title i { color: var(--primary); }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 14px;
+    }
+
+    .form-control-modern,
+    .form-select-modern {
+        width: 100%; height: 46px;
+        border-radius: 12px;
+        border: 1.5px solid #E2E8F0;
+        padding: 0 16px;
+        font-size: 14px;
+        background: #F8FAFF;
+        transition: all .2s;
+    }
+
+    .form-control-modern:focus,
+    .form-select-modern:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(79,70,229,.08);
+    }
+
     .alumni-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 24px;
-        margin-bottom: 40px;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 20px;
+        margin-bottom: 32px;
     }
 
     .alumni-card {
         background: white;
-        border-radius: var(--border-radius);
-        overflow: hidden;
+        border-radius: 22px;
+        border: 1px solid #EEF2FF;
         box-shadow: var(--shadow-md);
-        transition: var(--transition);
-        position: relative;
-        border: 1px solid var(--gray-200);
+        overflow: hidden;
+        transition: all .3s cubic-bezier(.4,0,.2,1);
         display: flex;
         flex-direction: column;
-    }
-
-    .alumni-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-xl);
-        border-color: var(--primary);
+        position: relative;
     }
 
     .alumni-card::before {
         content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
-        background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+        position: absolute; top: 0; left: 0; right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
     }
 
-    .alumni-card-header {
-        padding: 24px;
-        background: linear-gradient(135deg, var(--gray-50), var(--gray-100));
-        border-bottom: 1px solid var(--gray-200);
+    .alumni-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-lg);
+        border-color: rgba(79,70,229,.3);
     }
 
-    .alumni-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: var(--primary);
-        color: white;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 700;
-        margin-bottom: 16px;
+    .card-head {
+        padding: 20px 22px 16px;
+        border-bottom: 1px solid #F1F5F9;
     }
 
-    .alumni-badge i {
-        font-size: 14px;
+    .badge-tahun {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: linear-gradient(135deg, #EEF2FF, #E0E7FF);
+        color: var(--primary);
+        padding: 5px 12px;
+        border-radius: 30px;
+        font-size: 12px; font-weight: 700;
+        margin-bottom: 10px;
     }
 
-    .alumni-title {
-        font-size: 20px;
-        font-weight: 700;
+    .card-jurusan {
+        font-size: 18px; font-weight: 800;
         color: var(--gray-800);
-        margin-bottom: 8px;
+        margin: 0 0 6px;
         line-height: 1.3;
     }
 
-    .alumni-subtitle {
-        font-size: 14px;
-        color: var(--gray-500);
-        display: flex;
-        align-items: center;
-        gap: 6px;
+    .card-sub {
+        font-size: 13px; color: var(--gray-500);
+        display: flex; align-items: center; gap: 6px;
     }
 
-    .alumni-subtitle i {
-        color: var(--gray-400);
-    }
-
-    .alumni-card-body {
-        padding: 24px;
+    .card-body-modern {
+        padding: 18px 22px;
         flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
     }
 
-    .alumni-stats {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 16px;
-        margin-bottom: 20px;
-    }
-
-    .stat-item {
+    .stat-block {
         text-align: center;
+        margin-bottom: 16px;
     }
 
-    .stat-number {
-        font-size: 36px;
-        font-weight: 700;
-        color: var(--primary);
+    .stat-num {
+        font-size: 40px; font-weight: 800;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         line-height: 1;
-        display: flex;
-        align-items: baseline;
-        justify-content: center;
-        gap: 4px;
     }
 
-    .stat-label {
-        font-size: 14px;
+    .stat-lbl {
+        font-size: 12px; color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-top: 6px;
+    }
+
+    .preview-list {
+        background: #F8FAFF;
+        border-radius: 14px;
+        padding: 12px 14px;
+        margin-top: 14px;
+    }
+
+    .preview-title {
+        font-size: 11px; font-weight: 700;
         color: var(--gray-500);
-        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: 8px;
     }
 
-    .alumni-description {
-        text-align: center;
-        color: var(--gray-600);
-        font-size: 14px;
-        line-height: 1.5;
-        margin-bottom: 24px;
+    .preview-item {
+        display: flex; align-items: center; gap: 8px;
+        padding: 6px 0;
+        border-bottom: 1px dashed #E2E8F0;
+        font-size: 13px;
+        color: var(--gray-700);
     }
 
-    .alumni-card-footer {
-        padding: 20px 24px;
-        border-top: 1px solid var(--gray-200);
-        background: var(--gray-50);
-    }
+    .preview-item:last-child { border-bottom: none; }
 
-    .btn-alumni {
-        width: 100%;
-        padding: 12px 20px;
-        font-size: 15px;
-        border-radius: 10px;
+    .preview-item strong {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
         font-weight: 600;
-        transition: var(--transition);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
+    }
+
+    .preview-more {
+        font-size: 12px; color: var(--primary);
+        font-weight: 700;
+        text-align: center;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #E2E8F0;
+    }
+
+    .card-foot {
+        padding: 14px 22px 18px;
+        background: #FAFBFF;
+        border-top: 1px solid #F1F5F9;
+    }
+
+    .btn-detail {
+        width: 100%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
         border: none;
+        border-radius: 12px;
+        padding: 12px 18px;
+        font-weight: 700;
+        font-size: 14px;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        text-decoration: none;
+        transition: all .25s;
         cursor: pointer;
     }
 
-    .btn-alumni-primary {
-        background: var(--primary);
+    .btn-detail:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(79,70,229,.3);
         color: white;
     }
 
-    .btn-alumni-primary:hover {
-        background: var(--primary-dark);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    }
-
-    .btn-alumni-secondary {
-        background: var(--gray-200);
-        color: var(--gray-700);
-        cursor: not-allowed;
-    }
-
-    /* Empty State */
     .empty-state {
-        text-align: center;
-        padding: 80px 20px;
         background: white;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow);
+        border-radius: 24px;
+        padding: 70px 24px;
+        text-align: center;
+        box-shadow: var(--shadow-md);
     }
 
-    .empty-state-icon {
-        font-size: 64px;
-        color: var(--gray-300);
-        margin-bottom: 24px;
+    .empty-icon {
+        width: 90px; height: 90px;
+        background: linear-gradient(135deg, #EEF2FF, #E0E7FF);
+        color: var(--primary);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 22px;
+        font-size: 40px;
     }
 
-    .empty-state-title {
-        font-size: 24px;
-        font-weight: 700;
+    .empty-title {
+        font-size: 22px; font-weight: 800;
         color: var(--gray-800);
-        margin-bottom: 12px;
+        margin-bottom: 8px;
     }
 
-    .empty-state-description {
-        font-size: 16px;
-        color: var(--gray-500);
-        margin-bottom: 32px;
+    .empty-desc {
+        font-size: 14px; color: var(--gray-500);
+        max-width: 400px;
+        margin: 0 auto 24px;
     }
 
-    .empty-state-actions {
-        display: flex;
-        gap: 16px;
-        justify-content: center;
-        flex-wrap: wrap;
+    @media (max-width: 992px) {
+        .filter-grid { grid-template-columns: 1fr 1fr; }
     }
 
-    /* Responsive Design */
-    @media (max-width: 767px) {
-        .page-header { padding: 32px 0; margin-bottom: 32px; }
-        .page-header h1 { font-size: 28px; }
-        .search-section { padding: 20px; margin-bottom: 24px; }
-        .search-form { flex-direction: column; gap: 12px; }
-        .form-group { width: 100%; }
-        .alumni-grid { grid-template-columns: 1fr; gap: 16px; }
-        .stat-number { font-size: 28px; }
-    }
-
-    @media (min-width: 768px) and (max-width: 991px) {
-        .alumni-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-    }
-
-    @keyframes shimmer {
-        0% { background-position: -200% 0; }
-        100% { background-position: 200% 0; }
-    }
-
-    .loading {
-        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-        background-size: 200% 100%;
-        animation: shimmer 1.5s infinite;
-    }
-
-    @media print {
-        body { background-color: white; }
-        .page-header, .search-section { display: none !important; }
-        .alumni-card { box-shadow: none; border: 1px solid var(--gray-300); break-inside: avoid; }
-        @page { margin: 2cm; }
-    }
-
-    .fade-in {
-        animation: fadeIn 0.5s ease-in;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .pulse {
-        animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
+    @media (max-width: 768px) {
+        .hero-banner { padding: 26px; }
+        .hero-title { font-size: 26px; }
+        .filter-grid { grid-template-columns: 1fr; }
+        .alumni-grid { grid-template-columns: 1fr; }
     }
 </style>
 
-<!-- Page Header -->
-<div class="page-header">
-    <div class="container">
-        <h1 class="mb-2">Data Alumni</h1>
-        <p class="subtitle mb-0">Melacak prestasi dan perkembangan alumni SMKN 1 Kawali</p>
-    </div>
-</div>
+<div class="container-fluid px-3 px-md-4 py-4">
 
-<div class="container">
-    <!-- Search Section -->
-    <div class="search-section fade-in">
-        <h3 class="search-title">
-            <i class="bi bi-funnel"></i>
-            Filter Pencarian
-        </h3>
-        <form method="GET" action="{{ route('tu.alumni.index') }}" class="search-form">
-            <div class="form-group">
-                <label for="tahunAjaranSelect" class="form-label">Tahun Ajaran</label>
-                <select name="tahun_ajaran" class="form-select" id="tahunAjaranSelect">
-                    <option value="">-- Semua Tahun Ajaran --</option>
-                    @foreach($tahunAjaranList as $tahun)
-                        <option value="{{ $tahun }}" {{ $tahunSearch == $tahun ? 'selected' : '' }}>
-                            Tahun Ajaran {{ $tahun }}
-                        </option>
+    @if(session('success') || session('warning') || session('error') || session('import_errors'))
+    <div class="mb-4">
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+        @if(session('warning'))
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i> {{ session('warning') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-times-circle me-2"></i> {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+        @if(session('import_errors'))
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i> Beberapa baris tidak berhasil diimport:
+                <ul class="mb-0 mt-2">
+                    @foreach(session('import_errors') as $error)
+                        <li>{{ $error }}</li>
                     @endforeach
-                </select>
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-            <div class="form-group">
-                <label class="form-label">&nbsp;</label>
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-search"></i> Cari
-                </button>
-            </div>
-            @if($tahunSearch)
-                <div class="form-group">
-                    <label class="form-label">&nbsp;</label>
-                    <a href="{{ route('tu.alumni.index') }}" class="btn btn-secondary">
-                        <i class="bi bi-arrow-clockwise"></i> Reset
-                    </a>
-                </div>
-            @endif
-        </form>
+        @endif
     </div>
+    @endif
 
-    <!-- Alumni Cards Grid -->
-    @php
-        $totalAlumni = collect($allJurusanCards)->sum('count');
-    @endphp
-
-    @if($totalAlumni == 0)
-        <div class="empty-state fade-in">
-            <div class="empty-state-icon">
-                <i class="bi bi-inbox"></i>
+    <div class="hero-banner">
+        <div class="hero-content">
+            <div>
+                <h1 class="hero-title">
+                    <i class="fas fa-user-graduate me-2"></i> Data Alumni
+                </h1>
+                <p class="hero-subtitle">
+                    Lacak dan kelola data lulusan SMKN 1 Kawali
+                </p>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">{{ $totalAlumni }}</div>
+                        <div class="hero-stat-label">Total Alumni</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">{{ $totalJurusan }}</div>
+                        <div class="hero-stat-label">Jurusan</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">{{ $totalTahun }}</div>
+                        <div class="hero-stat-label">Tahun Lulus</div>
+                    </div>
+                </div>
             </div>
-            <h3 class="empty-state-title">Belum Ada Data Alumni</h3>
-            <p class="empty-state-description">
-                Saat ini belum ada data alumni yang terdaftar.
-                Data alumni akan muncul setelah siswa lulus dan terdaftar sebagai alumni.
-            </p>
-            <div class="empty-state-actions">
-                <a href="{{ route('tu.siswa.index') }}" class="btn btn-primary">
-                    <i class="bi bi-people"></i> Kelola Siswa
+            <div class="hero-actions">
+                <button type="button" class="btn-hero btn-hero-warning" data-bs-toggle="modal" data-bs-target="#importNilaiAlumniModal">
+                    <i class="fas fa-file-import"></i> Import Nilai
+                </button>
+                <a href="{{ route('tu.alumni.export.excel', request()->query()) }}" class="btn-hero btn-hero-success">
+                    <i class="fas fa-file-excel"></i> Excel
+                </a>
+                <a href="{{ route('tu.alumni.export.pdf', request()->query()) }}" class="btn-hero btn-hero-danger">
+                    <i class="fas fa-file-pdf"></i> PDF
                 </a>
             </div>
         </div>
-    @else
+    </div>
+
+    <div class="filter-card">
+        <div class="filter-title">
+            <i class="fas fa-sliders-h"></i> Filter Pencarian
+        </div>
+        <form method="GET" action="{{ route('tu.alumni.index') }}">
+            <div class="filter-grid">
+                <input type="text" name="search" class="form-control-modern"
+                       placeholder="Cari nama / NIS / NISN..."
+                       value="{{ $search }}">
+
+                <select name="tahun_ajaran" class="form-select-modern">
+                    <option value="">-- Semua Tahun --</option>
+                    @foreach($tahunAjaranList as $th)
+                        <option value="{{ $th }}" {{ $tahunSearch == $th ? 'selected' : '' }}>
+                            Tahun {{ $th }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <select name="jurusan_id" class="form-select-modern">
+                    <option value="">-- Semua Jurusan --</option>
+                    @foreach($allJurusan as $j)
+                        <option value="{{ $j->id }}" {{ $jurusanSearch == $j->id ? 'selected' : '' }}>
+                            {{ $j->nama }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <div style="display: flex; gap: 8px;">
+                    <select name="sort" class="form-select-modern" style="flex: 1;">
+                        <option value="tahun_desc" {{ $sortBy == 'tahun_desc' ? 'selected' : '' }}>Tahun Terbaru</option>
+                        <option value="tahun_asc"  {{ $sortBy == 'tahun_asc'  ? 'selected' : '' }}>Tahun Terlama</option>
+                        <option value="nama_asc"   {{ $sortBy == 'nama_asc'   ? 'selected' : '' }}>Nama A-Z</option>
+                        <option value="nama_desc"  {{ $sortBy == 'nama_desc'  ? 'selected' : '' }}>Nama Z-A</option>
+                    </select>
+                    <button type="submit" class="btn-hero" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 0 20px;">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    @if($search || $tahunSearch || $jurusanSearch || $sortBy != 'tahun_desc')
+                        <a href="{{ route('tu.alumni.index') }}" class="btn-hero" style="padding: 0 16px;">
+                            <i class="fas fa-rotate-right"></i>
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </form>
+    </div>
+
+    @if(count($groupedCards) > 0)
         <div class="alumni-grid">
-            @foreach($allJurusanCards as $card)
-                @if($card['count'] > 0)
-                    <div class="alumni-card fade-in" style="animation-delay: {{ $loop->index * 0.1 }}s">
-                        <div class="alumni-card-header">
-                            <div class="alumni-badge">
-                                <i class="bi bi-mortarboard"></i>
-                                {{ $card['tahun'] }}
-                            </div>
-                            <h3 class="alumni-title">{{ $card['jurusan'] }}</h3>
-                            <div class="alumni-subtitle">
-                                <i class="bi bi-building"></i>
-                                SMKN 1 Kawali
-                            </div>
-                        </div>
-                        <div class="alumni-card-body">
-                            <div class="alumni-stats">
-                                <div class="stat-item">
-                                    <div class="stat-number">{{ $card['count'] }}</div>
-                                    <div class="stat-label">Alumni</div>
-                                </div>
-                            </div>
-                            <p class="alumni-description">
-                                {{ $card['jurusan'] }} telah melahirkan {{ $card['count'] }} lulusan.
-                            </p>
-                        </div>
-                        <div class="alumni-card-footer">
-@if($card['jurusan_id'])
-    <a href="{{ route('tu.alumni.by-jurusan', ['jurusanId' => $card['jurusan_id']]) }}?tahun={{ urlencode($card['tahun']) }}" 
-       class="btn-alumni btn-alumni-primary">
-        <i class="bi bi-eye"></i> Lihat Detail Alumni
-    </a>
-@else
-    <button class="btn-alumni btn-alumni-secondary" disabled>
-        <i class="bi bi-exclamation-triangle"></i> Jurusan Belum Teridentifikasi
-    </button>
-@endif
+            @foreach($groupedCards as $card)
+                <div class="alumni-card">
+                    <div class="card-head">
+                        <span class="badge-tahun">
+                            <i class="fas fa-calendar-alt"></i>
+                            Lulus {{ $card['tahun'] }}
+                        </span>
+                        <h3 class="card-jurusan">{{ $card['jurusan'] }}</h3>
+                        <div class="card-sub">
+                            <i class="fas fa-school"></i> SMKN 1 Kawali
                         </div>
                     </div>
-                @endif
+
+                    <div class="card-body-modern">
+                        <div class="stat-block">
+                            <div class="stat-num">{{ $card['count'] }}</div>
+                            <div class="stat-lbl">Alumni</div>
+                        </div>
+
+                        @if(!empty($card['siswa']))
+                            <div class="preview-list">
+                                <div class="preview-title">Contoh Alumni</div>
+                                @foreach(array_slice($card['siswa'], 0, 5) as $s)
+                                    <div class="preview-item">
+                                        <i class="fas fa-user-circle" style="color: #94A3B8;"></i>
+                                        <strong>{{ $s['nama'] }}</strong>
+                                        <span style="color: #94A3B8; font-size: 11px;">{{ $s['nis'] }}</span>
+                                    </div>
+                                @endforeach
+                                @if($card['count'] > 5)
+                                    <div class="preview-more">
+                                        + {{ $card['count'] - 5 }} alumni lainnya
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="card-foot">
+                        @if($card['jurusan_id'])
+                            <a href="{{ route('tu.alumni.by-jurusan', ['jurusanId' => $card['jurusan_id']]) }}?tahun={{ urlencode($card['tahun']) }}"
+                               class="btn-detail">
+                                <i class="fas fa-eye"></i> Lihat Semua Alumni
+                            </a>
+                        @else
+                            <button class="btn-detail" disabled style="background: #E2E8F0; cursor: not-allowed;">
+                                <i class="fas fa-exclamation-triangle"></i> Jurusan Belum Teridentifikasi
+                            </button>
+                        @endif
+                    </div>
+                </div>
             @endforeach
         </div>
+    @else
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <h3 class="empty-title">Belum Ada Data Alumni</h3>
+            <p class="empty-desc">
+                @if($search || $tahunSearch || $jurusanSearch)
+                    Tidak ada alumni yang cocok dengan filter kamu. Coba ubah kata kunci atau reset filter.
+                @else
+                    Data alumni akan muncul setelah siswa lulus dan tercatat sebagai alumni.
+                @endif
+            </p>
+            @if($search || $tahunSearch || $jurusanSearch)
+                <a href="{{ route('tu.alumni.index') }}" class="btn-hero" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;">
+                    <i class="fas fa-rotate-right"></i> Reset Filter
+                </a>
+            @else
+                <a href="{{ route('tu.siswa.index') }}" class="btn-hero" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;">
+                    <i class="fas fa-users"></i> Kelola Siswa
+                </a>
+            @endif
+        </div>
     @endif
+
 </div>
 
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add ripple effect to buttons
-        document.querySelectorAll('.btn').forEach(button => {
-            button.addEventListener('click', function(e) {
-                const ripple = document.createElement('span');
-                const rect = this.getBoundingClientRect();
-                const size = Math.max(rect.width, rect.height);
-                const x = e.clientX - rect.left - size / 2;
-                const y = e.clientY - rect.top - size / 2;
-                
-                ripple.style.width = ripple.style.height = size + 'px';
-                ripple.style.left = x + 'px';
-                ripple.style.top = y + 'px';
-                ripple.classList.add('ripple');
-                
-                this.appendChild(ripple);
-                
-                setTimeout(() => ripple.remove(), 600);
-            });
-        });
+<!-- MODAL IMPORT NILAI ALUMNI -->
+<div class="modal fade" id="importNilaiAlumniModal" tabindex="-1" aria-labelledby="importNilaiAlumniModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px; border: none;">
+            <div class="modal-header" style="border-bottom: 1px solid #F1F5F9; padding: 20px 24px;">
+                <h5 class="modal-title" id="importNilaiAlumniModalLabel" style="font-weight: 700;">
+                    <i class="fas fa-file-import me-2" style="color: var(--primary);"></i> Import Nilai Rapor Alumni
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('tu.alumni.import.nilai') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body" style="padding: 24px;">
+                    <p class="text-muted" style="font-size: 13px;">
+                        Pilih file Excel (.xlsx / .xls / .csv) berisi nilai rapor alumni.
+                        Pastikan format kolom: <b>B=NIS, C=NISN, F=Semester, G=Tahun Ajaran, H+=Nama Mapel</b>.
+                    </p>
 
-        // Add smooth scroll behavior
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="font-size: 13px;">Semester (default)</label>
+                        <select name="semester" class="form-select" required>
+                            <option value="Ganjil">Ganjil</option>
+                            <option value="Genap">Genap</option>
+                        </select>
+                    </div>
 
-        // Animate numbers on scroll
-        const animateValue = (element, start, end, duration) => {
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                element.textContent = Math.floor(progress * (end - start) + start);
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
-        };
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="font-size: 13px;">Tahun Ajaran (default)</label>
+                        <input type="text" name="tahun_ajaran" class="form-control" value="2022/2023" required>
+                    </div>
 
-        // Observe elements for animation
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="font-size: 13px;">File Excel</label>
+                        <input class="form-control" type="file" name="file" accept=".xlsx,.xls,.csv" required>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #F1F5F9; padding: 16px 24px;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; font-weight: 700; border-radius: 10px; padding: 10px 24px;">
+                        <i class="fas fa-cloud-upload-alt me-2"></i> Upload & Import
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const statNumber = entry.target.querySelector('.stat-number');
-                    if (statNumber && !statNumber.classList.contains('animated')) {
-                        const finalValue = parseInt(statNumber.textContent);
-                        animateValue(statNumber, 0, finalValue, 1000);
-                        statNumber.classList.add('animated');
-                    }
-                }
-            });
-        }, observerOptions);
-
-        // Observe all alumni cards
-        document.querySelectorAll('.alumni-card').forEach(card => {
-            observer.observe(card);
-        });
-    });
-</script>
-@endpush
 @endsection

@@ -5,257 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buku Induk - {{ $siswa->nama_lengkap ?? 'Siswa' }}</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Times New Roman', Times, serif;
-            background-color: #fff;
-            padding: 0;
-            color: #000;
-            line-height: 1.1;
-        }
-        .container {
-            max-width: 210mm;
-            margin: 0 auto;
-            background-color: white;
-            padding: 8mm;
-            height: 297mm;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        .buku-induk-header {
-            text-align: center;
-            margin-bottom: 6px;
-            padding-bottom: 4px;
-            border-bottom: 2px solid #000;
-        }
-        .buku-induk-header h1 {
-            font-size: 14px;
-            margin-bottom: 2px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        .buku-induk-header h2 {
-            font-size: 9px;
-            margin-bottom: 2px;
-            font-weight: normal;
-        }
-
-        /* --- MAIN LAYOUT: TWO COLUMNS --- */
-        .main-content-wrapper {
-            display: flex;
-            gap: 8px;
-            flex-grow: 1;
-            overflow: hidden;
-        }
-        
-        .nilai-column {
-            flex: 2.2;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .data-column {
-            flex: 1.8;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        /* --- END OF MAIN LAYOUT --- */
-
-        /* --- Right Column: Student Data (VERTICAL) --- */
-        .data-section {
-            margin-bottom: 8px;
-        }
-        .data-section-title {
-            font-weight: bold;
-            margin-bottom: 4px;
-            font-size: 8px;
-            text-decoration: underline;
-        }
-        .data-row {
-            display: flex;
-            margin-bottom: 4px;
-            align-items: flex-end;
-        }
-        .data-label {
-            width: 85px;
-            font-weight: normal;
-            padding-right: 4px;
-            flex-shrink: 0;
-            font-size: 8px;
-        }
-        .data-value {
-            flex: 1;
-            border-bottom: 0.6px dotted #000;
-            min-height: 12px;
-            font-size: 8px;
-            padding-bottom: 1px;
-        }
-        
-        /* --- Photo & Side Info Table --- */
-        .photo-info-container {
-            text-align: center;
-            margin-bottom: 8px;
-        }
-        .photo-box {
-            width: 70px;
-            height: 95px;
-            border: 1px solid #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 6px;
-        }
-        .photo-box img {
-            width: 68px;
-            height: 93px;
-            object-fit: cover;
-        }
-
-        /* --- Left Column: Grades Table (PANJANG) --- */
-        .hasil-prestasi-title {
-            text-align: center;
-            font-weight: 700;
-            margin: 0 0 6px;
-            font-size: 10px;
-        }
-        .table-responsive {
-            flex-grow: 1;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        .buku-induk-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 6px;
-            table-layout: fixed;
-            height: 100%;
-        }
-        .buku-induk-table th, .buku-induk-table td {
-            border: 1px solid #000;
-            padding: 2px 3px;
-            text-align: center;
-            vertical-align: middle;
-        }
-        .buku-induk-table th {
-            background-color: #f0f0f0;
-            font-weight: bold;
-            font-size: 6px;
-            padding: 2px 1px;
-        }
-        .buku-induk-table tbody td:first-child {
-            text-align: left;
-            font-weight: normal;
-            font-size: 6px;
-            padding: 2px 4px;
-            line-height: 1.1;
-        }
-        .buku-induk-table tbody td:not(:first-child) {
-            font-size: 5.5px;
-        }
-        .buku-induk-table th:first-child {
-            text-align: center;
-        }
-        .buku-induk-table tbody tr.group-row td {
-            background-color: #e8e8e8;
-            font-weight: bold;
-            text-align: left;
-            font-size: 6px;
-        }
-
-        /* --- Signature --- */
-        .signature-section {
-            margin-top: auto;
-            padding-top: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            font-size: 6px;
-        }
-        .signature-box {
-            text-align: center;
-            width: 110px;
-        }
-        .signature-box p {
-            margin: 0;
-            font-size: 8px;
-            line-height: 1.2;
-        }
-        .signature-line {
-            border-top: 1px solid #000;
-            height: 36px;
-            margin-top: 6px;
-        }
-        .stamp-box {
-            width: 45px;
-            height: 45px;
-            border: 1px solid #000;
-        }
-        .signature-info {
-            margin-top: 6px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .signature-box-small {
-            width: 110px;
-            height: 40px;
-            border: 1px solid #000;
-            margin-bottom: 4px;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Times New Roman', Times, serif; background-color: #fff; padding: 0; color: #000; line-height: 1.1; }
+        .container { max-width: 210mm; margin: 0 auto; background-color: white; padding: 8mm; height: 297mm; overflow: hidden; display: flex; flex-direction: column; }
+        .buku-induk-header { text-align: center; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 2px solid #000; }
+        .buku-induk-header h1 { font-size: 14px; margin-bottom: 2px; font-weight: bold; text-transform: uppercase; }
+        .buku-induk-header h2 { font-size: 9px; margin-bottom: 2px; font-weight: normal; }
+        .main-content-wrapper { display: flex; gap: 8px; flex-grow: 1; overflow: hidden; }
+        .nilai-column { flex: 2.2; display: flex; flex-direction: column; overflow: hidden; }
+        .data-column { flex: 1.8; display: flex; flex-direction: column; overflow: hidden; }
+        .data-section { margin-bottom: 8px; }
+        .data-section-title { font-weight: bold; margin-bottom: 4px; font-size: 8px; text-decoration: underline; }
+        .data-row { display: flex; margin-bottom: 4px; align-items: flex-end; }
+        .data-label { width: 85px; font-weight: normal; padding-right: 4px; flex-shrink: 0; font-size: 8px; }
+        .data-value { flex: 1; border-bottom: 0.6px dotted #000; min-height: 12px; font-size: 8px; padding-bottom: 1px; }
+        .photo-info-container { text-align: center; margin-bottom: 8px; }
+        .photo-box { width: 70px; height: 95px; border: 1px solid #000; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; }
+        .photo-box img { width: 68px; height: 93px; object-fit: cover; }
+        .hasil-prestasi-title { text-align: center; font-weight: 700; margin: 0 0 6px; font-size: 10px; }
+        .table-responsive { flex-grow: 1; overflow: hidden; display: flex; flex-direction: column; }
+        .buku-induk-table { width: 100%; border-collapse: collapse; font-size: 6px; table-layout: fixed; height: 100%; }
+        .buku-induk-table th, .buku-induk-table td { border: 1px solid #000; padding: 2px 3px; text-align: center; vertical-align: middle; }
+        .buku-induk-table th { background-color: #f0f0f0; font-weight: bold; font-size: 6px; padding: 2px 1px; }
+        .buku-induk-table tbody td:first-child { text-align: left; font-weight: normal; font-size: 6px; padding: 2px 4px; line-height: 1.1; }
+        .buku-induk-table tbody td:not(:first-child) { font-size: 5.5px; }
+        .buku-induk-table th:first-child { text-align: center; }
+        .buku-induk-table tbody tr.group-row td { background-color: #e8e8e8; font-weight: bold; text-align: left; font-size: 6px; }
+        .signature-section { margin-top: auto; padding-top: 8px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 6px; }
+        .signature-box { text-align: center; width: 110px; }
+        .signature-box p { margin: 0; font-size: 8px; line-height: 1.2; }
+        .signature-line { border-top: 1px solid #000; height: 36px; margin-top: 6px; }
+        .stamp-box { width: 45px; height: 45px; border: 1px solid #000; }
+        .signature-info { margin-top: 6px; display: flex; flex-direction: column; align-items: center; }
+        .signature-box-small { width: 110px; height: 40px; border: 1px solid #000; margin-bottom: 4px; }
         @media print {
-            @page { 
-                size: A4 portrait; 
-                margin: 5mm;
-                -webkit-print-color-adjust: exact;
-            }
-            body {
-                padding: 0;
-                margin: 0;
-            }
-            .container {
-                box-shadow: none;
-                width: 210mm;
-                height: 297mm;
-                overflow: hidden;
-                page-break-after: always;
-                padding: 5mm;
-                margin: 0;
-            }
-            .main-content-wrapper {
-                flex-direction: row;
-                height: calc(100% - 40px);
-            }
-            .buku-induk-table {
-                font-size: 6pt;
-            }
-            .data-label, .data-value {
-                font-size: 7pt;
-            }
-            .table-responsive {
-                height: 100%;
-            }
+            @page { size: A4 portrait; margin: 5mm; -webkit-print-color-adjust: exact; }
+            body { padding: 0; margin: 0; }
+            .container { box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; page-break-after: always; padding: 5mm; margin: 0; }
+            .main-content-wrapper { flex-direction: row; height: calc(100% - 40px); }
+            .buku-induk-table { font-size: 6pt; }
+            .data-label, .data-value { font-size: 7pt; }
+            .table-responsive { height: 100%; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="buku-induk-header">
             <h1>BUKU INDUK SISWA</h1>
             <h2>SMKN 1 KAWALI</h2>
-            <h2>KONSENTRASI: {{ $siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan ? $siswa->rombel->kelas->jurusan->nama : 'REKAYASA PERANGKAT LUNAK' }}</h2>
+            <h2>KONSENTRASI: {{ $konsentrasi ?? 'Tidak Tersedia' }}</h2>
         </div>
 
         <div class="main-content-wrapper">
-            <!-- KOLOM KIRI: TABEL NILAI -->
             <div class="nilai-column">
                 <div class="hasil-prestasi-title">HASIL PRESTASI PEMBELAJARAN</div>
                 <div class="table-responsive">
@@ -313,9 +115,17 @@
                                     @endforeach
                                 </tr>
                             @endif
-                            
-                            {{-- TAMBAHKAN BARIS KOSONG --}}
-                            @for ($i = 0; $i < 15; $i++)
+
+                            {{-- BARIS PRAKTEK KERJA LAPANGAN --}}
+                            <tr>
+                                <td>Praktek Kerja Lapangan</td>
+                                @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                    <td>{{ $siswa->pkl_nilai ?? '-' }}</td>
+                                    <td>{{ $siswa->pkl_nilai ?? '-' }}</td>
+                                @endforeach
+                            </tr>
+
+                            @for ($i = 0; $i < 14; $i++)
                                 <tr>
                                     <td>&nbsp;</td>
                                     @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
@@ -329,9 +139,7 @@
                 </div>
             </div>
 
-            <!-- KOLOM KANAN: DATA SISWA -->
             <div class="data-column">
-                <!-- Photo -->
                 <div class="photo-info-container">
                     <div class="photo-box">
                         @if($siswa->foto)
@@ -342,7 +150,6 @@
                     </div>
                 </div>
 
-                <!-- Data Siswa -->
                 <div class="data-section">
                     <div class="data-row">
                         <div class="data-label">NIS / NISN</div>
@@ -364,21 +171,16 @@
                         <div class="data-label">Warganegara</div>
                         <div class="data-value">{{ $siswa->kewarganegaraan ?? 'WNI' }}</div>
                     </div>
-                    <!-- ========================================== -->
-                    <!-- AGAMA - FIXED -->
-                    <!-- ========================================== -->
                     <div class="data-row">
                         <div class="data-label">Agama</div>
                         <div class="data-value">{{ $siswa->agama->nama ?? $siswa->agama_lainnya ?? '-' }}</div>
                     </div>
-                    <!-- ========================================== -->
                     <div class="data-row">
                         <div class="data-label">Alamat Siswa</div>
                         <div class="data-value">{{ $siswa->alamat ?? '-' }}</div>
                     </div>
                 </div>
 
-                <!-- Orang Tua -->
                 <div class="data-section">
                     <div class="data-row">
                         <div class="data-label">Nama Orang Tua</div>
@@ -414,7 +216,6 @@
                     </div>
                 </div>
 
-                <!-- Diterima -->
                 <div class="data-section">
                     <div class="data-section-title">Diterima menjadi Siswa</div>
                     <div class="data-row">
@@ -427,7 +228,6 @@
                     </div>
                 </div>
 
-                <!-- Meninggalkan Sekolah -->
                 <div class="data-section">
                     <div class="data-section-title">Meninggalkan Sekolah</div>
                     <div class="data-row">
@@ -452,7 +252,6 @@
                     </div>
                 </div>
 
-                <!-- Lulus/Tamat -->
                 <div class="data-section">
                     <div class="data-section-title">Lulus/Tamat</div>
                     <div class="data-row">
@@ -481,7 +280,6 @@
                     </div>
                 </div>
 
-                <!-- PKL -->
                 <div class="data-section">
                     <div class="data-section-title">Praktek Kerja Industri</div>
                     <div class="data-row">
@@ -502,7 +300,6 @@
                     </div>
                 </div>
                 
-                <!-- Signature -->
                 <div class="signature-section">
                     <div class="signature-info">
                         <div class="signature-box-small"></div>

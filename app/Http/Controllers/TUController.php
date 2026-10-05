@@ -79,22 +79,43 @@ class TUController extends Controller
         ));
     }
 
-    public function siswa(Request $request)
+       public function siswa(Request $request)
     {
         $query = DataSiswa::with(['user', 'rombel.kelas.jurusan', 'mutasiTerakhir'])
             ->orderBy('nama_lengkap', 'asc');
 
         $statusFilter = request()->query('status', 'aktif');
-        
+
+        // 🔥 DAFTAR STATUS TERMINAL — siswa yang keluar dari sistem
+        $terminalStatuses = ['lulus', 'pindah', 'do', 'meninggal'];
+
         if ($statusFilter === 'aktif') {
-            $query->whereDoesntHave('mutasiTerakhir', function($q) {
-                $q->where('status', 'lulus');
+            // Siswa aktif = TIDAK punya mutasi terminal (pindah/do/lulus/meninggal)
+            $query->whereDoesntHave('mutasiTerakhir', function ($q) use ($terminalStatuses) {
+                $q->whereIn('status', $terminalStatuses);
             });
         } elseif ($statusFilter === 'alumni') {
-            $query->whereHas('mutasiTerakhir', function($q) {
+            // Alumni = status lulus
+            $query->whereHas('mutasiTerakhir', function ($q) {
                 $q->where('status', 'lulus');
             });
+        } elseif ($statusFilter === 'pindah') {
+            // Khusus pindah
+            $query->whereHas('mutasiTerakhir', function ($q) {
+                $q->where('status', 'pindah');
+            });
+        } elseif ($statusFilter === 'do') {
+            // Khusus DO
+            $query->whereHas('mutasiTerakhir', function ($q) {
+                $q->where('status', 'do');
+            });
+        } elseif ($statusFilter === 'meninggal') {
+            // Khusus meninggal
+            $query->whereHas('mutasiTerakhir', function ($q) {
+                $q->where('status', 'meninggal');
+            });
         }
+        // 'semua' = gak ada filter
 
         $tingkat = request()->query('tingkat', null);
         if ($tingkat) {
@@ -153,64 +174,63 @@ class TUController extends Controller
         return view('tu.siswa.create', compact('jurusans', 'rombels', 'kelas', 'jenisKelamins', 'agamas'));
     }
 
-    public function siswaStore(Request $request)
-    {
-        $isAgamaLainnya = $request->input('agama_id') === 'other';
+public function siswaStore(Request $request)
+{
+    $isAgamaLainnya = $request->input('agama_id') === 'other';
 
-        if ($isAgamaLainnya) {
-            $request->merge(['agama_id' => null]);
-        }
-
-        $data = $request->validate([
-            'nama_lengkap' => 'required|string|max:255',
-            'nis' => 'nullable|string|max:30|unique:data_siswa,nis',
-            'nisn' => 'nullable|string|max:30|unique:data_siswa,nisn',
-            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-            'tempat_lahir' => 'nullable|string|max:100',
-            'tanggal_lahir' => 'nullable|date',
-            'agama_id' => 'nullable|exists:agamas,id',
-            'agama_lainnya' => 'required_without:agama_id|nullable|string|max:50',
-            'alamat' => 'nullable|string',
-            'rombel_id' => 'nullable|exists:rombels,id',
-            'password' => 'nullable|string|min:6|confirmed',
-        ]);
-
-        DB::beginTransaction();
-        try {
-            $userId = null;
-            if (!empty($data['password'])) {
-                $user = User::create([
-                    'name' => $data['nama_lengkap'],
-                    'email' => $data['nis'] . '@siswa.sch.id',
-                    'password' => Hash::make($data['password']),
-                    'role' => 'siswa',
-                ]);
-                $userId = $user->id;
-            }
-
-            $siswa = DataSiswa::create([
-                'user_id' => $userId,
-                'nama_lengkap' => $data['nama_lengkap'],
-                'nis' => $data['nis'] ?? null,
-                'nisn' => $data['nisn'] ?? null,
-                'jenis_kelamin' => $data['jenis_kelamin'],
-                'tempat_lahir' => $data['tempat_lahir'] ?? null,
-                'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
-                'agama_id' => $data['agama_id'] ?? null,
-                'agama_lainnya' => $isAgamaLainnya ? $data['agama_lainnya'] : null,
-                'alamat' => $data['alamat'] ?? null,
-                'rombel_id' => $data['rombel_id'] ?? null,
-            ]);
-
-            DB::commit();
-            return redirect()->route('tu.siswa.index')->with('success', 'Data siswa berhasil ditambahkan.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
+    if ($isAgamaLainnya) {
+        $request->merge(['agama_id' => null]);
     }
 
-    public function siswaDetail($id)
+    $data = $request->validate([
+        'nama_lengkap'     => 'required|string|max:255',
+        'nis'              => 'nullable|string|max:30|unique:data_siswa,nis',
+        'nisn'             => 'nullable|string|max:30|unique:data_siswa,nisn',
+        'jenis_kelamin_id' => 'required|exists:jenis_kelamins,id',  // ✅
+        'tempat_lahir'     => 'nullable|string|max:100',
+        'tanggal_lahir'    => 'nullable|date',
+        'agama_id'         => 'nullable|exists:agamas,id',
+        'agama_lainnya'    => 'required_without:agama_id|nullable|string|max:50',
+        'alamat'           => 'nullable|string',
+        'rombel_id'        => 'nullable|exists:rombels,id',
+        'password'         => 'nullable|string|min:6|confirmed',
+    ]);
+
+    DB::beginTransaction();
+    try {
+        $userId = null;
+        if (!empty($data['nis'])) {
+            $user = User::create([
+                'name'         => $data['nama_lengkap'],
+                'email'        => $data['nis'] . '@siswa.sch.id',
+                'password'     => Hash::make($data['nis'] . '123'),
+                'role'         => 'siswa',
+                'nomor_induk'  => $data['nis'],
+            ]);
+            $userId = $user->id;
+        }
+
+        DataSiswa::create([
+            'user_id'          => $userId,
+            'nama_lengkap'     => $data['nama_lengkap'],
+            'nis'              => $data['nis'] ?? null,
+            'nisn'             => $data['nisn'] ?? null,
+            'jenis_kelamin_id' => $data['jenis_kelamin_id'],  // ✅
+            'tempat_lahir'     => $data['tempat_lahir'] ?? null,
+            'tanggal_lahir'    => $data['tanggal_lahir'] ?? null,
+            'agama_id'         => $data['agama_id'] ?? null,
+            'agama_lainnya'    => $isAgamaLainnya ? $data['agama_lainnya'] : null,
+            'alamat'           => $data['alamat'] ?? null,
+            'rombel_id'        => $data['rombel_id'] ?? null,
+        ]);
+
+        DB::commit();
+        return redirect()->route('tu.siswa.index')->with('success', 'Data siswa berhasil ditambahkan.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
+}    public function siswaDetail($id)
     {
         $siswa = DataSiswa::with(['user', 'nilaiRaports', 'rombel.kelas'])->findOrFail($id);
         return view('tu.siswa.data-diri.show', compact('siswa'));
@@ -243,7 +263,7 @@ class TUController extends Controller
             'nama_lengkap' => 'required|string|max:255',
             'nis' => 'nullable|string|max:20|unique:data_siswa,nis,' . $id,
             'nisn' => 'nullable|string|max:20|unique:data_siswa,nisn,' . $id,
-            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
+            'jenis_kelamin_id' => 'required|exists:jenis_kelamins,id',
             'tempat_lahir' => 'nullable|string|max:255',
             'tanggal_lahir' => 'nullable|date',
             'agama_id' => 'nullable|exists:agamas,id',
@@ -272,7 +292,7 @@ class TUController extends Controller
                 'nama_lengkap' => $request->nama_lengkap,
                 'nis' => $request->nis,
                 'nisn' => $request->nisn,
-                'jenis_kelamin' => $request->jenis_kelamin,
+                'jenis_kelamin_id' => $request->jenis_kelamin_id,
                 'tempat_lahir' => $request->tempat_lahir,
                 'tanggal_lahir' => $request->tanggal_lahir,
                 'agama_id' => $isAgamaLainnya ? null : $request->agama_id,
@@ -299,8 +319,8 @@ class TUController extends Controller
                 if ($request->filled('email')) {
                     $siswa->user->email = $request->email;
                 }
-                if ($request->filled('password')) {
-                    $siswa->user->password = Hash::make($request->password);
+                if ($request->filled('nis')) {
+                    $siswa->user->nomor_induk = $request->nis;
                 }
                 $siswa->user->save();
             }

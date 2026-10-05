@@ -15,7 +15,9 @@ class DataSiswa extends Model
         'nisn',
         'tempat_lahir',
         'tanggal_lahir',
+        'jenis_kelamin',
         'jenis_kelamin_id',
+        'agama',
         'agama_id',
         'agama_lainnya',
         'kewarganegaraan',
@@ -45,10 +47,32 @@ class DataSiswa extends Model
         'foto',
         'catatan_wali_kelas',
         'rombel_id',
+        'kelas_id',
         'kurikulum_id',
         'ayah_id',
         'ibu_id',
         'wali_id',
+        'pkl_nilai',
+        'pkl_sertifikat',
+        'pkl_nama_industri',
+        'pkl_alamat',
+        'ijazah_nomor',
+        'ijazah_tanggal',
+        'transkip_nomor',
+        'transkip_tanggal',
+        'tanggal_lulus',
+        'status_kelulusan',
+    ];
+
+    // ============================================
+    // 🔥 CASTS — Fix tanggal biar otomatis jadi Carbon
+    // ============================================
+    protected $casts = [
+        'tanggal_diterima' => 'date',
+        'tanggal_lahir' => 'date',
+        'tanggal_lulus' => 'date',
+        'ijazah_tanggal' => 'date',
+        'transkip_tanggal' => 'date',
     ];
 
     // ============================================
@@ -103,6 +127,11 @@ class DataSiswa extends Model
     public function rombel()
     {
         return $this->belongsTo(Rombel::class);
+    }
+
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class, 'kelas_id');
     }
 
     public function kurikulum()

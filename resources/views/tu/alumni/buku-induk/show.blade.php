@@ -4,330 +4,419 @@
 
 @section('content')
 <style>
-    :root {
-        --primary: #4F46E5;
-        --primary-dark: #4338CA;
-    }
-
     .buku-induk-container {
         font-family: 'Times New Roman', Times, serif;
-        line-height: 1.6;
-    }
-
-    .buku-induk-header {
-        text-align: center;
-        margin-bottom: 30px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #333;
-    }
-
-    .buku-induk-header h2 {
-        font-weight: bold;
-        font-size: 24px;
-    }
-
-    .buku-induk-header h4 {
-        font-size: 18px;
-    }
-
-    .buku-induk-photo {
-        width: 150px;
-        height: 200px;
-        border: 1px solid #ddd;
-        object-fit: cover;
-    }
-
-    .buku-induk-section {
-        margin-bottom: 25px;
-    }
-
-    .buku-induk-section h5 {
-        font-weight: bold;
-        margin-bottom: 15px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid #ddd;
-        color: var(--primary);
-    }
-
-    .info-item {
-        margin-bottom: 6px;
-        font-size: 14px;
-    }
-
-    .info-item strong {
-        font-weight: 600;
-        min-width: 140px;
-        display: inline-block;
-    }
-
-    .table-buku-induk {
-        font-size: 12px;
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .table-buku-induk th,
-    .table-buku-induk td {
-        border: 1px solid #000;
-        padding: 6px 8px;
-        text-align: center;
-    }
-
-    .table-buku-induk th {
-        background-color: #f0f0f0;
-        font-weight: bold;
-    }
-
-    .table-buku-induk td:first-child {
-        text-align: left;
-    }
-
-    .badge-status {
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .badge-lulus {
-        background: #10B981;
-        color: white;
-    }
-
-    .badge-belum {
-        background: #F59E0B;
-        color: white;
-    }
-
-    .btn-print {
-        background: var(--primary);
-        color: white;
-        border: none;
-        padding: 10px 20px;
+        line-height: 1.1;
+        background-color: #fff;
+        padding: 8mm;
+        max-width: 210mm;
+        margin: 20px auto;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
         border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
+    }
+    .page-header, .page-title, .page-title i, .action-buttons .btn, .action-buttons .btn * {
+        font-family: 'Poppins', sans-serif !important;
+    }
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f8f9fa;
+        color: #000;
+        line-height: 1.1;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    .main-content-wrapper {
+        display: flex;
         gap: 8px;
+        flex-grow: 1;
+        overflow: hidden;
+        margin-top: 10px;
     }
-
-    .btn-print:hover {
-        background: var(--primary-dark);
-        transform: translateY(-2px);
-        color: white;
+    .nilai-column { flex: 2.2; display: flex; flex-direction: column; overflow: hidden; }
+    .data-column { flex: 1.8; display: flex; flex-direction: column; overflow: hidden; }
+    .data-section { margin-bottom: 6px; }
+    .data-section-title { font-weight: bold; margin-bottom: 3px; font-size: 8px; text-decoration: underline; }
+    .data-row { display: flex; margin-bottom: 2px; align-items: flex-end; }
+    .data-label { width: 85px; font-weight: normal; padding-right: 4px; flex-shrink: 0; font-size: 8px; }
+    .data-value { flex: 1; border-bottom: 0.6px dotted #000; min-height: 12px; font-size: 8px; padding-bottom: 1px; }
+    .photo-info-container { text-align: center; margin-bottom: 8px; }
+    .photo-box { width: 70px; height: 95px; border: 1px solid #000; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; background: #f8f9fa; }
+    .photo-box img { width: 68px; height: 93px; object-fit: cover; }
+    .photo-box .no-photo { font-size: 8px; color: #999; }
+    .hasil-prestasi-title { text-align: center; font-weight: 700; margin: 0 0 6px; font-size: 10px; }
+    .table-responsive { flex-grow: 1; overflow: hidden; display: flex; flex-direction: column; }
+    .buku-induk-table { width: 100%; border-collapse: collapse; font-size: 6px; table-layout: fixed; height: 100%; }
+    .buku-induk-table th, .buku-induk-table td { border: 1px solid #000; padding: 2px 3px; text-align: center; vertical-align: middle; }
+    .buku-induk-table th { background-color: #f0f0f0; font-weight: bold; font-size: 6px; padding: 2px 1px; }
+    .buku-induk-table tbody td:first-child { text-align: left; font-weight: normal; font-size: 6px; padding: 2px 4px; line-height: 1.1; }
+    .buku-induk-table tbody td:not(:first-child) { font-size: 5.5px; }
+    .buku-induk-table th:first-child { text-align: center; }
+    .buku-induk-table tbody tr.group-row td { background-color: #e8e8e8; font-weight: bold; text-align: left; font-size: 6px; }
+    .signature-section { margin-top: auto; padding-top: 8px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 6px; }
+    .signature-box { text-align: center; width: 110px; }
+    .signature-box p { margin: 0; font-size: 8px; line-height: 1.2; }
+    .signature-line { border-top: 1px solid #000; height: 36px; margin-top: 6px; }
+    .stamp-box { width: 45px; height: 45px; border: 1px solid #000; }
+    .signature-info { margin-top: 6px; display: flex; flex-direction: column; align-items: center; }
+    .signature-box-small { width: 110px; height: 40px; border: 1px solid #000; margin-bottom: 4px; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 15px; flex-wrap: wrap; }
+    .page-title { font-size: clamp(18px, 4vw, 24px); margin: 0; font-family: 'Poppins', sans-serif !important; }
+    .page-title i { color: #2F53FF; font-family: 'Font Awesome 6 Free' !important; }
+    .action-buttons { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .action-buttons .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 24px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.3s ease; text-decoration: none; min-height: 44px; min-width: 120px; font-family: 'Poppins', sans-serif !important; border: none; cursor: pointer; }
+    .action-buttons .btn i { font-size: 16px; font-family: 'Font Awesome 6 Free', 'FontAwesome', sans-serif !important; font-weight: 900; }
+    .action-buttons .btn-outline-secondary { background: #f1f5f9; color: #475569; border: 2px solid #e2e8f0; }
+    .action-buttons .btn-outline-secondary:hover { background: #e2e8f0; color: #1e293b; border-color: #cbd5e1; transform: translateY(-2px); text-decoration: none; }
+    .action-buttons .btn-warning { background: #f59e0b; color: white; border: none; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
+    .action-buttons .btn-warning:hover { background: #d97706; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4); color: white; text-decoration: none; }
+    .action-buttons .btn-primary { background: linear-gradient(135deg, #2F53FF, #6366F1); color: white; border: none; box-shadow: 0 4px 12px rgba(47, 83, 255, 0.3); }
+    .action-buttons .btn-primary:hover { background: linear-gradient(135deg, #6366F1, #2F53FF); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(47, 83, 255, 0.4); color: white; text-decoration: none; }
+    .buku-induk-header { text-align: center; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 2px solid #000; }
+    .buku-induk-header h1 { font-size: 14px; margin-bottom: 2px; font-weight: bold; text-transform: uppercase; }
+    .buku-induk-header h2 { font-size: 9px; margin-bottom: 2px; font-weight: normal; }
+    @media print {
+        @page { size: A4 portrait; margin: 5mm; -webkit-print-color-adjust: exact; }
+        body { padding: 0; margin: 0; background-color: white; }
+        .buku-induk-container { box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; page-break-after: always; padding: 5mm; margin: 0; border-radius: 0; }
+        .main-content-wrapper { flex-direction: row; height: calc(100% - 40px); }
+        .buku-induk-table { font-size: 6pt; }
+        .data-label, .data-value { font-size: 7pt; }
+        .table-responsive { height: 100%; }
+        .page-header, .action-buttons, .btn { display: none !important; }
+        .buku-induk-header h1 { font-size: 14pt; }
+        .buku-induk-header h2 { font-size: 9pt; }
+        .hasil-prestasi-title { font-size: 10pt; }
+        .signature-box p { font-size: 8pt; }
     }
-
-    .btn-back {
-        background: #e2e8f0;
-        color: #1e293b;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .btn-back:hover {
-        background: #cbd5e1;
-        transform: translateY(-2px);
-        color: #1e293b;
-    }
-
     @media (max-width: 768px) {
-        .info-item strong {
-            min-width: 100px;
-            font-size: 13px;
-        }
-        .info-item {
-            font-size: 13px;
-        }
-        .table-buku-induk {
-            font-size: 10px;
-        }
-        .buku-induk-photo {
-            width: 100px;
-            height: 133px;
-        }
+        .buku-induk-container { padding: 4mm; margin: 10px; }
+        .main-content-wrapper { flex-direction: column; }
+        .nilai-column, .data-column { flex: 1; }
+        .page-header { flex-direction: column; align-items: stretch; }
+        .action-buttons { flex-direction: column; width: 100%; }
+        .action-buttons .btn { width: 100%; min-width: unset; justify-content: center; padding: 12px 20px; }
+        .data-label { width: 70px; font-size: 7px; }
+        .data-value { font-size: 7px; }
+    }
+    @media (max-width: 576px) {
+        .buku-induk-container { padding: 3mm; margin: 5px; }
+        .action-buttons .btn { font-size: 13px; padding: 10px 16px; min-height: 40px; }
+        .page-title { font-size: 18px; }
+        .photo-box { width: 60px; height: 80px; }
+        .photo-box img { width: 58px; height: 78px; }
     }
 </style>
 
-<div class="container-fluid py-4 buku-induk-container">
-
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <h2 class="mb-0">
-            <i class="fas fa-book text-primary"></i> Buku Induk Alumni
-        </h2>
-        <div class="d-flex gap-2">
-            <a href="{{ route('tu.alumni.show', $siswa->id) }}" class="btn-back">
+<div class="buku-induk-container">
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-book"></i> Buku Induk Alumni
+        </h1>
+        <div class="action-buttons">
+            <a href="{{ route('tu.alumni.show', $siswa->id) }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
-            <a href="{{ route('tu.alumni.buku-induk.cetak', $siswa->id) }}" target="_blank" class="btn-print">
-                <i class="fas fa-print"></i> Cetak PDF
+            <a href="{{ route('tu.buku-induk.edit', $siswa->id) }}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{{ route('tu.alumni.buku-induk.cetak', $siswa->id) }}" target="_blank" class="btn btn-primary">
+                <i class="fas fa-print"></i> Cetak
             </a>
         </div>
     </div>
 
-    <!-- Card -->
-    <div class="card shadow-sm">
-        <div class="card-body">
+    <div class="buku-induk-header">
+        <h1>BUKU INDUK SISWA</h1>
+        <h2>SMKN 1 KAWALI</h2>
+        <h2>KONSENTRASI: {{ $konsentrasi ?? 'Tidak Tersedia' }}</h2>
+    </div>
 
-            <!-- Header Buku Induk -->
-            <div class="buku-induk-header">
-                <h2>BUKU INDUK SISWA ALUMNI</h2>
-                <h4>SMK NEGERI 1 KAWALI</h4>
-                <p class="text-muted" style="font-size: 14px;">
-                    Konsentrasi Keahlian: 
-                    {{ $siswa->rombel && $siswa->rombel->kelas && $siswa->rombel->kelas->jurusan 
-                        ? $siswa->rombel->kelas->jurusan->nama 
-                        : 'Tidak tersedia' }}
-                </p>
+    <div class="main-content-wrapper">
+        <div class="nilai-column">
+            <div class="hasil-prestasi-title">HASIL PRESTASI PEMBELAJARAN</div>
+            <div class="table-responsive">
+                <table class="buku-induk-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="3" style="width: 35%;">MATA PELAJARAN</th>
+                            @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                <th colspan="2" class="text-center">{{ $tahunAjaran }}</th>
+                            @endforeach
+                        </tr>
+                        <tr>
+                            @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                <th style="width: 10%;">1</th>
+                                <th style="width: 10%;">2</th>
+                            @endforeach
+                        </tr>
+                        <tr>
+                            @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                <th>NILAI</th>
+                                <th>NILAI</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(count($nilaiByKelompok['byKelompok']) > 0)
+                            @foreach($nilaiByKelompok['byKelompok'] as $kelompok => $mapelGroup)
+                                <tr class="group-row">
+                                    <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}">
+                                        @if($kelompok === 'A')
+                                            A. KELOMPOK MATA PELAJARAN UMUM
+                                        @elseif($kelompok === 'B')
+                                            B. KELOMPOK MATA PELAJARAN KEJURUAN
+                                        @else
+                                            {{ strtoupper($kelompok) }}
+                                        @endif
+                                    </td>
+                                </tr>
+                                @foreach($mapelGroup as $mapelNama => $mapelData)
+                                    <tr>
+                                        <td>{{ $mapelData['nama'] }}</td>
+                                        @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                            <td>{{ $mapelData['nilai'][$tahunAjaran][1] ?? '-' }}</td>
+                                            <td>{{ $mapelData['nilai'][$tahunAjaran][2] ?? '-' }}</td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
+                            @endforeach
+                        @else
+                            <tr class="group-row">
+                                <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}">A. KELOMPOK MATA PELAJARAN UMUM</td>
+                            </tr>
+                            <tr>
+                                <td>-</td>
+                                @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                    <td>-</td>
+                                    <td>-</td>
+                                @endforeach
+                            </tr>
+                            <tr class="group-row">
+                                <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}">B. KELOMPOK MATA PELAJARAN KEJURUAN</td>
+                            </tr>
+                            <tr>
+                                <td>-</td>
+                                @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                    <td>-</td>
+                                    <td>-</td>
+                                @endforeach
+                            </tr>
+                        @endif
+
+                        {{-- BARIS KOSONG (biar tabel penuh) --}}
+                        @for ($i = 0; $i < 14; $i++)
+                            <tr>
+                                <td>&nbsp;</td>
+                                @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                @endforeach
+                            </tr>
+                        @endfor
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="data-column">
+            <div class="photo-info-container">
+                <div class="photo-box">
+                    @if($siswa->user && $siswa->user->photo)
+                        <img src="{{ asset('storage/' . $siswa->user->photo) }}" alt="{{ $siswa->nama_lengkap }}" onerror="this.style.display='none'">
+                    @elseif($siswa->foto)
+                        <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->nama_lengkap }}" onerror="this.style.display='none'">
+                    @else
+                        <span class="no-photo">Photo</span>
+                    @endif
+                </div>
             </div>
 
-            <!-- Data Pribadi -->
-            <div class="row">
-                <div class="col-md-9">
-                    <!-- A. Data Pribadi -->
-                    <div class="buku-induk-section">
-                        <h5>A. DATA PRIBADI SISWA</h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="info-item"><strong>NIS:</strong> {{ $siswa->nis ?? '-' }}</div>
-                                <div class="info-item"><strong>NISN:</strong> {{ $siswa->nisn ?? '-' }}</div>
-                                <div class="info-item"><strong>Nama Lengkap:</strong> {{ $siswa->nama_lengkap ?? '-' }}</div>
-                                <div class="info-item"><strong>Jenis Kelamin:</strong> 
-                                    {{ $siswa->jenisKelamin->nama ?? $siswa->jenis_kelamin ?? '-' }}
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="info-item"><strong>Tempat Lahir:</strong> {{ $siswa->tempat_lahir ?? '-' }}</div>
-                                <div class="info-item"><strong>Tanggal Lahir:</strong> 
-                                    {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d F Y') : '-' }}
-                                </div>
-                                <div class="info-item"><strong>Agama:</strong> 
-                                    {{ $siswa->agama->nama ?? $siswa->agama_lainnya ?? '-' }}
-                                </div>
-                                <div class="info-item"><strong>Alamat:</strong> {{ $siswa->alamat ?? '-' }}</div>
-                            </div>
-                        </div>
+            <div class="data-section">
+                <div class="data-row">
+                    <div class="data-label">NIS / NISN</div>
+                    <div class="data-value">{{ $siswa->nis ?? '-' }} / {{ $siswa->nisn ?? '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Nama Lengkap</div>
+                    <div class="data-value">{{ $siswa->nama_lengkap ?? '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Jenis Kelamin</div>
+                    <div class="data-value">
+                        @php
+                            $jk = $siswa->jenisKelamin->nama ?? $siswa->jenis_kelamin ?? '';
+                            $jkShort = stripos($jk, 'perempuan') !== false ? 'P' : (stripos($jk, 'laki') !== false ? 'L' : '-');
+                        @endphp
+                        {{ $jkShort }}
                     </div>
-
-                    <!-- B. Orang Tua -->
-                    <div class="buku-induk-section">
-                        <h5>B. DATA ORANG TUA / WALI</h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="info-item"><strong>Nama Ayah:</strong> {{ $siswa->ayah->nama ?? $siswa->nama_ayah ?? '-' }}</div>
-                                <div class="info-item"><strong>Pekerjaan Ayah:</strong> {{ $siswa->ayah->pekerjaan ?? $siswa->pekerjaan_ayah ?? '-' }}</div>
-                                <div class="info-item"><strong>Nama Ibu:</strong> {{ $siswa->ibu->nama ?? $siswa->nama_ibu ?? '-' }}</div>
-                                <div class="info-item"><strong>Pekerjaan Ibu:</strong> {{ $siswa->ibu->pekerjaan ?? $siswa->pekerjaan_ibu ?? '-' }}</div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="info-item"><strong>Nama Wali:</strong> {{ $siswa->wali->nama ?? $siswa->nama_wali ?? '-' }}</div>
-                                <div class="info-item"><strong>Pekerjaan Wali:</strong> {{ $siswa->wali->pekerjaan ?? $siswa->pekerjaan_wali ?? '-' }}</div>
-                                <div class="info-item"><strong>Alamat Wali:</strong> {{ $siswa->wali->alamat ?? $siswa->alamat_wali ?? '-' }}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- C. Status Mutasi -->
-                    <div class="buku-induk-section">
-                        <h5>C. STATUS MUTASI</h5>
-                        @if($siswa->mutasiTerakhir)
-                            <div class="info-item">
-                                <strong>Status:</strong> 
-                                <span class="badge-status badge-lulus">LULUS</span>
-                            </div>
-                            <div class="info-item"><strong>Tahun Ajaran:</strong> {{ $siswa->mutasiTerakhir->tahun_ajaran ?? '-' }}</div>
-                            <div class="info-item"><strong>Semester:</strong> {{ $siswa->mutasiTerakhir->semester ?? '-' }}</div>
-                            <div class="info-item"><strong>Catatan:</strong> {{ $siswa->mutasiTerakhir->catatan ?? '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Tempat/Tgl.Lahir</div>
+                    <div class="data-value">{{ $siswa->tempat_lahir ?? '-' }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d F Y') : '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Warganegara</div>
+                    <div class="data-value">{{ $siswa->kewarganegaraan ?? 'WNI' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Agama</div>
+                    <div class="data-value">
+                        @if($siswa->agama_id)
+                            {{ $siswa->agama->nama ?? '-' }}
+                        @elseif($siswa->agama_lainnya)
+                            {{ $siswa->agama_lainnya }}
                         @else
-                            <div class="info-item">
-                                <strong>Status:</strong> 
-                                <span class="badge-status badge-belum">Belum Ada Data</span>
-                            </div>
+                            -
                         @endif
                     </div>
                 </div>
-
-                <!-- Photo -->
-                <div class="col-md-3 text-center">
-                    @if($siswa->foto)
-                        <img src="{{ asset('storage/' . $siswa->foto) }}" alt="Foto" class="buku-induk-photo">
-                    @else
-                        <div class="buku-induk-photo d-flex align-items-center justify-content-center bg-light" style="border: 1px solid #ddd;">
-                            <span class="text-muted">Tidak ada foto</span>
-                        </div>
-                    @endif
-                    <p class="mt-2 text-muted" style="font-size: 12px;">Foto Siswa</p>
+                <div class="data-row">
+                    <div class="data-label">Alamat Siswa</div>
+                    <div class="data-value">
+                        @if($siswa->dusun || $siswa->kelurahan)
+                            Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}
+                        @else
+                            {{ $siswa->alamat ?? '-' }}
+                        @endif
+                    </div>
                 </div>
             </div>
 
-            <!-- Nilai Raport -->
-            <div class="buku-induk-section">
-                <h5>D. HASIL PRESTASI PEMBELAJARAN</h5>
-                <div class="table-responsive">
-                    <table class="table-buku-induk">
-                        <thead>
-                            <tr>
-                                <th rowspan="3" style="width: 35%;">MATA PELAJARAN</th>
-                                @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
-                                    <th colspan="2" class="text-center">{{ $tahunAjaran }}</th>
-                                @endforeach
-                            </tr>
-                            <tr>
-                                @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
-                                    <th style="width: 8%;">1</th>
-                                    <th style="width: 8%;">2</th>
-                                @endforeach
-                            </tr>
-                            <tr>
-                                @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
-                                    <th>NILAI</th>
-                                    <th>NILAI</th>
-                                @endforeach
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if(count($nilaiByKelompok['byKelompok']) > 0)
-                                @foreach($nilaiByKelompok['byKelompok'] as $kelompok => $mapelGroup)
-                                    <tr style="background-color: #f0f0f0; font-weight: bold;">
-                                        <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}">
-                                            @if($kelompok === 'A')
-                                                A. KELOMPOK MATA PELAJARAN UMUM
-                                            @elseif($kelompok === 'B')
-                                                B. KELOMPOK MATA PELAJARAN KEAHLIAN
-                                            @else
-                                                {{ strtoupper($kelompok) }}
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    @foreach($mapelGroup as $mapelNama => $mapelData)
-                                        <tr>
-                                            <td>{{ $mapelData['nama'] }}</td>
-                                            @foreach($nilaiByKelompok['tahunAjaranList'] as $tahunAjaran)
-                                                <td>{{ $mapelData['nilai'][$tahunAjaran][1] ?? '-' }}</td>
-                                                <td>{{ $mapelData['nilai'][$tahunAjaran][2] ?? '-' }}</td>
-                                            @endforeach
-                                        </tr>
-                                    @endforeach
-                                @endforeach
-                            @else
-                                <tr>
-                                    <td colspan="{{ 1 + (count($nilaiByKelompok['tahunAjaranList']) * 2) }}" class="text-center">Belum ada data nilai</td>
-                                </tr>
-                            @endif
-                        </tbody>
-                    </table>
+            <div class="data-section">
+                <div class="data-row">
+                    <div class="data-label">Nama Orang Tua</div>
+                    <div class="data-value"></div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">a. Ayah</div>
+                    <div class="data-value">{{ $siswa->ayah->nama ?? $siswa->nama_ayah ?? '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">b. Ibu</div>
+                    <div class="data-value">{{ $siswa->ibu->nama ?? $siswa->nama_ibu ?? '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">c. Pekerjaan Ayah</div>
+                    <div class="data-value">{{ $siswa->ayah->pekerjaan ?? $siswa->pekerjaan_ayah ?? '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">d. Alamat Rumah</div>
+                    <div class="data-value">
+                        @if($siswa->dusun || $siswa->kelurahan)
+                            Dusun {{ $siswa->dusun ?? '-' }}, RT/RW {{ $siswa->rt ?? '-' }}/{{ $siswa->rw ?? '-' }}, {{ $siswa->kelurahan ?? '-' }}, {{ $siswa->kecamatan ?? '-' }}, {{ $siswa->kode_pos ?? '-' }}
+                        @else
+                            {{ $siswa->alamat ?? '-' }}
+                        @endif
+                    </div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Nama Wali</div>
+                    <div class="data-value">{{ $siswa->wali->nama ?? $siswa->nama_wali ?? '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">a. Pekerjaan</div>
+                    <div class="data-value">{{ $siswa->wali->pekerjaan ?? $siswa->pekerjaan_wali ?? '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">b. Alamat Rumah</div>
+                    <div class="data-value">{{ $siswa->wali->alamat ?? $siswa->alamat_wali ?? '-' }}</div>
                 </div>
             </div>
 
+            <div class="data-section">
+                <div class="data-section-title">Diterima menjadi Siswa</div>
+                <div class="data-row">
+                    <div class="data-label">a. Mulai Tanggal</div>
+                    <div class="data-value">{{ $siswa->tanggal_diterima ? \Carbon\Carbon::parse($siswa->tanggal_diterima)->format('d F Y') : '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">b. Asal sekolah</div>
+                    <div class="data-value">{{ $siswa->sekolah_asal ?? '-' }}</div>
+                </div>
+            </div>
+
+            <div class="data-section">
+                <div class="data-section-title">Meninggalkan Sekolah</div>
+                <div class="data-row">
+                    <div class="data-label">a. Tanggal</div>
+                    <div class="data-value">
+                        @if($siswa->mutasiTerakhir)
+                            {{ $siswa->mutasiTerakhir->tanggal_mutasi ? \Carbon\Carbon::parse($siswa->mutasiTerakhir->tanggal_mutasi)->format('d F Y') : '-' }}
+                        @elseif($siswa->tanggal_lulus)
+                            {{ \Carbon\Carbon::parse($siswa->tanggal_lulus)->format('d F Y') }}
+                        @else
+                            -
+                        @endif
+                    </div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">b. Alasan</div>
+                    <div class="data-value">
+                        @if($siswa->mutasiTerakhir && $siswa->mutasiTerakhir->alasan_pindah)
+                            {{ $siswa->mutasiTerakhir->alasan_pindah }}
+                        @elseif($siswa->status_kelulusan)
+                            {{ $siswa->status_kelulusan }}
+                        @else
+                            Lulus
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-section">
+                <div class="data-section-title">Lulus/Tamat</div>
+                <div class="data-row">
+                    <div class="data-label">a. Nomor Ijazah</div>
+                    <div class="data-value">{{ $siswa->ijazah_nomor ?? '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">b. Tanggal Ijazah</div>
+                    <div class="data-value">{{ $siswa->ijazah_tanggal ? \Carbon\Carbon::parse($siswa->ijazah_tanggal)->format('d F Y') : '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">c. Nomor Transkip</div>
+                    <div class="data-value">{{ $siswa->transkip_nomor ?? '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">d. Tanggal Transkip</div>
+                    <div class="data-value">{{ $siswa->transkip_tanggal ? \Carbon\Carbon::parse($siswa->transkip_tanggal)->format('d F Y') : '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">e. Tanggal Lulus</div>
+                    <div class="data-value">{{ $siswa->tanggal_lulus ? \Carbon\Carbon::parse($siswa->tanggal_lulus)->format('d F Y') : '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">f. Status Kelulusan</div>
+                    <div class="data-value">{{ $siswa->status_kelulusan ?? '-' }}</div>
+                </div>
+            </div>
+
+            <div class="data-section">
+                <div class="data-section-title">Praktek Kerja Industri</div>
+                <div class="data-row">
+                    <div class="data-label">a. Nilai</div>
+                    <div class="data-value">{{ $siswa->pkl_nilai ?? '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">b. Nomor Sertifikat</div>
+                    <div class="data-value">{{ $siswa->pkl_sertifikat ?? '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">c. Nama Industri</div>
+                    <div class="data-value">{{ $siswa->pkl_nama_industri ?? '-' }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">d. Alamat</div>
+                    <div class="data-value">{{ $siswa->pkl_alamat ?? '-' }}</div>
+                </div>
+            </div>
+
+            <div class="signature-section">
+                <div class="signature-info">
+                    <div class="signature-box-small"></div>
+                    <p>Mengetahui</p>
+                    <p>Kepala Sekolah</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>

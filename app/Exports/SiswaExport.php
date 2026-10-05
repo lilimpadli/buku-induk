@@ -23,52 +23,70 @@ class SiswaExport implements FromCollection, WithHeadings, ShouldAutoSize, WithE
     }
 
     public function collection()
-    {
-        $query = DataSiswa::with(['rombel.kelas.jurusan'])->orderBy('nama_lengkap');
+{
+    $query = DataSiswa::with(['rombel.kelas.jurusan'])->orderBy('nama_lengkap');
 
-        if ($this->tingkat) {
-            $query->whereHas('rombel.kelas', function ($q) {
-                $q->where('tingkat', $this->tingkat);
-            });
-        }
+    // 🔥 TAMBAHAN: Exclude alumni dari mutasi (lowercase 'lulus')
+    $query->whereDoesntHave('mutasis', function ($q) {
+        $q->whereRaw('LOWER(status) = ?', ['lulus']);
+    });
 
-        if ($this->search) {
-            $query->where(function ($q) {
-                $q->where('nama_lengkap', 'like', "%{$this->search}%")
-                    ->orWhere('nis', 'like', "%{$this->search}%")
-                    ->orWhere('nisn', 'like', "%{$this->search}%");
-            });
-        }
+    // 🔥 TAMBAHAN: Exclude alumni dari kenaikan_kelas (case-insensitive)
+    $excludedIds = \App\Models\KenaikanKelas::whereRaw('LOWER(status) = ?', ['lulus'])
+        ->pluck('siswa_id')
+        ->unique()
+        ->filter()
+        ->toArray();
 
-        if ($this->rombel) {
-            $query->where('rombel_id', $this->rombel);
-        }
-
-        return $query->get()->map(function ($siswa, $index) {
-            $rombelModel = $siswa->rombel;
-            $kelasModel = $rombelModel ? $rombelModel->kelas : null;
-            $jurusanModel = $kelasModel ? $kelasModel->jurusan : null;
-
-            $rombel = $rombelModel ? $rombelModel->nama : '';
-            $kelas = $kelasModel ? $kelasModel->tingkat : '';
-            $jurusan = $jurusanModel ? $jurusanModel->nama : '';
-            $tanggalLahir = $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d-m-Y') : '';
-
-            return [
-                    'No' => $index + 1,
-                    'NIS' => $siswa->nis ?? '',
-                    'NISN' => $siswa->nisn ?? '',
-                    'Nama Lengkap' => $siswa->nama_lengkap ?? '',
-                    'Jenis Kelamin' => $siswa->jenis_kelamin ?? '',
-                    'Tempat Lahir' => $siswa->tempat_lahir ?? '',
-                    'Tanggal Lahir' => $tanggalLahir,
-                    'Alamat' => $siswa->alamat ?? '',
-                    'Kelas' => $kelas,
-                    'Rombel' => $rombel,
-                    'Jurusan' => $jurusan,
-                ];
-            });
+    if (!empty($excludedIds)) {
+        $query->whereNotIn('id', $excludedIds);
     }
+
+    if ($this->tingkat) {
+        $query->whereHas('rombel.kelas', function ($q) {
+            $q->where('tingkat', $this->tingkat);
+        });
+    }
+
+    if ($this->search) {
+        $query->where(function ($q) {
+            $q->where('nama_lengkap', 'like', "%{$this->search}%")
+                ->orWhere('nis', 'like', "%{$this->search}%")
+                ->orWhere('nisn', 'like', "%{$this->search}%");
+        });
+    }
+
+    if ($this->rombel) {
+        $query->where('rombel_id', $this->rombel);
+    }
+
+    return $query->get()->map(function ($siswa, $index) {
+        $rombelModel = $siswa->rombel;
+        $kelasModel = $rombelModel ? $rombelModel->kelas : null;
+        $jurusanModel = $kelasModel ? $kelasModel->jurusan : null;
+
+        $rombel = $rombelModel ? $rombelModel->nama : '';
+        $kelas = $kelasModel ? $kelasModel->tingkat : '';
+        $jurusan = $jurusanModel ? $jurusanModel->nama : '';
+        $tanggalLahir = $siswa->tanggal_lahir
+            ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d-m-Y')
+            : '';
+
+        return [
+            'No' => $index + 1,
+            'NIS' => $siswa->nis ?? '',
+            'NISN' => $siswa->nisn ?? '',
+            'Nama Lengkap' => $siswa->nama_lengkap ?? '',
+            'Jenis Kelamin' => $siswa->jenis_kelamin ?? '',
+            'Tempat Lahir' => $siswa->tempat_lahir ?? '',
+            'Tanggal Lahir' => $tanggalLahir,
+            'Alamat' => $siswa->alamat ?? '',
+            'Kelas' => $kelas,
+            'Rombel' => $rombel,
+            'Jurusan' => $jurusan,
+        ];
+    });
+}
 
     public function headings(): array
     {
