@@ -131,9 +131,8 @@
         @csrf
 
         @php
-            $statusKepegawaianOptions = ['PNS', 'PPPK', 'PPPK Paruh Waktu', 'Honorer', 'Guru Tetap Yayasan', 'Guru Tidak Tetap'];
+            $statusKepegawaianOptions = ['PNS', 'PPPK', 'PPPK Paruh Waktu', 'Non-ASN'];
             $statusAktifOptions       = ['Aktif', 'Non-Aktif', 'Cuti', 'Mutasi', 'Pensiun', 'Keluar'];
-            $pendidikanOptions        = ['S3', 'S2', 'S1', 'D4', 'D3'];
             $currentAktif             = old('status_aktif', 'Aktif');
         @endphp
 
@@ -223,13 +222,9 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label-premium"><i class="fas fa-graduation-cap"></i> Pendidikan Terakhir</label>
-                        <select name="pendidikan" class="form-select-premium @error('pendidikan') is-invalid-premium @enderror">
-                            <option value="">-- Pilih Pendidikan --</option>
-                            @foreach ($pendidikanOptions as $opt)
-                                <option value="{{ $opt }}" {{ old('pendidikan') == $opt ? 'selected' : '' }}>{{ $opt }}</option>
-                            @endforeach
-                        </select>
+                        <input type="text" name="pendidikan" value="{{ old('pendidikan') }}" class="form-control-premium @error('pendidikan') is-invalid-premium @enderror" placeholder="Contoh: S1 Teknik Informatika">
                         @error('pendidikan')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
+                        <div class="form-hint"><i class="fas fa-circle-info"></i> Bisa diisi lengkap: S1 / S2 / D3 + jurusan.</div>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label-premium"><i class="fas fa-certificate"></i> Serdik (Sertifikasi)</label>

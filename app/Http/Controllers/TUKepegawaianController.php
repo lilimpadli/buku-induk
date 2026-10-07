@@ -91,8 +91,7 @@ class TUKepegawaianController extends Controller
             'tugas_tambahan',
             'telepon', 'no_hp', 'email', 'email_pribadi', 'email_resmi',
             'alamat', 'alamat_jalan', 'rt', 'rw', 'dusun', 'desa',
-            'kecamatan', 'kode_pos', 'jurusan_id', 'gelar_belakang',
-            'gelar_depan',
+            'kecamatan', 'kode_pos', 'jurusan_id',
         ];
 
         $data = $request->only($fields);
@@ -205,27 +204,12 @@ class TUKepegawaianController extends Controller
         }
 
         return view('tu_kepegawaian.dashboard', compact(
-            'totalGuru',
-            'totalTU',
-            'totalTUKepegawaian',
-            'totalStaffAktif',
-            'guruBaru',
-            'totalPegawai',
-            'totalPegawaiLainnya',
-            'totalGuruPNS',
-            'totalGuruPPPK',
-            'totalGuruPPPKParuh',
-            'totalTUPNS',
-            'totalTUPPPK',
-            'totalTUPPKParuh',
-            'guruAktif',
-            'guruNonaktif',
-            'guruLakiLaki',
-            'guruPerempuan',
-            'guruBulanIni',
-            'pegawaiBulanIni',
-            'masuk6BulanGuru',
-            'masuk6BulanPegawai'
+            'totalGuru', 'totalTU', 'totalTUKepegawaian', 'totalStaffAktif',
+            'guruBaru', 'totalPegawai', 'totalPegawaiLainnya',
+            'totalGuruPNS', 'totalGuruPPPK', 'totalGuruPPPKParuh',
+            'totalTUPNS', 'totalTUPPPK', 'totalTUPPKParuh',
+            'guruAktif', 'guruNonaktif', 'guruLakiLaki', 'guruPerempuan',
+            'guruBulanIni', 'pegawaiBulanIni', 'masuk6BulanGuru', 'masuk6BulanPegawai'
         ));
     }
 
@@ -262,7 +246,7 @@ class TUKepegawaianController extends Controller
         }
 
         if ($request->filled('pendidikan')) {
-            $query->where('pendidikan', $request->pendidikan);
+            $query->where('pendidikan', 'like', '%' . $request->pendidikan . '%');
         }
 
         $rekap = [
@@ -271,9 +255,7 @@ class TUKepegawaianController extends Controller
             'P'       => (clone $query)->where('jenis_kelamin', 'P')->count(),
             'PNS'     => (clone $query)->where('status_kepegawaian', 'PNS')->count(),
             'PPPK'    => (clone $query)->where('status_kepegawaian', 'PPPK')->count(),
-            'Honorer' => (clone $query)->where('status_kepegawaian', 'Honorer')->count(),
-            'S1'      => (clone $query)->where('pendidikan', 'S1')->count(),
-            'S2'      => (clone $query)->where('pendidikan', 'S2')->count(),
+            'NonASN'  => (clone $query)->where('status_kepegawaian', 'Non ASN')->count(),
         ];
 
         $perPage = $request->input('per_page', 25);
@@ -336,9 +318,7 @@ class TUKepegawaianController extends Controller
             'email_pribadi' => 'nullable|email',
             'email_resmi' => 'nullable|email',
             'password' => 'nullable|min:6|confirmed',
-            'status_kepegawaian' => 'nullable|in:PNS,PPPK,PPPK Paruh Waktu,Honorer,Guru Tetap Yayasan,Guru Tidak Tetap',
-            'pendidikan' => 'nullable|in:S1,S2,S3,D4,D3',
-            'gelar_belakang' => 'nullable|string|max:255',
+            'status_kepegawaian' => 'nullable|string|max:50',
         ]);
 
         DB::beginTransaction();
@@ -390,9 +370,7 @@ class TUKepegawaianController extends Controller
             'email_pribadi' => 'nullable|email',
             'email_resmi' => 'nullable|email',
             'password' => 'nullable|min:6|confirmed',
-            'status_kepegawaian' => 'nullable|in:PNS,PPPK,PPPK Paruh Waktu,Honorer,Guru Tetap Yayasan,Guru Tidak Tetap',
-            'pendidikan' => 'nullable|in:S1,S2,S3,D4,D3',
-            'gelar_belakang' => 'nullable|string|max:255',
+            'status_kepegawaian' => 'nullable|string|max:50',
         ]);
 
         if ($guru->user) {
@@ -504,7 +482,7 @@ class TUKepegawaianController extends Controller
         }
 
         if ($request->filled('pendidikan')) {
-            $query->where('pendidikan', $request->pendidikan);
+            $query->where('pendidikan', 'like', '%' . $request->pendidikan . '%');
         }
 
         if ($request->filled('search')) {
@@ -513,7 +491,8 @@ class TUKepegawaianController extends Controller
                 $q->where('nama', 'like', "%{$search}%")
                   ->orWhere('nip', 'like', "%{$search}%")
                   ->orWhere('nik', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('tugas_tambahan', 'like', "%{$search}%");
             });
         }
 
@@ -528,11 +507,6 @@ class TUKepegawaianController extends Controller
         $statusList = $allPegawais->pluck('status_kepegawaian')->filter()->unique()->values();
         foreach ($statusList as $status) {
             $rekap[$status] = $allPegawais->where('status_kepegawaian', $status)->count();
-        }
-
-        $pendidikanList = $allPegawais->pluck('pendidikan')->filter()->unique()->values();
-        foreach ($pendidikanList as $pendidikan) {
-            $rekap[$pendidikan] = $allPegawais->where('pendidikan', $pendidikan)->count();
         }
 
         $perPage = $request->input('per_page', 25);
@@ -551,27 +525,23 @@ class TUKepegawaianController extends Controller
     public function tuStore(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+            'nomor_induk' => 'required|string|max:50',
             'nik' => 'nullable|string|max:20',
             'nuptk' => 'nullable|string|max:30',
-            'nip' => 'nullable|string|max:30|unique:pegawais,nip',
             'jenis_kelamin' => 'nullable|in:L,P',
             'tanggal_lahir' => 'nullable|date',
-            'email_pribadi' => 'nullable|email',
-            'email_resmi' => 'nullable|email',
+            'email' => 'nullable|email|max:255',
+            'status_kepegawaian' => 'nullable|string|max:50',
+            'pendidikan' => 'nullable|string|max:100',
         ]);
 
         DB::beginTransaction();
         try {
-            if (!Schema::hasTable('pegawais')) {
-                return back()->withInput()->with('error', 'Tabel pegawai belum tersedia.');
-            }
-
             // ✅ SIMPAN DATA PEGAWAI SAJA — TANPA BIKIN AKUN USER
             Pegawai::create([
-                // === VERSI BARU ===
-                'nama'               => $request->nama,
-                'nip'                => $request->nip,
+                'nama'               => $request->name,
+                'nip'                => $request->nomor_induk,
                 'nik'                => $request->nik,
                 'nuptk'              => $request->nuptk,
                 'jenis_kelamin'      => $request->jenis_kelamin,
@@ -580,10 +550,9 @@ class TUKepegawaianController extends Controller
                 'status_kepegawaian' => $request->status_kepegawaian ?: '-',
                 'pendidikan'         => $request->pendidikan,
                 'tugas_tambahan'     => $request->tugas_tambahan,
-                'email_pribadi'      => $request->email_pribadi,
-                'email_resmi'        => $request->email_resmi,
+                'email'              => $request->email,
                 'no_hp'              => $request->no_hp ?: '-',
-                'jabatan'            => 'pegawai',
+                'jabatan'            => $request->role ?? 'pegawai',
                 'alamat'             => $request->alamat ?: '-',
                 'rt'                 => $request->rt,
                 'rw'                 => $request->rw,
@@ -592,16 +561,11 @@ class TUKepegawaianController extends Controller
                 'kecamatan'          => $request->kecamatan,
                 'kode_pos'           => $request->kode_pos,
                 'user_id'            => null,
-
-                // === VERSI LAMA (NOT NULL) — WAJIB ===
-                'nama_lengkap'       => $request->nama,
-                'nip_nuptk'          => $request->nip ?: ($request->nik ?: ('IMP-' . time())),
-                'jk'                 => $request->jenis_kelamin ?: 'L',
-                'tgl_lahir'          => $request->tanggal_lahir ?: now()->format('Y-m-d'),
             ]);
 
             DB::commit();
-            return redirect()->route('tu_kepegawaian.tu.index')->with('success', 'Data pegawai berhasil ditambahkan.');
+            return redirect()->route('tu_kepegawaian.tu.index')
+                ->with('success', 'Data pegawai berhasil ditambahkan (belum ada akun login).');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
@@ -614,7 +578,7 @@ class TUKepegawaianController extends Controller
             $pegawai = Pegawai::with('user')->findOrFail($id);
             return view('tu_kepegawaian.tu.show', compact('pegawai'));
         }
-        
+
         $user = User::findOrFail($id);
         return view('tu_kepegawaian.tu.show', compact('user'));
     }
@@ -625,67 +589,95 @@ class TUKepegawaianController extends Controller
             $pegawai = Pegawai::with('user')->findOrFail($id);
             return view('tu_kepegawaian.tu.edit', compact('pegawai'));
         }
-        
+
         $user = User::findOrFail($id);
         return view('tu_kepegawaian.tu.edit', compact('user'));
     }
 
     public function tuUpdate(Request $request, $id)
     {
+        $pegawai = Pegawai::findOrFail($id);
+
+        // Normalisasi email kosong → null
+        $request->merge([
+            'email' => trim((string) $request->email) !== '' ? trim($request->email) : null,
+        ]);
+
         $request->validate([
-            'name' => 'required|string',
-            'nomor_induk' => 'required|string|unique:users,nomor_induk,' . $id,
-            'email' => 'nullable|email|unique:users,email,' . $id,
-            'role' => 'required|in:tu,tu_kepegawaian',
-            'password' => 'nullable|string|min:6|confirmed',
+            'name'               => 'required|string|max:255',
+            'nomor_induk'        => 'required|string|max:50',
+            'email'              => 'nullable|email|max:255',
+            'role'               => 'nullable|string|max:50',
+            'password'           => 'nullable|string|min:6|confirmed',
+            'nik'                => 'nullable|string|max:20',
+            'nuptk'              => 'nullable|string|max:30',
+            'jenis_kelamin'      => 'nullable|in:L,P',
+            'tempat_lahir'       => 'nullable|string|max:255',
+            'tanggal_lahir'      => 'nullable|date',
+            'status_kepegawaian' => 'nullable|string|max:50',
+            'pendidikan'         => 'nullable|string|max:100',
+            'tugas_tambahan'     => 'nullable|string|max:255',
+            'no_hp'              => 'nullable|string|max:20',
+            'alamat'             => 'nullable|string|max:500',
+            'rt'                 => 'nullable|string|max:5',
+            'rw'                 => 'nullable|string|max:5',
+            'dusun'              => 'nullable|string|max:100',
+            'desa'               => 'nullable|string|max:100',
+            'kecamatan'          => 'nullable|string|max:100',
+            'kode_pos'           => 'nullable|string|max:10',
         ]);
 
         DB::beginTransaction();
         try {
-            $user = User::findOrFail($id);
-            
-            $userData = [
-                'name' => $request->name,
-                'nomor_induk' => $request->nomor_induk,
-                'email' => $request->email,
-                'role' => $request->role,
-            ];
-            
-            if ($request->filled('password')) {
-                $userData['password'] = bcrypt($request->password);
-            }
-            
-            $user->update($userData);
+            // 1. UPDATE AKUN USER (jika pegawai punya akun)
+            if ($pegawai->user_id) {
+                $user = User::find($pegawai->user_id);
 
-            if (Schema::hasTable('pegawais')) {
-                $pegawai = Pegawai::where('user_id', $user->id)->first();
-                if ($pegawai) {
-                    $pegawai->update([
-                        'nama' => $request->name,
-                        'nip' => $request->nomor_induk,
-                        'nik' => $request->nik,
-                        'nuptk' => $request->nuptk,
-                        'jenis_kelamin' => $request->jenis_kelamin,
-                        'tempat_lahir' => $request->tempat_lahir,
-                        'tanggal_lahir' => $request->tanggal_lahir,
-                        'status_kepegawaian' => $request->status_kepegawaian,
-                        'pendidikan' => $request->pendidikan,
-                        'tugas_tambahan' => $request->tugas_tambahan,
-                        'email' => $request->email,
-                        'email_pribadi' => $request->email_pribadi,
-                        'email_resmi' => $request->email_resmi,
-                        'no_hp' => $request->no_hp,
-                        'jabatan' => $request->role,
-                        'alamat' => $request->alamat,
-                        'rt' => $request->rt,
-                        'rw' => $request->rw,
-                        'dusun' => $request->dusun,
-                        'desa' => $request->desa,
-                        'kecamatan' => $request->kecamatan,
-                        'kode_pos' => $request->kode_pos,
-                    ]);
+                if ($user) {
+                    $userData = [
+                        'name'        => $request->name,
+                        'nomor_induk' => $request->nomor_induk,
+                    ];
+
+                    if ($request->filled('role')) {
+                        $userData['role'] = $request->role;
+                    }
+
+                    if ($request->filled('email')) {
+                        $userData['email'] = $request->email;
+                    }
+
+                    if ($request->filled('password')) {
+                        $userData['password'] = bcrypt($request->password);
+                    }
+
+                    $user->update($userData);
                 }
             }
+
+            // 2. UPDATE DATA PEGAWAI
+            $pegawai->update([
+                'nama'               => $request->name,
+                'nip'                => $request->nomor_induk,
+                'nik'                => $request->nik,
+                'nuptk'              => $request->nuptk,
+                'jenis_kelamin'      => $request->jenis_kelamin,
+                'tempat_lahir'       => $request->tempat_lahir,
+                'tanggal_lahir'      => $request->tanggal_lahir,
+                'status_kepegawaian' => $request->status_kepegawaian,
+                'pendidikan'         => $request->pendidikan,
+                'tugas_tambahan'     => $request->tugas_tambahan,
+                'email'              => $request->email,
+                'no_hp'              => $request->no_hp,
+                'jabatan'            => $request->role ?? $pegawai->jabatan,
+                'alamat'             => $request->alamat,
+                'rt'                 => $request->rt,
+                'rw'                 => $request->rw,
+                'dusun'              => $request->dusun,
+                'desa'               => $request->desa,
+                'kecamatan'          => $request->kecamatan,
+                'kode_pos'           => $request->kode_pos,
+            ]);
 
             DB::commit();
             return redirect()->route('tu_kepegawaian.tu.index')->with('success', 'Data Pegawai berhasil diupdate');
@@ -699,21 +691,23 @@ class TUKepegawaianController extends Controller
     {
         DB::beginTransaction();
         try {
-            $user = User::findOrFail($id);
+            $pegawai = Pegawai::findOrFail($id);
 
-            $totalAdmin = User::where('role', 'tu_kepegawaian')->count();
-            if ($user->role === 'tu_kepegawaian' && $totalAdmin <= 1) {
-                return back()->with('error', 'GAGAL DIHAPUS! Anda adalah satu-satunya Admin. Tidak bisa menghapus akun login sendiri.');
-            }
+            if ($pegawai->user_id) {
+                $user = User::find($pegawai->user_id);
 
-            if (Schema::hasTable('pegawais')) {
-                $pegawai = Pegawai::where('user_id', $user->id)->first();
-                if ($pegawai) {
-                    $pegawai->forceDelete();
+                if ($user && $user->role === 'tu_kepegawaian'
+                    && User::where('role', 'tu_kepegawaian')->count() <= 1) {
+                    DB::rollBack();
+                    return back()->with('error', 'GAGAL DIHAPUS! Anda adalah satu-satunya Admin Kepegawaian.');
+                }
+
+                if ($user) {
+                    $user->forceDelete();
                 }
             }
 
-            $user->forceDelete();
+            $pegawai->forceDelete();
 
             DB::commit();
             return back()->with('success', 'Data Pegawai berhasil dihapus permanen dari database.');
@@ -738,26 +732,10 @@ class TUKepegawaianController extends Controller
             public function headings(): array
             {
                 return [
-                    'nama',
-                    'nik',
-                    'nuptk',
-                    'nip',
-                    'jenis_ptk',
-                    'tugas_tambahan',
-                    'tempat_lahir',
-                    'tanggal_lahir',
-                    'jenis_kelamin',
-                    'agama',
-                    'status_kepegawaian',
-                    'alamat',
-                    'rt',
-                    'rw',
-                    'dusun',
-                    'desa',
-                    'kecamatan',
-                    'kode_pos',
-                    'no_hp',
-                    'email'
+                    'nama', 'nik', 'nuptk', 'nip', 'jenis_ptk', 'tugas_tambahan',
+                    'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'agama',
+                    'status_kepegawaian', 'alamat', 'rt', 'rw', 'dusun', 'desa',
+                    'kecamatan', 'kode_pos', 'no_hp', 'email'
                 ];
             }
 
@@ -768,19 +746,9 @@ class TUKepegawaianController extends Controller
                         $sheet = $event->sheet->getDelegate();
 
                         $sheet->getStyle('A1:T1')->applyFromArray([
-                            'font' => [
-                                'bold' => true,
-                                'size' => 11,
-                                'color' => ['argb' => 'FFFFFF'],
-                            ],
-                            'fill' => [
-                                'fillType' => Fill::FILL_SOLID,
-                                'startColor' => ['argb' => '28A745'],
-                            ],
-                            'alignment' => [
-                                'horizontal' => Alignment::HORIZONTAL_CENTER,
-                                'vertical' => Alignment::VERTICAL_CENTER,
-                            ],
+                            'font' => ['bold' => true, 'size' => 11, 'color' => ['argb' => 'FFFFFF']],
+                            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => '28A745']],
+                            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
                         ]);
 
                         $sheet->getRowDimension(1)->setRowHeight(28);
@@ -877,17 +845,13 @@ class TUKepegawaianController extends Controller
                     $email = strtolower(str_replace(' ', '', $nama)) . time() . "@smkn1x.sch.id";
                 }
 
-                // Cegah duplikat email di tabel users
                 $emailExists = User::where('email', $email)->exists();
                 if ($emailExists) {
                     $existingByEmail = User::where('email', $email)->first();
 
                     if ($existingByEmail && $existingByEmail->nomor_induk === $nip) {
                         $user = $existingByEmail;
-                        $user->update([
-                            'name' => $nama,
-                            'role' => $jabatan,
-                        ]);
+                        $user->update(['name' => $nama, 'role' => $jabatan]);
                     } else {
                         $baseEmail = explode('@', $email)[0];
                         $domain    = explode('@', $email)[1] ?? 'smkn1x.sch.id';
@@ -903,23 +867,13 @@ class TUKepegawaianController extends Controller
 
                         $user = User::firstOrCreate(
                             ['nomor_induk' => $nip],
-                            [
-                                'name'     => $nama,
-                                'email'    => $email,
-                                'password' => Hash::make($password),
-                                'role'     => $jabatan,
-                            ]
+                            ['name' => $nama, 'email' => $email, 'password' => Hash::make($password), 'role' => $jabatan]
                         );
                     }
                 } else {
                     $user = User::firstOrCreate(
                         ['nomor_induk' => $nip],
-                        [
-                            'name'     => $nama,
-                            'email'    => $email,
-                            'password' => Hash::make($password),
-                            'role'     => $jabatan,
-                        ]
+                        ['name' => $nama, 'email' => $email, 'password' => Hash::make($password), 'role' => $jabatan]
                     );
                 }
 
@@ -927,7 +881,6 @@ class TUKepegawaianController extends Controller
                     Pegawai::updateOrCreate(
                         ['nip' => $nip],
                         [
-                            // === VERSI BARU ===
                             'nama'               => $nama,
                             'nik'                => $nik,
                             'nuptk'              => $nuptk,
@@ -947,12 +900,6 @@ class TUKepegawaianController extends Controller
                             'kode_pos'           => $kode_pos,
                             'tugas_tambahan'     => $tugas_tambahan,
                             'user_id'            => $user->id,
-
-                            // === VERSI LAMA (NOT NULL) ===
-                            'nama_lengkap'       => $nama,
-                            'nip_nuptk'          => $nip,
-                            'jk'                 => $jenis_kelamin ?: 'L',
-                            'tgl_lahir'          => $tanggal_lahir ?: now()->format('Y-m-d'),
                         ]
                     );
                 }
@@ -1019,97 +966,74 @@ class TUKepegawaianController extends Controller
     }
 
     // ==========================================================
-    // RIWAYAT TUGAS
+    // RIWAYAT TUGAS — SUDAH DIGANTI JADI MUTASI
     // ==========================================================
     public function riwayat()
     {
-        if ($this->riwayatTugasTableAvailable()) {
-            $riwayat = RiwayatTugas::all();
-        } elseif ($this->riwayatTableAvailable()) {
-            $riwayat = RiwayatKerja::all();
-        } else {
-            $riwayat = collect();
-        }
-
-        $pegawais = Schema::hasTable('pegawais') ? Pegawai::all() : collect();
-
-        return view('tu_kepegawaian.riwayat_tugas.index', compact('riwayat', 'pegawais'));
+        return redirect()->route('tu_kepegawaian.mutasi.index');
     }
 
     public function riwayatIndex()
     {
-        return $this->riwayat();
+        return redirect()->route('tu_kepegawaian.mutasi.index');
     }
 
     public function riwayatStore(Request $request)
     {
-        $request->validate([
-            'instansi' => 'required',
-            'jabatan' => 'required',
-            'mulai' => 'required|date',
-        ]);
-
-        if ($this->riwayatTugasTableAvailable()) {
-            RiwayatTugas::create($request->all());
-        } elseif ($this->riwayatTableAvailable()) {
-            RiwayatKerja::create($request->all());
-        }
-
-        return redirect()->route('tu_kepegawaian.riwayat.index')->with('success', 'Data berhasil ditambahkan!');
+        return redirect()->route('tu_kepegawaian.mutasi.index');
     }
 
     public function riwayatUpdate(Request $request, $id)
     {
-        $request->validate([
-            'instansi' => 'required',
-            'jabatan' => 'required',
-            'mulai' => 'required|date',
-        ]);
-
-        if ($this->riwayatTugasTableAvailable()) {
-            $riwayat = RiwayatTugas::findOrFail($id);
-        } elseif ($this->riwayatTableAvailable()) {
-            $riwayat = RiwayatKerja::findOrFail($id);
-        } else {
-            return back()->with('error', 'Tabel riwayat tidak tersedia.');
-        }
-
-        $riwayat->update($request->all());
-
-        return redirect()->route('tu_kepegawaian.riwayat.index')->with('success', 'Data berhasil diperbarui!');
+        return redirect()->route('tu_kepegawaian.mutasi.index');
     }
 
     public function riwayatDestroy($id)
     {
-        if ($this->riwayatTugasTableAvailable()) {
-            RiwayatTugas::findOrFail($id)->delete();
-        } elseif ($this->riwayatTableAvailable()) {
-            RiwayatKerja::findOrFail($id)->delete();
-        }
-
-        return redirect()->route('tu_kepegawaian.riwayat.index')->with('success', 'Data berhasil dihapus!');
+        return redirect()->route('tu_kepegawaian.mutasi.index');
     }
 
     // ==========================================================
     // MUTASI
     // ==========================================================
-    public function mutasiIndex()
+    public function mutasiIndex(Request $request)
     {
-        if ($this->mutasiTableAvailable()) {
-            $mutasis = Mutasi::all();
-        } elseif ($this->mutasiPegawaiTableAvailable()) {
-            $mutasis = MutasiPegawai::with('pegawai')->get();
-        } else {
-            $mutasis = collect();
+        $query = Mutasi::orderBy('tanggal', 'desc');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_entitas', 'like', "%{$search}%")
+                  ->orWhere('nip', 'like', "%{$search}%")
+                  ->orWhere('nik', 'like', "%{$search}%");
+            });
         }
+
+        if ($request->filled('jenis')) {
+            $query->where('jenis', $request->jenis);
+        }
+
+        if ($request->filled('tipe_entitas')) {
+            $query->where('tipe_entitas', $request->tipe_entitas);
+        }
+
+        if ($request->filled('jenis_kelamin')) {
+            $query->where('jenis_kelamin', $request->jenis_kelamin);
+        }
+
+        $perPage = $request->input('per_page', 25);
+        $mutasis = ($perPage === 'all')
+            ? $query->get()
+            : $query->paginate(is_numeric($perPage) ? (int) $perPage : 25)->withQueryString();
 
         return view('tu_kepegawaian.mutasi.index', compact('mutasis'));
     }
 
     public function mutasiCreate()
     {
-        $gurus = Guru::all();
-        $pegawais = Schema::hasTable('pegawais') ? Pegawai::all() : collect();
+        $gurus = Guru::orderBy('nama')->get();
+        $pegawais = Schema::hasTable('pegawais') ? Pegawai::orderBy('nama')->get() : collect();
+
         return view('tu_kepegawaian.mutasi.create', compact('gurus', 'pegawais'));
     }
 
@@ -1118,109 +1042,220 @@ class TUKepegawaianController extends Controller
         $request->validate([
             'entitas_id'   => 'required',
             'jenis_mutasi' => 'required',
-            'tanggal'      => 'required',
+            'tanggal'      => 'required|date',
         ]);
 
         $split = explode('-', $request->entitas_id);
-        $tipe  = $split[0];
+        $tipe  = strtolower($split[0]);
         $id    = $split[1] ?? null;
 
         if (empty($id)) {
-            return back()->with('error', 'Data yang dipilih tidak valid. Silakan pilih Guru atau Pegawai.');
+            return back()->with('error', 'Data yang dipilih tidak valid.');
         }
 
-        $namaEntitas = '';
-        if ($tipe === 'guru') {
-            $guru = Guru::find($id);
-            if ($guru) {
-                $namaEntitas = $guru->nama;
+        DB::beginTransaction();
+        try {
+            if ($tipe === 'guru') {
+                $guru = Guru::findOrFail($id);
+
+                Mutasi::create([
+                    'guru_id'            => $guru->id,
+                    'tipe_entitas'       => 'Guru',
+                    'nama_entitas'       => $guru->nama,
+                    'jenis'              => $request->jenis_mutasi,
+                    'tanggal'            => $request->tanggal,
+                    'keterangan'         => $request->keterangan ?? null,
+                    'nip'                => $guru->nip,
+                    'nik'                => $guru->nik,
+                    'nuptk'              => $guru->nuptk,
+                    'jenis_kelamin'      => $guru->jenis_kelamin,
+                    'tempat_lahir'       => $guru->tempat_lahir,
+                    'tanggal_lahir'      => $guru->tanggal_lahir,
+                    'status_kepegawaian' => $guru->status_kepegawaian,
+                    'pendidikan'         => $guru->pendidikan,
+                    'serdik'             => $guru->serdik,
+                    'tugas_tambahan'     => $guru->tugas_tambahan,
+                    'jabatan'            => 'Guru',
+                    'email'              => $guru->email,
+                    'email_pribadi'      => $guru->email_pribadi,
+                    'email_resmi'        => $guru->email_resmi,
+                    'telepon'            => $guru->telepon,
+                    'alamat'             => $guru->alamat,
+                    'alamat_jalan'       => $guru->alamat_jalan,
+                    'rt'                 => $guru->rt,
+                    'rw'                 => $guru->rw,
+                    'dusun'              => $guru->dusun,
+                    'desa'               => $guru->desa,
+                    'kecamatan'          => $guru->kecamatan,
+                    'kode_pos'           => $guru->kode_pos,
+                    'user_id_backup'     => $guru->user_id,
+                ]);
+
+                if ($guru->user_id) {
+                    User::where('id', $guru->user_id)->forceDelete();
+                }
+
+                $guru->delete();
+
+            } elseif ($tipe === 'pegawai') {
+                $pegawai = Pegawai::findOrFail($id);
+
+                Mutasi::create([
+                    'guru_id'            => $pegawai->id,
+                    'tipe_entitas'       => 'Pegawai',
+                    'nama_entitas'       => $pegawai->nama,
+                    'jenis'              => $request->jenis_mutasi,
+                    'tanggal'            => $request->tanggal,
+                    'keterangan'         => $request->keterangan ?? null,
+                    'nip'                => $pegawai->nip,
+                    'nik'                => $pegawai->nik,
+                    'nuptk'              => $pegawai->nuptk,
+                    'jenis_kelamin'      => $pegawai->jenis_kelamin,
+                    'tempat_lahir'       => $pegawai->tempat_lahir,
+                    'tanggal_lahir'      => $pegawai->tanggal_lahir,
+                    'status_kepegawaian' => $pegawai->status_kepegawaian,
+                    'pendidikan'         => $pegawai->pendidikan,
+                    'tugas_tambahan'     => $pegawai->tugas_tambahan,
+                    'jabatan'            => $pegawai->jabatan ?? 'Pegawai',
+                    'email'              => $pegawai->email,
+                    'telepon'            => $pegawai->no_hp,
+                    'alamat'             => $pegawai->alamat,
+                    'rt'                 => $pegawai->rt,
+                    'rw'                 => $pegawai->rw,
+                    'dusun'              => $pegawai->dusun,
+                    'desa'               => $pegawai->desa,
+                    'kecamatan'          => $pegawai->kecamatan,
+                    'kode_pos'           => $pegawai->kode_pos,
+                    'user_id_backup'     => $pegawai->user_id,
+                ]);
+
+                if ($pegawai->user_id) {
+                    User::where('id', $pegawai->user_id)->forceDelete();
+                }
+
+                $pegawai->delete();
+
             } else {
-                return back()->with('error', 'Guru tidak ditemukan.');
+                DB::rollBack();
+                return back()->with('error', 'Tipe entitas tidak dikenal.');
             }
-        } elseif ($tipe === 'pegawai' && Schema::hasTable('pegawais')) {
-            $pegawai = Pegawai::find($id);
-            if ($pegawai) {
-                $namaEntitas = $pegawai->nama;
-            } else {
-                return back()->with('error', 'Pegawai tidak ditemukan.');
-            }
-        }
 
-        if ($this->mutasiTableAvailable()) {
-            Mutasi::create([
-                'guru_id'      => $id,
-                'nama_entitas' => $namaEntitas,
-                'jenis'        => $request->jenis_mutasi,
-                'tanggal'      => $request->tanggal,
-            ]);
-        } elseif ($this->mutasiPegawaiTableAvailable()) {
-            MutasiPegawai::create([
-                'pegawai_id' => $id,
-                'jenis'      => $request->jenis_mutasi,
-                'tanggal'    => $request->tanggal,
-            ]);
+            DB::commit();
+            return redirect()->route('tu_kepegawaian.mutasi.index')
+                             ->with('success', 'Data berhasil dipindahkan ke Mutasi!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menyimpan mutasi: ' . $e->getMessage());
         }
+    }
 
-        return redirect()->route('tu_kepegawaian.mutasi.index')
-                         ->with('success', 'Data mutasi berhasil ditambahkan!');
+    public function mutasiShow($id)
+    {
+        $mutasi = Mutasi::findOrFail($id);
+        return view('tu_kepegawaian.mutasi.show', compact('mutasi'));
     }
 
     public function mutasiEdit($id)
     {
-        if ($this->mutasiTableAvailable()) {
-            $mutasi = Mutasi::findOrFail($id);
-        } else {
-            $mutasi = MutasiPegawai::findOrFail($id);
-        }
-
-        $gurus = Guru::all();
-        $pegawais = Schema::hasTable('pegawais') ? Pegawai::all() : collect();
-
-        return view('tu_kepegawaian.mutasi.edit', compact('mutasi', 'gurus', 'pegawais'));
+        $mutasi = Mutasi::findOrFail($id);
+        return view('tu_kepegawaian.mutasi.edit', compact('mutasi'));
     }
 
-    public function mutasiUpdate(Request $request, $id)
+    public function mutasiEditData($id)
     {
+        $mutasi = Mutasi::findOrFail($id);
+        return view('tu_kepegawaian.mutasi.edit_data', compact('mutasi'));
+    }
+
+    public function mutasiUpdateData(Request $request, $id)
+    {
+        $mutasi = Mutasi::findOrFail($id);
+
         $request->validate([
-            'jenis_mutasi' => 'required',
-            'tanggal'      => 'required|date',
+            'nama_entitas'       => 'required|string|max:255',
+            'jenis'              => 'required|string|max:50',
+            'tanggal'            => 'required|date',
+            'nip'                => 'nullable|string|max:50',
+            'nik'                => 'nullable|string|max:20',
+            'nuptk'              => 'nullable|string|max:50',
+            'jenis_kelamin'      => 'nullable|in:L,P',
+            'tempat_lahir'       => 'nullable|string|max:100',
+            'tanggal_lahir'      => 'nullable|date',
+            'status_kepegawaian' => 'nullable|string|max:50',
+            'pendidikan'         => 'nullable|string|max:100',
+            'serdik'             => 'nullable|string|max:100',
+            'tugas_tambahan'     => 'nullable|string|max:255',
+            'jabatan'            => 'nullable|string|max:100',
+            'email'              => 'nullable|email|max:255',
+            'email_pribadi'      => 'nullable|email|max:255',
+            'email_resmi'        => 'nullable|email|max:255',
+            'telepon'            => 'nullable|string|max:30',
+            'alamat_jalan'       => 'nullable|string',
+            'rt'                 => 'nullable|string|max:10',
+            'rw'                 => 'nullable|string|max:10',
+            'dusun'              => 'nullable|string|max:100',
+            'desa'               => 'nullable|string|max:100',
+            'kecamatan'          => 'nullable|string|max:100',
+            'kode_pos'           => 'nullable|string|max:10',
+            'keterangan'         => 'nullable|string',
         ]);
 
-        if ($this->mutasiTableAvailable()) {
-            $mutasi = Mutasi::findOrFail($id);
-        } else {
-            $mutasi = MutasiPegawai::findOrFail($id);
-        }
+        // Auto-generate alamat lengkap dari field terpisah
+        $array_alamat = [];
+        if ($request->filled('alamat_jalan')) $array_alamat[] = $request->alamat_jalan;
+        if ($request->filled('rt') && $request->filled('rw')) $array_alamat[] = "RT {$request->rt}/RW {$request->rw}";
+        if ($request->filled('dusun'))        $array_alamat[] = "Dusun {$request->dusun}";
+        if ($request->filled('desa'))         $array_alamat[] = "Desa/Kel. {$request->desa}";
+        if ($request->filled('kecamatan'))    $array_alamat[] = "Kec. {$request->kecamatan}";
+        if ($request->filled('kode_pos'))     $array_alamat[] = $request->kode_pos;
+
+        $alamat_gabung = count($array_alamat) > 0 ? implode(', ', $array_alamat) : null;
 
         $mutasi->update([
-            'jenis' => $request->jenis_mutasi,
-            'tanggal' => $request->tanggal,
+            'nama_entitas'       => $request->nama_entitas,
+            'jenis'              => $request->jenis,
+            'tanggal'            => $request->tanggal,
+            'nip'                => $request->nip,
+            'nik'                => $request->nik,
+            'nuptk'              => $request->nuptk,
+            'jenis_kelamin'      => $request->jenis_kelamin,
+            'tempat_lahir'       => $request->tempat_lahir,
+            'tanggal_lahir'      => $request->tanggal_lahir,
+            'status_kepegawaian' => $request->status_kepegawaian,
+            'pendidikan'         => $request->pendidikan,
+            'serdik'             => $request->serdik,
+            'tugas_tambahan'     => $request->tugas_tambahan,
+            'jabatan'            => $request->jabatan,
+            'email'              => $request->email,
+            'email_pribadi'      => $request->email_pribadi,
+            'email_resmi'        => $request->email_resmi,
+            'telepon'            => $request->telepon,
+            'alamat'             => $alamat_gabung,
+            'alamat_jalan'       => $request->alamat_jalan,
+            'rt'                 => $request->rt,
+            'rw'                 => $request->rw,
+            'dusun'              => $request->dusun,
+            'desa'               => $request->desa,
+            'kecamatan'          => $request->kecamatan,
+            'kode_pos'           => $request->kode_pos,
+            'keterangan'         => $request->keterangan,
         ]);
 
-        return redirect()->route('tu_kepegawaian.mutasi.index')->with('success', 'Data mutasi berhasil diperbarui.');
+        return redirect()->route('tu_kepegawaian.mutasi.index')
+                        ->with('success', 'Data mutasi berhasil diperbarui secara lengkap.');
     }
 
     public function mutasiDestroy($id)
     {
-        if ($this->mutasiTableAvailable()) {
-            Mutasi::findOrFail($id)->delete();
-        } elseif ($this->mutasiPegawaiTableAvailable()) {
-            MutasiPegawai::findOrFail($id)->delete();
-        }
+        $mutasi = Mutasi::findOrFail($id);
+        $mutasi->delete();
 
         return redirect()->back()->with('success', 'Data berhasil dihapus!');
     }
 
     public function mutasiLaporan()
     {
-        if ($this->mutasiTableAvailable()) {
-            $mutasis = Mutasi::all();
-        } elseif ($this->mutasiPegawaiTableAvailable()) {
-            $mutasis = MutasiPegawai::with('pegawai')->get();
-        } else {
-            $mutasis = collect();
-        }
-
+        $mutasis = Mutasi::orderBy('tanggal', 'desc')->get();
         return view('tu_kepegawaian.mutasi.laporan', compact('mutasis'));
     }
 }

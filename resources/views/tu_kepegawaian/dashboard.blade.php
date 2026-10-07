@@ -24,10 +24,7 @@
         to   { opacity: 1; transform: translateY(0); }
     }
 
-    .fade-item {
-        animation: fadeUp .5s ease both;
-    }
-
+    .fade-item { animation: fadeUp .5s ease both; }
     .fade-item:nth-child(2) { animation-delay: .06s; }
     .fade-item:nth-child(3) { animation-delay: .12s; }
     .fade-item:nth-child(4) { animation-delay: .18s; }
@@ -53,40 +50,28 @@
     .mn-stat::before {
         content: '';
         position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
+        left: 0; top: 0; bottom: 0;
         width: 4.5px;
         background: var(--ac, #334155);
         border-radius: 0 4px 4px 0;
     }
 
-    /* Lingkaran dekoratif di pojok */
     .mn-stat::after {
         content: '';
         position: absolute;
-        right: -34px;
-        top: -34px;
-        width: 110px;
-        height: 110px;
+        right: -34px; top: -34px;
+        width: 110px; height: 110px;
         border-radius: 50%;
         background: var(--ac-soft, rgba(51, 65, 85, .06));
         transition: transform .35s ease;
     }
 
-    .mn-stat:hover::after {
-        transform: scale(1.35);
-    }
+    .mn-stat:hover::after { transform: scale(1.35); }
+    .mn-stat:hover { transform: translateY(-4px); }
 
-    .mn-stat:hover {
-        transform: translateY(-4px);
-    }
-
-    /* Hover shadow + border per warna aksen */
     .st-indigo:hover  { border-color: #c7d2fe; box-shadow: 0 16px 32px -10px rgba(79, 70, 229, .30); }
     .st-emerald:hover { border-color: #a7f3d0; box-shadow: 0 16px 32px -10px rgba(16, 185, 129, .30); }
     .st-orange:hover  { border-color: #fed7aa; box-shadow: 0 16px 32px -10px rgba(249, 115, 22, .30); }
-    .st-blue:hover    { border-color: #bfdbfe; box-shadow: 0 16px 32px -10px rgba(59, 130, 246, .30); }
 
     .mn-stat .label {
         font-size: .68rem;
@@ -99,8 +84,7 @@
     }
 
     .mn-stat .ico {
-        width: 46px;
-        height: 46px;
+        width: 46px; height: 46px;
         border-radius: 14px;
         display: flex;
         align-items: center;
@@ -129,7 +113,6 @@
         z-index: 1;
     }
 
-    /* Panah muncul saat hover */
     .go-arrow {
         opacity: 0;
         transform: translateX(-4px);
@@ -174,8 +157,7 @@
     }
 
     .live-dot {
-        width: 8px;
-        height: 8px;
+        width: 8px; height: 8px;
         border-radius: 50%;
         background: #10b981;
         box-shadow: 0 0 0 3px rgba(16, 185, 129, .18);
@@ -203,12 +185,10 @@
         transform: translateX(3px);
     }
 
-    .rp-row + .rp-row {
-        border-top: 1px dashed #eef0f5;
-    }
+    .rp-row + .rp-row { border-top: 1px dashed #eef0f5; }
 
     .rp-label {
-        width: 120px;
+        width: 130px;
         flex-shrink: 0;
         font-size: .84rem;
         font-weight: 600;
@@ -219,8 +199,7 @@
     }
 
     .rp-dot {
-        width: 8px;
-        height: 8px;
+        width: 8px; height: 8px;
         border-radius: 3px;
         flex-shrink: 0;
     }
@@ -275,6 +254,7 @@
     .bd.amber  { background: #fffbeb; color: #b45309; }
     .bd.slate  { background: #f3f4f6; color: #6b7280; }
     .bd.rose   { background: #fff1f2; color: #e11d48; }
+    .bd.green  { background: #ecfdf5; color: #059669; }
 
     /* ── List guru terbaru ── */
     .gb-row {
@@ -291,13 +271,10 @@
         transform: translateX(3px);
     }
 
-    .gb-row + .gb-row {
-        border-top: 1px solid #f0f2f6;
-    }
+    .gb-row + .gb-row { border-top: 1px solid #f0f2f6; }
 
     .gb-idx {
-        width: 38px;
-        height: 38px;
+        width: 38px; height: 38px;
         border-radius: 11px;
         flex-shrink: 0;
         font-weight: 800;
@@ -333,8 +310,7 @@
 
     /* ── Ikon judul section ── */
     .sec-ico {
-        width: 38px;
-        height: 38px;
+        width: 38px; height: 38px;
         border-radius: 11px;
         display: flex;
         align-items: center;
@@ -372,16 +348,15 @@
     $guruLain  = max(0, $guruTotal - ($guruPNS + $guruPPPK + $guruParuh));
 
     // ── Rekap pegawai ──
-    $tuTotal = (int) ($totalPegawai ?? 0);
-    $tuPNS   = (int) ($totalTUPNS ?? 0);
-    $tuPPPK  = (int) ($totalTUPPPK ?? 0);
-    $tuParuh = (int) ($totalTUPPKParuh ?? 0);
-    $tuLain  = max(0, $tuTotal - ($tuPNS + $tuPPPK + $tuParuh));
+    // Perubahan: baris PPPK = jumlah PPPK Paruh Waktu
+    $tuTotal  = (int) ($totalPegawai ?? 0);
+    $tuPNS    = (int) ($totalTUPNS ?? 0);
+    $tuParuh  = (int) ($totalTUPPKParuh ?? 0);
+    $tuPPPK   = $tuParuh; // ← baris "PPPK" dihitung dari PPPK Paruh Waktu
+    $tuLain   = max(0, $tuTotal - ($tuPNS + $tuPPPK));
 
     // ── Kartu statistik utama ──
     $totalPersonel = (int) ($totalStaffAktif ?? 0);
-    $tuAkademik    = (int) ($totalTU ?? 0);
-    $tuKepegawaian = (int) ($totalTUKepegawaian ?? 0);
 
     // ── Persentase bar rekap ──
     $pct = fn($bagian, $total) => $total > 0 ? round(($bagian / $total) * 100) : 0;
@@ -436,16 +411,15 @@
     </div>
 
     {{-- ══════════════════════════════════════════════════════════
-         SECTION 2 — KARTU STATISTIK UTAMA
-         1. Total Personel | 2. Guru
-         3. Pegawai TU     | 4. Struktur TU
+         SECTION 2 — KARTU STATISTIK UTAMA (3 KARTU)
     ═══════════════════════════════════════════════════════════ --}}
     <div class="row g-3 mb-4">
 
-        {{-- 2A. Total Personel — indigo --}}
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="mn-card mn-stat st-indigo fade-item"
-                 style="--ac:#4f46e5; --ac-soft:rgba(79,70,229,.07);">
+        {{-- 2A. Total Personel --}}
+        <div class="col-12 col-sm-6 col-xl-4">
+            <a href="{{ route('tu_kepegawaian.guru.index') }}"
+               class="mn-card mn-stat st-indigo fade-item"
+               style="--ac:#4f46e5; --ac-soft:rgba(79,70,229,.07);">
 
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <span class="label">Total Personel</span>
@@ -459,12 +433,13 @@
                     <strong class="text-dark">{{ $guruTotal }}</strong> guru
                     &nbsp;+&nbsp;
                     <strong class="text-dark">{{ $tuTotal }}</strong> pegawai
+                    <i class="fas fa-arrow-right go-arrow ms-1" style="font-size:.65rem;color:#4f46e5;"></i>
                 </div>
-            </div>
+            </a>
         </div>
 
-        {{-- 2B. Guru — emerald --}}
-        <div class="col-12 col-sm-6 col-xl-3">
+        {{-- 2B. Guru --}}
+        <div class="col-12 col-sm-6 col-xl-4">
             <a href="{{ route('tu_kepegawaian.guru.index') }}"
                class="mn-card mn-stat st-emerald fade-item"
                style="--ac:#10b981; --ac-soft:rgba(16,185,129,.07);">
@@ -478,14 +453,14 @@
 
                 <div class="num mb-2">{{ $guruTotal }}</div>
                 <div class="sub">
-                    Kelola data guru
+                    {{ $guruPNS }} PNS · {{ $guruPPPK }} PPPK
                     <i class="fas fa-arrow-right go-arrow ms-1" style="font-size:.65rem;color:#059669;"></i>
                 </div>
             </a>
         </div>
 
-        {{-- 2C. Pegawai TU — orange --}}
-        <div class="col-12 col-sm-6 col-xl-3">
+        {{-- 2C. Pegawai TU --}}
+        <div class="col-12 col-sm-6 col-xl-4">
             <a href="{{ route('tu_kepegawaian.tu.index') }}"
                class="mn-card mn-stat st-orange fade-item"
                style="--ac:#f97316; --ac-soft:rgba(249,115,22,.07);">
@@ -499,44 +474,8 @@
 
                 <div class="num mb-2">{{ $tuTotal }}</div>
                 <div class="sub">
-                    Kelola data pegawai
+                    {{ $tuPNS }} PNS · {{ $tuPPPK }} PPPK Paruh Waktu
                     <i class="fas fa-arrow-right go-arrow ms-1" style="font-size:.65rem;color:#ea580c;"></i>
-                </div>
-            </a>
-        </div>
-
-        {{-- 2D. Struktur TU — blue --}}
-        <div class="col-12 col-sm-6 col-xl-3">
-            <a href="{{ route('tu_kepegawaian.tu.index', ['role' => 'tu']) }}"
-               class="mn-card mn-stat st-blue fade-item"
-               style="--ac:#3b82f6; --ac-soft:rgba(59,130,246,.07);">
-
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <span class="label">Struktur TU</span>
-                    <span class="ico" style="background:linear-gradient(135deg,#eff6ff,#dbeafe);color:#2563eb;">
-                        <i class="fas fa-sitemap"></i>
-                    </span>
-                </div>
-
-                <div class="d-flex align-items-center gap-3 mb-2">
-                    <div>
-                        <div class="num" style="font-size:1.95rem;">{{ $tuAkademik }}</div>
-                        <small class="sub">
-                            <span class="rp-dot d-inline-block" style="background:#4f46e5;"></span> Akademik
-                        </small>
-                    </div>
-                    <div style="width:1px;height:40px;background:#eceef3;"></div>
-                    <div>
-                        <div class="num" style="font-size:1.95rem;">{{ $tuKepegawaian }}</div>
-                        <small class="sub">
-                            <span class="rp-dot d-inline-block" style="background:#3b82f6;"></span> Kepegawaian
-                        </small>
-                    </div>
-                </div>
-
-                <div class="sub">
-                    Kelola struktur
-                    <i class="fas fa-arrow-right go-arrow ms-1" style="font-size:.65rem;color:#2563eb;"></i>
                 </div>
             </a>
         </div>
@@ -544,7 +483,7 @@
     </div>
 
     {{-- ══════════════════════════════════════════════════════════
-         SECTION 3 — REKAP GURU & PEGAWAI (BARIS BAR HORIZONTAL)
+         SECTION 4 — REKAP GURU & PEGAWAI
     ═══════════════════════════════════════════════════════════ --}}
     <div class="row g-3 mb-4">
 
@@ -625,6 +564,7 @@
         </div>
 
         {{-- ===== REKAP PEGAWAI ===== --}}
+        {{-- Perubahan: PPPK = PPPK Paruh Waktu, baris "PPPK Paruh Waktu" DIHAPUS --}}
         <div class="col-12 col-lg-6">
             <div class="mn-card h-100">
                 <div class="d-flex justify-content-between align-items-center p-4 pb-2">
@@ -664,24 +604,14 @@
                         <span class="rp-pct">{{ $pct($tuPNS, $tuTotal) }}%</span>
                     </a>
 
-                    {{-- PPPK --}}
-                    <a href="{{ route('tu_kepegawaian.tu.index', ['status_kepegawaian' => 'PPPK']) }}" class="rp-row">
-                        <span class="rp-label">
-                            <span class="rp-dot" style="background:{{ $dotStatus['PPPK'] }};"></span> PPPK
-                        </span>
-                        <div class="rp-bar"><div style="width:{{ $pct($tuPPPK, $tuTotal) }}%;background:{{ $warnaStatus['PPPK'] }};"></div></div>
-                        <span class="rp-num">{{ $tuPPPK }}</span>
-                        <span class="rp-pct">{{ $pct($tuPPPK, $tuTotal) }}%</span>
-                    </a>
-
-                    {{-- PPPK Paruh Waktu --}}
+                    {{-- PPPK Paruh Waktu (ditampilkan sebagai "PPPK") --}}
                     <a href="{{ route('tu_kepegawaian.tu.index', ['status_kepegawaian' => 'PPPK Paruh Waktu']) }}" class="rp-row">
                         <span class="rp-label">
-                            <span class="rp-dot" style="background:{{ $dotStatus['PPPK Paruh Waktu'] }};"></span> PPPK P. Waktu
+                            <span class="rp-dot" style="background:{{ $dotStatus['PPPK Paruh Waktu'] }};"></span> PPPK
                         </span>
-                        <div class="rp-bar"><div style="width:{{ $pct($tuParuh, $tuTotal) }}%;background:{{ $warnaStatus['PPPK Paruh Waktu'] }};"></div></div>
-                        <span class="rp-num">{{ $tuParuh }}</span>
-                        <span class="rp-pct">{{ $pct($tuParuh, $tuTotal) }}%</span>
+                        <div class="rp-bar"><div style="width:{{ $pct($tuPPPK, $tuTotal) }}%;background:{{ $warnaStatus['PPPK Paruh Waktu'] }};"></div></div>
+                        <span class="rp-num">{{ $tuPPPK }}</span>
+                        <span class="rp-pct">{{ $pct($tuPPPK, $tuTotal) }}%</span>
                     </a>
 
                     {{-- Lainnya --}}
@@ -703,7 +633,7 @@
     </div>
 
     {{-- ══════════════════════════════════════════════════════════
-         SECTION 4 — GURU TERBARU (LIST BERNOMOR)
+         SECTION 5 — GURU TERBARU
     ═══════════════════════════════════════════════════════════ --}}
     <div class="row g-3">
         <div class="col-12">

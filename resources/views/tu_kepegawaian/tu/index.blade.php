@@ -97,104 +97,33 @@
     .filter-control:focus { background: #fff; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.06); }
     .filter-actions { display: flex; gap: 10px; }
 
-    /* ==========================================
-       TABEL — RAPI & KOMPAK (SAMA DGN DATA GURU)
-       ========================================== */
+    /* --- Table --- */
     .table-container { overflow-x: auto; padding: 0; }
-    .table-premium { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    .table-premium { width: 100%; border-collapse: collapse; font-size: 14px; }
     .table-premium thead th {
-        padding: 13px 16px;
+        padding: 14px 20px;
         text-align: left;
-        font-weight: 700;
-        font-size: 11px;
+        font-weight: 600;
+        font-size: 12px;
         text-transform: uppercase;
-        letter-spacing: 0.07em;
+        letter-spacing: 0.06em;
         color: var(--text-muted);
         background: #FAFBFC;
         border-bottom: 1px solid var(--border);
-        white-space: nowrap;
-        vertical-align: middle;
     }
     .table-premium tbody td {
-        padding: 13px 16px;
+        padding: 16px 20px;
         border-bottom: 1px solid #F1F5F9;
         color: var(--text-body);
-        vertical-align: middle;
     }
     .table-premium tbody tr { transition: background 0.15s; }
     .table-premium tbody tr:hover { background: #F8FAFC; }
     .table-premium tbody tr:last-child td { border-bottom: none; }
-    .table-premium th.text-center,
-    .table-premium td.text-center { text-align: center; }
 
-    .data-name {
-        font-weight: 700;
-        color: var(--text-heading);
-        font-size: 14px;
-        line-height: 1.3;
-    }
-    .data-email {
-        display: inline-block;
-        max-width: 180px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        vertical-align: middle;
-        font-size: 12px;
-        color: var(--text-muted);
-    }
-    .data-email i { font-size: 10px; }
+    .data-name { font-weight: 600; color: var(--text-heading); }
+    .data-email { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--text-muted); }
 
-    /* Identitas nomor: ringkas 2 baris dengan tag label */
-    .num-line {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        line-height: 1.5;
-        white-space: nowrap;
-    }
-    .num-line .tag {
-        font-size: 9px;
-        font-weight: 800;
-        letter-spacing: .06em;
-        color: var(--text-muted);
-        background: #F1F5F9;
-        border-radius: 5px;
-        padding: 1.5px 6px;
-        flex-shrink: 0;
-        min-width: 44px;
-        text-align: center;
-    }
-    .num-line .val {
-        font-family: monospace;
-        font-size: 12.5px;
-        color: var(--text-body);
-        font-weight: 600;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .nip-val {
-        font-family: monospace;
-        font-size: 12.5px;
-        font-weight: 600;
-        color: var(--text-body);
-        white-space: nowrap;
-    }
-
-    /* ==========================================
-       BADGE — ANTI PATAH BARIS
-       ========================================== */
-    .badge-pill {
-        display: inline-flex;
-        align-items: center;
-        padding: 4px 12px;
-        border-radius: 100px;
-        font-size: 11.5px;
-        font-weight: 600;
-        white-space: nowrap;
-        line-height: 1.4;
-    }
+    .badge-pill { display: inline-flex; align-items: center; padding: 4px 14px; border-radius: 100px; font-size: 12px; font-weight: 600; }
     .badge-blue { background: #EEF2FF; color: #4F46E5; }
     .badge-cyan { background: #ECFEFF; color: #0891B2; }
     .badge-yellow { background: #FEF3C7; color: #B45309; }
@@ -204,47 +133,8 @@
     .badge-outline-green { border: 1px solid #A7F3D0; color: #047857; background: transparent; }
     .badge-outline-gray { border: 1px solid #E2E8F0; color: #64748B; background: transparent; }
 
-    /* JK: chip kecil ikon + huruf */
-    .jk-chip {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        width: 40px;
-        padding: 4px 0;
-        border-radius: 8px;
-        font-size: 11.5px;
-        font-weight: 700;
-    }
-    .jk-l { background: #EEF2FF; color: #4F46E5; }
-    .jk-p { background: #FDF2F8; color: #DB2777; }
-
-    /* Indikator kosong */
-    .mark-no {
-        color: #CBD5E1;
-        font-weight: 600;
-        font-size: 13px;
-    }
-
-    .action-btn-group {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-    }
-    .action-btn {
-        width: 32px;
-        height: 32px;
-        border: none;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-        cursor: pointer;
-        text-decoration: none;
-        font-size: 12.5px;
-    }
+    .action-btn-group { display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .action-btn { width: 34px; height: 34px; border: none; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s ease; cursor: pointer; text-decoration: none; }
     .action-btn-view { background: #EEF2FF; color: var(--primary); }
     .action-btn-view:hover { background: var(--primary); color: #fff; transform: scale(1.05); }
     .action-btn-edit { background: #EEF2FF; color: var(--primary); }
@@ -265,7 +155,6 @@
         .filter-actions { flex-direction: column; }
         .filter-actions .btn-premium { width: 100%; justify-content: center; }
         .pagination-modern { flex-direction: column; align-items: center; }
-        .data-email { max-width: 130px; }
     }
 </style>
 
@@ -332,9 +221,6 @@
                         <option value="PNS" {{ request('status_kepegawaian') == 'PNS' ? 'selected' : '' }}>PNS</option>
                         <option value="PPPK" {{ request('status_kepegawaian') == 'PPPK' ? 'selected' : '' }}>PPPK</option>
                         <option value="PPPK Paruh Waktu" {{ request('status_kepegawaian') == 'PPPK Paruh Waktu' ? 'selected' : '' }}>PPPK Paruh Waktu</option>
-                        <option value="Honorer" {{ request('status_kepegawaian') == 'Honorer' ? 'selected' : '' }}>Honorer</option>
-                        <option value="Guru Tetap Yayasan" {{ request('status_kepegawaian') == 'Guru Tetap Yayasan' ? 'selected' : '' }}>GTY</option>
-                        <option value="Guru Tidak Tetap" {{ request('status_kepegawaian') == 'Guru Tidak Tetap' ? 'selected' : '' }}>GTT</option>
                     </select>
                 </div>
 
@@ -398,92 +284,52 @@
             <table class="table-premium">
                 <thead>
                     <tr>
-                        <th style="width: 46px;" class="text-center">#</th>
-                        <th style="min-width: 210px;">Identitas</th>
+                        <th style="width: 50px;">#</th>
+                        <th style="min-width: 200px;">Identitas</th>
                         <th>NIK / NUPTK</th>
                         <th>NIP</th>
                         <th>Status</th>
-                        <th class="text-center" style="width: 70px;">JK</th>
-                        <th style="min-width: 150px;">Tugas Tambahan</th>
-                        <th class="text-center" style="width: 128px;">Aksi</th>
+                        <th class="text-center">JK</th>
+                        <th class="text-center">Tugas Tambahan</th>
+                        <th class="text-center" style="width: 140px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($pegawais as $pegawai)
                         <tr>
-                            {{-- Nomor urut --}}
-                            <td class="text-center fw-bold text-secondary" style="font-size: 12.5px;">
+                            <td class="fw-bold text-secondary" style="font-size: 13px;">
                                 {{ $loop->iteration + $offset }}
                             </td>
-
-                            {{-- Identitas: nama + email terpotong rapi --}}
                             <td>
                                 <div class="data-name">{{ $pegawai->nama }}</div>
-                                @if (!empty($pegawai->email))
-                                    <span class="data-email" title="{{ $pegawai->email }}">
-                                        <i class="fas fa-envelope me-1"></i>{{ $pegawai->email }}
-                                    </span>
-                                @else
-                                    <span class="text-muted small">—</span>
-                                @endif
-                            </td>
-
-                            {{-- NIK / NUPTK: 2 baris ringkas dengan tag label --}}
-                            <td>
-                                <div class="num-line">
-                                    <span class="tag">NIK</span>
-                                    <span class="val">{{ $pegawai->nik ?? '—' }}</span>
-                                </div>
-                                <div class="num-line">
-                                    <span class="tag">NUPTK</span>
-                                    <span class="val">{{ $pegawai->nuptk ?? '—' }}</span>
+                                <div class="data-email">
+                                    <i class="fas fa-envelope text-secondary"></i> {{ $pegawai->email ?? '-' }}
                                 </div>
                             </td>
-
-                            {{-- NIP --}}
-                            <td>
-                                <span class="nip-val">{{ $pegawai->nip ?? '—' }}</span>
+                            <td class="text-secondary">
+                                <div class="fw-bold">{{ $pegawai->nik ?? '-' }}</div>
+                                <div class="text-muted small">NUPTK: {{ $pegawai->nuptk ?? '-' }}</div>
                             </td>
-
-                            {{-- Status: badge anti patah --}}
+                            <td class="text-secondary fw-semibold" style="font-family: monospace; font-size: 13px;">{{ $pegawai->nip ?? '-' }}</td>
                             <td>
                                 @php
                                     $st = strtolower(str_replace(' ', '-', $pegawai->status_kepegawaian ?? ''));
                                     $stClass = 'badge-gray';
                                     if ($st == 'pns') $stClass = 'badge-blue';
                                     elseif ($st == 'pppk' || $st == 'pppk-paruh-waktu') $stClass = 'badge-cyan';
-                                    elseif ($st == 'honorer') $stClass = 'badge-yellow';
-                                    elseif ($st == 'guru-tetap-yayasan') $stClass = 'badge-green';
-                                    elseif ($st == 'guru-tidak-tetap') $stClass = 'badge-purple';
                                 @endphp
                                 <span class="badge-pill {{ $stClass }}">
-                                    {{ $pegawai->status_kepegawaian ?? '—' }}
+                                    {{ $pegawai->status_kepegawaian ?? '-' }}
                                 </span>
                             </td>
-
-                            {{-- JK: chip ikon --}}
+                            <td class="text-center fw-bold text-secondary">{{ $pegawai->jenis_kelamin ?? '-' }}</td>
                             <td class="text-center">
-                                @if ($pegawai->jenis_kelamin === 'L')
-                                    <span class="jk-chip jk-l" title="Laki-laki"><i class="fas fa-mars"></i> L</span>
-                                @elseif ($pegawai->jenis_kelamin === 'P')
-                                    <span class="jk-chip jk-p" title="Perempuan"><i class="fas fa-venus"></i> P</span>
-                                @else
-                                    <span class="mark-no">—</span>
-                                @endif
-                            </td>
-
-                            {{-- Tugas Tambahan: badge amber anti patah --}}
-                            <td>
                                 @if(!empty($pegawai->tugas_tambahan))
-                                    <span class="badge-pill badge-yellow">
-                                        <i class="fas fa-award me-1" style="font-size:10px;"></i>{{ $pegawai->tugas_tambahan }}
-                                    </span>
+                                    <span class="badge-pill badge-yellow">{{ $pegawai->tugas_tambahan }}</span>
                                 @else
-                                    <span class="mark-no">—</span>
+                                    <span class="badge-pill badge-outline-gray">—</span>
                                 @endif
                             </td>
-
-                            {{-- Aksi --}}
                             <td class="text-center">
                                 <div class="action-btn-group">
                                     <a href="{{ route('tu_kepegawaian.tu.show', $pegawai->id) }}" class="action-btn action-btn-view" data-bs-toggle="tooltip" title="Lihat Detail"><i class="fas fa-eye"></i></a>

@@ -21,6 +21,7 @@ class Mutasi extends Model
         'jenis_kelamin',
         'tempat_lahir',
         'tanggal_lahir',
+        'tanggal_lahir', 
         'status_kepegawaian',
         'pendidikan',
         'serdik',

@@ -707,13 +707,8 @@ Route::prefix('mutasi')->name('mutasi.')->group(function () {
             Route::get('/dokumen/create', [TUKepegawaianController::class, 'dokumenCreate'])->name('dokumen.create');
             Route::post('/dokumen/store', [TUKepegawaianController::class, 'dokumenStore'])->name('dokumen.store');
 
-            // ===== RIWAYAT KERJA =====
-            Route::get('/riwayat', [TUKepegawaianController::class, 'riwayatIndex'])->name('riwayat.index');
-            Route::post('/riwayat', [TUKepegawaianController::class, 'riwayatStore'])->name('riwayat.store');
-            Route::put('/riwayat/{id}', [TUKepegawaianController::class, 'riwayatUpdate'])->name('riwayat.update');
-            Route::delete('/riwayat/{id}', [TUKepegawaianController::class, 'riwayatDestroy'])->name('riwayat.destroy');
 
-            // ===== MUTASI =====
+           // ===== MUTASI =====
             Route::get('/mutasi', [TUKepegawaianController::class, 'mutasiIndex'])->name('mutasi.index');
             Route::get('/mutasi/create', [TUKepegawaianController::class, 'mutasiCreate'])->name('mutasi.create');
             Route::post('/mutasi', [TUKepegawaianController::class, 'mutasiStore'])->name('mutasi.store');
@@ -721,6 +716,8 @@ Route::prefix('mutasi')->name('mutasi.')->group(function () {
             Route::get('/mutasi/{id}', [TUKepegawaianController::class, 'mutasiShow'])->name('mutasi.show');
             Route::get('/mutasi/{id}/edit', [TUKepegawaianController::class, 'mutasiEdit'])->name('mutasi.edit');
             Route::put('/mutasi/{id}', [TUKepegawaianController::class, 'mutasiUpdate'])->name('mutasi.update');
+            Route::get('/mutasi/{id}/edit-data', [TUKepegawaianController::class, 'mutasiEditData'])->name('mutasi.edit-data');
+            Route::put('/mutasi/{id}/update-data', [TUKepegawaianController::class, 'mutasiUpdateData'])->name('mutasi.update-data');
             Route::delete('/mutasi/{id}', [TUKepegawaianController::class, 'mutasiDestroy'])->name('mutasi.destroy');
         });
 

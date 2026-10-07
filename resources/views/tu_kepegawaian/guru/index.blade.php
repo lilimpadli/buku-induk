@@ -4,9 +4,8 @@
 
 @section('content')
 <style>
-    /* ==========================================================
-       PREMIUM DESIGN 2.0 (Sleek, Clean, & Modern)
-       ========================================================== */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
     :root {
         --primary: #4F46E5;
         --primary-light: #EEF2FF;
@@ -30,9 +29,7 @@
         box-shadow: var(--shadow-card);
         transition: all 0.25s ease;
     }
-    .card-premium:hover {
-        box-shadow: var(--shadow-hover);
-    }
+    .card-premium:hover { box-shadow: var(--shadow-hover); }
 
     .header-premium {
         display: flex;
@@ -42,11 +39,7 @@
         gap: 16px;
         margin-bottom: 32px;
     }
-    .header-title-wrap {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
+    .header-title-wrap { display: flex; align-items: center; gap: 16px; }
     .header-icon {
         width: 48px;
         height: 48px;
@@ -71,11 +64,7 @@
         font-weight: 500;
         margin: 0;
     }
-    .header-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
+    .header-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 
     .btn-premium {
         padding: 10px 22px;
@@ -90,440 +79,82 @@
         text-decoration: none;
         cursor: pointer;
     }
-    .btn-premium-primary {
-        background: var(--primary);
-        color: #fff;
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
-    }
-    .btn-premium-primary:hover {
-        background: var(--primary-dark);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
-        color: #fff;
-    }
-    .btn-premium-success {
-        background: var(--success);
-        color: #fff;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-    }
-    .btn-premium-success:hover {
-        background: #059669;
-        transform: translateY(-2px);
-        color: #fff;
-    }
-    .btn-premium-ghost {
-        background: #F1F5F9;
-        color: var(--text-body);
-    }
-    .btn-premium-ghost:hover {
-        background: #E2E8F0;
-        transform: translateY(-2px);
-    }
-    .btn-premium-danger-ghost {
-        background: #FEF2F2;
-        color: #EF4444;
-    }
-    .btn-premium-danger-ghost:hover {
-        background: #FEE2E2;
-        transform: translateY(-2px);
-    }
+    .btn-premium-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25); }
+    .btn-premium-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35); color: #fff; }
+    .btn-premium-success { background: var(--success); color: #fff; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); }
+    .btn-premium-success:hover { background: #059669; transform: translateY(-2px); color: #fff; }
+    .btn-premium-ghost { background: #F1F5F9; color: var(--text-body); }
+    .btn-premium-ghost:hover { background: #E2E8F0; transform: translateY(-2px); }
+    .btn-premium-danger-ghost { background: #FEF2F2; color: #EF4444; }
+    .btn-premium-danger-ghost:hover { background: #FEE2E2; transform: translateY(-2px); }
 
-    /* ==========================================
-       TOMBOL CETAK & DROPDOWN
-       ========================================== */
-    .btn-premium-print {
-        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-        color: #fff;
-        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
-        padding: 10px 28px;
-        font-size: 14px;
-        border-radius: 100px;
-        font-weight: 700;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        border: none;
-        cursor: pointer;
-        text-decoration: none;
-        letter-spacing: 0.5px;
-    }
-    .btn-premium-print:hover {
-        transform: translateY(-3px) scale(1.02);
-        box-shadow: 0 8px 30px rgba(245, 158, 11, 0.5);
-        color: #fff;
-    }
+    /* --- Filter --- */
+    .filter-wrapper { padding: 20px 24px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 20px; }
+    .filter-item { flex: 1 1 160px; min-width: 140px; }
+    .filter-item-large { flex: 2 1 240px; }
+    .filter-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-body); margin-bottom: 6px; letter-spacing: 0.02em; }
+    .filter-control { width: 100%; padding: 10px 14px; background: #FAFBFC; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; color: var(--text-heading); transition: 0.2s; outline: none; }
+    .filter-control:focus { background: #fff; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.06); }
+    .filter-actions { display: flex; gap: 10px; }
 
-    .dropdown-menu {
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        padding: 8px;
-        min-width: 250px;
-    }
-    .dropdown-header {
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        padding: 8px 12px;
-    }
-    .dropdown-item {
-        border-radius: 8px;
-        padding: 10px 12px;
-        font-size: 14px;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.2s;
-    }
-    .dropdown-item:hover {
-        background: var(--primary-light);
-        color: var(--primary);
-    }
-    .dropdown-item i {
-        width: 18px;
-        text-align: center;
-    }
-    .dropdown-divider {
-        border-color: var(--border);
-        margin: 6px 0;
-    }
-
-    .filter-wrapper {
-        padding: 20px 24px;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-end;
-        gap: 12px 20px;
-    }
-    .filter-item {
-        flex: 1 1 160px;
-        min-width: 140px;
-    }
-    .filter-item-large {
-        flex: 2 1 240px;
-    }
-    .filter-label {
-        display: block;
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--text-body);
-        margin-bottom: 6px;
-        letter-spacing: 0.02em;
-    }
-    .filter-control {
-        width: 100%;
-        padding: 10px 14px;
-        background: #FAFBFC;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        font-size: 14px;
-        color: var(--text-heading);
-        transition: 0.2s;
-        outline: none;
-    }
-    .filter-control:focus {
-        background: #fff;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.06);
-    }
-    .filter-actions {
-        display: flex;
-        gap: 10px;
-    }
-
-    /* ==========================================
-       TABEL — RAPI & KOMPAK
-       ========================================== */
-    .table-container {
-        overflow-x: auto;
-        padding: 0;
-    }
-    .table-premium {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13.5px;
-    }
+    /* --- Table --- */
+    .table-container { overflow-x: auto; padding: 0; }
+    .table-premium { width: 100%; border-collapse: collapse; font-size: 14px; }
     .table-premium thead th {
-        padding: 13px 16px;
+        padding: 14px 20px;
         text-align: left;
-        font-weight: 700;
-        font-size: 11px;
+        font-weight: 600;
+        font-size: 12px;
         text-transform: uppercase;
-        letter-spacing: 0.07em;
+        letter-spacing: 0.06em;
         color: var(--text-muted);
         background: #FAFBFC;
         border-bottom: 1px solid var(--border);
-        white-space: nowrap;
-        vertical-align: middle;
     }
     .table-premium tbody td {
-        padding: 13px 16px;
+        padding: 16px 20px;
         border-bottom: 1px solid #F1F5F9;
         color: var(--text-body);
-        vertical-align: middle;
     }
-    .table-premium tbody tr {
-        transition: background 0.15s;
-    }
-    .table-premium tbody tr:hover {
-        background: #F8FAFC;
-    }
-    .table-premium tbody tr:last-child td {
-        border-bottom: none;
-    }
-    .table-premium th.text-center,
-    .table-premium td.text-center {
-        text-align: center;
-    }
+    .table-premium tbody tr { transition: background 0.15s; }
+    .table-premium tbody tr:hover { background: #F8FAFC; }
+    .table-premium tbody tr:last-child td { border-bottom: none; }
 
-    .data-name {
-        font-weight: 700;
-        color: var(--text-heading);
-        font-size: 14px;
-        line-height: 1.3;
-    }
-    .data-email {
-        display: inline-block;
-        max-width: 180px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        vertical-align: middle;
-        font-size: 12px;
-        color: var(--text-muted);
-    }
-    .data-email i {
-        font-size: 10px;
-    }
+    .data-name { font-weight: 600; color: var(--text-heading); }
+    .data-email { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--text-muted); }
 
-    /* Identitas nomor: ringkas 2 baris dengan label kecil */
-    .num-line {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        line-height: 1.5;
-        white-space: nowrap;
-    }
-    .num-line .tag {
-        font-size: 9px;
-        font-weight: 800;
-        letter-spacing: .06em;
-        color: var(--text-muted);
-        background: #F1F5F9;
-        border-radius: 5px;
-        padding: 1.5px 6px;
-        flex-shrink: 0;
-        min-width: 44px;
-        text-align: center;
-    }
-    .num-line .val {
-        font-family: monospace;
-        font-size: 12.5px;
-        color: var(--text-body);
-        font-weight: 600;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+    .badge-pill { display: inline-flex; align-items: center; padding: 4px 14px; border-radius: 100px; font-size: 12px; font-weight: 600; }
+    .badge-blue { background: #EEF2FF; color: #4F46E5; }
+    .badge-cyan { background: #ECFEFF; color: #0891B2; }
+    .badge-yellow { background: #FEF3C7; color: #B45309; }
+    .badge-green { background: #D1FAE5; color: #047857; }
+    .badge-gray { background: #F1F5F9; color: #475569; }
+    .badge-purple { background: #F3E8FF; color: #7E22CE; }
+    .badge-outline-green { border: 1px solid #A7F3D0; color: #047857; background: transparent; }
+    .badge-outline-gray { border: 1px solid #E2E8F0; color: #64748B; background: transparent; }
 
-    .nip-val {
-        font-family: monospace;
-        font-size: 12.5px;
-        font-weight: 600;
-        color: var(--text-body);
-        white-space: nowrap;
-    }
+    .action-btn-group { display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .action-btn { width: 34px; height: 34px; border: none; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s ease; cursor: pointer; text-decoration: none; }
+    .action-btn-view { background: #EEF2FF; color: var(--primary); }
+    .action-btn-view:hover { background: var(--primary); color: #fff; transform: scale(1.05); }
+    .action-btn-edit { background: #EEF2FF; color: var(--primary); }
+    .action-btn-edit:hover { background: var(--primary); color: #fff; transform: scale(1.05); }
+    .action-btn-delete { background: #FEF2F2; color: var(--danger); }
+    .action-btn-delete:hover { background: var(--danger); color: #fff; transform: scale(1.05); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
 
-    /* ==========================================
-       BADGE — ANTI PATAH BARIS
-       ========================================== */
-    .badge-pill {
-        display: inline-flex;
-        align-items: center;
-        padding: 4px 12px;
-        border-radius: 100px;
-        font-size: 11.5px;
-        font-weight: 600;
-        white-space: nowrap;
-        line-height: 1.4;
-    }
-    .badge-blue {
-        background: #EEF2FF;
-        color: #4F46E5;
-    }
-    .badge-cyan {
-        background: #ECFEFF;
-        color: #0891B2;
-    }
-    .badge-yellow {
-        background: #FEF3C7;
-        color: #B45309;
-    }
-    .badge-green {
-        background: #D1FAE5;
-        color: #047857;
-    }
-    .badge-gray {
-        background: #F1F5F9;
-        color: #475569;
-    }
-    .badge-purple {
-        background: #F3E8FF;
-        color: #7E22CE;
-    }
-    .badge-outline-green {
-        border: 1px solid #A7F3D0;
-        color: #047857;
-        background: transparent;
-    }
-    .badge-outline-gray {
-        border: 1px solid #E2E8F0;
-        color: #64748B;
-        background: transparent;
-    }
-
-    /* JK: chip kecil ikon + huruf */
-    .jk-chip {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        width: 40px;
-        padding: 4px 0;
-        border-radius: 8px;
-        font-size: 11.5px;
-        font-weight: 700;
-    }
-    .jk-l { background: #EEF2FF; color: #4F46E5; }
-    .jk-p { background: #FDF2F8; color: #DB2777; }
-
-    /* Serdik & tugas: indikator ringkas */
-    .mark-yes {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 11.5px;
-        font-weight: 700;
-        color: #047857;
-        white-space: nowrap;
-    }
-    .mark-yes i { font-size: 12px; }
-    .mark-no {
-        color: #CBD5E1;
-        font-weight: 600;
-        font-size: 13px;
-    }
-
-    .action-btn-group {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-    }
-    .action-btn {
-        width: 32px;
-        height: 32px;
-        border: none;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-        cursor: pointer;
-        text-decoration: none;
-        font-size: 12.5px;
-    }
-    .action-btn-view {
-        background: #EEF2FF;
-        color: var(--primary);
-    }
-    .action-btn-view:hover {
-        background: var(--primary);
-        color: #fff;
-        transform: scale(1.05);
-    }
-    .action-btn-edit {
-        background: #EEF2FF;
-        color: var(--primary);
-    }
-    .action-btn-edit:hover {
-        background: var(--primary);
-        color: #fff;
-        transform: scale(1.05);
-    }
-    .action-btn-delete {
-        background: #FEF2F2;
-        color: var(--danger);
-    }
-    .action-btn-delete:hover {
-        background: var(--danger);
-        color: #fff;
-        transform: scale(1.05);
-        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-    }
-
-    .pagination-modern {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 16px 24px 24px;
-        border-top: 1px solid #F1F5F9;
-    }
-    .pagination-modern .page-link {
-        border: none;
-        border-radius: 10px;
-        padding: 8px 14px;
-        font-weight: 600;
-        font-size: 13px;
-        color: var(--text-body);
-        transition: 0.2s;
-    }
-    .pagination-modern .page-link:hover {
-        background: #F1F5F9;
-        color: var(--primary);
-    }
-    .pagination-modern .page-item.active .page-link {
-        background: var(--primary);
-        color: #fff;
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
-    }
+    .pagination-modern { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 24px 24px; border-top: 1px solid #F1F5F9; }
+    .pagination-modern .page-link { border: none; border-radius: 10px; padding: 8px 14px; font-weight: 600; font-size: 13px; color: var(--text-body); transition: 0.2s; }
+    .pagination-modern .page-link:hover { background: #F1F5F9; color: var(--primary); }
+    .pagination-modern .page-item.active .page-link { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25); }
 
     @media (max-width: 768px) {
-        .header-premium {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .header-actions {
-            width: 100%;
-            flex-direction: column;
-        }
-        .header-actions .btn-premium {
-            width: 100%;
-            justify-content: center;
-        }
-        .filter-wrapper {
-            flex-direction: column;
-            gap: 12px;
-            padding: 16px;
-        }
-        .filter-actions {
-            flex-direction: column;
-        }
-        .filter-actions .btn-premium {
-            width: 100%;
-            justify-content: center;
-        }
-        .pagination-modern {
-            flex-direction: column;
-            align-items: center;
-        }
-        .data-email {
-            max-width: 130px;
-        }
+        .header-premium { flex-direction: column; align-items: flex-start; }
+        .header-actions { width: 100%; flex-direction: column; }
+        .header-actions .btn-premium { width: 100%; justify-content: center; }
+        .filter-wrapper { flex-direction: column; gap: 12px; padding: 16px; }
+        .filter-actions { flex-direction: column; }
+        .filter-actions .btn-premium { width: 100%; justify-content: center; }
+        .pagination-modern { flex-direction: column; align-items: center; }
     }
 </style>
 
@@ -541,11 +172,10 @@
 
 <div class="app-container">
 
+    <!-- HEADER -->
     <div class="header-premium">
         <div class="header-title-wrap">
-            <div class="header-icon">
-                <i class="fas fa-chalkboard-user"></i>
-            </div>
+            <div class="header-icon"><i class="fas fa-chalkboard-user"></i></div>
             <div>
                 <h1 class="header-title">Data Guru</h1>
                 <p class="header-subtitle">Manajemen terpusat tenaga pendidik</p>
@@ -554,7 +184,7 @@
         <div class="header-actions">
             <!-- DROPDOWN CETAK -->
             <div class="btn-group">
-                <button type="button" class="btn-premium-print dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <button type="button" class="btn-premium btn-premium-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-print"></i> Cetak
                 </button>
                 <ul class="dropdown-menu">
@@ -576,15 +206,9 @@
                 </ul>
             </div>
 
-            <button type="button" class="btn-premium btn-premium-success" data-bs-toggle="modal" data-bs-target="#importGuruModal">
-                <i class="fas fa-file-import"></i> Import
-            </button>
-            <button type="button" class="btn-premium btn-premium-ghost" data-bs-toggle="modal" data-bs-target="#templateGuruModal">
-                <i class="fas fa-download"></i> Template
-            </button>
-            <a href="{{ route('tu_kepegawaian.guru.create') }}" class="btn-premium btn-premium-primary">
-                <i class="fas fa-plus"></i> Tambah
-            </a>
+            <button type="button" class="btn-premium btn-premium-success" data-bs-toggle="modal" data-bs-target="#importGuruModal"><i class="fas fa-file-import"></i> Import</button>
+            <button type="button" class="btn-premium btn-premium-ghost" data-bs-toggle="modal" data-bs-target="#templateGuruModal"><i class="fas fa-download"></i> Template</button>
+            <a href="{{ route('tu_kepegawaian.guru.create') }}" class="btn-premium btn-premium-primary"><i class="fas fa-plus"></i> Tambah</a>
         </div>
     </div>
 
@@ -608,9 +232,6 @@
                         <option value="PNS" {{ request('status_kepegawaian') == 'PNS' ? 'selected' : '' }}>PNS</option>
                         <option value="PPPK" {{ request('status_kepegawaian') == 'PPPK' ? 'selected' : '' }}>PPPK</option>
                         <option value="PPPK Paruh Waktu" {{ request('status_kepegawaian') == 'PPPK Paruh Waktu' ? 'selected' : '' }}>PPPK Paruh Waktu</option>
-                        <option value="Honorer" {{ request('status_kepegawaian') == 'Honorer' ? 'selected' : '' }}>Honorer</option>
-                        <option value="Guru Tetap Yayasan" {{ request('status_kepegawaian') == 'Guru Tetap Yayasan' ? 'selected' : '' }}>GTY</option>
-                        <option value="Guru Tidak Tetap" {{ request('status_kepegawaian') == 'Guru Tidak Tetap' ? 'selected' : '' }}>GTT</option>
                     </select>
                 </div>
 
@@ -636,12 +257,8 @@
                 </div>
 
                 <div class="filter-actions">
-                    <button type="submit" class="btn-premium btn-premium-primary">
-                        <i class="fas fa-sliders-h"></i> Filter
-                    </button>
-                    <a href="{{ route('tu_kepegawaian.guru.index') }}" class="btn-premium btn-premium-danger-ghost">
-                        <i class="fas fa-undo-alt"></i> Reset
-                    </a>
+                    <button type="submit" class="btn-premium btn-premium-primary"><i class="fas fa-sliders-h"></i> Filter</button>
+                    <a href="{{ route('tu_kepegawaian.guru.index') }}" class="btn-premium btn-premium-danger-ghost"><i class="fas fa-undo-alt"></i> Reset</a>
                 </div>
             </div>
         </form>
@@ -670,9 +287,7 @@
             <div class="text-muted small fw-semibold">
                 <i class="fas fa-database text-primary me-1"></i>
                 Total:
-                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-1">
-                    {{ $totalData }}
-                </span>
+                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-1">{{ $totalData }}</span>
             </div>
         </div>
 
@@ -680,113 +295,65 @@
             <table class="table-premium">
                 <thead>
                     <tr>
-                        <th style="width: 46px;" class="text-center">#</th>
-                        <th style="min-width: 210px;">Identitas</th>
+                        <th style="width: 50px;">#</th>
+                        <th style="min-width: 200px;">Identitas</th>
                         <th>NIK / NUPTK</th>
                         <th>NIP</th>
                         <th>Status</th>
-                        <th class="text-center" style="width: 70px;">JK</th>
-                        <th class="text-center" style="width: 80px;">Serdik</th>
-                        <th style="min-width: 150px;">Tugas Tambahan</th>
-                        <th class="text-center" style="width: 128px;">Aksi</th>
+                        <th class="text-center">JK</th>
+                        <th class="text-center">Serdik</th>
+                        <th class="text-center">Tugas Tambahan</th>
+                        <th class="text-center" style="width: 140px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($gurus as $guru)
                         <tr>
-                            {{-- Nomor urut --}}
-                            <td class="text-center fw-bold text-secondary" style="font-size: 12.5px;">
+                            <td class="fw-bold text-secondary" style="font-size: 13px;">
                                 {{ $loop->iteration + $offset }}
                             </td>
-
-                            {{-- Identitas: nama + email terpotong rapi --}}
                             <td>
                                 <div class="data-name">{{ $guru->nama }}</div>
-                                @if (!empty($guru->email))
-                                    <span class="data-email" title="{{ $guru->email }}">
-                                        <i class="fas fa-envelope me-1"></i>{{ $guru->email }}
-                                    </span>
-                                @else
-                                    <span class="text-muted small">—</span>
-                                @endif
-                            </td>
-
-                            {{-- NIK / NUPTK: 2 baris ringkas dengan tag label --}}
-                            <td>
-                                <div class="num-line">
-                                    <span class="tag">NIK</span>
-                                    <span class="val">{{ $guru->nik ?? '—' }}</span>
-                                </div>
-                                <div class="num-line">
-                                    <span class="tag">NUPTK</span>
-                                    <span class="val">{{ $guru->nuptk ?? '—' }}</span>
+                                <div class="data-email">
+                                    <i class="fas fa-envelope text-secondary"></i> {{ $guru->email ?? '-' }}
                                 </div>
                             </td>
-
-                            {{-- NIP --}}
-                            <td>
-                                <span class="nip-val">{{ $guru->nip ?? '—' }}</span>
+                            <td class="text-secondary">
+                                <div class="fw-bold">{{ $guru->nik ?? '-' }}</div>
+                                <div class="text-muted small">NUPTK: {{ $guru->nuptk ?? '-' }}</div>
                             </td>
-
-                            {{-- Status: badge anti patah --}}
+                            <td class="text-secondary fw-semibold" style="font-family: monospace; font-size: 13px;">{{ $guru->nip ?? '-' }}</td>
                             <td>
                                 @php
                                     $status = strtolower(str_replace(' ', '-', $guru->status_kepegawaian ?? ''));
                                     $class = 'badge-gray';
                                     if($status == 'pns') $class = 'badge-blue';
                                     elseif($status == 'pppk' || $status == 'pppk-paruh-waktu') $class = 'badge-cyan';
-                                    elseif($status == 'honorer') $class = 'badge-yellow';
-                                    elseif($status == 'guru-tetap-yayasan') $class = 'badge-green';
-                                    elseif($status == 'guru-tidak-tetap') $class = 'badge-purple';
                                 @endphp
                                 <span class="badge-pill {{ $class }}">
-                                    {{ $guru->status_kepegawaian ?? '—' }}
+                                    {{ $guru->status_kepegawaian ?? '-' }}
                                 </span>
                             </td>
-
-                            {{-- JK: chip ikon --}}
-                            <td class="text-center">
-                                @if ($guru->jenis_kelamin === 'L')
-                                    <span class="jk-chip jk-l" title="Laki-laki"><i class="fas fa-mars"></i> L</span>
-                                @elseif ($guru->jenis_kelamin === 'P')
-                                    <span class="jk-chip jk-p" title="Perempuan"><i class="fas fa-venus"></i> P</span>
-                                @else
-                                    <span class="mark-no">—</span>
-                                @endif
-                            </td>
-
-                            {{-- Serdik: centang / garis --}}
+                            <td class="text-center fw-bold text-secondary">{{ $guru->jenis_kelamin ?? '-' }}</td>
                             <td class="text-center">
                                 @if(!empty($guru->serdik))
-                                    <span class="mark-yes" title="{{ $guru->serdik }}"><i class="fas fa-circle-check"></i> Ada</span>
+                                    <span class="badge-pill badge-green">{{ $guru->serdik }}</span>
                                 @else
-                                    <span class="mark-no">—</span>
+                                    <span class="badge-pill badge-outline-gray">—</span>
                                 @endif
                             </td>
-
-                            {{-- Tugas Tambahan: badge amber anti patah --}}
-                            <td>
+                            <td class="text-center">
                                 @if(!empty($guru->tugas_tambahan))
-                                    <span class="badge-pill badge-yellow">
-                                        <i class="fas fa-award me-1" style="font-size:10px;"></i>{{ $guru->tugas_tambahan }}
-                                    </span>
+                                    <span class="badge-pill badge-yellow">{{ $guru->tugas_tambahan }}</span>
                                 @else
-                                    <span class="mark-no">—</span>
+                                    <span class="badge-pill badge-outline-gray">—</span>
                                 @endif
                             </td>
-
-                            {{-- Aksi --}}
                             <td class="text-center">
                                 <div class="action-btn-group">
-                                    <a href="{{ route('tu_kepegawaian.guru.show', $guru->id) }}" class="action-btn action-btn-view" data-bs-toggle="tooltip" title="Lihat Detail">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ route('tu_kepegawaian.guru.edit', $guru->id) }}" class="action-btn action-btn-edit" data-bs-toggle="tooltip" title="Edit Data">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <button type="button" class="action-btn action-btn-delete" onclick="confirmDelete({{ $guru->id }}, '{{ addslashes($guru->nama) }}')" data-bs-toggle="tooltip" title="Hapus Data">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                    <a href="{{ route('tu_kepegawaian.guru.show', $guru->id) }}" class="action-btn action-btn-view" data-bs-toggle="tooltip" title="Lihat Detail"><i class="fas fa-eye"></i></a>
+                                    <a href="{{ route('tu_kepegawaian.guru.edit', $guru->id) }}" class="action-btn action-btn-edit" data-bs-toggle="tooltip" title="Edit Data"><i class="fas fa-edit"></i></a>
+                                    <button type="button" class="action-btn action-btn-delete" onclick="confirmDelete({{ $guru->id }}, '{{ addslashes($guru->nama) }}')" data-bs-toggle="tooltip" title="Hapus Data"><i class="fas fa-trash-alt"></i></button>
                                 </div>
                             </td>
                         </tr>

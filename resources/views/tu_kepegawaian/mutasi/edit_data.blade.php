@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Data Pegawai / TU')
+@section('title', 'Edit Data Mutasi')
 
 @section('content')
 <style>
@@ -11,7 +11,6 @@
         --primary: #4F46E5;
         --primary-light: #EEF2FF;
         --primary-dark: #4338CA;
-        --success: #10B981;
         --danger: #EF4444;
         --text-heading: #0F172A;
         --text-body: #334155;
@@ -36,7 +35,6 @@
     .stagger-2 { animation-delay: .12s; }
     .stagger-3 { animation-delay: .18s; }
     .stagger-4 { animation-delay: .24s; }
-    .stagger-5 { animation-delay: .30s; }
 
     .header-premium { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
     .header-title-wrap { display: flex; align-items: center; gap: 16px; }
@@ -55,9 +53,6 @@
 
     .section-header { display: flex; align-items: center; gap: 14px; padding: 22px 28px; background: linear-gradient(135deg, #FAFBFC, #fff); border-bottom: 1px solid #F1F5F9; }
     .section-icon { width: 42px; height: 42px; flex-shrink: 0; background: var(--primary-light); color: var(--primary); border-radius: 12px; font-size: 16px; display: flex; align-items: center; justify-content: center; }
-    .section-icon-success { background: #D1FAE5; color: #047857; }
-    .section-icon-warning { background: #FEF3C7; color: #B45309; }
-    .section-icon-info { background: #E0F2FE; color: #0369A1; }
     .section-title { font-size: 16px; font-weight: 700; color: var(--text-heading); margin: 0; }
     .section-desc { font-size: 13px; color: var(--text-muted); margin: 2px 0 0; }
     .section-body { padding: 24px 28px; }
@@ -88,12 +83,6 @@
     .field-error { display: flex; align-items: center; gap: 5px; color: var(--danger); font-size: 12px; font-weight: 500; margin-top: 6px; }
     .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; display: flex; align-items: center; gap: 5px; }
 
-    /* Info box */
-    .info-box { display: flex; align-items: flex-start; gap: 12px; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; }
-    .info-box i { color: #2563EB; font-size: 16px; margin-top: 2px; flex-shrink: 0; }
-    .info-box-text { font-size: 13px; color: #1E40AF; line-height: 1.5; }
-    .info-box-text strong { color: #1E3A8A; }
-
     .form-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 20px 28px; background-color: #FAFBFC; border-top: 1px solid #F1F5F9; }
     .form-footer-note { font-size: 13px; color: var(--text-muted); display: inline-flex; align-items: center; gap: 7px; }
 
@@ -112,14 +101,14 @@
     {{-- HEADER --}}
     <div class="header-premium">
         <div class="header-title-wrap">
-            <div class="header-icon"><i class="fas fa-user-plus"></i></div>
+            <div class="header-icon"><i class="fas fa-user-pen"></i></div>
             <div>
-                <h1 class="header-title">Tambah Data Pegawai / TU</h1>
-                <p class="header-subtitle">Formulir penambahan data kepegawaian tenaga usaha</p>
-                <p class="header-subtitle">Formulir penambahan data pegawai baru</p>            </div>
+                <h1 class="header-title">Edit Data Mutasi</h1>
+                <p class="header-subtitle">Sedang mengedit: <strong class="text-dark">{{ $mutasi->nama_entitas }}</strong></p>
+            </div>
         </div>
-        <a href="{{ route('tu_kepegawaian.tu.index') }}" class="btn-premium btn-premium-ghost">
-            <i class="fas fa-arrow-left"></i> Kembali
+        <a href="{{ route('tu_kepegawaian.mutasi.show', $mutasi->id) }}" class="btn-premium btn-premium-ghost">
+            <i class="fas fa-eye"></i> Lihat Detail
         </a>
     </div>
 
@@ -138,22 +127,17 @@
         </div>
     @endif
 
-    <form action="{{ route('tu_kepegawaian.tu.store') }}" method="POST">
+    <form action="{{ route('tu_kepegawaian.mutasi.update-data', $mutasi->id) }}" method="POST">
         @csrf
+        @method('PUT')
+
+        {{-- Hidden fields: jenis & tanggal --}}
+        <input type="hidden" name="jenis" value="{{ $mutasi->jenis }}">
+        <input type="hidden" name="tanggal" value="{{ $mutasi->tanggal }}">
 
         @php
-            $statusKepegawaianOptions = ['PNS', 'PPPK', 'PPPK Paruh Waktu', 'Honorer', 'Guru Tetap Yayasan', 'Guru Tidak Tetap'];
-            $pendidikanOptions        = ['S3', 'S2', 'S1', 'D4', 'D3'];
-        @endphp
-
-        {{-- INFO BOX --}}
-        <div class="card-premium mb-4">
-            <div class="section-body">
-                <div class="info-box" style="margin-bottom: 0;">
-                    <i class="fas fa-info-circle"></i>
-                    <div class="info-box-text">
-                        <strong>Informasi:</strong> Form ini <b>hanya menyimpan data pegawai</b> ke database. Tidak ada akun login yang dibuat otomatis. Untuk pegawai yang membutuhkan akses sistem (misal TU Kepegawaian), silakan atur melalui menu <b>Super Admin → Users</b>.
-            $statusKepegawaianOptions = ['PNS', 'PPPK', 'PPPK Paruh Waktu', 'Non-ASN'];
+            $val = fn($field) => old($field, $mutasi->$field);
+            $tanggalLahir = old('tanggal_lahir', $mutasi->tanggal_lahir ? \Carbon\Carbon::parse($mutasi->tanggal_lahir)->format('Y-m-d') : '');
         @endphp
 
         {{-- ===== SECTION 1: IDENTITAS ===== --}}
@@ -161,165 +145,98 @@
             <div class="section-header">
                 <div class="section-icon"><i class="fas fa-id-card"></i></div>
                 <div>
-                    <h2 class="section-title">Informasi Utama & Identitas</h2>
-                    <p class="section-desc">Data diri dan nomor identitas resmi pegawai</p>
+                    <h2 class="section-title">Identitas</h2>
+                    <p class="section-desc">Data diri lengkap</p>
                 </div>
             </div>
             <div class="section-body">
                 <div class="row g-4">
                     <div class="col-md-8">
                         <label class="form-label-premium"><i class="fas fa-user"></i> Nama Lengkap <span class="required-star">*</span></label>
-                        <input type="text" name="name" value="{{ old('name') }}" class="form-control-premium @error('name') is-invalid-premium @enderror" placeholder="Contoh: Rizki Ramadhan, S.Kom." required>
-                        @error('name')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label-premium"><i class="fas fa-venus-mars"></i> Jenis Kelamin <span class="required-star">*</span></label>
-                        <select name="jenis_kelamin" class="form-select-premium @error('jenis_kelamin') is-invalid-premium @enderror" required>
-                            <option value="">-- Pilih --</option>
-                            <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-laki</option>
-                            <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
-                        </select>
-                        @error('jenis_kelamin')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label-premium"><i class="fas fa-hashtag"></i> NIP / Nomor Induk <span class="required-star">*</span></label>
-                        <input type="text" name="nomor_induk" value="{{ old('nomor_induk') }}" class="form-control-premium @error('nomor_induk') is-invalid-premium @enderror" placeholder="Nomor Induk Pegawai" required>
-                        @error('nomor_induk')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label-premium"><i class="fas fa-fingerprint"></i> NIK</label>
-                        <input type="text" name="nik" value="{{ old('nik') }}" maxlength="16" inputmode="numeric" class="form-control-premium @error('nik') is-invalid-premium @enderror" placeholder="16 digit angka">
-                        @error('nik')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label-premium"><i class="fas fa-id-badge"></i> NUPTK</label>
-                        <input type="text" name="nuptk" value="{{ old('nuptk') }}" class="form-control-premium @error('nuptk') is-invalid-premium @enderror" placeholder="Nomor Unik PTK">
-                        @error('nuptk')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label-premium"><i class="fas fa-map-marker-alt"></i> Tempat Lahir</label>
-                        <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir') }}" class="form-control-premium @error('tempat_lahir') is-invalid-premium @enderror" placeholder="Kota / Kabupaten kelahiran">
-                        @error('tempat_lahir')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label-premium"><i class="fas fa-calendar-alt"></i> Tanggal Lahir</label>
-                        <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}" class="form-control-premium @error('tanggal_lahir') is-invalid-premium @enderror">
-                        @error('tanggal_lahir')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- ===== SECTION 1: IDENTITAS PEGAWAI ===== --}}
-        <div class="card-premium mb-4">
-            <div class="section-header">
-                <div class="section-icon section-icon-info"><i class="fas fa-id-card"></i></div>
-                <div>
-                    <h2 class="section-title">Identitas Pegawai</h2>
-                    <p class="section-desc">Data diri dan nomor identitas resmi pegawai</p>
-                </div>
-            </div>
-            <div class="section-body">
-                <div class="row g-4">
-                    <div class="col-md-8">
-                        <label class="form-label-premium"><i class="fas fa-user"></i> Nama Lengkap <span class="required-star">*</span></label>
-                        <input type="text" name="nama" value="{{ old('nama') }}" class="form-control-premium @error('nama') is-invalid-premium @enderror" placeholder="Nama lengkap pegawai" required>
-                        @error('nama')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
+                        <input type="text" name="nama_entitas" value="{{ $val('nama_entitas') }}" class="form-control-premium @error('nama_entitas') is-invalid-premium @enderror" required>
+                        @error('nama_entitas')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label-premium"><i class="fas fa-venus-mars"></i> Jenis Kelamin</label>
                         <select name="jenis_kelamin" class="form-select-premium @error('jenis_kelamin') is-invalid-premium @enderror">
                             <option value="">-- Pilih --</option>
-                            <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-laki</option>
-                            <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
+                            <option value="L" {{ $val('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                            <option value="P" {{ $val('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
                         </select>
                         @error('jenis_kelamin')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label-premium"><i class="fas fa-fingerprint"></i> NIK</label>
-                        <input type="text" name="nik" value="{{ old('nik') }}" maxlength="16" inputmode="numeric" class="form-control-premium @error('nik') is-invalid-premium @enderror" placeholder="16 digit angka">
+                        <input type="text" name="nik" value="{{ $val('nik') }}" maxlength="16" inputmode="numeric" class="form-control-premium @error('nik') is-invalid-premium @enderror">
                         @error('nik')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label-premium"><i class="fas fa-id-badge"></i> NUPTK</label>
-                        <input type="text" name="nuptk" value="{{ old('nuptk') }}" class="form-control-premium @error('nuptk') is-invalid-premium @enderror" placeholder="Nomor Unik PTK">
+                        <input type="text" name="nuptk" value="{{ $val('nuptk') }}" class="form-control-premium @error('nuptk') is-invalid-premium @enderror">
                         @error('nuptk')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label-premium"><i class="fas fa-hashtag"></i> NIP</label>
-                        <input type="text" name="nip" value="{{ old('nip') }}" class="form-control-premium @error('nip') is-invalid-premium @enderror" placeholder="Nomor Induk Pegawai">
+                        <input type="text" name="nip" value="{{ $val('nip') }}" class="form-control-premium @error('nip') is-invalid-premium @enderror">
                         @error('nip')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-6">
                         <label class="form-label-premium"><i class="fas fa-map-marker-alt"></i> Tempat Lahir</label>
-                        <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir') }}" class="form-control-premium @error('tempat_lahir') is-invalid-premium @enderror" placeholder="Kota / Kabupaten kelahiran">
+                        <input type="text" name="tempat_lahir" value="{{ $val('tempat_lahir') }}" class="form-control-premium @error('tempat_lahir') is-invalid-premium @enderror">
                         @error('tempat_lahir')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-6">
                         <label class="form-label-premium"><i class="fas fa-calendar-alt"></i> Tanggal Lahir</label>
-                        <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}" class="form-control-premium @error('tanggal_lahir') is-invalid-premium @enderror">
+                        <input type="date" name="tanggal_lahir" value="{{ $tanggalLahir }}" class="form-control-premium @error('tanggal_lahir') is-invalid-premium @enderror">
                         @error('tanggal_lahir')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- ===== SECTION 2: KEPEGAWAIAN ===== --}}
-        <div class="card-premium mb-4 stagger-1">
-            <div class="section-header">
-                <div class="section-icon section-icon-warning"><i class="fas fa-briefcase"></i></div>
-                <div>
-                    <h2 class="section-title">Kepegawaian & Kualifikasi</h2>
-                    <p class="section-desc">Status kepegawaian, kualifikasi akademik, dan tugas tambahan</p>
         {{-- ===== SECTION 2: KEPEGAWAIAN ===== --}}
         <div class="card-premium mb-4 stagger-1">
             <div class="section-header">
                 <div class="section-icon"><i class="fas fa-briefcase"></i></div>
                 <div>
                     <h2 class="section-title">Kepegawaian & Kualifikasi</h2>
-                    <p class="section-desc">Jabatan, status kepegawaian, dan kualifikasi akademik</p>
+                    <p class="section-desc">Status, pendidikan, dan tugas</p>
                 </div>
             </div>
             <div class="section-body">
                 <div class="row g-4">
                     <div class="col-md-6">
-                        <label class="form-label-premium"><i class="fas fa-sitemap"></i> Jabatan / Role <span class="required-star">*</span></label>
-                        <input type="text" name="role" value="{{ old('role') }}" class="form-control-premium @error('role') is-invalid-premium @enderror" placeholder="Contoh: TU Akademik, TU Kepegawaian" required>
-                        @error('role')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
-                        <div class="form-hint"><i class="fas fa-circle-info"></i> Ketik jabatan, misal: TU Akademik, TU Kepegawaian, Staf Administrasi.</div>
-                    </div>
-                    <div class="col-md-6">
                         <label class="form-label-premium"><i class="fas fa-building-user"></i> Status Kepegawaian</label>
                         <select name="status_kepegawaian" class="form-select-premium @error('status_kepegawaian') is-invalid-premium @enderror">
-                            <option value="">-- Pilih Status Kepegawaian --</option>
-                            @foreach ($statusKepegawaianOptions as $opt)
-                                <option value="{{ $opt }}" {{ old('status_kepegawaian') == $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                            <option value="">-- Pilih --</option>
+                            @foreach(['PNS', 'PPPK', 'PPPK Paruh Waktu', 'Non-ASN'] as $opt)
+                                <option value="{{ $opt }}" {{ $val('status_kepegawaian') == $opt ? 'selected' : '' }}>{{ $opt }}</option>
                             @endforeach
                         </select>
                         @error('status_kepegawaian')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-6">
                         <label class="form-label-premium"><i class="fas fa-graduation-cap"></i> Pendidikan Terakhir</label>
-                        <select name="pendidikan" class="form-select-premium @error('pendidikan') is-invalid-premium @enderror">
-                            <option value="">-- Pilih Pendidikan --</option>
-                            @foreach ($pendidikanOptions as $opt)
-                                <option value="{{ $opt }}" {{ old('pendidikan') == $opt ? 'selected' : '' }}>{{ $opt }}</option>
-                            @endforeach
-                        </select>
+                        <input type="text" name="pendidikan" value="{{ $val('pendidikan') }}" class="form-control-premium @error('pendidikan') is-invalid-premium @enderror" placeholder="Contoh: S1 Teknik Informatika">
                         @error('pendidikan')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
+                        <div class="form-hint"><i class="fas fa-circle-info"></i> Contoh: S1 Teknik Informatika / S2 Magister Manajemen.</div>
                     </div>
-                    <div class="col-md-12">
-                        <label class="form-label-premium"><i class="fas fa-tasks"></i> Tugas Tambahan</label>
-                        <input type="text" name="tugas_tambahan" value="{{ old('tugas_tambahan') }}" class="form-control-premium @error('tugas_tambahan') is-invalid-premium @enderror" placeholder="Contoh: Bendahara Sekolah / Staf Perpustakaan">
-                        <input type="text" name="pendidikan" value="{{ old('pendidikan') }}" class="form-control-premium @error('pendidikan') is-invalid-premium @enderror" placeholder="Contoh: S1 Teknik Informatika">
-                        @error('pendidikan')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
-                        <div class="form-hint"><i class="fas fa-circle-info"></i> Bisa diisi lengkap: S1 / S2 / D3 + jurusan.</div>
+                    <div class="col-md-6">
+                        <label class="form-label-premium"><i class="fas fa-certificate"></i> Serdik (Sertifikasi)</label>
+                        <input type="text" name="serdik" value="{{ $val('serdik') }}" class="form-control-premium @error('serdik') is-invalid-premium @enderror" placeholder="Contoh: 2019 / nomor sertifikat">
+                        @error('serdik')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
+                        <div class="form-hint"><i class="fas fa-circle-info"></i> Kosongkan jika belum tersertifikasi.</div>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label-premium"><i class="fas fa-tasks"></i> Tugas Tambahan</label>
-                        <input type="text" name="tugas_tambahan" value="{{ old('tugas_tambahan') }}" class="form-control-premium @error('tugas_tambahan') is-invalid-premium @enderror" placeholder="Contoh: Tenaga Perpustakaan">
+                        <input type="text" name="tugas_tambahan" value="{{ $val('tugas_tambahan') }}" class="form-control-premium @error('tugas_tambahan') is-invalid-premium @enderror" placeholder="Contoh: Wali Kelas XI RPL 1 / Kaprog">
                         @error('tugas_tambahan')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                         <div class="form-hint"><i class="fas fa-circle-info"></i> Kosongkan jika tidak ada tugas tambahan.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-premium"><i class="fas fa-user-tie"></i> Jabatan</label>
+                        <input type="text" name="jabatan" value="{{ $val('jabatan') }}" class="form-control-premium @error('jabatan') is-invalid-premium @enderror" placeholder="Contoh: Guru / Pegawai TU">
+                        @error('jabatan')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                 </div>
             </div>
@@ -328,35 +245,33 @@
         {{-- ===== SECTION 3: KONTAK ===== --}}
         <div class="card-premium mb-4 stagger-2">
             <div class="section-header">
-                <div class="section-icon section-icon-success"><i class="fas fa-address-book"></i></div>
-                <div>
-                    <h2 class="section-title">Informasi Kontak</h2>
-                    <p class="section-desc">Nomor telepon dan alamat email yang dapat dihubungi</p>
                 <div class="section-icon"><i class="fas fa-address-book"></i></div>
                 <div>
                     <h2 class="section-title">Informasi Kontak</h2>
-                    <p class="section-desc">Nomor telepon dan email yang dapat dihubungi</p>
+                    <p class="section-desc">Email dan telepon</p>
                 </div>
             </div>
             <div class="section-body">
                 <div class="row g-4">
                     <div class="col-md-4">
-                        <label class="form-label-premium"><i class="fas fa-phone-alt"></i> No. HP / WhatsApp</label>
-                        <input type="tel" name="no_hp" value="{{ old('no_hp') }}" class="form-control-premium @error('no_hp') is-invalid-premium @enderror" placeholder="081234567890">
-                        @error('no_hp')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label-premium"><i class="fas fa-envelope"></i> Email Pribadi</label>
-                        <input type="email" name="email_pribadi" value="{{ old('email_pribadi') }}" class="form-control-premium @error('email_pribadi') is-invalid-premium @enderror" placeholder="nama@gmail.com">
-                        @error('email_pribadi')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                         <label class="form-label-premium"><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" name="email" value="{{ old('email') }}" class="form-control-premium @error('email') is-invalid-premium @enderror" placeholder="nama@sekolah.sch.id">
+                        <input type="email" name="email" value="{{ $val('email') }}" class="form-control-premium @error('email') is-invalid-premium @enderror" placeholder="nama@sekolah.sch.id">
                         @error('email')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label-premium"><i class="fas fa-at"></i> Email Resmi / Sekolah</label>
-                        <input type="email" name="email_resmi" value="{{ old('email_resmi') }}" class="form-control-premium @error('email_resmi') is-invalid-premium @enderror" placeholder="nama@sekolah.sch.id">
+                        <label class="form-label-premium"><i class="fas fa-envelope-open"></i> Email Pribadi</label>
+                        <input type="email" name="email_pribadi" value="{{ $val('email_pribadi') }}" class="form-control-premium @error('email_pribadi') is-invalid-premium @enderror" placeholder="nama@gmail.com">
+                        @error('email_pribadi')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label-premium"><i class="fas fa-at"></i> Email Resmi</label>
+                        <input type="email" name="email_resmi" value="{{ $val('email_resmi') }}" class="form-control-premium @error('email_resmi') is-invalid-premium @enderror" placeholder="nama@sekolah.sch.id">
                         @error('email_resmi')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label-premium"><i class="fas fa-phone-alt"></i> Telepon</label>
+                        <input type="text" name="telepon" value="{{ $val('telepon') }}" class="form-control-premium @error('telepon') is-invalid-premium @enderror" placeholder="081234567890">
+                        @error('telepon')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                 </div>
             </div>
@@ -368,64 +283,78 @@
                 <div class="section-icon"><i class="fas fa-map-marked-alt"></i></div>
                 <div>
                     <h2 class="section-title">Alamat Domisili</h2>
-                    <p class="section-desc">Informasi domisili dan wilayah tempat tinggal saat ini</p>
+                    <p class="section-desc">Domisili lengkap — alamat lengkap otomatis digabung dari field di bawah</p>
                 </div>
             </div>
             <div class="section-body">
                 <div class="row g-4">
                     <div class="col-12">
                         <label class="form-label-premium"><i class="fas fa-road"></i> Alamat Jalan / Kampung</label>
-                        <textarea name="alamat" rows="2" class="form-control-premium @error('alamat') is-invalid-premium @enderror" placeholder="Nama jalan, nomor rumah, dsb...">{{ old('alamat') }}</textarea>
-                        @error('alamat')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
+                        <textarea name="alamat_jalan" rows="2" class="form-control-premium @error('alamat_jalan') is-invalid-premium @enderror" placeholder="Nama jalan, nomor rumah, dsb...">{{ $val('alamat_jalan') }}</textarea>
+                        @error('alamat_jalan')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label-premium"><i class="fas fa-map-pin"></i> Dusun</label>
-                        <input type="text" name="dusun" value="{{ old('dusun') }}" class="form-control-premium @error('dusun') is-invalid-premium @enderror" placeholder="Nama dusun">
+                        <input type="text" name="dusun" value="{{ $val('dusun') }}" class="form-control-premium @error('dusun') is-invalid-premium @enderror">
                         @error('dusun')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label-premium"><i class="fas fa-home"></i> Desa / Kelurahan</label>
-                        <input type="text" name="desa" value="{{ old('desa') }}" class="form-control-premium @error('desa') is-invalid-premium @enderror" placeholder="Nama desa / kelurahan">
+                        <input type="text" name="desa" value="{{ $val('desa') }}" class="form-control-premium @error('desa') is-invalid-premium @enderror">
                         @error('desa')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label-premium"><i class="fas fa-city"></i> Kecamatan</label>
-                        <input type="text" name="kecamatan" value="{{ old('kecamatan') }}" class="form-control-premium @error('kecamatan') is-invalid-premium @enderror" placeholder="Nama kecamatan">
+                        <input type="text" name="kecamatan" value="{{ $val('kecamatan') }}" class="form-control-premium @error('kecamatan') is-invalid-premium @enderror">
                         @error('kecamatan')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label-premium"><i class="fas fa-sort-numeric-down"></i> RT</label>
-                        <input type="text" name="rt" value="{{ old('rt') }}" class="form-control-premium @error('rt') is-invalid-premium @enderror" placeholder="001">
+                        <input type="text" name="rt" value="{{ $val('rt') }}" class="form-control-premium @error('rt') is-invalid-premium @enderror">
                         @error('rt')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label-premium"><i class="fas fa-sort-numeric-down-alt"></i> RW</label>
-                        <input type="text" name="rw" value="{{ old('rw') }}" class="form-control-premium @error('rw') is-invalid-premium @enderror" placeholder="002">
+                        <input type="text" name="rw" value="{{ $val('rw') }}" class="form-control-premium @error('rw') is-invalid-premium @enderror">
                         @error('rw')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label-premium"><i class="fas fa-mail-bulk"></i> Kode Pos</label>
-                        <input type="text" name="kode_pos" value="{{ old('kode_pos') }}" maxlength="5" inputmode="numeric" class="form-control-premium @error('kode_pos') is-invalid-premium @enderror" placeholder="12345">
+                        <input type="text" name="kode_pos" value="{{ $val('kode_pos') }}" maxlength="5" inputmode="numeric" class="form-control-premium @error('kode_pos') is-invalid-premium @enderror">
                         @error('kode_pos')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
                     </div>
                 </div>
             </div>
         </div>
 
+        {{-- ===== SECTION 5: KETERANGAN ===== --}}
+        <div class="card-premium mb-4 stagger-4">
+            <div class="section-header">
+                <div class="section-icon"><i class="fas fa-comment-dots"></i></div>
+                <div>
+                    <h2 class="section-title">Keterangan</h2>
+                    <p class="section-desc">Catatan tambahan</p>
+                </div>
+            </div>
+            <div class="section-body">
+                <textarea name="keterangan" rows="3" class="form-control-premium @error('keterangan') is-invalid-premium @enderror" placeholder="Catatan tambahan...">{{ $val('keterangan') }}</textarea>
+                @error('keterangan')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
+            </div>
+        </div>
+
         {{-- ===== FOOTER ===== --}}
-        <div class="card-premium stagger-4">
+        <div class="card-premium">
             <div class="form-footer">
                 <div class="form-footer-note">
                     <i class="fas fa-info-circle text-primary"></i>
                     Kolom bertanda <span class="required-star">*</span> wajib diisi.
                 </div>
                 <div class="d-flex gap-2 btn-group-action">
-                    <a href="{{ route('tu_kepegawaian.tu.index') }}" class="btn-premium btn-premium-ghost">Batal</a>
-                    <a href="{{ route('tu_kepegawaian.tu.index') }}" class="btn-premium btn-premium-ghost">
+                    <a href="{{ route('tu_kepegawaian.mutasi.index') }}" class="btn-premium btn-premium-ghost">
                         <i class="fas fa-arrow-left"></i> Batal
                     </a>
                     <button type="submit" class="btn-premium btn-premium-primary">
-                        <i class="fas fa-save"></i> Simpan Data
+                        <i class="fas fa-save"></i> Simpan Perubahan
                     </button>
                 </div>
             </div>

@@ -40,6 +40,8 @@ class GuruImport implements ToCollection
         'serdiksertifikasi'  => 'serdik',
         'sertifikasi'        => 'serdik',
         'tugastambahan'      => 'tugas_tambahan',
+        'tugas'              => 'tugas_tambahan',
+        'jabatan'            => 'tugas_tambahan',
         'tempatlahir'        => 'tempat_lahir',
         'tanggallahir'       => 'tanggal_lahir',
         'emailpribadi'       => 'email_pribadi',
@@ -66,6 +68,37 @@ class GuruImport implements ToCollection
     /** Hasil mapping: key internal => index kolom di Excel */
     protected $map = [];
 
+    /**
+     * Fallback index — kalau header tidak terdeteksi.
+     * Sesuai urutan kolom Excel yang biasa dipakai:
+     * 0=Nama, 1=NIK, 2=NUPTK, 3=NIP, 4=Status, 5=JK,
+     * 6=Serdik, 7=Tugas Tambahan, 8=Tempat Lahir, 9=Tanggal Lahir,
+     * 10=Email Pribadi, 11=Email Resmi, 12=Alamat, 13=RT, 14=RW,
+     * 15=Dusun, 16=Kelurahan, 17=Kecamatan, 18=Kode Pos, 19=No HP
+     */
+    protected $fallbackIndex = [
+        'nama'               => 0,
+        'nik'                => 1,
+        'nuptk'              => 2,
+        'nip'                => 3,
+        'status_kepegawaian' => 4,
+        'jenis_kelamin'      => 5,
+        'serdik'             => 6,
+        'tugas_tambahan'     => 7,
+        'tempat_lahir'       => 8,
+        'tanggal_lahir'      => 9,
+        'email_pribadi'      => 10,
+        'email_resmi'        => 11,
+        'alamat_jalan'       => 12,
+        'rt'                 => 13,
+        'rw'                 => 14,
+        'dusun'              => 15,
+        'desa'               => 16,
+        'kecamatan'          => 17,
+        'kode_pos'           => 18,
+        'telepon'            => 19,
+    ];
+
     protected function normalizeHeader(?string $header): string
     {
         return preg_replace('/[^a-z0-9]/', '', strtolower(trim((string) $header)));
@@ -90,20 +123,32 @@ class GuruImport implements ToCollection
             }
         }
 
+        Log::info('GuruImport RAW HEADER: ' . json_encode($headerRow->toArray()));
         Log::info('GuruImport MAP: ' . json_encode($this->map));
     }
 
     /**
      * Ambil nilai cell berdasarkan NAMA KOLOM (bukan index).
-     * Aman: kalau kolom tidak ada di Excel, hasilnya null.
+     * Aman: kalau kolom tidak ada di Excel, fallback ke index default.
      */
     protected function cell(Collection $row, string $field): ?string
     {
-        if (!array_key_exists($field, $this->map)) {
+        $idx = null;
+
+        // 1. Coba ambil dari mapping header
+        if (array_key_exists($field, $this->map)) {
+            $idx = $this->map[$field];
+        }
+        // 2. Fallback ke index default
+        elseif (array_key_exists($field, $this->fallbackIndex)) {
+            $idx = $this->fallbackIndex[$field];
+        }
+
+        if ($idx === null) {
             return null;
         }
 
-        $value = trim((string) ($row[$this->map[$field]] ?? ''));
+        $value = trim((string) ($row[$idx] ?? ''));
 
         return $value !== '' ? $value : null;
     }
@@ -118,8 +163,8 @@ class GuruImport implements ToCollection
         // ── BARIS PERTAMA = HEADER ──
         $this->buildMap($rows->first());
 
-        if (!array_key_exists('nama', $this->map)) {
-            $this->errors[] = 'Kolom "Nama" tidak ditemukan. Pastikan baris pertama Excel berisi judul kolom (Nama, NIK, NIP, dst).';
+        if (!array_key_exists('nama', $this->map) && !array_key_exists('nama', $this->fallbackIndex)) {
+            $this->errors[] = 'Kolom "Nama" tidak ditemukan.';
             return;
         }
 
@@ -137,11 +182,14 @@ class GuruImport implements ToCollection
             $jk            = strtoupper((string) $this->cell($row, 'jenis_kelamin'));
             $jenis_kelamin = in_array($jk, ['L', 'P']) ? $jk : 'L';
 
-            // ✅ FIX UTAMA: serdik & tugas_tambahan kini dibaca
-            //    SESUAI JUDUL KOLOMNYA — urutan kolom Excel bebas
+            // ✅ FIX: serdik & tugas_tambahan dibaca berdasarkan HEADER,
+            //    kalau header tidak ada → fallback index.
             $serdik         = $this->cell($row, 'serdik');
             $tugas_tambahan = $this->cell($row, 'tugas_tambahan');
             $tempat_lahir   = $this->cell($row, 'tempat_lahir');
+
+            // Debug log per baris
+            Log::info("GuruImport ROW {$index}: nama='{$nama}' | serdik='{$serdik}' | tugas_tambahan='{$tugas_tambahan}'");
 
             // ── Tanggal lahir (dukung tanggal Excel & teks) ──
             $tanggal_lahir = null;
@@ -185,7 +233,6 @@ class GuruImport implements ToCollection
             try {
                 $nomor_induk = $nip ?: ($nik ?: $nama);
 
-                // Cegah menimpa akun super admin
                 $superAdmin = User::where('nomor_induk', $nomor_induk)
                     ->where('role', 'super_admin')
                     ->first();
@@ -257,9 +304,6 @@ class GuruImport implements ToCollection
 
     // ==========================================================
     // KOMPATIBILITAS DENGAN CONTROLLER
-    // Controller memanggil 2 method ini jika checkbox dikirim.
-    // Dengan mapping berbasis header, keduanya tidak diperlukan,
-    // tapi WAJIB ada agar tidak error "undefined method".
     // ==========================================================
     public function setSelectedColumns(array $columns)
     {

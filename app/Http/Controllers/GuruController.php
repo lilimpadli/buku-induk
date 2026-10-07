@@ -134,6 +134,7 @@ class GuruController extends Controller
         $guru->jenis_kelamin      = $request->jenis_kelamin;
         $guru->pendidikan         = $request->pendidikan;
         $guru->serdik             = $request->serdik;
+        $guru->tugas_tambahan     = $request->tugas_tambahan;
         $guru->tempat_lahir       = $request->tempat_lahir;
         $guru->tanggal_lahir      = $request->tanggal_lahir;
         $guru->email              = $user->email;
@@ -142,13 +143,10 @@ class GuruController extends Controller
         $guru->alamat             = $request->alamat_jalan ?? $request->alamat;        $guru->rt                 = $request->rt;
         $guru->rw                 = $request->rw;
         $guru->dusun              = $request->dusun;
-        // FIX: DB tidak punya kolom 'kelurahan' → pakai 'desa' saja
         $guru->desa               = $request->desa ?? $request->kelurahan;
         $guru->kecamatan          = $request->kecamatan;
         $guru->kode_pos           = $request->kode_pos;
         $guru->telepon            = $request->telepon;
-        $guru->gelar_depan        = $request->gelar_depan;
-        $guru->gelar_belakang     = $request->gelar_belakang;
         $guru->user_id            = $user->id;
 
         $guru->save();
@@ -223,6 +221,9 @@ class GuruController extends Controller
         return Excel::download(new GuruTemplateExport($fields), 'template_guru.xlsx');
     }
 
+    // ==========================================
+    // IMPORT GURU — PAKAI GuruImport (baca header, bukan index)
+    // ==========================================
     public function import(Request $request)
     {
         $request->validate([
@@ -234,110 +235,13 @@ class GuruController extends Controller
         ]);
 
         try {
-            $file = $request->file('file');
+            // ✅ GUNAKAN GuruImport — baca berdasarkan HEADER, bukan index
+            $import = new \App\Imports\GuruImport();
 
-            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getRealPath());
-            $sheet = $spreadsheet->getActiveSheet();
-            $rows = $sheet->toArray();
+            Excel::import($import, $request->file('file'));
 
-            $successCount = 0;
-            $errors = [];
-            $defaultPassword = '12345678';
-
-            foreach ($rows as $index => $row) {
-                if ($index === 0) {
-                    continue;
-                }
-
-                $nama = trim($row[0] ?? '');
-
-                if (empty($nama)) {
-                    continue;
-                }
-
-                $nik            = trim($row[1] ?? null);
-                $nuptk          = trim($row[2] ?? null);
-                $nip            = trim($row[3] ?? null);
-                $status_pegawai = trim($row[4] ?? null);
-                $jenis_kelamin  = trim($row[5] ?? 'L');
-                $pendidikan     = trim($row[6] ?? null);
-                $serdik         = trim($row[7] ?? null);
-                $tempat_lahir   = trim($row[8] ?? null);
-                $tanggal_lahir  = trim($row[9] ?? null);
-                $email_pribadi  = trim($row[10] ?? null);
-                $email_resmi    = trim($row[11] ?? null);
-
-                $alamat_jalan   = trim($row[12] ?? null);
-                $rt             = trim($row[13] ?? null);
-                $rw             = trim($row[14] ?? null);
-                $dusun          = trim($row[15] ?? null);
-                $desa           = trim($row[16] ?? null);
-                $kecamatan      = trim($row[17] ?? null);
-                $kode_pos       = trim($row[18] ?? null);
-                $no_hp          = trim($row[19] ?? null);
-
-                $nomor_induk = $nip ?: ($nik ?: $nama);
-
-                $superAdmin = User::where('nomor_induk', $nomor_induk)->where('role', 'super_admin')->first();
-                if ($superAdmin) {
-                    $errors[] = "SKIP: Identitas {$nomor_induk} milik SUPER ADMIN.";
-                    continue;
-                }
-
-                $email = $email_pribadi ?: (strtolower(str_replace(' ', '', $nama)) . time() . "@smkn1x.sch.id");
-
-                $existingUser = User::where('nomor_induk', $nomor_induk)->first();
-                if ($existingUser) {
-                    if ($existingUser->role === 'super_admin') {
-                        continue;
-                    }
-                    $user = $existingUser;
-                    $user->update(['name' => $nama, 'email' => $email]);
-                } else {
-                    $user = User::create([
-                        'name' => $nama,
-                        'nomor_induk' => $nomor_induk,
-                        'email' => $email,
-                        'password' => Hash::make($defaultPassword),
-                        'role' => 'guru',
-                    ]);
-                }
-
-                $guru = Guru::where('nip', $nomor_induk)->orWhere('nik', $nik)->first();
-                if (!$guru) {
-                    $guru = new Guru();
-                }
-
-                $guru->nama                 = $nama;
-                $guru->nik                  = $nik;
-                $guru->nuptk                = $nuptk;
-                $guru->nip                  = $nip ?: $nomor_induk;
-                $guru->status_kepegawaian   = $status_pegawai;
-                $guru->jenis_kelamin        = $jenis_kelamin;
-                $guru->pendidikan           = $pendidikan;
-                $guru->serdik               = $serdik;
-                $guru->tempat_lahir         = $tempat_lahir;
-                $guru->tanggal_lahir        = $tanggal_lahir;
-                $guru->email                = $email;
-                $guru->email_pribadi        = $email;
-                $guru->email_resmi          = $email_resmi;
-
-                $guru->alamat_jalan         = $alamat_jalan;
-                $guru->alamat               = $alamat_jalan;
-                $guru->rt                   = $rt;
-                $guru->rw                   = $rw;
-                $guru->dusun                = $dusun;
-                // FIX: DB tidak punya kolom 'kelurahan' → pakai 'desa' saja
-                $guru->desa                 = $desa;
-                $guru->kecamatan            = $kecamatan;
-                $guru->kode_pos             = $kode_pos;
-                $guru->telepon              = $no_hp;
-
-                $guru->user_id              = $user->id;
-                $guru->save();
-
-                $successCount++;
-            }
+            $successCount = $import->getSuccessCount();
+            $errors       = $import->getErrors();
 
             if ($successCount === 0) {
                 if (count($errors) > 0) {

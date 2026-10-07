@@ -2,7 +2,8 @@
 
 @section('title', 'Tambah Data Mutasi')
 
-@section('content')
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     .card-custom {
@@ -65,8 +66,84 @@
         background: #F1F5F9;
         border-color: #94A3B8;
     }
-</style>
 
+    /* ===== SELECT2 PREMIUM STYLE ===== */
+    .select2-container--default .select2-selection--single {
+        height: auto;
+        padding: 12px 16px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        background: #f8fafc;
+        transition: all 0.2s ease;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #0F172A;
+        font-size: 14px;
+        line-height: 1.5;
+        padding: 0;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 100%;
+        right: 12px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-color: #94A3B8 transparent transparent transparent;
+        border-width: 6px 5px 0 5px;
+    }
+    .select2-container--default.select2-container--focus .select2-selection--single,
+    .select2-container--default.select2-container--open .select2-selection--single {
+        background: #ffffff;
+        border-color: #4F46E5;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+    }
+    .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #94A3B8;
+    }
+    .select2-dropdown {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        margin-top: 4px;
+    }
+    .select2-search--dropdown {
+        padding: 10px;
+    }
+    .select2-search--dropdown .select2-search__field {
+        padding: 10px 14px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 14px;
+        outline: none;
+    }
+    .select2-search--dropdown .select2-search__field:focus {
+        border-color: #4F46E5;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+    }
+    .select2-results__option {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #4F46E5;
+        color: #fff;
+    }
+    .select2-container--default .select2-results__option[aria-selected=true] {
+        background-color: #EEF2FF;
+        color: #4F46E5;
+    }
+    .select2-results__group {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #94A3B8;
+        padding: 8px 16px 4px;
+    }
+</style>
+@endpush
+
+@section('content')
 <div class="container-fluid px-4 mt-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -101,7 +178,7 @@
                             <div class="col-md-6">
                                 <div class="mb-4">
                                     <label class="form-label-custom"><i class="fas fa-user me-1 text-primary"></i> Pilih Guru / Pegawai <span class="text-danger">*</span></label>
-                                    <select name="entitas_id" class="form-select form-control-custom" required>
+                                    <select name="entitas_id" id="entitas_id" class="form-select form-control-custom" required>
                                         <option value="">-- Pilih --</option>
                                         <optgroup label="Data Guru">
                                             @foreach($gurus as $g)
@@ -118,7 +195,7 @@
                                             @endforeach
                                         </optgroup>
                                     </select>
-                                    <div class="form-text text-muted small">Pilih guru atau pegawai yang akan dicatat mutasinya.</div>
+                                    <div class="form-text text-muted small">Ketik nama untuk mencari, atau pilih dari daftar.</div>
                                 </div>
                             </div>
 
@@ -161,3 +238,28 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#entitas_id').select2({
+            placeholder: '-- Ketik nama untuk mencari --',
+            allowClear: true,
+            width: '100%',
+            language: {
+                noResults: function() {
+                    return 'Tidak ada hasil ditemukan';
+                },
+                searching: function() {
+                    return 'Mencari...';
+                },
+                inputTooShort: function() {
+                    return 'Ketik minimal 1 karakter';
+                }
+            }
+        });
+    });
+</script>
+@endpush

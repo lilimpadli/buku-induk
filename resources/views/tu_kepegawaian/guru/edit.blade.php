@@ -132,13 +132,11 @@
         @method('PUT')
 
         @php
-            $statusKepegawaianOptions = ['PNS', 'PPPK', 'PPPK Paruh Waktu', 'Honorer', 'Guru Tetap Yayasan', 'Guru Tidak Tetap'];
+            $statusKepegawaianOptions = ['PNS', 'PPPK', 'PPPK Paruh Waktu', 'Non ASN'];
             $statusAktifOptions       = ['Aktif', 'Non-Aktif', 'Cuti', 'Mutasi', 'Pensiun', 'Keluar'];
-            $pendidikanOptions        = ['S3', 'S2', 'S1', 'D4', 'D3'];
 
             $currentKepegawaian = old('status_kepegawaian', $guru->status_kepegawaian);
             $currentAktif       = old('status_aktif', $guru->status_aktif ?? 'Aktif');
-            $currentPendidikan  = old('pendidikan', $guru->pendidikan);
             $currentTglLahir    = old('tanggal_lahir', $guru->tanggal_lahir ? \Carbon\Carbon::parse($guru->tanggal_lahir)->format('Y-m-d') : '');
         @endphp
 
@@ -233,16 +231,9 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label-premium"><i class="fas fa-graduation-cap"></i> Pendidikan Terakhir</label>
-                        <select name="pendidikan" class="form-select-premium @error('pendidikan') is-invalid-premium @enderror">
-                            <option value="">-- Pilih Pendidikan --</option>
-                            @if ($currentPendidikan && !in_array($currentPendidikan, $pendidikanOptions))
-                                <option value="{{ $currentPendidikan }}" selected>{{ $currentPendidikan }}</option>
-                            @endif
-                            @foreach ($pendidikanOptions as $opt)
-                                <option value="{{ $opt }}" {{ $currentPendidikan == $opt ? 'selected' : '' }}>{{ $opt }}</option>
-                            @endforeach
-                        </select>
+                        <input type="text" name="pendidikan" value="{{ old('pendidikan', $guru->pendidikan) }}" class="form-control-premium @error('pendidikan') is-invalid-premium @enderror" placeholder="Contoh: S1 Teknik Informatika">
                         @error('pendidikan')<div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>@enderror
+                        <div class="form-hint"><i class="fas fa-circle-info"></i> Contoh: S1 Teknik Informatika / S2 Magister Manajemen.</div>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label-premium"><i class="fas fa-certificate"></i> Serdik (Sertifikasi)</label>

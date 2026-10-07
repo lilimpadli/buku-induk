@@ -198,7 +198,7 @@
             'PNS' => 'badge-blue',
             'PPPK' => 'badge-cyan',
             'PPPK Paruh Waktu' => 'badge-cyan',
-            'Honorer' => 'badge-yellow',
+            'Non-ASN' => 'badge-yellow',
             'Guru Tetap Yayasan' => 'badge-green',
             'Guru Tidak Tetap' => 'badge-purple',
         ];

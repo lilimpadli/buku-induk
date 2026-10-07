@@ -555,11 +555,13 @@
                                     <i class="fas fa-user-tie"></i> <span>Data Pegawai</span>
                                 </a>
 
-                                <a href="{{ route('tu_kepegawaian.riwayat.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.riwayat.*') ? 'active' : '' }}">
-                                    <i class="fas fa-history"></i> <span>Riwayat Tugas</span>
+                                {{-- ✅ FIX: Data Mutasi → halaman ARSIP (index) --}}
+                                <a href="{{ route('tu_kepegawaian.mutasi.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.mutasi.index') || request()->routeIs('tu_kepegawaian.mutasi.laporan') ? 'active' : '' }}">
+                                    <i class="fas fa-history"></i> <span>Data Mutasi</span>
                                 </a>
 
-                                <a href="{{ route('tu_kepegawaian.mutasi.index') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.mutasi*') ? 'active' : '' }}">
+                                {{-- ✅ FIX: Mutasi Guru & Pegawai → halaman FORM (create) --}}
+                                <a href="{{ route('tu_kepegawaian.mutasi.create') }}" class="nav-link {{ request()->routeIs('tu_kepegawaian.mutasi.create') || request()->routeIs('tu_kepegawaian.mutasi.edit') ? 'active' : '' }}">
                                     <i class="fas fa-exchange-alt"></i> <span>Mutasi Guru & Pegawai</span>
                                 </a>
 
