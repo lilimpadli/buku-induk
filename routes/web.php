@@ -526,7 +526,7 @@ Route::group([], function () {
                 // ============================================================
                 // MUTASI SISWA
                 // ============================================================
-                Route::prefix('mutasi')->name('mutasi.')->group(function () {
+Route::prefix('mutasi')->name('mutasi.')->group(function () {
     Route::get('/', [MutasiController::class, 'index'])->name('index');
     Route::get('/create', [MutasiController::class, 'create'])->name('create');
     Route::post('/', [MutasiController::class, 'store'])->name('store');
@@ -545,6 +545,15 @@ Route::group([], function () {
     Route::post('/simpan-pindah', [MutasiController::class, 'simpanSuratPindah'])->name('simpan-pindah');
     Route::post('/simpan-do', [MutasiController::class, 'simpanSuratDo'])->name('simpan-do');
     Route::get('/surat/{id}', [MutasiController::class, 'suratShow'])->name('surat-show');
+     Route::post('/surat/{id}/update-nomor', [MutasiController::class, 'updateNomorSurat'])->name('surat.update-nomor');
+
+    // ============================================================
+    // ✅ TAMBAHAN BARU — MUTASI MASUK & REKAP
+    // Letakkan DI ATAS route dinamis {mutasi}
+    // ============================================================
+    Route::get('/masuk/create', [MutasiController::class, 'createMasuk'])->name('masuk.create');
+    Route::post('/masuk', [MutasiController::class, 'storeMasuk'])->name('masuk.store');
+    Route::get('/rekap', [MutasiController::class, 'rekap'])->name('rekap');
 
     // Dynamic — paling bawah
     Route::get('/{mutasi}', [MutasiController::class, 'show'])->name('show');
@@ -552,7 +561,6 @@ Route::group([], function () {
     Route::put('/{mutasi}', [MutasiController::class, 'update'])->name('update');
     Route::delete('/{mutasi}', [MutasiController::class, 'destroy'])->name('destroy');
 });
-
                 // ============================================================
                 // NILAI RAPORT
                 // ============================================================

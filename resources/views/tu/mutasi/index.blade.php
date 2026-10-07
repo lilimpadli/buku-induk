@@ -41,6 +41,9 @@
     .hero-title { font-size: 32px; font-weight: 800; margin: 0 0 6px; }
     .hero-subtitle { font-size: 14px; opacity: .85; margin: 0; }
 
+    /* ============================================
+       TOMBOL HERO — VARIASI WARNA
+       ============================================ */
     .btn-hero {
         background: white; color: var(--primary);
         border: none; border-radius: 14px;
@@ -56,6 +59,26 @@
         border: 1px solid rgba(255,255,255,.3);
     }
     .btn-hero.btn-outline:hover { background: rgba(255,255,255,.25); color: white; }
+
+    .btn-hero.btn-green {
+        background: linear-gradient(135deg, #34D399, #10B981);
+        color: white;
+    }
+    .btn-hero.btn-green:hover {
+        background: linear-gradient(135deg, #10B981, #059669);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-hero.btn-cyan {
+        background: linear-gradient(135deg, #38BDF8, #0EA5E9);
+        color: white;
+    }
+    .btn-hero.btn-cyan:hover {
+        background: linear-gradient(135deg, #0EA5E9, #0284C7);
+        color: white;
+        transform: translateY(-2px);
+    }
 
     /* AKSI MASSAL */
     .card-modern {
@@ -165,6 +188,12 @@
                 </a>
                 <a href="{{ route('tu.mutasi.create') }}" class="btn-hero">
                     <i class="fas fa-plus"></i> Mutasi Individual
+                </a>
+                <a href="{{ route('tu.mutasi.masuk.create') }}" class="btn-hero btn-green">
+                    <i class="fas fa-sign-in-alt"></i> Tambah Siswa Pindahan
+                </a>
+                <a href="{{ route('tu.mutasi.rekap') }}" class="btn-hero btn-cyan">
+                    <i class="fas fa-list-alt"></i> Rekap Mutasi
                 </a>
             </div>
         </div>

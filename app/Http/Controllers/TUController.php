@@ -932,7 +932,7 @@ public function cetakBiodataAll(Request $request)
     
     return $pdf->download($fileName);
 }
-    public function cetakDaftarHadirRapot()
+      public function cetakDaftarHadirRapot()
     {
         $rombelId = request('rombel_id');
 
@@ -942,23 +942,47 @@ public function cetakBiodataAll(Request $request)
 
         $rombel = Rombel::with(['siswa', 'siswa.absensi'])->findOrFail($rombelId);
 
-        $semester = Semester::where('is_active', true)->first();
+        // Ambil semester aktif (yang is_current paling diprioritaskan)
+        $semester = Semester::with('tahunAjaran')
+            ->where('is_current', true)
+            ->first();
+
         if (!$semester) {
-            $semester = Semester::orderBy('id', 'desc')->first();
+            $semester = Semester::with('tahunAjaran')
+                ->where('is_active', true)
+                ->orderBy('id', 'desc')
+                ->first();
         }
 
-$tahunAjaran = $semester ? $semester->tahun : null;
-    $pdf = Pdf::loadView('tu.laporan.pdf.daftar-hadir-rapot', [
-    'rombel' => $rombel,
-    'siswa' => $rombel->siswa,
-    'semester' => $semester,
-    'tahunAjaran' => $tahunAjaran,
-]);
+        if (!$semester) {
+            $semester = Semester::with('tahunAjaran')
+                ->orderBy('id', 'desc')
+                ->first();
+        }
+
+        // Ambil tahun ajaran dari relasi (bukan dari kolom $semester->tahun yang tidak ada)
+        $tahunAjaran = $semester?->tahunAjaran?->tahun;
+
+        // Fallback: kalau masih null, cari tahun ajaran yang is_current
+        if (empty($tahunAjaran)) {
+            $tahunAjaran = \App\Models\TahunAjaran::where('is_current', true)->value('tahun');
+        }
+
+        // Fallback terakhir: tahun ajaran terbaru (order by tahun desc)
+        if (empty($tahunAjaran)) {
+            $tahunAjaran = \App\Models\TahunAjaran::orderBy('tahun', 'desc')->value('tahun');
+        }
+
+        $pdf = Pdf::loadView('tu.laporan.pdf.daftar-hadir-rapot', [
+            'rombel' => $rombel,
+            'siswa' => $rombel->siswa,
+            'semester' => $semester,
+            'tahunAjaran' => $tahunAjaran,
+        ]);
         $pdf->setPaper('F4', 'portrait');
 
         return $pdf->stream('daftar-hadir-rapot.pdf');
     }
-
     public function cetakSuratAktif($siswa_id)
     {
         $siswa = DataSiswa::with(['rombel.kelas.jurusan'])->findOrFail($siswa_id);

@@ -16,16 +16,15 @@ class SiswaImportTemplate implements FromArray, WithHeadings, ShouldAutoSize, Wi
      */
     public function array(): array
     {
-        // Get sample data - fetch rombel names from database for valid examples
         $rombelList = Rombel::select('nama')->limit(3)->get();
-        
-        // Provide fallback names if no rombels exist in database
-        $rombelNames = $rombelList->isNotEmpty() 
+
+        $rombelNames = $rombelList->isNotEmpty()
             ? $rombelList->pluck('nama')->toArray()
             : ['10 IPA 1', '10 IPA 2', '10 IPS 1'];
-        
+
         $rows = [
             [
+                // ===== 24 KOLOM LAMA =====
                 'NIS' => '001',
                 'NISN' => '0001234567',
                 'Nama Lengkap' => 'Ahmad Rizki Pratama',
@@ -50,8 +49,51 @@ class SiswaImportTemplate implements FromArray, WithHeadings, ShouldAutoSize, Wi
                 'Mulai Tanggal Diterima' => '2023-07-01',
                 'Asal Sekolah' => 'SMP Negeri 1 Jakarta',
                 'Nama Rombel' => $rombelNames[0] ?? '10 IPA 1',
+
+                // ===== 40 KOLOM DAPODIK =====
+                'NIK' => '',
+                'No KK' => '',
+                'No Registrasi Akta Lahir' => '',
+                'Kebutuhan Khusus' => 'Tidak ada',
+                'Alat Transportasi' => 'Jalan kaki',
+                'Jenis Tinggal' => 'Bersama orang tua',
+                'E-Mail' => '',
+                'Tahun Lahir Ayah' => '1975',
+                'Jenjang Pendidikan Ayah' => 'SMA / sederajat',
+                'Penghasilan Ayah' => 'Rp. 1,000,000 - Rp. 1,999,999',
+                'NIK Ayah' => '',
+                'Tahun Lahir Ibu' => '1978',
+                'Jenjang Pendidikan Ibu' => 'SMP / sederajat',
+                'Penghasilan Ibu' => 'Tidak Berpenghasilan',
+                'NIK Ibu' => '',
+                'Tahun Lahir Wali' => '',
+                'Jenjang Pendidikan Wali' => '',
+                'Penghasilan Wali' => '',
+                'NIK Wali' => '',
+                'Penerima KPS' => 'Tidak',
+                'No. KPS' => '',
+                'Penerima KIP' => 'Tidak',
+                'Nomor KIP' => '',
+                'Nama di KIP' => '',
+                'Nomor KKS' => '',
+                'Bank' => '',
+                'Nomor Rekening Bank' => '',
+                'Rekening Atas Nama' => '',
+                'Layak PIP (usulan dari sekolah)' => 'Tidak',
+                'Alasan Layak PIP' => '',
+                'SKHUN' => '',
+                'No Peserta Ujian Nasional' => '',
+                'No Seri Ijazah' => '',
+                'Berat Badan' => '',
+                'Tinggi Badan' => '',
+                'Lingkar Kepala' => '',
+                'Jml. Saudara Kandung' => '1',
+                'Jarak Rumah ke Sekolah (KM)' => '',
+                'Lintang' => '',
+                'Bujur' => '',
             ],
             [
+                // ===== 24 KOLOM LAMA =====
                 'NIS' => '002',
                 'NISN' => '0001234568',
                 'Nama Lengkap' => 'Siti Nurhaliza',
@@ -76,8 +118,51 @@ class SiswaImportTemplate implements FromArray, WithHeadings, ShouldAutoSize, Wi
                 'Mulai Tanggal Diterima' => '2023-07-01',
                 'Asal Sekolah' => 'SMP Negeri 2 Bandung',
                 'Nama Rombel' => $rombelNames[1] ?? '10 IPA 2',
+
+                // ===== 40 KOLOM DAPODIK =====
+                'NIK' => '',
+                'No KK' => '',
+                'No Registrasi Akta Lahir' => '',
+                'Kebutuhan Khusus' => 'Tidak ada',
+                'Alat Transportasi' => 'Jalan kaki',
+                'Jenis Tinggal' => 'Bersama orang tua',
+                'E-Mail' => '',
+                'Tahun Lahir Ayah' => '1970',
+                'Jenjang Pendidikan Ayah' => 'S1',
+                'Penghasilan Ayah' => 'Rp. 2,000,000 - Rp. 4,999,999',
+                'NIK Ayah' => '',
+                'Tahun Lahir Ibu' => '1975',
+                'Jenjang Pendidikan Ibu' => 'SMA / sederajat',
+                'Penghasilan Ibu' => 'Tidak Berpenghasilan',
+                'NIK Ibu' => '',
+                'Tahun Lahir Wali' => '',
+                'Jenjang Pendidikan Wali' => '',
+                'Penghasilan Wali' => '',
+                'NIK Wali' => '',
+                'Penerima KPS' => 'Tidak',
+                'No. KPS' => '',
+                'Penerima KIP' => 'Tidak',
+                'Nomor KIP' => '',
+                'Nama di KIP' => '',
+                'Nomor KKS' => '',
+                'Bank' => '',
+                'Nomor Rekening Bank' => '',
+                'Rekening Atas Nama' => '',
+                'Layak PIP (usulan dari sekolah)' => 'Tidak',
+                'Alasan Layak PIP' => '',
+                'SKHUN' => '',
+                'No Peserta Ujian Nasional' => '',
+                'No Seri Ijazah' => '',
+                'Berat Badan' => '',
+                'Tinggi Badan' => '',
+                'Lingkar Kepala' => '',
+                'Jml. Saudara Kandung' => '1',
+                'Jarak Rumah ke Sekolah (KM)' => '',
+                'Lintang' => '',
+                'Bujur' => '',
             ],
             [
+                // ===== 24 KOLOM LAMA =====
                 'NIS' => '003',
                 'NISN' => '0001234569',
                 'Nama Lengkap' => 'Budi Santoso',
@@ -102,6 +187,48 @@ class SiswaImportTemplate implements FromArray, WithHeadings, ShouldAutoSize, Wi
                 'Mulai Tanggal Diterima' => '2023-07-01',
                 'Asal Sekolah' => 'SMP Negeri 3 Surabaya',
                 'Nama Rombel' => $rombelNames[2] ?? '10 IPS 1',
+
+                // ===== 40 KOLOM DAPODIK =====
+                'NIK' => '',
+                'No KK' => '',
+                'No Registrasi Akta Lahir' => '',
+                'Kebutuhan Khusus' => 'Tidak ada',
+                'Alat Transportasi' => 'Sepeda motor',
+                'Jenis Tinggal' => 'Bersama orang tua',
+                'E-Mail' => '',
+                'Tahun Lahir Ayah' => '1968',
+                'Jenjang Pendidikan Ayah' => 'SMP / sederajat',
+                'Penghasilan Ayah' => 'Rp. 1,000,000 - Rp. 1,999,999',
+                'NIK Ayah' => '',
+                'Tahun Lahir Ibu' => '1972',
+                'Jenjang Pendidikan Ibu' => 'SMA / sederajat',
+                'Penghasilan Ibu' => 'Tidak Berpenghasilan',
+                'NIK Ibu' => '',
+                'Tahun Lahir Wali' => '',
+                'Jenjang Pendidikan Wali' => '',
+                'Penghasilan Wali' => '',
+                'NIK Wali' => '',
+                'Penerima KPS' => 'Tidak',
+                'No. KPS' => '',
+                'Penerima KIP' => 'Tidak',
+                'Nomor KIP' => '',
+                'Nama di KIP' => '',
+                'Nomor KKS' => '',
+                'Bank' => '',
+                'Nomor Rekening Bank' => '',
+                'Rekening Atas Nama' => '',
+                'Layak PIP (usulan dari sekolah)' => 'Tidak',
+                'Alasan Layak PIP' => '',
+                'SKHUN' => '',
+                'No Peserta Ujian Nasional' => '',
+                'No Seri Ijazah' => '',
+                'Berat Badan' => '',
+                'Tinggi Badan' => '',
+                'Lingkar Kepala' => '',
+                'Jml. Saudara Kandung' => '1',
+                'Jarak Rumah ke Sekolah (KM)' => '',
+                'Lintang' => '',
+                'Bujur' => '',
             ],
         ];
 
@@ -111,6 +238,7 @@ class SiswaImportTemplate implements FromArray, WithHeadings, ShouldAutoSize, Wi
     public function headings(): array
     {
         return [
+            // 24 kolom existing
             'NIS',
             'NISN',
             'Nama Lengkap',
@@ -135,6 +263,48 @@ class SiswaImportTemplate implements FromArray, WithHeadings, ShouldAutoSize, Wi
             'Mulai Tanggal Diterima',
             'Asal Sekolah',
             'Nama Rombel',
+
+            // 40 kolom Dapodik
+            'NIK',
+            'No KK',
+            'No Registrasi Akta Lahir',
+            'Kebutuhan Khusus',
+            'Alat Transportasi',
+            'Jenis Tinggal',
+            'E-Mail',
+            'Tahun Lahir Ayah',
+            'Jenjang Pendidikan Ayah',
+            'Penghasilan Ayah',
+            'NIK Ayah',
+            'Tahun Lahir Ibu',
+            'Jenjang Pendidikan Ibu',
+            'Penghasilan Ibu',
+            'NIK Ibu',
+            'Tahun Lahir Wali',
+            'Jenjang Pendidikan Wali',
+            'Penghasilan Wali',
+            'NIK Wali',
+            'Penerima KPS',
+            'No. KPS',
+            'Penerima KIP',
+            'Nomor KIP',
+            'Nama di KIP',
+            'Nomor KKS',
+            'Bank',
+            'Nomor Rekening Bank',
+            'Rekening Atas Nama',
+            'Layak PIP (usulan dari sekolah)',
+            'Alasan Layak PIP',
+            'SKHUN',
+            'No Peserta Ujian Nasional',
+            'No Seri Ijazah',
+            'Berat Badan',
+            'Tinggi Badan',
+            'Lingkar Kepala',
+            'Jml. Saudara Kandung',
+            'Jarak Rumah ke Sekolah (KM)',
+            'Lintang',
+            'Bujur',
         ];
     }
 
@@ -143,52 +313,76 @@ class SiswaImportTemplate implements FromArray, WithHeadings, ShouldAutoSize, Wi
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-                
-                // Style header row (row 1)
-                $sheet->getStyle('A1:X1')->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFFFF'));
-                $sheet->getStyle('A1:X1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                    ->getStartColor()->setARGB('FF2F53FF');
-                $sheet->getStyle('A1:X1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->getRowDimension(1)->setRowHeight(20);
 
-                // Add borders
+                // ============================================
+                // STYLE HEADER (A1 s.d. AV1 = 64 kolom)
+                // ============================================
+                $sheet->getStyle('A1:AV1')->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFFFF'));
+                $sheet->getStyle('A1:AV1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                    ->getStartColor()->setARGB('FF2F53FF');
+                $sheet->getStyle('A1:AV1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('A1:AV1')->getAlignment()->setWrapText(true);
+                $sheet->getRowDimension(1)->setRowHeight(30);
+
+                // ============================================
+                // BORDER SEMUA SEL
+                // ============================================
                 $highestRow = $sheet->getHighestRow();
-                $sheet->getStyle('A1:X' . $highestRow)->getBorders()->getAllBorders()
+                $sheet->getStyle('A1:AV' . $highestRow)->getBorders()->getAllBorders()
                     ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)
                     ->getColor()->setARGB('FFD3D3D3');
 
-                // Column width
-                $sheet->getColumnDimension('A')->setWidth(12);  // NIS
-                $sheet->getColumnDimension('B')->setWidth(14);  // NISN
-                $sheet->getColumnDimension('C')->setWidth(20);  // Nama Lengkap
-                $sheet->getColumnDimension('D')->setWidth(14);  // Jenis Kelamin
-                $sheet->getColumnDimension('E')->setWidth(16);  // Tempat Lahir
-                $sheet->getColumnDimension('F')->setWidth(14);  // Tanggal Lahir
-                $sheet->getColumnDimension('G')->setWidth(16);  // Kewarganegaraan
-                $sheet->getColumnDimension('H')->setWidth(10);  // Agama
-                $sheet->getColumnDimension('I')->setWidth(8);   // RT
-                $sheet->getColumnDimension('J')->setWidth(8);   // RW
-                $sheet->getColumnDimension('K')->setWidth(16);  // Dusun
-                $sheet->getColumnDimension('L')->setWidth(18);  // Kelurahan
-                $sheet->getColumnDimension('M')->setWidth(16);  // Kecamatan
-                $sheet->getColumnDimension('N')->setWidth(10);  // Kode Pos
-                $sheet->getColumnDimension('O')->setWidth(16);  // Nama Ayah
-                $sheet->getColumnDimension('P')->setWidth(16);  // Nama Ibu
-                $sheet->getColumnDimension('Q')->setWidth(20);  // Pekerjaan Ayah
-                $sheet->getColumnDimension('R')->setWidth(25);  // Alamat Rumah
-                $sheet->getColumnDimension('S')->setWidth(16);  // Nama Wali
-                $sheet->getColumnDimension('T')->setWidth(20);  // Pekerjaan Wali
-                $sheet->getColumnDimension('U')->setWidth(25);  // Alamat Wali
-                $sheet->getColumnDimension('V')->setWidth(18);  // Mulai Tanggal Diterima
-                $sheet->getColumnDimension('W')->setWidth(20);  // Asal Sekolah
+                // ============================================
+                // WIDTH KOLOM — 24 kolom lama
+                // ============================================
+                $widths = [
+                    'A' => 12,  // NIS
+                    'B' => 14,  // NISN
+                    'C' => 20,  // Nama Lengkap
+                    'D' => 14,  // Jenis Kelamin
+                    'E' => 16,  // Tempat Lahir
+                    'F' => 14,  // Tanggal Lahir
+                    'G' => 16,  // Kewarganegaraan
+                    'H' => 10,  // Agama
+                    'I' => 8,   // RT
+                    'J' => 8,   // RW
+                    'K' => 16,  // Dusun
+                    'L' => 18,  // Kelurahan
+                    'M' => 16,  // Kecamatan
+                    'N' => 10,  // Kode Pos
+                    'O' => 16,  // Nama Ayah
+                    'P' => 16,  // Nama Ibu
+                    'Q' => 20,  // Pekerjaan Ayah
+                    'R' => 25,  // Alamat Rumah
+                    'S' => 16,  // Nama Wali
+                    'T' => 20,  // Pekerjaan Wali
+                    'U' => 25,  // Alamat Wali
+                    'V' => 18,  // Mulai Tanggal Diterima
+                    'W' => 20,  // Asal Sekolah
+                    'X' => 20,  // Nama Rombel
+                ];
+                foreach ($widths as $col => $width) {
+                    $sheet->getColumnDimension($col)->setWidth($width);
+                }
 
-                // Format date columns
+                // ============================================
+                // WIDTH KOLOM — 40 kolom Dapodik (Y s.d. AV)
+                // ============================================
+                foreach (range('Y', 'AV') as $col) {
+                    $sheet->getColumnDimension($col)->setWidth(20);
+                }
+
+                // ============================================
+                // FORMAT TANGGAL
+                // ============================================
                 $sheet->getStyle('F2:F' . $highestRow)->getNumberFormat()
                     ->setFormatCode('DD-MM-YYYY');
                 $sheet->getStyle('V2:V' . $highestRow)->getNumberFormat()
                     ->setFormatCode('DD-MM-YYYY');
 
-                // Freeze first row (header only)
+                // ============================================
+                // FREEZE HEADER
+                // ============================================
                 $sheet->freezePane('A2');
             },
         ];

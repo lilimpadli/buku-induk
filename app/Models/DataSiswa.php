@@ -62,23 +62,110 @@ class DataSiswa extends Model
         'transkip_tanggal',
         'tanggal_lulus',
         'status_kelulusan',
+
+        // ==========================================
+        // DAPODIK — IDENTITAS (7)
+        // ==========================================
+        'nik',
+        'no_kk',
+        'no_registrasi_akta',
+        'kebutuhan_khusus',
+        'alat_transportasi',
+        'jenis_tinggal',
+        'email',
+
+        // ==========================================
+        // DAPODIK — AYAH (4)
+        // ==========================================
+        'tahun_lahir_ayah',
+        'jenjang_pendidikan_ayah',
+        'penghasilan_ayah',
+        'nik_ayah',
+
+        // ==========================================
+        // DAPODIK — IBU (4)
+        // ==========================================
+        'tahun_lahir_ibu',
+        'jenjang_pendidikan_ibu',
+        'penghasilan_ibu',
+        'nik_ibu',
+
+        // ==========================================
+        // DAPODIK — WALI (4)
+        // ==========================================
+        'tahun_lahir_wali',
+        'jenjang_pendidikan_wali',
+        'penghasilan_wali',
+        'nik_wali',
+
+        // ==========================================
+        // DAPODIK — KIP / KPS / PIP (6)
+        // ==========================================
+        'penerima_kps',
+        'no_kps',
+        'penerima_kip',
+        'nomor_kip',
+        'nama_kip',
+        'nomor_kks',
+
+        // ==========================================
+        // DAPODIK — BANK & PIP (5)
+        // ==========================================
+        'bank',
+        'nomor_rekening',
+        'rekening_atas_nama',
+        'layak_pip',
+        'alasan_layak_pip',
+
+        // ==========================================
+        // DAPODIK — UJIAN (3)
+        // ==========================================
+        'skhun',
+        'no_peserta_un',
+        'no_seri_ijazah',
+
+        // ==========================================
+        // DAPODIK — FISIK & LOKASI (7)
+        // ==========================================
+        'berat_badan',
+        'tinggi_badan',
+        'lingkar_kepala',
+        'jumlah_saudara',
+        'jarak_rumah_sekolah',
+        'lintang',
+        'bujur',
     ];
 
     // ============================================
-    // 🔥 CASTS — Fix tanggal biar otomatis jadi Carbon
+    // CASTS
     // ============================================
     protected $casts = [
+        // Existing
         'tanggal_diterima' => 'date',
         'tanggal_lahir' => 'date',
         'tanggal_lulus' => 'date',
         'ijazah_tanggal' => 'date',
         'transkip_tanggal' => 'date',
+
+        // Dapodik — tahun & integer
+        'tahun_lahir_ayah' => 'integer',
+        'tahun_lahir_ibu' => 'integer',
+        'tahun_lahir_wali' => 'integer',
+        'jumlah_saudara' => 'integer',
+
+        // Dapodik — decimal
+        'berat_badan' => 'decimal:2',
+        'tinggi_badan' => 'decimal:2',
+        'lingkar_kepala' => 'decimal:2',
+        'jarak_rumah_sekolah' => 'decimal:3',
+        'lintang' => 'decimal:7',
+        'bujur' => 'decimal:7',
     ];
 
     // ============================================
     // RELASI
     // ============================================
-    
+
     public function nilai()
     {
         return $this->hasMany(NilaiRaport::class, 'siswa_id');
@@ -155,7 +242,7 @@ class DataSiswa extends Model
     }
 
     /**
-     * Relasi ke Ayah
+     * Relasi ke Ayah (legacy — tidak dipakai karena ayah_id tidak ada di DB)
      */
     public function ayah()
     {
@@ -163,7 +250,7 @@ class DataSiswa extends Model
     }
 
     /**
-     * Relasi ke Ibu
+     * Relasi ke Ibu (legacy — tidak dipakai karena ibu_id tidak ada di DB)
      */
     public function ibu()
     {
@@ -171,7 +258,7 @@ class DataSiswa extends Model
     }
 
     /**
-     * Relasi ke Wali
+     * Relasi ke Wali (legacy — tidak dipakai karena wali_id tidak ada di DB)
      */
     public function wali()
     {
@@ -234,7 +321,7 @@ class DataSiswa extends Model
         if (!empty($this->kelurahan)) $parts[] = $this->kelurahan;
         if (!empty($this->kecamatan)) $parts[] = $this->kecamatan;
         if (!empty($this->kode_pos)) $parts[] = $this->kode_pos;
-        
+
         return implode(', ', $parts) ?: '-';
     }
 
@@ -247,7 +334,7 @@ class DataSiswa extends Model
         if (is_null($value) || $value === '') return $query;
         $map = ['L' => 'Laki-laki', 'P' => 'Perempuan'];
         $nama = $map[$value] ?? $value;
-        return $query->whereHas('jenisKelamin', function($qq) use ($nama) {
+        return $query->whereHas('jenisKelamin', function ($qq) use ($nama) {
             $qq->where('nama', $nama);
         });
     }

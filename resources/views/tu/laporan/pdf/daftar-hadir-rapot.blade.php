@@ -148,7 +148,15 @@
     <table class="kop-table">
         <tr>
            <td class="logo-cell" rowspan="2">
-                <img src="{{ asset('images/smkn1-kawali-logo.png') }}" alt="Logo SMKN 1 Kawali" onerror="this.style.display='none'">
+                @php
+                    $logoPath = public_path('images/smkn1-kawali-logo.png');
+                    $logoSrc = file_exists($logoPath)
+                        ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+                        : '';
+                @endphp
+                @if($logoSrc)
+                    <img src="{{ $logoSrc }}" alt="Logo SMKN 1 Kawali">
+                @endif
             </td>
             <td class="school-cell">
                 <div class="school-name">SMK NEGERI 1 KAWALI</div>
@@ -175,11 +183,7 @@
                 {{ $rombel->nama ?? '-' }}
             </div>
         </div>
-        <div class="right">
-            <div>
-                <span class="label">Semester :</span> 
-                {{ $semester->nama ?? $semester->semester ?? 'Ganjil' }}
-            </div>
+         <div class="right">
             <div>
                 <span class="label">Tahun Ajaran :</span> 
                 @if(is_object($tahunAjaran))
@@ -192,16 +196,15 @@
     </div>
 
     <!-- ============================================
-         TABEL
+         TABEL — TTD SISWA SUDAH DIHAPUS
          ============================================ -->
     <table>
         <thead>
             <tr>
                 <th style="width: 5%;">No</th>
-                <th style="width: 15%;">NIS</th>
-                <th style="width: 30%;">Nama Lengkap</th>
-                <th style="width: 20%;">Tanda Tangan Siswa</th>
-                <th style="width: 20%;">Tanda Tangan Orang Tua</th>
+                <th style="width: 18%;">NIS</th>
+                <th style="width: 37%;">Nama Lengkap</th>
+                <th style="width: 30%;">Tanda Tangan Orang Tua</th>
                 <th style="width: 10%;">Keterangan</th>
             </tr>
         </thead>
@@ -212,12 +215,11 @@
                     <td class="text-center">{{ $s->nis ?? '-' }}</td>
                     <td class="text-left">{{ $s->nama_lengkap ?? '-' }}</td>
                     <td class="text-center signature-cell"></td>
-                    <td class="text-center signature-cell"></td>
                     <td class="text-center"></td>
                 </tr>
             @empty
                 <tr>
-                    <td class="text-center" colspan="6">Tidak ada data siswa.</td>
+                    <td class="text-center" colspan="5">Tidak ada data siswa.</td>
                 </tr>
             @endforelse
         </tbody>

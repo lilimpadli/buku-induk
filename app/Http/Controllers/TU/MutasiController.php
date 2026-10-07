@@ -298,6 +298,193 @@ class MutasiController extends Controller
             ->with('success', 'Data mutasi siswa berhasil dihapus!');
     }
 
+        /**
+     * ============================================================
+     * MUTASI MASUK — Form Input Siswa Pindahan
+     * ============================================================
+     */
+    public function createMasuk()
+    {
+        $rombels = Rombel::with(['kelas.jurusan'])
+            ->orderBy('nama')
+            ->get();
+
+        $jenisKelamins = \App\Models\JenisKelamin::all();
+        $agamas = \App\Models\Agama::all();
+
+        return view('tu.mutasi.masuk.create', compact('rombels', 'jenisKelamins', 'agamas'));
+    }
+
+    /**
+     * ============================================================
+     * MUTASI MASUK — Simpan Siswa Pindahan
+     * ============================================================
+     */
+    public function storeMasuk(Request $request)
+    {
+        $validated = $request->validate([
+            // Data siswa
+            'nama_lengkap'     => 'required|string|max:255',
+            'nis'              => 'required|string|max:30|unique:data_siswa,nis',
+            'nisn'             => 'nullable|string|max:30|unique:data_siswa,nisn',
+            'jenis_kelamin_id' => 'required|exists:jenis_kelamins,id',
+            'agama_id'         => 'nullable|exists:agamas,id',
+            'agama_lainnya'    => 'nullable|string|max:50',
+            'tempat_lahir'     => 'nullable|string|max:100',
+            'tanggal_lahir'    => 'nullable|date',
+
+            // Alamat
+            'rt'         => 'nullable|string|max:5',
+            'rw'         => 'nullable|string|max:5',
+            'dusun'      => 'nullable|string|max:100',
+            'kelurahan'  => 'nullable|string|max:100',
+            'kecamatan'  => 'nullable|string|max:100',
+            'kode_pos'   => 'nullable|string|max:10',
+
+            // Data orang tua
+            'nama_ayah' => 'nullable|string|max:255',
+            'nama_ibu'  => 'nullable|string|max:255',
+            'nama_wali' => 'nullable|string|max:255',
+            'no_hp'     => 'nullable|string|max:30',
+
+            // Mutasi
+            'rombel_id'             => 'required|exists:rombels,id',
+            'sekolah_asal'          => 'required|string|max:255',
+            'nis_dari_sekolah_asal' => 'nullable|string|max:30',
+            'tanggal_mutasi'        => 'required|date',
+            'alasan_pindah'         => 'nullable|string|max:255',
+            'keterangan'            => 'nullable|string',
+
+            // Surat
+            'no_surat_masuk'        => 'nullable|string|max:100',
+            'tanggal_surat_masuk'   => 'nullable|date',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $userId = $this->getValidUserId();
+
+            // ============================================================
+            // 1. Buat User untuk login siswa
+            // ============================================================
+            $user = User::create([
+                'name'         => strtoupper($validated['nama_lengkap']),
+                'email'        => $validated['nis'] . '@siswa.local',
+                'password'     => \Illuminate\Support\Facades\Hash::make($validated['nis'] . '123'),
+                'role'         => 'siswa',
+                'nomor_induk'  => $validated['nis'],
+            ]);
+
+            // ============================================================
+            // 2. Buat DataSiswa
+            // ============================================================
+            $siswa = DataSiswa::create([
+                'user_id'          => $user->id,
+                'nama_lengkap'     => strtoupper($validated['nama_lengkap']),
+                'nis'              => $validated['nis'],
+                'nisn'             => $validated['nisn'] ?? null,
+                'jenis_kelamin_id' => $validated['jenis_kelamin_id'],
+                'agama_id'         => $validated['agama_id'] ?? null,
+                'agama_lainnya'    => $validated['agama_lainnya'] ?? null,
+                'tempat_lahir'     => strtoupper($validated['tempat_lahir'] ?? ''),
+                'tanggal_lahir'    => $validated['tanggal_lahir'] ?? null,
+
+                'rt'         => $validated['rt'] ?? null,
+                'rw'         => $validated['rw'] ?? null,
+                'dusun'      => $validated['dusun'] ?? null,
+                'kelurahan'  => $validated['kelurahan'] ?? null,
+                'kecamatan'  => $validated['kecamatan'] ?? null,
+                'kode_pos'   => $validated['kode_pos'] ?? null,
+
+                'nama_ayah' => $validated['nama_ayah'] ?? null,
+                'nama_ibu'  => $validated['nama_ibu'] ?? null,
+                'nama_wali' => $validated['nama_wali'] ?? null,
+                'no_hp'     => $validated['no_hp'] ?? null,
+
+                'rombel_id'         => $validated['rombel_id'],
+                'sekolah_asal'      => $validated['sekolah_asal'],
+                'tanggal_diterima'  => $validated['tanggal_mutasi'],
+                'kewarganegaraan'   => 'Indonesia',
+            ]);
+
+            // ============================================================
+            // 3. Buat MutasiSiswa dengan status = 'masuk'
+            // ============================================================
+            $mutasi = MutasiSiswa::create([
+                'siswa_id'              => $siswa->id,
+                'status'                => 'masuk',
+                'tanggal_mutasi'        => $validated['tanggal_mutasi'],
+                'rombel_tujuan_id'      => $validated['rombel_id'],
+                'sekolah_asal'          => $validated['sekolah_asal'],
+                'nis_dari_sekolah_asal' => $validated['nis_dari_sekolah_asal'] ?? null,
+                'alasan_pindah'         => $validated['alasan_pindah'] ?? null,
+                'no_surat_masuk'        => $validated['no_surat_masuk'] ?? null,
+                'tanggal_surat_masuk'   => $validated['tanggal_surat_masuk'] ?? null,
+                'keterangan'            => $validated['keterangan'] ?? null,
+                'diproses_oleh'         => $userId,
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('tu.mutasi.index')
+                ->with('success', "✅ Siswa pindahan <strong>{$siswa->nama_lengkap}</strong> berhasil ditambahkan ke <strong>" . $siswa->rombel->nama . "</strong>.");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Mutasi masuk error: ' . $e->getMessage());
+            return redirect()->back()->withInput()
+                ->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * ============================================================
+     * REKAP MUTASI — Masuk & Keluar
+     * ============================================================
+     */
+    public function rekap(Request $request)
+    {
+        $query = MutasiSiswa::with(['siswa', 'rombelAsal.kelas.jurusan', 'rombelTujuan.kelas.jurusan', 'diprosesOleh'])
+            ->latest('tanggal_mutasi');
+
+        // Filter jenis: masuk / keluar
+        $jenis = $request->get('jenis', 'semua');
+        if ($jenis === 'masuk') {
+            $query->where('status', 'masuk');
+        } elseif ($jenis === 'keluar') {
+            $query->whereIn('status', ['pindah', 'do', 'meninggal', 'lulus']);
+        }
+
+        // Filter tanggal
+        if ($request->filled('tanggal_dari')) {
+            $query->where('tanggal_mutasi', '>=', $request->tanggal_dari);
+        }
+        if ($request->filled('tanggal_sampai')) {
+            $query->where('tanggal_mutasi', '<=', $request->tanggal_sampai);
+        }
+
+        // Filter search
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->whereHas('siswa', function ($q) use ($s) {
+                $q->where('nama_lengkap', 'like', "%{$s}%")
+                  ->orWhere('nis', 'like', "%{$s}%")
+                  ->orWhere('nisn', 'like', "%{$s}%");
+            });
+        }
+
+        $mutasis = $query->paginate(20)->withQueryString();
+
+        $stats = [
+            'total_masuk'   => MutasiSiswa::where('status', 'masuk')->count(),
+            'total_pindah'  => MutasiSiswa::where('status', 'pindah')->count(),
+            'total_do'      => MutasiSiswa::where('status', 'do')->count(),
+            'total_meninggal' => MutasiSiswa::where('status', 'meninggal')->count(),
+            'total_lulus'   => MutasiSiswa::where('status', 'lulus')->count(),
+        ];
+
+        return view('tu.mutasi.rekap', compact('mutasis', 'stats', 'jenis'));
+    }
     /**
      * Get valid user ID for diproses_oleh
      */
@@ -1072,6 +1259,35 @@ $mutasi = MutasiSiswa::with([
             : 'tu.mutasi.surat-do';
 
         return view($view, compact('mutasi', 'rombel'));
+    }
+
+        /**
+     * Update nomor surat (pindah / DO) — manual dari TU
+     */
+    public function updateNomorSurat(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'no_sk_keluar' => 'required|string|max:100',
+        ]);
+
+        try {
+            $mutasi = MutasiSiswa::findOrFail($id);
+            $mutasi->update([
+                'no_sk_keluar' => $validated['no_sk_keluar'],
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Nomor surat berhasil diperbarui.',
+                'no_sk_keluar' => $mutasi->no_sk_keluar,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Update nomor surat error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal: ' . $e->getMessage(),
+            ], 422);
+        }
     }
 
     /**

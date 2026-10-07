@@ -22,7 +22,7 @@
         justify-content: space-between;
     }
 
-    .controls { display: flex; gap: 10px; margin-bottom: 15px; }
+    .controls { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
     .controls .btn {
         border-radius: 6px; font-weight: 600; padding: 8px 16px; font-size: 10pt;
         display: inline-flex; align-items: center; gap: 6px;
@@ -31,6 +31,8 @@
     }
     .btn-secondary { background: white; color: #111827; }
     .btn-primary { background: #2563eb; color: white; border-color: #2563eb; }
+    .btn-warning { background: #F59E0B; color: white; border-color: #F59E0B; }
+    .btn-warning:hover { background: #D97706; color: white; }
 
     /* KOP — pakai TABLE */
     .kop-surat {
@@ -83,7 +85,7 @@
     }
     .signature-box {
         text-align: center;
-        width: 280px;
+        width: 320px;
     }
     .signature .place-date {
         text-align: left;
@@ -95,20 +97,95 @@
         font-size: 12pt;
         margin-bottom: 0;
     }
-    .signature .nama-ttd {
-        font-weight: bold;
-        text-decoration: underline;
-        font-size: 12pt;
+
+    /* TTE IMAGE */
+    .tte-image {
+        display: block;
+        margin: 0 auto;
+        max-width: 260px;
+        width: 100%;
+        height: auto;
+        object-fit: contain;
     }
-    .signature .nip {
-        font-size: 11pt;
-        margin-top: 2px;
+
+    /* MODAL */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.5);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        font-family: system-ui, sans-serif;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-card {
+        background: white;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 480px;
+        padding: 28px;
+        box-shadow: 0 20px 60px rgba(0,0,0,.3);
+        animation: slideDown .3s ease;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-title {
+        font-size: 18px;
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .modal-desc {
+        font-size: 13px;
+        color: #6B7280;
+        margin-bottom: 20px;
+    }
+    .modal-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #374151;
+        margin-bottom: 8px;
+        display: block;
+    }
+    .modal-input {
+        width: 100%;
+        border: 1.5px solid #dbe3ff;
+        border-radius: 12px;
+        padding: 12px 14px;
+        font-size: 14px;
+        font-family: system-ui, sans-serif;
+        transition: all .2s;
+    }
+    .modal-input:focus {
+        outline: none;
+        border-color: #2563EB;
+        box-shadow: 0 0 0 4px rgba(37,99,235,.1);
+    }
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+    .modal-actions .btn {
+        font-family: system-ui, sans-serif;
     }
 
     @media print {
         *, *::before, *::after { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         nav, header, footer, .navbar, .sidebar, .main-header, .main-sidebar, .controls,
-        .mobile-header, .user-info, .dropdown-menu, .logout-section, .sidebar-header, .sidebar-content { display: none !important; }
+        .mobile-header, .user-info, .dropdown-menu, .logout-section, .sidebar-header, .sidebar-content,
+        .modal-overlay { display: none !important; }
         body { background: white !important; }
         .print-wrapper { width: 100% !important; margin: 0 !important; padding: 2.5cm !important; box-shadow: none !important; min-height: auto !important; }
         main { margin: 0 !important; padding: 0 !important; max-width: 100% !important; }
@@ -122,6 +199,9 @@
             <a href="{{ route('tu.mutasi.laporan-surat') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
+            <button type="button" class="btn btn-warning" onclick="openModalNomor()">
+                <i class="fas fa-edit"></i> Edit Nomor Surat
+            </button>
             <button type="button" class="btn btn-primary" onclick="window.print()">
                 <i class="fas fa-print"></i> Print
             </button>
@@ -149,7 +229,9 @@
 
         <!-- JUDUL -->
         <div class="title-surat">SURAT KETERANGAN KELUAR SISWA</div>
-        <div class="nomor-surat">No. {{ $mutasi->no_sk_keluar ?? '-' }}</div>
+        <div class="nomor-surat">
+            No. <span id="nomorSuratText">{{ $mutasi->no_sk_keluar ?? '-' }}</span>
+        </div>
 
         <!-- ISI -->
         <div class="content">
@@ -164,7 +246,8 @@
                 <tr>
                     <td class="label">Jenis Kelamin</td>
                     <td class="colon">:</td>
-<td>{{ $mutasi->siswa->jenisKelamin->nama ?? $mutasi->siswa->jenis_kelamin ?? '-' }}</td>                </tr>
+                    <td>{{ $mutasi->siswa->jenisKelamin->nama ?? $mutasi->siswa->jenis_kelamin ?? '-' }}</td>
+                </tr>
                 <tr>
                     <td class="label">Agama</td>
                     <td class="colon">:</td>
@@ -214,18 +297,117 @@
         </div>
     </div>
 
-        <!-- TTD -->
+    <!-- TTD -->
     <div>
         <div class="signature">
             <div class="signature-box">
                 <div class="place-date">Kawali, {{ $mutasi->tanggal_mutasi ? \Carbon\Carbon::parse($mutasi->tanggal_mutasi)->translatedFormat('d F Y') : '-' }}</div>
                 <div class="jabatan">KEPALA SMK NEGERI 1 KAWALI</div>
-                <div style="height: 80px;"></div>
-                <div class="nama-ttd">DEDE FAJRIADI, S.Pd., M.Pd.</div>
-                <div class="nip">Penata Tk.1/ III.d</div>
+
+                {{-- TTE IMAGE — path: public/images/tte-kepsek.png --}}
+                @php
+                    $ttePath = public_path('images/tte-kepsek.png');
+                    $tteSrc = file_exists($ttePath)
+                        ? 'data:image/png;base64,' . base64_encode(file_get_contents($ttePath))
+                        : null;
+                @endphp
+                @if($tteSrc)
+                    <img src="{{ $tteSrc }}" alt="TTE Kepala Sekolah" class="tte-image">
+                @else
+                    <div style="height: 90px;"></div>
+                @endif
             </div>
         </div>
     </div>
 </div>
+
+<!-- MODAL EDIT NOMOR SURAT -->
+<div class="modal-overlay" id="modalNomor">
+    <div class="modal-card">
+        <div class="modal-title">
+            <i class="fas fa-edit" style="color:#2563EB;"></i>
+            Edit Nomor Surat
+        </div>
+        <div class="modal-desc">Masukkan nomor surat sesuai format yang berlaku.</div>
+
+        <form id="formNomorSurat">
+            <label class="modal-label">Nomor Surat</label>
+            <input type="text" name="no_sk_keluar" id="inputNoSurat"
+                   class="modal-input"
+                   value="{{ $mutasi->no_sk_keluar ?? '' }}"
+                   placeholder="cth: 421.7/001/SMK.1.KW/2026"
+                   required>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModalNomor()">Batal</button>
+                <button type="submit" class="btn btn-primary" id="btnSubmitNomor">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const MUTASI_ID = {{ $mutasi->id }};
+    const CSRF = '{{ csrf_token() }}';
+    const UPDATE_URL = '{{ route("tu.mutasi.surat.update-nomor", ["id" => $mutasi->id]) }}';
+
+    function openModalNomor() {
+        document.getElementById('modalNomor').classList.add('active');
+        document.getElementById('inputNoSurat').focus();
+    }
+
+    function closeModalNomor() {
+        document.getElementById('modalNomor').classList.remove('active');
+    }
+
+    document.getElementById('formNomorSurat').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const btn = document.getElementById('btnSubmitNomor');
+        const value = document.getElementById('inputNoSurat').value.trim();
+
+        if (!value) {
+            alert('Nomor surat tidak boleh kosong.');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+        fetch(UPDATE_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': CSRF,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ no_sk_keluar: value })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> Simpan';
+
+            if (data.success) {
+                document.getElementById('nomorSuratText').textContent = data.no_sk_keluar;
+                closeModalNomor();
+            } else {
+                alert('Gagal: ' + data.message);
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> Simpan';
+            alert('Error: ' + err.message);
+        });
+    });
+
+    // Close modal kalau klik overlay
+    document.getElementById('modalNomor').addEventListener('click', function(e) {
+        if (e.target === this) closeModalNomor();
+    });
+</script>
 
 @endsection

@@ -21,8 +21,13 @@ class MutasiSiswa extends Model
         'rombel_tujuan_id',
         'alasan_pindah',
         'tujuan_pindah',
+        'sekolah_asal',
+        'nis_dari_sekolah_asal',
+        'tanggal_masuk',
+        'no_surat_masuk',
         'no_sk_keluar',
         'tanggal_sk_keluar',
+        'tahun_ajaran',
         'keterangan',
         'diproses_oleh'
     ];
@@ -30,6 +35,7 @@ class MutasiSiswa extends Model
     protected $dates = [
         'tanggal_mutasi',
         'tanggal_sk_keluar',
+        'tanggal_masuk',
         'created_at',
         'updated_at',
     ];
@@ -37,22 +43,20 @@ class MutasiSiswa extends Model
     protected $casts = [
         'tanggal_mutasi' => 'date',
         'tanggal_sk_keluar' => 'date',
+        'tanggal_masuk' => 'date',
     ];
 
-    // 🔥 FIX: Boot method
     protected static function boot()
     {
         parent::boot();
 
         static::created(function ($mutasi) {
             Log::info("Mutasi created: ID {$mutasi->id}, Status: {$mutasi->status}");
-            // Biarkan observer yang menangani
         });
 
         static::updated(function ($mutasi) {
             if ($mutasi->isDirty('status')) {
                 Log::info("Mutasi updated: ID {$mutasi->id}, Status baru: {$mutasi->status}");
-                // Biarkan observer yang menangani
             }
         });
     }
@@ -60,8 +64,8 @@ class MutasiSiswa extends Model
     // Relasi
     public function siswa()
     {
- return $this->belongsTo(DataSiswa::class, 'siswa_id');
-     }
+        return $this->belongsTo(DataSiswa::class, 'siswa_id');
+    }
 
     public function rombelAsal()
     {
@@ -84,10 +88,21 @@ class MutasiSiswa extends Model
         return $query->where('status', $status);
     }
 
+    public function scopeMasuk($query)
+    {
+        return $query->where('status', 'masuk');
+    }
+
+    public function scopeKeluar($query)
+    {
+        return $query->whereIn('status', ['pindah', 'do', 'meninggal', 'lulus']);
+    }
+
     // Accessors
     public function getStatusLabelAttribute()
     {
         $labels = [
+            'masuk' => 'Pindah Masuk',
             'pindah' => 'Pindah Sekolah',
             'do' => 'Keluar Sekolah',
             'meninggal' => 'Meninggal',
@@ -100,12 +115,21 @@ class MutasiSiswa extends Model
     public function getStatusColorAttribute()
     {
         $colors = [
+            'masuk' => 'success',
             'pindah' => 'info',
             'do' => 'warning',
             'meninggal' => 'danger',
-            'naik_kelas' => 'success',
-            'lulus' => 'primary',
+            'naik_kelas' => 'primary',
+            'lulus' => 'secondary',
         ];
         return $colors[$this->status] ?? 'secondary';
+    }
+
+    /**
+     * Apakah ini mutasi masuk?
+     */
+    public function getIsMasukAttribute()
+    {
+        return $this->status === 'masuk';
     }
 }

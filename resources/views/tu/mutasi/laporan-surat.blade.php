@@ -67,8 +67,19 @@
 <div class="container-fluid px-3 px-md-4 py-4">
 
     <div class="hero-banner">
-        <h1 class="hero-title"><i class="fas fa-envelope-open-text me-2"></i> Laporan Surat Mutasi</h1>
-        <p class="hero-subtitle">Riwayat surat mutasi pindah & DO siswa</p>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+            <div>
+                <h1 class="hero-title"><i class="fas fa-envelope-open-text me-2"></i> Laporan Surat Mutasi</h1>
+                <p class="hero-subtitle">Riwayat surat mutasi pindah & DO siswa</p>
+            </div>
+            <a href="{{ route('tu.mutasi.index') }}" 
+               style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); border-radius: 14px; color: white; text-decoration: none; font-weight: 700; font-size: 13px; transition: all .25s; backdrop-filter: blur(12px);"
+               onmouseover="this.style.background='white'; this.style.color='#4F46E5';"
+               onmouseout="this.style.background='rgba(255,255,255,.15)'; this.style.color='white';">
+                <i class="fas fa-arrow-left"></i>
+                Kembali
+            </a>
+        </div>
         <div class="hero-stats">
             <div class="hero-stat">
                 <div class="hero-stat-value">{{ $stats['total_pindah'] }}</div>
