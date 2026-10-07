@@ -8,22 +8,49 @@ class Mutasi extends Model
 {
     protected $table = 'mutasis';
 
-    // PERBAIKAN PENTING: Tambahkan 'nama_entitas' ke dalam array fillable
     protected $fillable = [
-        'guru_id', 
-        'nama_entitas', 
-        'jenis', 
-        'tanggal', 
-        'keterangan'
+        'guru_id',
+        'tipe_entitas',
+        'jenis',
+        'tanggal',
+        'keterangan',
+        'nama_entitas',
+        'nip',
+        'nik',
+        'nuptk',
+        'jenis_kelamin',
+        'tempat_lahir',
+        'tanggal_lahir',
+        'status_kepegawaian',
+        'pendidikan',
+        'serdik',
+        'tugas_tambahan',
+        'jabatan',
+        'email',
+        'email_pribadi',
+        'email_resmi',
+        'telepon',
+        'alamat',
+        'alamat_jalan',
+        'rt',
+        'rw',
+        'dusun',
+        'desa',
+        'kecamatan',
+        'kode_pos',
+        'user_id_backup',
     ];
 
-    // Relasi ke Guru (karena di database kolomnya bernama guru_id)
     public function guru()
     {
-        return $this->belongsTo(Guru::class, 'guru_id');
+        return $this->belongsTo(Guru::class, 'guru_id')->withTrashed();
     }
 
-    // Relasi ke Dokumen Mutasi (jika ada)
+    public function pegawai()
+    {
+        return $this->belongsTo(Pegawai::class, 'guru_id')->withTrashed();
+    }
+
     public function dokumenMutasi()
     {
         return $this->hasOne(DokumenMutasi::class, 'mutasi_id');

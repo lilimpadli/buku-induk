@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Guru extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'gurus';
 
@@ -17,7 +18,7 @@ class Guru extends Model
         'nik',
         'nuptk',
         'serdik',
-        'tugas_tambahan',       // ← TAMBAH INI
+        'tugas_tambahan',
         'email_resmi',
         'email_pribadi',
         'status_keaktifan',
@@ -64,15 +65,18 @@ class Guru extends Model
         return $this->belongsTo(Rombel::class, 'rombel_id');
     }
 
-    // Relasi ke Rombel yang Diampu (HasMany)
     public function rombels()
     {
         return $this->hasMany(Rombel::class, 'guru_id');
     }
 
-    // Relasi ke Tugas Tambahan
     public function tugasTambahans()
     {
         return $this->hasMany(TugasTambahan::class, 'guru_id');
+    }
+
+    public function mutasis()
+    {
+        return $this->hasMany(Mutasi::class, 'guru_id');
     }
 }

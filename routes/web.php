@@ -718,6 +718,7 @@ Route::prefix('mutasi')->name('mutasi.')->group(function () {
             Route::get('/mutasi/create', [TUKepegawaianController::class, 'mutasiCreate'])->name('mutasi.create');
             Route::post('/mutasi', [TUKepegawaianController::class, 'mutasiStore'])->name('mutasi.store');
             Route::get('/mutasi/laporan', [TUKepegawaianController::class, 'mutasiLaporan'])->name('mutasi.laporan');
+            Route::get('/mutasi/{id}', [TUKepegawaianController::class, 'mutasiShow'])->name('mutasi.show');
             Route::get('/mutasi/{id}/edit', [TUKepegawaianController::class, 'mutasiEdit'])->name('mutasi.edit');
             Route::put('/mutasi/{id}', [TUKepegawaianController::class, 'mutasiUpdate'])->name('mutasi.update');
             Route::delete('/mutasi/{id}', [TUKepegawaianController::class, 'mutasiDestroy'])->name('mutasi.destroy');

@@ -54,7 +54,7 @@ class GuruController extends Controller
         }
 
         if ($request->filled('pendidikan')) {
-            $query->where('pendidikan', $request->pendidikan);
+            $query->where('pendidikan', 'like', '%' . $request->pendidikan . '%');
         }
 
         $allFilteredGurus = (clone $query)->get();

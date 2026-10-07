@@ -2,10 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Pegawai extends Model
 {
+    use HasFactory, SoftDeletes;
+
+    protected $table = 'pegawais';
+
     protected $fillable = [
         // === VERSI BARU ===
         'nama',
@@ -32,18 +38,20 @@ class Pegawai extends Model
         'kode_pos',
         'user_id',
 
-        // === VERSI LAMA (NOT NULL di DB) ===
+        // === VERSI LAMA (NOT NULL di DB) — WAJIB DIPERTAHANKAN ===
         'nama_lengkap',
         'nip_nuptk',
         'jk',
         'tgl_lahir',
     ];
 
-    /**
-     * Relasi ke User
-     */
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function mutasis()
+    {
+        return $this->hasMany(Mutasi::class, 'guru_id');
     }
 }
